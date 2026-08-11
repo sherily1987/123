@@ -49,12 +49,14 @@ def parse_day(value):
 
 
 # [中文功能] 加载含赔率的比赛（可选按日期截止）
-def load_matches(jsonl_path, train_until=None):
+def load_matches(jsonl_path, train_until=None, league_id=None, require_odds=True):
     rows = []
     with open(jsonl_path, encoding="utf-8") as f:
         for line in f:
             r = json.loads(line)
-            if not r.get("odds") or not r.get("actual"):
+            if not r.get("actual") or (require_odds and not r.get("odds")):
+                continue
+            if league_id is not None and str(r.get("league_id")) != str(league_id):
                 continue
             rf = r.get("raw_fields") or {}
             day = parse_day(r.get("kickoff")) or parse_day(rf.get("Date"))
@@ -65,8 +67,8 @@ def load_matches(jsonl_path, train_until=None):
             rows.append({
                 "home": r.get("home"), "away": r.get("away"),
                 "gh": int(r["actual"][0]), "ga": int(r["actual"][1]),
-                "day": day, "league": str(r.get("competition") or r.get("stage") or r.get("div") or "?"),
-                "odds": [float(x) for x in r["odds"][:3]],
+                "day": day, "league": str(r.get("league_id") or r.get("competition") or r.get("stage") or r.get("div") or "?"),
+                "odds": [float(x) for x in r.get("odds", [])[:3]],
             })
     return rows
 
@@ -219,11 +221,14 @@ def validate(matches, model, from_day, half_life=500.0):
         lh = math.exp(model["home_adv"] + model["alpha"][i] + model["beta"][j])
         la = math.exp(model["alpha"][j] + model["beta"][i])
         mp = dc_one(dc_matrix(lh, la, RHO))
-        rows.append({
+        row = {
             "league": m["league"], "day": m["day"],
             "actual_idx": 0 if m["gh"] > m["ga"] else (1 if m["gh"] == m["ga"] else 2),
-            "model": mp, "market": market_probs(m["odds"]),
-        })
+            "model": mp,
+        }
+        if len(m["odds"]) == 3 and all(x > 1 for x in m["odds"]):
+            row["market"] = market_probs(m["odds"])
+        rows.append(row)
     if not rows:
         return {"n": 0, "skip": skip}
 
@@ -249,16 +254,31 @@ def validate(matches, model, from_day, half_life=500.0):
     by_league = {}
     for r in rows:
         by_league.setdefault(r["league"], []).append(r)
+    market_rows = [r for r in rows if "market" in r]
+    market_report = (
+        metrics("market", market_rows)
+        if market_rows
+        else {"status": "UNAVAILABLE", "reason": "no_pre_match_odds"}
+    )
+
+    def league_report(rs):
+        market_rs = [r for r in rs if "market" in r]
+        return {
+            "n": len(rs),
+            "model": metrics("model", rs),
+            "market": metrics("market", market_rs) if market_rs else {"status": "UNAVAILABLE", "reason": "no_pre_match_odds"},
+        }
+
     return {
         "n": len(rows), "skip": skip,
         "model": metrics("model"),
-        "market": metrics("market"),
+        "market": market_report,
         "frequency_baseline": {
             "n": len(rows), "brier_mean": round(sum(freq_bs) / len(rows), 6),
             "log_loss": round(sum(freq_ll) / len(rows), 6),
             "probs": [round(x, 4) for x in freq_p],
         },
-        "by_league": {k: {"n": len(v), "model": metrics("model", v), "market": metrics("market", v)} for k, v in by_league.items()},
+        "by_league": {k: league_report(v) for k, v in by_league.items()},
     }
 
 
@@ -269,6 +289,8 @@ def main():
     ap.add_argument("--output")
     ap.add_argument("--half-life", type=float, default=500.0)
     ap.add_argument("--train-until", help="拟合截止日 YYYY-MM-DD（默认全部）")
+    ap.add_argument("--league-id", help="仅加载指定联赛 ID")
+    ap.add_argument("--results-only", action="store_true", help="允许加载无赛前赔率的已完场赛果")
     ap.add_argument("--predict-home")
     ap.add_argument("--predict-away")
     ap.add_argument("--ratings")
@@ -282,7 +304,12 @@ def main():
         if not a.input:
             raise SystemExit("--fit 需要 --input")
         t0 = time.time()
-        matches = load_matches(a.input, train_until=cutoff)
+        matches = load_matches(
+            a.input,
+            train_until=cutoff,
+            league_id=a.league_id,
+            require_odds=not a.results_only,
+        )
         print(f"fit input matches: {len(matches)}（截止 {a.train_until or '全部'}）", flush=True)
         model = fit_model(matches, a.half_life)
         model["schema_version"] = "team-strength-1.0"
@@ -322,7 +349,11 @@ def main():
         if not a.input:
             raise SystemExit("--validate 需要 --input")
         model = json.loads(Path(a.ratings).read_text(encoding="utf-8"))
-        matches = load_matches(a.input)
+        matches = load_matches(
+            a.input,
+            league_id=a.league_id,
+            require_odds=not a.results_only,
+        )
         rep = validate(matches, model, parse_day(a.from_day), a.half_life)
         rep["generated_at"] = datetime.now().astimezone().isoformat(timespec="seconds")
         if a.output:
