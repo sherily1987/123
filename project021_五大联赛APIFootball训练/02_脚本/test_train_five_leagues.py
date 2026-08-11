@@ -21,3 +21,8 @@ def test_time_cutoffs_keep_same_kickoff_day_together():
 
     assert first == datetime.fromisoformat("2021-08-03").date().toordinal()
     assert second == datetime.fromisoformat("2021-08-04").date().toordinal()
+
+
+def test_training_loads_core_prediction_helpers():
+    assert training.strength.dc_matrix is not None
+    assert training.strength.dc_one is not None
