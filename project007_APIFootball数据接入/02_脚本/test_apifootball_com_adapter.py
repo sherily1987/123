@@ -8,6 +8,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -99,6 +101,23 @@ def test_normalize_match_objects_unwraps_match_id_keyed_statistics():
     assert rows[0]["statistics"][0]["type"] == "Corners"
 
 
+def test_normalize_odds_marks_bookmaker_market_not_sporttery():
+    rows = adapter.normalize_odds([{
+        "match_id": "9", "odd_bookmakers": "bwin", "odd_date": "2026-08-11 12:00:00",
+        "odd_1": "2.1", "odd_x": "3.2", "odd_2": "3.6",
+    }])
+    assert rows[0]["source_type"] == "bookmaker_odds"
+    assert rows[0]["odds_1x2"] == [2.1, 3.2, 3.6]
+    assert rows[0]["sporttery_compatible"] is False
+
+
+def test_normalize_predictions_is_provider_benchmark_not_edge():
+    rows = adapter.normalize_predictions([{"match_id": "9", "prob_HW": "42", "prob_D": "28", "prob_AW": "30"}])
+    assert rows[0]["source_type"] == "PROVIDER_BENCHMARK"
+    assert rows[0]["edge_eligible"] is False
+    assert rows[0]["probabilities_1x2"] == [0.42, 0.28, 0.30]
+
+
 def test_client_reads_only_dedicated_environment_variable(monkeypatch):
     monkeypatch.delenv("APIFOOTBALL_COM_KEY", raising=False)
     monkeypatch.setenv("API_FOOTBALL_KEY", "wrong-provider-key")
@@ -108,3 +127,10 @@ def test_client_reads_only_dedicated_environment_variable(monkeypatch):
         assert "APIFOOTBALL_COM_KEY" in str(exc)
     else:
         raise AssertionError("missing dedicated key must fail closed")
+
+
+def test_skill_runtime_entry_uses_its_own_workspace_source():
+    entry = Path(__file__).parents[2] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts" / "apifootball_com_adapter.py"
+    proc = subprocess.run([sys.executable, str(entry), "--help"], text=True, capture_output=True)
+    assert proc.returncode == 0
+    assert "predictions" in proc.stdout

@@ -68,6 +68,13 @@ def _int(value: Any) -> int | None:
         return None
 
 
+def _float(value: Any) -> float | None:
+    try:
+        return float(value) if value not in (None, "", "null") else None
+    except (TypeError, ValueError):
+        return None
+
+
 def _result(payload: Any) -> list[dict[str, Any]]:
     rows = payload if isinstance(payload, list) else payload.get("result", [])
     if isinstance(rows, dict):
@@ -124,6 +131,25 @@ def normalize_standings(payload: dict[str, Any]) -> list[dict[str, Any]]:
 def normalize_teams(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return [{"team_id": _int(x.get("team_key")), "team": x.get("team_name"),
              "country": x.get("team_country"), "logo": x.get("team_badge", x.get("team_logo"))} for x in _result(payload)]
+
+
+def normalize_odds(payload: Any) -> list[dict[str, Any]]:
+    return [{
+        "match_id": _int(x.get("match_id")), "bookmaker": x.get("odd_bookmakers"),
+        "observed_at": x.get("odd_date"),
+        "odds_1x2": [_float(x.get("odd_1")), _float(x.get("odd_x")), _float(x.get("odd_2"))],
+        "source_type": "bookmaker_odds", "sporttery_compatible": False,
+    } for x in _result(payload)]
+
+
+def normalize_predictions(payload: Any) -> list[dict[str, Any]]:
+    return [{
+        "match_id": _int(x.get("match_id")),
+        "probabilities_1x2": [_float(x.get("prob_HW"),) / 100 if _float(x.get("prob_HW")) is not None else None,
+                               _float(x.get("prob_D")) / 100 if _float(x.get("prob_D")) is not None else None,
+                               _float(x.get("prob_AW")) / 100 if _float(x.get("prob_AW")) is not None else None],
+        "source_type": "PROVIDER_BENCHMARK", "edge_eligible": False,
+    } for x in _result(payload)]
 
 
 def normalize_match_objects(payload: Any) -> list[dict[str, Any]]:
@@ -189,6 +215,19 @@ def run(a: argparse.Namespace) -> None:
     elif a.cmd == "statistics":
         action, normalizer = "get_statistics", normalize_match_objects
         params["match_id"] = a.match_id
+    elif a.cmd == "odds":
+        action, normalizer = "get_odds", normalize_odds
+        for dest, key in (("from_date", "from"), ("to_date", "to"), ("match_id", "match_id")):
+            value = getattr(a, dest, None)
+            if value is not None:
+                params[key] = value
+    elif a.cmd == "predictions":
+        action, normalizer = "get_predictions", normalize_predictions
+        for dest, key in (("from_date", "from"), ("to_date", "to"), ("country_id", "country_id"),
+                          ("league_id", "league_id"), ("match_id", "match_id")):
+            value = getattr(a, dest, None)
+            if value is not None:
+                params[key] = value
     else:
         raise SystemExit(f"未知命令: {a.cmd}")
     payload = request(action, params)
@@ -209,6 +248,8 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("teams"); g = p.add_mutually_exclusive_group(); g.add_argument("--league-id", type=int); g.add_argument("--team-id", type=int); output(p); p.set_defaults(fn=run)
     p = sub.add_parser("lineups"); p.add_argument("--match-id", type=int, required=True); output(p); p.set_defaults(fn=run)
     p = sub.add_parser("statistics"); p.add_argument("--match-id", type=int, required=True); output(p); p.set_defaults(fn=run)
+    p = sub.add_parser("odds"); p.add_argument("--from-date"); p.add_argument("--to-date"); p.add_argument("--match-id", type=int); output(p); p.set_defaults(fn=run)
+    p = sub.add_parser("predictions"); p.add_argument("--from-date"); p.add_argument("--to-date"); p.add_argument("--country-id", type=int); p.add_argument("--league-id", type=int); p.add_argument("--match-id", type=int); output(p); p.set_defaults(fn=run)
     a = ap.parse_args(argv); a.fn(a)
 
 

@@ -9,7 +9,8 @@ from __future__ import annotations
 import runpy
 from pathlib import Path
 
-SOURCE = Path(r"F:\HM足球比赛预测\project007_APIFootball数据接入\02_脚本\apifootball_com_adapter.py")
+WORKSPACE = Path(__file__).resolve().parents[5]
+SOURCE = WORKSPACE / "project007_APIFootball数据接入" / "02_脚本" / "apifootball_com_adapter.py"
 
 if not SOURCE.is_file():
     raise SystemExit(f"适配器源文件不存在: {SOURCE}")
