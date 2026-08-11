@@ -1,0 +1,220 @@
+{
+  "schema": "situation-slice-backtest.v1",
+  "generated_at": "2026-08-09T11:38:17",
+  "situation_source": "data/situation_2026-08-08/situations.json",
+  "results_sources": [
+    "data\\results_2026-08-05.json",
+    "data\\results_2026-08-07.json",
+    "data\\results_2026-08-08.json"
+  ],
+  "overall": {
+    "n": 2,
+    "primary": {
+      "n": 2,
+      "hit": 2,
+      "hit_rate_pct": 100.0
+    },
+    "dual_rule": {
+      "n": 2,
+      "hit": 2,
+      "hit_rate_pct": 100.0
+    },
+    "quant": {
+      "n": 2,
+      "hit": 2,
+      "hit_rate_pct": 100.0
+    },
+    "llm": {
+      "n": 2,
+      "hit": 2,
+      "hit_rate_pct": 100.0
+    }
+  },
+  "slices": {
+    "action=single": {
+      "primary_as_single": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "primary_or_alt_as_dual": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "quant": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "llm": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      }
+    },
+    "action=dual": {
+      "primary_as_single": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      },
+      "primary_or_alt_as_dual": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      },
+      "quant": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      },
+      "llm": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      }
+    },
+    "action=observe": {
+      "primary_as_single": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "primary_or_alt_as_dual": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "quant": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "llm": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      }
+    },
+    "lineup_gap": {
+      "primary": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "dual_rule": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      }
+    },
+    "lineup_ok": {
+      "primary": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      },
+      "dual_rule": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      }
+    },
+    "has_conflict": {
+      "primary": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      },
+      "dual_rule": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      }
+    },
+    "no_conflict": {
+      "primary": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "dual_rule": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      }
+    },
+    "track_agree": {
+      "primary": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      },
+      "dual_rule": {
+        "n": 2,
+        "hit": 2,
+        "hit_rate_pct": 100.0
+      }
+    },
+    "track_disagree": {
+      "primary": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      },
+      "dual_rule": {
+        "n": 0,
+        "hit": 0,
+        "hit_rate_pct": null
+      }
+    }
+  },
+  "detail": [
+    {
+      "match_num": "周六001",
+      "home": "大阪樱花",
+      "away": "冈山绿雉",
+      "action": "dual",
+      "label": "证据薄 / 基本面均衡",
+      "primary": "主胜",
+      "alt": "平局",
+      "actual": "主胜",
+      "score_90": "2-1",
+      "single_hit": true,
+      "dual_hit": true,
+      "quant_dir": "主胜",
+      "llm_dir": "主胜",
+      "quant_hit": true,
+      "llm_hit": true,
+      "track_agree": true,
+      "lineup_gap": false,
+      "has_conflict": true,
+      "gap_count": 2,
+      "uncertainty_grade": 2
+    },
+    {
+      "match_num": "周六002",
+      "home": "大宫松鼠",
+      "away": "新潟天鹅",
+      "action": "dual",
+      "label": "证据薄 / 基本面均衡",
+      "primary": "主胜",
+      "alt": "平局",
+      "actual": "主胜",
+      "score_90": "1-0",
+      "single_hit": true,
+      "dual_hit": true,
+      "quant_dir": "主胜",
+      "llm_dir": "主胜",
+      "quant_hit": true,
+      "llm_hit": true,
+      "track_agree": true,
+      "lineup_gap": false,
+      "has_conflict": true,
+      "gap_count": 2,
+      "uncertainty_grade": 2
+    }
+  ],
+  "caveat": "n<<100 不构成正式结论；observe 场次命中率仅研究用，不代表可投"
+}
