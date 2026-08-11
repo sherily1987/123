@@ -1,0 +1,100 @@
+{
+  "league": {
+    "id": 207,
+    "slug": "serie_a",
+    "name": "Serie A",
+    "country": "Italy"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1901,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 27,
+    "train_n": 1140,
+    "validation_n": 380,
+    "test_n": 381
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\.worktrees\\codex-five-league-training\\project021_五大联赛APIFootball训练\\03_模型\\serie_a_candidate.json",
+  "validation": {
+    "n": 306,
+    "skip": 75,
+    "model": {
+      "n": 306,
+      "brier_mean": 0.570436,
+      "log_loss": 0.957938,
+      "accuracy_pct": 54.25
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 306,
+      "brier_mean": 0.659732,
+      "log_loss": 1.088153,
+      "probs": [
+        0.4105,
+        0.2719,
+        0.3175
+      ]
+    },
+    "by_league": {
+      "207": {
+        "n": 306,
+        "model": {
+          "n": 306,
+          "brier_mean": 0.570436,
+          "log_loss": 0.957938,
+          "accuracy_pct": 54.25
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 340,
+    "skip": 40,
+    "model": {
+      "n": 340,
+      "brier_mean": 0.656274,
+      "log_loss": 1.345652,
+      "accuracy_pct": 50.88
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 340,
+      "brier_mean": 0.65823,
+      "log_loss": 1.085591,
+      "probs": [
+        0.407,
+        0.2748,
+        0.3182
+      ]
+    },
+    "by_league": {
+      "207": {
+        "n": 340,
+        "model": {
+          "n": 340,
+          "brier_mean": 0.656274,
+          "log_loss": 1.345652,
+          "accuracy_pct": 50.88
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}

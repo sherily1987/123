@@ -1,0 +1,100 @@
+{
+  "league": {
+    "id": 175,
+    "slug": "bundesliga",
+    "name": "Bundesliga",
+    "country": "Germany"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1553,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 28,
+    "train_n": 931,
+    "validation_n": 311,
+    "test_n": 311
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\.worktrees\\codex-five-league-training\\project021_五大联赛APIFootball训练\\03_模型\\bundesliga_candidate.json",
+  "validation": {
+    "n": 298,
+    "skip": 12,
+    "model": {
+      "n": 298,
+      "brier_mean": 0.648674,
+      "log_loss": 1.185914,
+      "accuracy_pct": 46.98
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 298,
+      "brier_mean": 0.666615,
+      "log_loss": 1.096532,
+      "probs": [
+        0.4582,
+        0.2479,
+        0.294
+      ]
+    },
+    "by_league": {
+      "175": {
+        "n": 298,
+        "model": {
+          "n": 298,
+          "brier_mean": 0.648674,
+          "log_loss": 1.185914,
+          "accuracy_pct": 46.98
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 310,
+    "skip": 1,
+    "model": {
+      "n": 310,
+      "brier_mean": 0.73224,
+      "log_loss": 1.444103,
+      "accuracy_pct": 48.39
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 310,
+      "brier_mean": 0.646725,
+      "log_loss": 1.069164,
+      "probs": [
+        0.438,
+        0.2504,
+        0.3116
+      ]
+    },
+    "by_league": {
+      "175": {
+        "n": 310,
+        "model": {
+          "n": 310,
+          "brier_mean": 0.73224,
+          "log_loss": 1.444103,
+          "accuracy_pct": 48.39
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}

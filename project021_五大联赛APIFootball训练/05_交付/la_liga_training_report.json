@@ -1,0 +1,100 @@
+{
+  "league": {
+    "id": 302,
+    "slug": "la_liga",
+    "name": "La Liga",
+    "country": "Spain"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1912,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 26,
+    "train_n": 1147,
+    "validation_n": 382,
+    "test_n": 383
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\.worktrees\\codex-five-league-training\\project021_五大联赛APIFootball训练\\03_模型\\la_liga_candidate.json",
+  "validation": {
+    "n": 370,
+    "skip": 11,
+    "model": {
+      "n": 370,
+      "brier_mean": 0.579904,
+      "log_loss": 0.977043,
+      "accuracy_pct": 52.43
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 370,
+      "brier_mean": 0.645414,
+      "log_loss": 1.068041,
+      "probs": [
+        0.4486,
+        0.2718,
+        0.2796
+      ]
+    },
+    "by_league": {
+      "302": {
+        "n": 370,
+        "model": {
+          "n": 370,
+          "brier_mean": 0.579904,
+          "log_loss": 0.977043,
+          "accuracy_pct": 52.43
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 377,
+    "skip": 6,
+    "model": {
+      "n": 377,
+      "brier_mean": 0.629431,
+      "log_loss": 1.103994,
+      "accuracy_pct": 48.81
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 377,
+      "brier_mean": 0.632068,
+      "log_loss": 1.049377,
+      "probs": [
+        0.4493,
+        0.2655,
+        0.2852
+      ]
+    },
+    "by_league": {
+      "302": {
+        "n": 377,
+        "model": {
+          "n": 377,
+          "brier_mean": 0.629431,
+          "log_loss": 1.103994,
+          "accuracy_pct": 48.81
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}
