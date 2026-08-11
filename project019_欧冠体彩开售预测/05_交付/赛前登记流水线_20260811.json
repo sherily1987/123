@@ -1,0 +1,279 @@
+{
+  "ran_at": "2026-08-11T19:01:42.857697+08:00",
+  "sales_day": "2026-08-11",
+  "settle": {
+    "settled": 1,
+    "pending": 3,
+    "detail": [
+      {
+        "match_id": "sporttery-2040811",
+        "match": "江原FC vs 大阪钢巴",
+        "matched_by": "fixed_by_id",
+        "score_90": "0-0",
+        "status": "settled",
+        "err": null
+      }
+    ]
+  },
+  "collect": {
+    "count": 10,
+    "with_odds": 10
+  },
+  "record": [
+    {
+      "match_num": "周二001",
+      "match": "江原FC vs 大阪钢巴",
+      "ok": false,
+      "status": "error",
+      "duplicate": false,
+      "note": "kickoff already passed; refuse retrospective prediction"
+    },
+    {
+      "match_num": "周二002",
+      "match": "阿拉木图 vs 索列夫",
+      "ok": false,
+      "status": "skipped_duplicate_snapshot",
+      "duplicate": true,
+      "note": null
+    },
+    {
+      "match_num": "周二003",
+      "match": "博德闪耀 vs 圣吉联合",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二004",
+      "match": "萨巴赫 vs 奥胡斯",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二005",
+      "match": "奈梅亨 vs 奥林匹亚",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二006",
+      "match": "采列 vs 亚拉腊",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二007",
+      "match": "布拉迪斯 vs 米亚尔比",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二008",
+      "match": "格风暴 vs 费内巴切",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二009",
+      "match": "里昂 vs 布斯巴达",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    },
+    {
+      "match_num": "周二010",
+      "match": "弗鲁米嫩 vs 里独立",
+      "ok": true,
+      "status": "recorded",
+      "duplicate": false,
+      "note": null
+    }
+  ],
+  "movement": {
+    "added": 170,
+    "skipped_dup": 10,
+    "total": 1174,
+    "store": "C:\\Users\\Administrator\\.codex\\skills\\football-quant-fusion-suite\\shared\\football-quant-fusion\\odds\\production_movement.jsonl"
+  },
+  "intl_odds": {
+    "schema": "intl-odds-snapshot-1.0",
+    "provider": "the-odds-api",
+    "status": "ok",
+    "ran_at": "2026-08-11T11:01:56.564170+00:00",
+    "requests": [
+      {
+        "sport_key": "soccer_epl",
+        "events": 10,
+        "bookmakers_total": 208,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_spain_la_liga",
+        "events": 20,
+        "bookmakers_total": 272,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_italy_serie_a",
+        "events": 10,
+        "bookmakers_total": 210,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_germany_bundesliga",
+        "events": 9,
+        "bookmakers_total": 187,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_france_ligue_one",
+        "events": 9,
+        "bookmakers_total": 188,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "events": 10,
+        "bookmakers_total": 124,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_brazil_campeonato",
+        "events": 20,
+        "bookmakers_total": 360,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_korea_kleague1",
+        "events": 6,
+        "bookmakers_total": 105,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_norway_eliteserien",
+        "events": 7,
+        "bookmakers_total": 127,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_finland_veikkausliiga",
+        "events": 6,
+        "bookmakers_total": 92,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_sweden_allsvenskan",
+        "events": 8,
+        "bookmakers_total": 148,
+        "quota": "1 请求/联赛/市场组"
+      },
+      {
+        "sport_key": "soccer_china_superleague",
+        "events": 8,
+        "bookmakers_total": 144,
+        "quota": "1 请求/联赛/市场组"
+      }
+    ],
+    "matches": [],
+    "unmatched": [
+      {
+        "match_id": "sporttery-2040811",
+        "match_num": "周二001",
+        "league": "亚冠精英",
+        "reason": "no_sport_key（league_map 未配置: 亚冠精英）"
+      },
+      {
+        "match_id": "sporttery-2040829",
+        "match_num": "周二002",
+        "match": "阿拉木图 vs 索列夫",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040812",
+        "match_num": "周二003",
+        "match": "博德闪耀 vs 圣吉联合",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040813",
+        "match_num": "周二004",
+        "match": "萨巴赫 vs 奥胡斯",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040814",
+        "match_num": "周二005",
+        "match": "奈梅亨 vs 奥林匹亚",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040830",
+        "match_num": "周二006",
+        "match": "采列 vs 亚拉腊",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040815",
+        "match_num": "周二007",
+        "match": "布拉迪斯 vs 米亚尔比",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040816",
+        "match_num": "周二008",
+        "match": "格风暴 vs 费内巴切",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040817",
+        "match_num": "周二009",
+        "match": "里昂 vs 布斯巴达",
+        "league": "欧冠",
+        "sport_key": "soccer_uefa_champs_league_qualification",
+        "reason": "no_intl_event"
+      },
+      {
+        "match_id": "sporttery-2040818",
+        "match_num": "周二010",
+        "league": "解放者杯",
+        "reason": "no_sport_key（league_map 未配置: 解放者杯）"
+      }
+    ],
+    "store_file": "C:\\Users\\Administrator\\.codex\\skills\\football-quant-fusion-suite\\shared\\football-quant-fusion\\odds\\intl_production.jsonl",
+    "dry_run": false
+  },
+  "summary": {
+    "settled": 1,
+    "collected": 10,
+    "recorded": 8,
+    "duplicate_snapshot": 1,
+    "skipped_or_blocked": 1,
+    "odds_snapshots_added": 170
+  }
+}
