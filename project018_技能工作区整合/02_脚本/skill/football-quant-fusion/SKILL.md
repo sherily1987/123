@@ -111,6 +111,8 @@ version: 1.4.0
 - 赛事/赛果：赛事官网、官方联赛、体彩官方列表。
 - 补充足球数据：`football-data.org`，只读取环境变量 `FOOTBALL_DATA_API_KEY`；用于其覆盖赛事的赛程、积分、近期结果和交锋交叉核验。该源无赛事覆盖时必须标 `UNAVAILABLE`，不得用其他联赛数据替代。
 - 补充足球数据：`API-Football v3`（`scripts/api_football_adapter.py`，Key 只从环境变量 `API_FOOTBALL_KEY` 读取）：赛程/赛果、积分榜、伤停、H2H。**Free 套餐限制**：仅开放 2022–2024 赛季（2025/2026 当前赛季会报错）、每日 100 次请求；`/odds` 赔率接口未适配且免费套餐覆盖不稳定——赔率仍以体彩官方采集为准。该源仅用于历史样本补齐与前瞻证据，不参与生产赔率。
+- 补充足球数据：`apifootball.com`（`scripts/apifootball_com_adapter.py`，Key 只从环境变量 `APIFOOTBALL_COM_KEY` 读取）：这是独立供应商，使用 `apiv3.apifootball.com` 与查询参数 `APIkey`，不能与上面的 API-Sports v3 适配器混用。首期支持账户可用国家/联赛清单、赛程赛果、积分榜、球队、首发和统计原始结果；先落盘 provider 信封并标准化预览，字段核验后才允许接入特征。该源只做外部数据 enrich，不替代体彩官方赔率。
+- `apifootball.com` 文档口径补充：`get_events` 支持 `timezone/from/to/country_id/league_id/match_id/team_id/match_live/withPlayerStats`；`get_standings` 使用 `overall_league_*` 字段；`get_lineups`/`get_statistics` 按 match id 包裹对象；`get_odds` 与 `get_predictions` 仅作外部基准，不能替换体彩赔率或直接当作独立模型 edge。详见 `project007_APIFootball数据接入/05_交付/接入说明.md`。
 - 体彩赔率：移动端官方 HAD/HHAD/CRS/TTG/HAFU；保留更新时间和原始 URL。**赔率一律以体彩官方为准。**
 - 国际盘赔率（The Odds API，可选）：**仅作移动赔率/CLV 参考**；不参与概率建模、不替换体彩盘口、不进推荐门控。默认不启用（未设置 `ODDS_API_KEY` 自动跳过）。
 - 阵容/伤停：俱乐部/赛事官方优先，至少一个可信备源交叉验证。
