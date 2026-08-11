@@ -41,3 +41,18 @@ def test_results_only_validation_marks_market_as_unavailable(monkeypatch):
     )
     assert report["model"]["n"] == 1
     assert report["market"] == {"status": "UNAVAILABLE", "reason": "no_pre_match_odds"}
+
+
+def test_results_only_validation_honors_exclusive_to_day(monkeypatch):
+    monkeypatch.setattr(strength, "dc_matrix", lambda lh, la, rho: [lh, la])
+    monkeypatch.setattr(strength, "dc_one", lambda values: [0.5, 0.3, 0.2])
+    model = {"teams": ["A", "B"], "home_adv": 0.0, "alpha": [0.0, 0.0], "beta": [0.0, 0.0]}
+    rows = [
+        {"home": "A", "away": "B", "gh": 1, "ga": 0, "day": 1, "league": "152", "odds": []},
+        {"home": "B", "away": "A", "gh": 0, "ga": 1, "day": 2, "league": "152", "odds": []},
+        {"home": "A", "away": "B", "gh": 1, "ga": 1, "day": 3, "league": "152", "odds": []},
+    ]
+
+    report = strength.validate(rows, model, from_day=2, to_day=3)
+
+    assert report["n"] == 1

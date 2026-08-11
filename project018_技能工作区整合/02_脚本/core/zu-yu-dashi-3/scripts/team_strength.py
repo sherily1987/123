@@ -208,8 +208,8 @@ def market_probs(odds):
 
 
 # [中文功能] 时间切分 OOS 验证：模型 vs 市场 vs 频率基线
-def validate(matches, model, from_day, half_life=500.0):
-    test = [m for m in matches if m["day"] >= from_day]
+def validate(matches, model, from_day, half_life=500.0, to_day=None):
+    test = [m for m in matches if m["day"] >= from_day and (to_day is None or m["day"] < to_day)]
     rows = []
     skip = 0
     for m in test:
@@ -297,6 +297,7 @@ def main():
     ap.add_argument("--prior", action="store_true", help="输出可并入模型输入的 lambda_prior（对手强度调整）")
     ap.add_argument("--validate", action="store_true")
     ap.add_argument("--from", dest="from_day", help="验证起始日 YYYY-MM-DD")
+    ap.add_argument("--to", dest="to_day", help="验证结束日 YYYY-MM-DD（不含该日）")
     a = ap.parse_args()
     cutoff = parse_day(a.train_until) if a.train_until else None
 
@@ -354,7 +355,7 @@ def main():
             league_id=a.league_id,
             require_odds=not a.results_only,
         )
-        rep = validate(matches, model, parse_day(a.from_day), a.half_life)
+        rep = validate(matches, model, parse_day(a.from_day), a.half_life, parse_day(a.to_day) if a.to_day else None)
         rep["generated_at"] = datetime.now().astimezone().isoformat(timespec="seconds")
         if a.output:
             Path(a.output).parent.mkdir(parents=True, exist_ok=True)
