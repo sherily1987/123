@@ -60,7 +60,12 @@ def request(action: str, params: dict[str, Any] | None = None,
         and str(payload.get("error")) == "404"
         and payload.get("message") == "No event found (please check your plan)!"
     ) if isinstance(payload, dict) else False
-    if isinstance(payload, dict) and not no_event_found and (str(payload.get("success", "1")) in {"0", "false", "False"} or payload.get("error")):
+    no_odd_found = (
+        action == "get_odds"
+        and str(payload.get("error")) == "404"
+        and payload.get("message") == "No odd found (please check your plan)!"
+    ) if isinstance(payload, dict) else False
+    if isinstance(payload, dict) and not (no_event_found or no_odd_found) and (str(payload.get("success", "1")) in {"0", "false", "False"} or payload.get("error")):
         detail = payload.get("error") or payload.get("message") or "provider returned success=0"
         raise RuntimeError(f"apifootball.com 返回错误：{detail}")
     return payload

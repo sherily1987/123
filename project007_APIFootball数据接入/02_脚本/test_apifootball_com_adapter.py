@@ -148,6 +148,17 @@ def test_request_keeps_no_event_404_as_a_valid_empty_events_response(monkeypatch
     assert payload == {"error": 404, "message": "No event found (please check your plan)!"}
 
 
+def test_request_keeps_no_odd_404_as_a_valid_empty_odds_response(monkeypatch):
+    class Response(io.BytesIO):
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+
+    monkeypatch.setenv("APIFOOTBALL_COM_KEY", "test-key")
+    payload = adapter.request("get_odds", {"from": "2021-08-13", "to": "2021-08-13"}, opener=lambda request, timeout: Response(b'{"error": 404, "message": "No odd found (please check your plan)!"}'))
+
+    assert payload == {"error": 404, "message": "No odd found (please check your plan)!"}
+
+
 def test_skill_runtime_entry_uses_its_own_workspace_source():
     entry = Path(__file__).parents[2] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts" / "apifootball_com_adapter.py"
     proc = subprocess.run([sys.executable, str(entry), "--help"], text=True, capture_output=True)
