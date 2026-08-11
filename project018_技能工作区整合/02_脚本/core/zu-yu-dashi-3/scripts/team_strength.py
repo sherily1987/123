@@ -64,12 +64,16 @@ def load_matches(jsonl_path, train_until=None, league_id=None, require_odds=True
                 continue
             if train_until and day > train_until:
                 continue
-            rows.append({
+            match = {
                 "home": r.get("home"), "away": r.get("away"),
                 "gh": int(r["actual"][0]), "ga": int(r["actual"][1]),
                 "day": day, "league": str(r.get("league_id") or r.get("competition") or r.get("stage") or r.get("div") or "?"),
                 "odds": [float(x) for x in r.get("odds", [])[:3]],
-            })
+            }
+            provider_market = r.get("provider_market_1x2")
+            if isinstance(provider_market, list) and len(provider_market) == 3 and all(isinstance(x, (int, float)) and x > 0 for x in provider_market):
+                match["provider_market"] = [float(x) for x in provider_market]
+            rows.append(match)
     return rows
 
 
@@ -208,7 +212,7 @@ def market_probs(odds):
 
 
 # [中文功能] 时间切分 OOS 验证：模型 vs 市场 vs 频率基线
-def validate(matches, model, from_day, half_life=500.0, to_day=None):
+def validate(matches, model, from_day, half_life=500.0, to_day=None, baseline_key="market", baseline_label="market"):
     test = [m for m in matches if m["day"] >= from_day and (to_day is None or m["day"] < to_day)]
     rows = []
     skip = 0
@@ -226,8 +230,14 @@ def validate(matches, model, from_day, half_life=500.0, to_day=None):
             "actual_idx": 0 if m["gh"] > m["ga"] else (1 if m["gh"] == m["ga"] else 2),
             "model": mp,
         }
-        if len(m["odds"]) == 3 and all(x > 1 for x in m["odds"]):
-            row["market"] = market_probs(m["odds"])
+        if baseline_key == "market":
+            baseline = market_probs(m["odds"]) if len(m["odds"]) == 3 and all(x > 1 for x in m["odds"]) else None
+        else:
+            baseline = m.get(baseline_key)
+            if not (isinstance(baseline, list) and len(baseline) == 3 and all(isinstance(x, (int, float)) and x > 0 for x in baseline)):
+                baseline = None
+        if baseline is not None:
+            row[baseline_label] = baseline
         rows.append(row)
     if not rows:
         return {"n": 0, "skip": skip}
@@ -254,25 +264,25 @@ def validate(matches, model, from_day, half_life=500.0, to_day=None):
     by_league = {}
     for r in rows:
         by_league.setdefault(r["league"], []).append(r)
-    market_rows = [r for r in rows if "market" in r]
+    market_rows = [r for r in rows if baseline_label in r]
     market_report = (
-        metrics("market", market_rows)
+        metrics(baseline_label, market_rows)
         if market_rows
         else {"status": "UNAVAILABLE", "reason": "no_pre_match_odds"}
     )
 
     def league_report(rs):
-        market_rs = [r for r in rs if "market" in r]
+        market_rs = [r for r in rs if baseline_label in r]
         return {
             "n": len(rs),
             "model": metrics("model", rs),
-            "market": metrics("market", market_rs) if market_rs else {"status": "UNAVAILABLE", "reason": "no_pre_match_odds"},
+            baseline_label: metrics(baseline_label, market_rs) if market_rs else {"status": "UNAVAILABLE", "reason": "no_pre_match_odds"},
         }
 
     return {
         "n": len(rows), "skip": skip,
         "model": metrics("model"),
-        "market": market_report,
+        baseline_label: market_report,
         "frequency_baseline": {
             "n": len(rows), "brier_mean": round(sum(freq_bs) / len(rows), 6),
             "log_loss": round(sum(freq_ll) / len(rows), 6),

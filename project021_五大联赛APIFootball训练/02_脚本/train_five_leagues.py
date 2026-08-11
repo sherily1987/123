@@ -46,7 +46,7 @@ def time_cutoffs(rows: list[dict]) -> tuple[int, int]:
     return first, second
 
 
-def train_one_league(input_path: Path, league: dict, output_dir: Path) -> dict:
+def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_key: str = "market", baseline_label: str = "market") -> dict:
     raw_rows = [json.loads(line) for line in input_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     for row in raw_rows:
         audit.validate_prematch_record(row)
@@ -73,8 +73,8 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path) -> dict:
     result.update({
         "status": "trained",
         "model_path": str(model_path),
-        "validation": strength.validate(matches, validation_model, first, to_day=second),
-        "test": strength.validate(matches, final_model, second),
+        "validation": strength.validate(matches, validation_model, first, to_day=second, baseline_key=baseline_key, baseline_label=baseline_label),
+        "test": strength.validate(matches, final_model, second, baseline_key=baseline_key, baseline_label=baseline_label),
     })
     return result
 

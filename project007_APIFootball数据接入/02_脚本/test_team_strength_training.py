@@ -56,3 +56,18 @@ def test_results_only_validation_honors_exclusive_to_day(monkeypatch):
     report = strength.validate(rows, model, from_day=2, to_day=3)
 
     assert report["n"] == 1
+
+
+def test_validate_reports_named_provider_market_baseline(monkeypatch):
+    monkeypatch.setattr(strength, "dc_matrix", lambda lh, la, rho: [lh, la])
+    monkeypatch.setattr(strength, "dc_one", lambda values: [0.5, 0.3, 0.2])
+    model = {"teams": ["A", "B"], "home_adv": 0.0, "alpha": [0.0, 0.0], "beta": [0.0, 0.0]}
+    matches = [
+        {"home": "A", "away": "B", "gh": 0, "ga": 0, "day": 1, "league": "152", "odds": []},
+        {"home": "A", "away": "B", "gh": 1, "ga": 0, "day": 2, "league": "152", "odds": [], "provider_market": [0.5, 0.3, 0.2]},
+    ]
+
+    report = strength.validate(matches, model, from_day=2, baseline_key="provider_market", baseline_label="provider_market")
+
+    assert report["provider_market"]["n"] == 1
+    assert "market" not in report
