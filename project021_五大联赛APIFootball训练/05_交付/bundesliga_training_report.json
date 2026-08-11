@@ -28,9 +28,11 @@
       "log_loss": 1.185914,
       "accuracy_pct": 46.98
     },
-    "market": {
-      "status": "UNAVAILABLE",
-      "reason": "no_pre_match_odds"
+    "provider_market": {
+      "n": 277,
+      "brier_mean": 0.602716,
+      "log_loss": 1.005652,
+      "accuracy_pct": 50.9
     },
     "frequency_baseline": {
       "n": 298,
@@ -51,9 +53,11 @@
           "log_loss": 1.185914,
           "accuracy_pct": 46.98
         },
-        "market": {
-          "status": "UNAVAILABLE",
-          "reason": "no_pre_match_odds"
+        "provider_market": {
+          "n": 277,
+          "brier_mean": 0.602716,
+          "log_loss": 1.005652,
+          "accuracy_pct": 50.9
         }
       }
     }
@@ -67,9 +71,11 @@
       "log_loss": 1.444103,
       "accuracy_pct": 48.39
     },
-    "market": {
-      "status": "UNAVAILABLE",
-      "reason": "no_pre_match_odds"
+    "provider_market": {
+      "n": 276,
+      "brier_mean": 0.554001,
+      "log_loss": 0.939663,
+      "accuracy_pct": 57.25
     },
     "frequency_baseline": {
       "n": 310,
@@ -90,11 +96,21 @@
           "log_loss": 1.444103,
           "accuracy_pct": 48.39
         },
-        "market": {
-          "status": "UNAVAILABLE",
-          "reason": "no_pre_match_odds"
+        "provider_market": {
+          "n": 276,
+          "brier_mean": 0.554001,
+          "log_loss": 0.939663,
+          "accuracy_pct": 57.25
         }
       }
     }
+  },
+  "provider_market_coverage": {
+    "event_count": 1553,
+    "matched_events": 1062,
+    "unmatched_events": 491,
+    "rejected_after_kickoff": 230,
+    "rejected_invalid_odds": 5,
+    "rejected_unparseable_time": 0
   }
 }

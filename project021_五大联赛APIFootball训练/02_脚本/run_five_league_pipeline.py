@@ -58,6 +58,10 @@ def run_pipeline(project: Path, refresh: bool = False) -> dict:
     dates = {date.fromisoformat(row["kickoff"][:10]) for rows in event_sets.values() for row in rows if row.get("kickoff")}
     odds_report = download_odds_for_dates(dates, project)
     result["provider_market_coverage"] = {k: v for k, v in odds_report.items() if k != "rows"}
+    (delivery / "provider_market_coverage_report.json").write_text(
+        json.dumps({"event_dates": len(dates), **result["provider_market_coverage"]}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     failures.extend({"provider_market": True, **failure} for failure in odds_report["failures"])
     for slug, (league, report) in downloaded.items():
         if report["failures"]:

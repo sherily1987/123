@@ -41,3 +41,4 @@ def test_pipeline_downloads_provider_odds_once_for_all_event_dates(monkeypatch, 
     pipeline.run_pipeline(tmp_path)
 
     assert calls == [{date(2024, 8, 17)}]
+    assert (tmp_path / "05_交付" / "provider_market_coverage_report.json").exists()
