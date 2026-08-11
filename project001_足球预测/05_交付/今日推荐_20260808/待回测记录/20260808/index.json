@@ -1,0 +1,390 @@
+{
+  "schema": "pending-backtest-1.0",
+  "kickoff_date": "2026-08-08",
+  "sales_day": "2026-08-08",
+  "sales_label": "周六",
+  "snapshot": "prematch",
+  "generated_at": "2026-08-08T20:04:21",
+  "source_raw": "F:\\HM足球比赛预测\\今日推荐_20260808\\raw.json",
+  "notes": [
+    "量化：13场销售日，11场有HAD建模；001/002开球后拒绝共享库登记；018/024无HAD",
+    "共享库 prematch 成功登记：有HAD且未开球场次",
+    "出胆：全部 banker_allowed=False；check_output 11/11 方向一致无失真"
+  ],
+  "records": [
+    {
+      "match_num": "周六001",
+      "match_id": "sporttery-2040750",
+      "league": "日职",
+      "home": "大阪樱花",
+      "away": "冈山绿雉",
+      "kickoff": "2026-08-08T18:00:00+08:00",
+      "final_1x2_pct": [
+        46.1,
+        28.9,
+        24.9
+      ],
+      "top_score_1": "1-1",
+      "top_score_2": "1-0",
+      "top_score_3": "2-1",
+      "record_file": null,
+      "prediction_id": null,
+      "snapshot": "prematch",
+      "created_at": null,
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        48.4,
+        26.1,
+        25.5
+      ],
+      "odds_eligible": true,
+      "registered_to_store": false,
+      "note": "kickoff already passed; refuse store register; local snapshot only"
+    },
+    {
+      "match_num": "周六002",
+      "match_id": "sporttery-2040797",
+      "league": "日乙",
+      "home": "大宫松鼠",
+      "away": "新潟天鹅",
+      "kickoff": "2026-08-08T18:00:00+08:00",
+      "final_1x2_pct": [
+        46.6,
+        30.1,
+        23.3
+      ],
+      "top_score_1": "1-1",
+      "top_score_2": "1-0",
+      "top_score_3": "2-1",
+      "record_file": null,
+      "prediction_id": null,
+      "snapshot": "prematch",
+      "created_at": null,
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        49.0,
+        27.2,
+        23.8
+      ],
+      "odds_eligible": true,
+      "registered_to_store": false,
+      "note": "kickoff already passed; refuse store register; local snapshot only"
+    },
+    {
+      "match_num": "周六015",
+      "match_id": "sporttery-2040763",
+      "league": "芬超",
+      "home": "雅罗",
+      "away": "瓦萨",
+      "kickoff": "2026-08-09T00:00:00+08:00",
+      "final_1x2_pct": [
+        21.6,
+        23.4,
+        55.0
+      ],
+      "top_score_1": "1-1",
+      "top_score_2": "0-1",
+      "top_score_3": "1-2",
+      "record_file": "周六015_sporttery-2040763__vfusion-1-4-0-core-3-4-4__20260808T114906Z__prematch.json",
+      "prediction_id": "sporttery-2040763__vfusion-1-4-0-core-3-4-4__20260808T114906Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:06.653007+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        20.7,
+        23.8,
+        55.5
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六016",
+      "match_id": "sporttery-2040764",
+      "league": "荷甲",
+      "home": "前进之鹰",
+      "away": "威廉二世",
+      "kickoff": "2026-08-09T00:45:00+08:00",
+      "final_1x2_pct": [
+        62.7,
+        22.0,
+        15.3
+      ],
+      "top_score_1": "2-1",
+      "top_score_2": "2-0",
+      "top_score_3": "1-1",
+      "record_file": "周六016_sporttery-2040764__vfusion-1-4-0-core-3-4-4__20260808T114913Z__prematch.json",
+      "prediction_id": "sporttery-2040764__vfusion-1-4-0-core-3-4-4__20260808T114913Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:13.568936+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        65.6,
+        19.3,
+        15.1
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六017",
+      "match_id": "sporttery-2040765",
+      "league": "葡超",
+      "home": "吉马良斯",
+      "away": "阿罗卡",
+      "kickoff": "2026-08-09T01:00:00+08:00",
+      "final_1x2_pct": [
+        50.4,
+        28.2,
+        21.4
+      ],
+      "top_score_1": "1-0",
+      "top_score_2": "1-1",
+      "top_score_3": "2-1",
+      "record_file": "周六017_sporttery-2040765__vfusion-1-4-0-core-3-4-4__20260808T114920Z__prematch.json",
+      "prediction_id": "sporttery-2040765__vfusion-1-4-0-core-3-4-4__20260808T114920Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:20.473766+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        53.0,
+        25.4,
+        21.7
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六018",
+      "match_id": "sporttery-2040766",
+      "league": "荷甲",
+      "home": "埃因霍温",
+      "away": "福图纳",
+      "kickoff": "2026-08-09T02:00:00+08:00",
+      "final_1x2_pct": null,
+      "top_score_1": null,
+      "top_score_2": null,
+      "top_score_3": null,
+      "record_file": null,
+      "prediction_id": null,
+      "snapshot": "prematch",
+      "created_at": null,
+      "mode": null,
+      "banker_allowed": null,
+      "market_prob_pct": null,
+      "odds_eligible": false,
+      "registered_to_store": false,
+      "note": "no HAD; quant modeling skipped"
+    },
+    {
+      "match_num": "周六019",
+      "match_id": "sporttery-2040767",
+      "league": "法乙",
+      "home": "波城FC",
+      "away": "阿纳西",
+      "kickoff": "2026-08-09T02:45:00+08:00",
+      "final_1x2_pct": [
+        31.3,
+        31.4,
+        37.3
+      ],
+      "top_score_1": "1-1",
+      "top_score_2": "0-1",
+      "top_score_3": "1-0",
+      "record_file": "周六019_sporttery-2040767__vfusion-1-4-0-core-3-4-4__20260808T114927Z__prematch.json",
+      "prediction_id": "sporttery-2040767__vfusion-1-4-0-core-3-4-4__20260808T114927Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:27.290158+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        32.5,
+        28.5,
+        39.0
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六020",
+      "match_id": "sporttery-2040768",
+      "league": "法乙",
+      "home": "蒙彼利埃",
+      "away": "第戎",
+      "kickoff": "2026-08-09T02:45:00+08:00",
+      "final_1x2_pct": [
+        52.3,
+        29.0,
+        18.7
+      ],
+      "top_score_1": "1-0",
+      "top_score_2": "1-1",
+      "top_score_3": "2-0",
+      "record_file": "周六020_sporttery-2040768__vfusion-1-4-0-core-3-4-4__20260808T114934Z__prematch.json",
+      "prediction_id": "sporttery-2040768__vfusion-1-4-0-core-3-4-4__20260808T114934Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:34.093898+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        55.1,
+        26.1,
+        18.8
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六021",
+      "match_id": "sporttery-2040798",
+      "league": "法乙",
+      "home": "南特",
+      "away": "圣旺红星",
+      "kickoff": "2026-08-09T02:45:00+08:00",
+      "final_1x2_pct": [
+        52.7,
+        28.4,
+        18.9
+      ],
+      "top_score_1": "1-0",
+      "top_score_2": "1-1",
+      "top_score_3": "2-0",
+      "record_file": "周六021_sporttery-2040798__vfusion-1-4-0-core-3-4-4__20260808T114940Z__prematch.json",
+      "prediction_id": "sporttery-2040798__vfusion-1-4-0-core-3-4-4__20260808T114940Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:40.878996+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        55.4,
+        25.5,
+        19.0
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六022",
+      "match_id": "sporttery-2040769",
+      "league": "荷甲",
+      "home": "阿尔克马",
+      "away": "海牙",
+      "kickoff": "2026-08-09T03:00:00+08:00",
+      "final_1x2_pct": [
+        71.8,
+        17.7,
+        10.5
+      ],
+      "top_score_1": "2-0",
+      "top_score_2": "2-1",
+      "top_score_3": "3-0",
+      "record_file": "周六022_sporttery-2040769__vfusion-1-4-0-core-3-4-4__20260808T114947Z__prematch.json",
+      "prediction_id": "sporttery-2040769__vfusion-1-4-0-core-3-4-4__20260808T114947Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:47.765226+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        74.7,
+        15.2,
+        10.1
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六023",
+      "match_id": "sporttery-2040770",
+      "league": "巴甲",
+      "home": "格雷米奥",
+      "away": "圣保罗",
+      "kickoff": "2026-08-09T03:00:00+08:00",
+      "final_1x2_pct": [
+        37.3,
+        34.9,
+        27.8
+      ],
+      "top_score_1": "1-1",
+      "top_score_2": "1-0",
+      "top_score_3": "0-0",
+      "record_file": "周六023_sporttery-2040770__vfusion-1-4-0-core-3-4-4__20260808T114954Z__prematch.json",
+      "prediction_id": "sporttery-2040770__vfusion-1-4-0-core-3-4-4__20260808T114954Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:49:54.580939+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        39.2,
+        32.0,
+        28.8
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    },
+    {
+      "match_num": "周六024",
+      "match_id": "sporttery-2040771",
+      "league": "葡超",
+      "home": "阿马多拉",
+      "away": "里斯本",
+      "kickoff": "2026-08-09T03:30:00+08:00",
+      "final_1x2_pct": null,
+      "top_score_1": null,
+      "top_score_2": null,
+      "top_score_3": null,
+      "record_file": null,
+      "prediction_id": null,
+      "snapshot": "prematch",
+      "created_at": null,
+      "mode": null,
+      "banker_allowed": null,
+      "market_prob_pct": null,
+      "odds_eligible": false,
+      "registered_to_store": false,
+      "note": "no HAD; quant modeling skipped"
+    },
+    {
+      "match_num": "周六025",
+      "match_id": "sporttery-2040772",
+      "league": "巴甲",
+      "home": "博塔弗戈",
+      "away": "弗鲁米嫩",
+      "kickoff": "2026-08-09T08:00:00+08:00",
+      "final_1x2_pct": [
+        36.6,
+        31.9,
+        31.5
+      ],
+      "top_score_1": "1-1",
+      "top_score_2": "1-0",
+      "top_score_3": "0-1",
+      "record_file": "周六025_sporttery-2040772__vfusion-1-4-0-core-3-4-4__20260808T115001Z__prematch.json",
+      "prediction_id": "sporttery-2040772__vfusion-1-4-0-core-3-4-4__20260808T115001Z__prematch",
+      "snapshot": "prematch",
+      "created_at": "2026-08-08T11:50:01.372282+00:00",
+      "mode": "market_only",
+      "banker_allowed": false,
+      "market_prob_pct": [
+        38.2,
+        29.1,
+        32.7
+      ],
+      "odds_eligible": true,
+      "registered_to_store": true,
+      "note": null
+    }
+  ]
+}

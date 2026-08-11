@@ -1,0 +1,49 @@
+{
+  "schema": "current-model-evaluation-1.0",
+  "evaluated_at": "2026-08-10T22:30:00+08:00",
+  "quant": {
+    "identity": "MARKET_BASELINE/market_only",
+    "official_90min_n": 22,
+    "one_x_two": {"hit": 11, "hit_pct": 50.0},
+    "brier_multiclass_mean": 0.619513,
+    "log_loss_mean": 1.0247,
+    "score_top1": {"hit": 5, "hit_pct": 22.73},
+    "score_top3": {"hit": 10, "hit_pct": 45.45},
+    "diagnostics": {
+      "predicted_outcomes": {"H": 15, "D": 0, "A": 7},
+      "actual_outcomes": {"H": 9, "D": 7, "A": 6},
+      "top_score_mode": "1-1",
+      "top_score_mode_count": 13,
+      "top_label_ece_coarse": 0.266
+    },
+    "claim_status": "exploratory_market_baseline_not_independent_edge"
+  },
+  "llm": {
+    "historical_legacy": {
+      "n": 13,
+      "single_direction": {"hit": 8, "hit_pct": 61.54},
+      "double_coverage": {"hit": 10, "hit_pct": 76.92},
+      "score": {"hit": 2, "hit_pct": 15.38},
+      "status": "not_comparable_to_current_pool"
+    },
+    "current_production_pool": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen3.8-max",
+      "deepseek/deepseek-chat",
+      "moonshot/kimi-k2.6"
+    ],
+    "same_version_official_90min_n": 0,
+    "status": "not_evaluable_yet"
+  },
+  "paired_independent_experiment": {
+    "n": 0,
+    "min_matches": 100,
+    "status": "insufficient_paired_samples"
+  },
+  "production_decision": {
+    "quant": "MARKET_BASELINE/market_only",
+    "banker": false,
+    "weight_change": false,
+    "new_model_direct_production_admission": false
+  }
+}

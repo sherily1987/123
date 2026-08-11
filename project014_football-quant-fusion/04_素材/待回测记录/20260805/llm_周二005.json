@@ -1,0 +1,31 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040721",
+  "match_num": "周二005",
+  "match": "布斯巴达 vs 里昂",
+  "competition": "欧冠资格赛第三轮首回合（Sparta Praha vs Olympique Lyonnais）",
+  "kickoff": "2026-08-05T02:00:00+08:00",
+  "pre_registered_at": "2026-08-04T22:25:00+08:00",
+  "direction": {
+    "pick": "双选 平局/客胜（D/A）",
+    "single_preference": "客胜（A）",
+    "note": "定性判断，非概率输出；里昂纸面实力占优但五核心缺阵+法甲未开赛状态存疑，斯巴达主场稳定但伤停严重且历史对里昂不胜——双选覆盖平局"
+  },
+  "score_picks": ["1-1", "0-1", "1-2"],
+  "signals": [
+    "里昂客场：五名核心缺阵（Sulc、Merah、Bidstrup、Tagliafico、Niakhaté），Tagliafico 世界杯决赛后未恢复训练",
+    "里昂法甲 8/22 才开赛，本场是赛季首场正式比赛，比赛状态存疑；纸面实力与交锋历史占优",
+    "布斯巴达：捷甲已赛两轮，上周五主场3-1取胜，主场表现稳定",
+    "布斯巴达伤病潮严重：约7人缺阵（门将、前锋库赫塔、中场安德森/曼斯韦克/维德拉等），主力门将詹森重伤",
+    "历史交锋斯巴达对里昂4-6次未尝胜绩（2021-22欧冠小组赛被双杀0-3/3-4），心理包袱不小"
+  ],
+  "evidence": [
+    {"fact": "里昂五名核心缺阵：Pavel Sulc、Khalis Merah、Mads Bidstrup 三人伤缺，Tagliafico 因世界杯决赛后未恢复训练缺席，另有 Moussa Niakhaté", "source": "https://onefootball.com/pt-br/noticias/sparta-prague-ol-les-compos-probables-du-3e-tour-preliminaire-aller-de-ligue-des-champions-43226225", "collected_at": "2026-08-04T22:20+08:00", "mapped": "attack_absence_lyon/defense_absence_lyon", "basis": "Onefootball 2026-08-03，与 maxifoot/10guru 交叉一致"},
+    {"fact": "里昂法甲赛季8月22日才开始，本场是赛季首场正式比赛；斯巴达已赛两轮捷甲，上周五主场3-1获胜", "source": "https://www.tipsbladet.dk/nyhed/spil/priske-sparta-kan-drille-fransk-danskerklub", "collected_at": "2026-08-04T22:20+08:00", "mapped": "form_context", "basis": "Tipsbladet 2026-08-03"},
+    {"fact": "斯巴达伤病潮严重：门将、前锋库赫塔、中场安德森、曼斯韦克、维德拉等约7人缺阵；中前场轮换与进攻梳理受影响", "source": "https://bbs.hupu.com/641544446.html", "collected_at": "2026-08-04T22:20+08:00", "mapped": "attack_absence_sparta/gk_absence_sparta", "basis": "虎扑 2026-08-03，与 leisu 前瞻交叉一致"},
+    {"fact": "双方过往交手斯巴达未尝胜绩（2021-22赛季欧冠小组赛里昂主场3-0、客场4-3双杀）；里昂客让平/半", "source": "https://www.qiumiwu.com/news/1983327865563", "collected_at": "2026-08-04T22:20+08:00", "mapped": "h2h_background", "basis": "球迷屋 2026-08-03，与 10guru 一致"}
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜24.2% 平27.1% 负48.7%，比分Top3: 1-1/0-1/1-2。LLM 方向与量化一致（偏客胜，双选覆盖平局），依据为里昂纸面实力+历史压制，但双方均残阵增加不确定性。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

@@ -1,0 +1,1538 @@
+{
+  "schema": "match_situation_batch.v1",
+  "generated_at": "2026-08-09T11:33:50",
+  "count": 13,
+  "action_counts": {
+    "dual": 10,
+    "single": 1,
+    "observe": 2
+  },
+  "note": "态势层不设胆；single仅对照",
+  "situations": [
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六001",
+      "home": "大阪樱花",
+      "away": "冈山绿雉",
+      "league": "日职 2026-08-08 18:00",
+      "kickoff": "2026-08-08 18:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "有阵容叙述"
+          ],
+          "gap": false
+        },
+        "form": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "近况缺口"
+          ],
+          "gap": true
+        },
+        "motive": {
+          "side": "unknown",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.9/3.28/3.35"
+          ],
+          "gap": false,
+          "odds": [
+            1.9,
+            3.28,
+            3.35
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发双源交叉验证不足",
+            "近 5 场战绩与 xG 未拉取",
+            "国际盘 MCP 批量匹配本轮成功率低（候选池截断），未写入独立国际盘块"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "大阪樱花",
+          "away": "冈山绿雉",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            46.1,
+            28.9,
+            24.9
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六001",
+          "home": "大阪樱花",
+          "away": "冈山绿雉",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_001_大阪樱花_冈山绿雉.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六002",
+      "home": "大宫松鼠",
+      "away": "新潟天鹅",
+      "league": "日乙 2026-08-08 18:00",
+      "kickoff": "2026-08-08 18:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "有阵容叙述"
+          ],
+          "gap": false
+        },
+        "form": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "近况缺口"
+          ],
+          "gap": true
+        },
+        "motive": {
+          "side": "unknown",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.88/3.16/3.56"
+          ],
+          "gap": false,
+          "odds": [
+            1.88,
+            3.16,
+            3.56
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发双源交叉验证不足",
+            "近 5 场战绩与 xG 未拉取",
+            "国际盘 MCP 批量匹配本轮成功率低（候选池截断），未写入独立国际盘块"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "大宫松鼠",
+          "away": "新潟天鹅",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            46.6,
+            30.1,
+            23.3
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六002",
+          "home": "大宫松鼠",
+          "away": "新潟天鹅",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_002_大宫松鼠_新潟天鹅.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六015",
+      "home": "雅罗",
+      "away": "瓦萨",
+      "league": "芬超 2026-08-09 00:00",
+      "kickoff": "2026-08-09 00:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "近况缺口"
+          ],
+          "gap": true
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "away",
+          "grade": 1,
+          "notes": [
+            "市场倾向客",
+            "HAD 4.0/3.55/1.68"
+          ],
+          "gap": false,
+          "odds": [
+            4.0,
+            3.55,
+            1.68
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战",
+            "含旅行/环境因子"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈3",
+            "伤停、近况、天气、国际盘均不足；主要依赖体彩盘口结构"
+          ],
+          "gap": true,
+          "gap_count": 3
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "雅罗",
+          "away": "瓦萨",
+          "match_num": "",
+          "direction": "客胜",
+          "pct": [
+            21.6,
+            23.4,
+            55.0
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE"
+          ],
+          "action_note": "市场主方向 A，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六015",
+          "home": "雅罗",
+          "away": "瓦萨",
+          "direction": "客胜",
+          "strength": 57,
+          "score_pref": "1-2"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "客胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "LLM强度57%<60 → 强制双选",
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_003_雅罗_瓦萨.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六016",
+      "home": "前进之鹰",
+      "away": "威廉二世",
+      "league": "荷甲 2026-08-09 00:45",
+      "kickoff": "2026-08-09 00:45",
+      "label": "基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "有阵容叙述"
+          ],
+          "gap": false
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "赛季角色信号"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 2,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.44/4.15/5.15",
+            "盘口极热"
+          ],
+          "gap": false,
+          "odds": [
+            1.44,
+            4.15,
+            5.15
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "关键维缺口数≈1",
+            "具体伤停球员名单未双源交叉确认",
+            "天气预报未拉",
+            "国际盘多家赔率未采"
+          ],
+          "gap": false,
+          "gap_count": 1
+        }
+      },
+      "conflicts": [],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "前进之鹰",
+          "away": "威廉二世",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            62.7,
+            22.0,
+            15.3
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六016",
+          "home": "前进之鹰",
+          "away": "威廉二世",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "single",
+      "primary_direction": "主胜",
+      "alt_direction": null,
+      "action_reasons": [
+        "双轨一致且缺口可控 → 单选对照（非出胆）"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_004_前进之鹰_威廉二世.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六017",
+      "home": "吉马良斯",
+      "away": "阿罗卡",
+      "league": "葡超 2026-08-09 01:00",
+      "kickoff": "2026-08-09 01:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.75/3.35/3.85"
+          ],
+          "gap": false,
+          "odds": [
+            1.75,
+            3.35,
+            3.85
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/近5场具体比分未交叉验证；天气/国际盘未采"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "吉马良斯",
+          "away": "阿罗卡",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            50.4,
+            28.2,
+            21.4
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六017",
+          "home": "吉马良斯",
+          "away": "阿罗卡",
+          "direction": "主胜",
+          "strength": 86,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_005_吉马良斯_阿罗卡.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六018",
+      "home": "埃因霍温",
+      "away": "福图纳",
+      "league": "荷甲 2026-08-09 02:00",
+      "kickoff": "2026-08-09 02:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "赛季角色信号"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "无可用 HAD"
+          ],
+          "gap": true,
+          "odds": null
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/预计首发双源缺失；无体彩胜平负；天气未采"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": null,
+        "llm": {
+          "match_num": "周六018",
+          "home": "埃因霍温",
+          "away": "福图纳",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-0"
+        }
+      },
+      "action": "observe",
+      "primary_direction": "主胜",
+      "alt_direction": null,
+      "action_reasons": [
+        "无HAD且证据薄 → 仅观察"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_006_埃因霍温_福图纳.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六019",
+      "home": "波城FC",
+      "away": "阿纳西",
+      "league": "法乙 2026-08-09 02:45",
+      "kickoff": "2026-08-09 02:45",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "有阵容叙述"
+          ],
+          "gap": false
+        },
+        "form": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "近况缺口"
+          ],
+          "gap": true
+        },
+        "motive": {
+          "side": "unknown",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "away",
+          "grade": 1,
+          "notes": [
+            "市场倾向客",
+            "HAD 2.72/3.05/2.31"
+          ],
+          "gap": false,
+          "odds": [
+            2.72,
+            3.05,
+            2.31
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发双源交叉验证不足",
+            "近 5 场战绩与 xG 未拉取",
+            "国际盘 MCP 批量匹配本轮成功率低（候选池截断），未写入独立国际盘块"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "波城FC",
+          "away": "阿纳西",
+          "match_num": "",
+          "direction": "客胜",
+          "pct": [
+            31.3,
+            31.4,
+            37.3
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE"
+          ],
+          "action_note": "市场主方向 A，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六019",
+          "home": "波城FC",
+          "away": "阿纳西",
+          "direction": "客胜",
+          "strength": 50,
+          "score_pref": "1-2"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "客胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "LLM强度50%<60 → 强制双选",
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_007_波城FC_阿纳西.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六020",
+      "home": "蒙彼利埃",
+      "away": "第戎",
+      "league": "法乙 2026-08-09 02:45",
+      "kickoff": "2026-08-09 02:45",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "有阵容叙述"
+          ],
+          "gap": false
+        },
+        "form": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "近况缺口"
+          ],
+          "gap": true
+        },
+        "motive": {
+          "side": "unknown",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.69/3.26/4.35"
+          ],
+          "gap": false,
+          "odds": [
+            1.69,
+            3.26,
+            4.35
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发双源交叉验证不足",
+            "近 5 场战绩与 xG 未拉取",
+            "国际盘 MCP 批量匹配本轮成功率低（候选池截断），未写入独立国际盘块"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "蒙彼利埃",
+          "away": "第戎",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            52.3,
+            29.0,
+            18.7
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六020",
+          "home": "蒙彼利埃",
+          "away": "第戎",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_008_蒙彼利埃_第戎.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六021",
+      "home": "南特",
+      "away": "圣旺红星",
+      "league": "法乙 2026-08-09 02:45",
+      "kickoff": "2026-08-09 02:45",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "有阵容叙述"
+          ],
+          "gap": false
+        },
+        "form": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "近况缺口"
+          ],
+          "gap": true
+        },
+        "motive": {
+          "side": "unknown",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.68/3.32/4.3"
+          ],
+          "gap": false,
+          "odds": [
+            1.68,
+            3.32,
+            4.3
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发双源交叉验证不足",
+            "近 5 场战绩与 xG 未拉取",
+            "国际盘 MCP 批量匹配本轮成功率低（候选池截断），未写入独立国际盘块"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "南特",
+          "away": "圣旺红星",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            52.7,
+            28.4,
+            18.9
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六021",
+          "home": "南特",
+          "away": "圣旺红星",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_009_南特_圣旺红星.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六022",
+      "home": "阿尔克马",
+      "away": "海牙",
+      "league": "荷甲 2026-08-09 03:00",
+      "kickoff": "2026-08-09 03:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 2,
+          "notes": [
+            "市场倾向主",
+            "HAD 1.28/4.9/6.95",
+            "盘口极热"
+          ],
+          "gap": false,
+          "odds": [
+            1.28,
+            4.9,
+            6.95
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停名单双源缺失；天气/国际盘未采"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "阿尔克马",
+          "away": "海牙",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            71.8,
+            17.7,
+            10.5
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六022",
+          "home": "阿尔克马",
+          "away": "海牙",
+          "direction": "主胜",
+          "strength": 100,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_010_阿尔克马_海牙.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六023",
+      "home": "格雷米奥",
+      "away": "圣保罗",
+      "league": "巴甲 2026-08-09 03:00",
+      "kickoff": "2026-08-09 03:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 2.3/2.75/3.02"
+          ],
+          "gap": false,
+          "odds": [
+            2.3,
+            2.75,
+            3.02
+          ]
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战",
+            "含旅行/环境因子"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发、近5场、天气、国际盘"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "格雷米奥",
+          "away": "圣保罗",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            37.3,
+            34.9,
+            27.8
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六023",
+          "home": "格雷米奥",
+          "away": "圣保罗",
+          "direction": "主胜",
+          "strength": 86,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_011_格雷米奥_圣保罗.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六024",
+      "home": "阿马多拉",
+      "away": "里斯本",
+      "league": "葡超 2026-08-09 03:30",
+      "kickoff": "2026-08-09 03:30",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "无可用 HAD"
+          ],
+          "gap": true,
+          "odds": null
+        },
+        "env": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "主场作战"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 0,
+          "notes": [
+            "身份需警惕重名"
+          ],
+          "gap": true
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停双源、首发、国际盘均缺"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱",
+        "身份核验存疑"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": null,
+        "llm": {
+          "match_num": "周六024",
+          "home": "阿马多拉",
+          "away": "里斯本",
+          "direction": "客胜",
+          "strength": 50,
+          "score_pref": "1-2"
+        }
+      },
+      "action": "observe",
+      "primary_direction": "客胜",
+      "alt_direction": null,
+      "action_reasons": [
+        "无HAD且证据薄 → 仅观察"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_012_阿马多拉_里斯本.md"
+    },
+    {
+      "schema": "match_situation.v1",
+      "generated_at": "2026-08-09T11:33:50",
+      "match_num": "周六025",
+      "home": "博塔弗戈",
+      "away": "弗鲁米嫩",
+      "league": "巴甲 2026-08-09 08:00",
+      "kickoff": "2026-08-09 08:00",
+      "label": "证据薄 / 基本面均衡",
+      "dimensions": {
+        "lineup": {
+          "side": "unknown",
+          "grade": 0,
+          "notes": [
+            "伤停/首发证据不足"
+          ],
+          "gap": true
+        },
+        "form": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "近况有叙述"
+          ],
+          "gap": false
+        },
+        "motive": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "战意有叙述"
+          ],
+          "gap": false
+        },
+        "market": {
+          "side": "home",
+          "grade": 1,
+          "notes": [
+            "市场倾向主",
+            "HAD 2.35/3.0/2.7"
+          ],
+          "gap": false,
+          "odds": [
+            2.35,
+            3.0,
+            2.7
+          ]
+        },
+        "env": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "含旅行/环境因子"
+          ],
+          "gap": false
+        },
+        "identity": {
+          "side": "neutral",
+          "grade": 1,
+          "notes": [
+            "身份已核验或可追溯"
+          ],
+          "gap": false
+        },
+        "uncertainty": {
+          "side": "neutral",
+          "grade": 2,
+          "notes": [
+            "关键维缺口数≈2",
+            "伤停/首发/近5场/天气/国际盘"
+          ],
+          "gap": true,
+          "gap_count": 2
+        }
+      },
+      "conflicts": [
+        "关键证据维缺口≥2，信息态势脆弱"
+      ],
+      "fund_lean": "neutral",
+      "tracks": {
+        "quant": {
+          "home": "博塔弗戈",
+          "away": "弗鲁米嫩",
+          "match_num": "",
+          "direction": "主胜",
+          "pct": [
+            36.6,
+            31.9,
+            31.5
+          ],
+          "mode": "market_only",
+          "dependency": 100,
+          "banker_allowed": false,
+          "gate_reasons": [
+            "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+            "CALIBRATED_PROBABILITY_UNAVAILABLE",
+            "ONE_GOAL_OR_PUSH_RISK"
+          ],
+          "action_note": "市场主方向 H，仅作基线；比分/大小球/BTTS/让球需单独降级"
+        },
+        "llm": {
+          "match_num": "周六025",
+          "home": "博塔弗戈",
+          "away": "弗鲁米嫩",
+          "direction": "主胜",
+          "strength": 50,
+          "score_pref": "2-1"
+        }
+      },
+      "action": "dual",
+      "primary_direction": "主胜",
+      "alt_direction": "平局",
+      "action_reasons": [
+        "LLM强度50%<60 → 强制双选",
+        "证据缺口多 → 双选或降级",
+        "自动补双选备选=平局"
+      ],
+      "banker_allowed": false,
+      "banker_note": "态势层永不直接出胆；出胆仅看量化 recommendation_gate.banker_allowed",
+      "evidence_file": "evidence_013_博塔弗戈_弗鲁米嫩.md"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM证据驱动（3模型：zhipu/qwen/deepseek）",
+  "match_num": "周六021",
+  "match_id": "sporttery-2040798",
+  "match": "南特 vs 圣旺红星",
+  "competition": "法乙",
+  "kickoff": "2026-08-09T02:45:00+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）",
+    "single_preference": "主胜（H）",
+    "strength_pct": 100,
+    "votes": {
+      "主胜": 3.0
+    },
+    "caution": false,
+    "note": "证据以体彩官方盘口+身份核验为主；伤停/近况深搜本轮缺口。"
+  },
+  "score_picks": [
+    "2-1"
+  ],
+  "models": [
+    {
+      "model": "qwen-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "让球盘口客胜赔率1.92，反映市场对南特让一球有较强信心【让球盘口: 客胜1.92】"
+    },
+    {
+      "model": "deepseek-chat",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【赔率异动：主1.68/平3.32/客4.3】主胜赔率低且让球-1仍开3.32，市场明确倾向南特。【主客：南特主场对阵圣"
+    },
+    {
+      "model": "glm-4-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【战意/动机: 法乙联赛属性】【主客/旅行/天气: 主场对阵】南特在主场作战且处于法乙联赛，战意强烈，主场优势明显。"
+    }
+  ],
+  "signals": [
+    "体彩HAD=[1.68, 3.32, 4.3]",
+    "HHAD={'line': -1.0, 'odds': [3.32, 3.25, 1.92]}",
+    "LLM强度=100%"
+  ],
+  "evidence": [
+    {
+      "fact": "体彩官方胜平负 [1.68, 3.32, 4.3]；更新 2026-08-08 17:51:33",
+      "source": "https://webapi.sporttery.cn/gateway/uniform/football/getFixedBonusV1.qry?clientCode=3001&matchId=2040798",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "odds_official",
+      "basis": "sales-day collect 2026-08-08"
+    },
+    {
+      "fact": "身份核验 主=南特 客=圣旺红星",
+      "source": "sporttery team_ids",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "identity",
+      "basis": "raw.json"
+    }
+  ],
+  "comparison_note": "量化 final=[52.7, 28.4, 18.9] market=[55.4, 25.5, 19.0]；LLM 单选 主胜（H） 强度100%",
+  "pre_registered_at": "2026-08-08T20:04+0800",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

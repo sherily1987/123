@@ -1,0 +1,113 @@
+{
+  "home": "Brommapojkarna",
+  "away": "Malmo FF",
+  "competition": "瑞超",
+  "stage": "瑞超",
+  "kickoff": "2026-08-02T21:00:00+08:00",
+  "mode": "hybrid",
+  "apifootball_match_id": "715562",
+  "apifootball_league_id": "307",
+  "field_meta": {
+    "odds": {
+      "observed_at": "2026-08-02T20:00:00+08:00",
+      "freshness": 100,
+      "reliability": 100
+    },
+    "lambda_prior": {
+      "status": "VALID",
+      "source": "apifootball_events_dynamic_dc",
+      "observed_at": "2026-08-02T21:00:00+08:00",
+      "sample_legs": 114,
+      "calibration": "UNFITTED"
+    },
+    "api_features": {
+      "status": "VALID",
+      "as_of": "2026-08-02T21:00:00+08:00",
+      "history_matches": 114,
+      "no_future_leakage": true,
+      "xg_status": "MISSING_UNLESS_EXPLICIT",
+      "note": "统计/首发/积分榜仍保留原始分层；未回测不自动改写系数。"
+    }
+  },
+  "odds": [
+    2.5,
+    3.2,
+    2.8
+  ],
+  "lambda_prior": {
+    "lambda_home": 1.8533,
+    "lambda_away": 1.6621,
+    "weight": 0.02,
+    "source": "apifootball_events_dynamic_dc",
+    "sample_legs": 114,
+    "note": "严格使用kickoff前历史赛果；权重需联赛OOS校准"
+  },
+  "adjustment_ledger": [
+    {
+      "field": "lambda_prior",
+      "fact": "APIfootball历史赛果拟合的时间衰减Dixon-Coles球队λ",
+      "source": "apifootball.com get_events",
+      "mapping_basis": "kickoff前历史赛果，半衰期500天，联赛内拟合",
+      "calibration": "UNFITTED",
+      "system_generated": true,
+      "sample_legs": 114
+    }
+  ],
+  "api_features": {
+    "provider": "apifootball.com",
+    "as_of": "2026-08-02T21:00:00+08:00",
+    "statistics": null,
+    "standings": null,
+    "lineups": null,
+    "official_prediction": null,
+    "external_market": null,
+    "history_matches": 114,
+    "window": 5,
+    "team_strength": {
+      "status": "VALID",
+      "home": "Brommapojkarna",
+      "away": "Malmo FF",
+      "lambda_home": 1.8533,
+      "lambda_away": 1.6621,
+      "home_adv": 0.3557,
+      "probs_1x2": [
+        0.4358,
+        0.2066,
+        0.3576
+      ],
+      "source": "dixon_coles_team_strength"
+    },
+    "rolling_statistics": {
+      "home_team_history": {
+        "home": {
+          "shots_total": null,
+          "shots_on_target": null,
+          "shots_inside_box": null,
+          "shots_outside_box": null,
+          "shots_blocked": null,
+          "dangerous_attacks": null,
+          "attacks": null,
+          "possession": null
+        },
+        "away": {
+          "shots_total": null,
+          "shots_on_target": null,
+          "shots_inside_box": null,
+          "shots_outside_box": null,
+          "shots_blocked": null,
+          "dangerous_attacks": null,
+          "attacks": null,
+          "possession": null
+        }
+      }
+    },
+    "no_future_leakage": true
+  },
+  "feature_build": {
+    "provider": "apifootball.com",
+    "events": 114,
+    "statistics_records": 1,
+    "injected_lambda_prior": 1,
+    "mode": "hybrid"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "status": "ok",
+  "n_evaluated": 48,
+  "n_skipped": 0,
+  "actual_distribution_pct": [
+    45.8,
+    25.0,
+    29.2
+  ],
+  "scores": {
+    "model_brier": 0.5484,
+    "model_logloss": 0.9234,
+    "market_brier": 0.5484,
+    "market_logloss": 0.9234,
+    "baseline_brier": 0.6424
+  },
+  "calibration_table": [
+    {
+      "bin": "0%-20%",
+      "n": 27,
+      "avg_pred_pct": 14.8,
+      "actual_pct": 7.4,
+      "gap_pp": 7.3
+    },
+    {
+      "bin": "20%-40%",
+      "n": 74,
+      "avg_pred_pct": 27.6,
+      "actual_pct": 25.7,
+      "gap_pp": 2.0
+    },
+    {
+      "bin": "40%-60%",
+      "n": 29,
+      "avg_pred_pct": 47.8,
+      "actual_pct": 62.1,
+      "gap_pp": -14.3
+    },
+    {
+      "bin": "60%-80%",
+      "n": 14,
+      "avg_pred_pct": 69.3,
+      "actual_pct": 64.3,
+      "gap_pp": 5.0
+    },
+    {
+      "bin": "80%-100%",
+      "n": 0,
+      "avg_pred_pct": null,
+      "actual_pct": null,
+      "gap_pp": null
+    }
+  ],
+  "verdict": [
+    "✅ 打败基础频率基线（0.5484 < 0.6424）",
+    "❌ 未打败市场基线（0.5484 >= 0.5484）——直接抄盘口比用模型更准，模型在引入噪声",
+    "⚠️ 样本量仅 48 场，统计噪声很大。Brier 差异小于 0.02 时不要当真。建议至少 200 场再下结论。"
+  ],
+  "skipped_detail": [],
+  "how_to_read": {
+    "brier": "0 = 完美，越低越好。三分类随机猜约 0.67。",
+    "calibration_table": "gap_pp 接近 0 表示校准良好。正值 = 模型过于自信，负值 = 过于保守。",
+    "next_step": "若某档 gap_pp 系统性偏正，说明模型高估了自己；可回到 predict.py 顶部调整 [UNFITTED] 常数后重跑本脚本。"
+  }
+}

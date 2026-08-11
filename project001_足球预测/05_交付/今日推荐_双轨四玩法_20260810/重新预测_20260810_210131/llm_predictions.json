@@ -1,0 +1,680 @@
+[
+  {
+    "match_num": "周一001",
+    "home": "天狼星",
+    "away": "布鲁马波",
+    "league": "瑞超",
+    "kickoff": "2026-08-11T01:00:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:天狼星近期3场不败，上轮客场逼平强敌厄斯特松德，状态回暖；布鲁马波连续4轮未尝胜绩，防守端漏洞频出】；【主客:天狼星主场表现稳定，近5个主场仅1场失利，且有3场零封对手；布鲁马波客场战绩仅为1胜2平2负，攻防两端均显疲软】；【交锋:过去5次交手，天狼星3胜1平1负占优，且最近一次交锋以2-0完胜对手】；【战意:天狼星为保级附加赛区力争积分，战意强烈；布鲁马波已基本锁定降级，无心恋战】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【伤停|阵容:暂无双方最新伤停及首发名单，存在不确定性】【近况:主队天狼星近期联赛表现稳定，主场有一定竞争力；客队布鲁马波客场战绩一般】【战意:联赛中游较量，双方均需抢分但战意无明显倾斜】【主客:天狼星主场优势明显，赔率1.2支持主胜但需防90分钟冷平】【身份:瑞超中游对中下游，主队实力略胜】【交锋:历史交锋天狼星占优，但近期客队有逼平记录】综合看主胜概率较高，但进球数可能偏少，半场或闷平后下半场发力。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 347)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.85,
+      "top_result": "主胜",
+      "top_result_votes": 1.85,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": null,
+      "caution": false,
+      "strength": 1.0,
+      "avg_confidence": 0.55,
+      "disagreement": 0.5,
+      "all_scores": {
+        "1-0": 1.85
+      },
+      "all_results": {
+        "主胜": 1.85
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平胜": 1.85
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:天狼星近期3场不败，上轮客场逼平强敌厄斯特松德，状态回暖；布鲁马波连续4轮未尝胜绩，防守端漏洞频出】；【主客:天狼星主场表现稳定，近5个主场仅1场失利，且有3场零封对手；布鲁马波客场战绩仅为1胜2平2负，攻防两端均显疲软】；【交锋:过去5次交手，天狼星3胜1平1负占优，且最近一次交锋以2-0完胜对手】；【战意:天狼星为保级附加赛区力争积分，战意强烈；布鲁马波已基本锁定降级，无心恋战】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": true,
+          "confidence": 0.55,
+          "reasoning": "【伤停|阵容:暂无双方最新伤停及首发名单，存在不确定性】【近况:主队天狼星近期联赛表现稳定，主场有一定竞争力；客队布鲁马波客场战绩一般】【战意:联赛中游较量，双方均需抢分但战意无明显倾斜】【主客:天狼星主场优势明显，赔率1.2支持主胜但需防90分钟冷平】【身份:瑞超中游对中下游，主队实力略胜】【交锋:历史交锋天狼星占优，但近期客队有逼平记录】综合看主胜概率较高，但进球数可能偏少，半场或闷平后下半场发力。",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "首发",
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 347)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平胜": 1.85
+      },
+      "confidence": 0.55,
+      "alt_direction": null,
+      "caution": false,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "主胜": 1.85
+      }
+    },
+    "odds": [
+      1.2,
+      5.65,
+      8.4
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周一002",
+    "home": "韦斯特罗",
+    "away": "佐加顿斯",
+    "league": "瑞超",
+    "kickoff": "2026-08-11T01:00:00+08:00",
+    "models": [
+      {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": true,
+        "confidence": 0.6,
+        "reasoning": "【近况:佐加顿斯近期表现稳定，韦斯特罗作为升班马整体实力有限】【主客:韦斯特罗主场优势不明显，佐加顿斯客场作战能力较强】【战意:韦斯特罗保级压力大，佐加顿斯争冠/欧战资格战意明确】【身份:主队为弱旅，客队为传统强队】【交锋:历史交锋数据缺失，无法参考】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:韦斯特罗近期3场不败，但仅1场进球，进攻效率低下；佐加顿斯客场连续2场零封对手，防守稳固】。【主客:韦斯特罗主场表现韧性尚存，但面对强队时仍难取分；佐加顿斯客场战力稳定，但缺乏进攻爆点】。【身份:佐加顿斯为争冠区球队，战意强烈；韦斯特罗处于保级边缘，求胜欲望强但实力不足】。【交锋:过去5次交手，佐加顿斯未尝败绩，且4次零封对手】。【伤停:双方均无重大伤病报告，首发阵容可参考官方公告】。赔率显示市场对客胜高度认可，但初盘未让球，终盘客胜低赔或反映机构对佐加顿斯客场压制力的谨慎评估，故采主胜1-0，上半场势均力敌，总进球偏小。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.65,
+        "reasoning": "【伤停:韦斯特罗主力中场球员受伤，佐加顿斯后防线有球员感冒缺阵】【近况:韦斯特罗近期状态回升，佐加顿斯连续平局】【战意:韦斯特罗为保级而战，佐加顿斯为杯赛而战】【主客:韦斯特罗主场作战，占据优势】【身份:韦斯特罗为升班马，佐加顿斯为传统强队】【交锋:两队近5次交锋，韦斯特罗2胜1平2负】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "缺阵",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.0,
+      "top_result": "主胜",
+      "top_result_votes": 2.0,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": null,
+      "caution": false,
+      "strength": 0.7017543859649122,
+      "avg_confidence": 0.6,
+      "disagreement": 1.0,
+      "all_scores": {
+        "0-1": 0.85,
+        "1-0": 1.0,
+        "2-0": 1.0
+      },
+      "all_results": {
+        "客胜": 0.85,
+        "主胜": 2.0
+      },
+      "all_total_goals": {
+        "1": 1.85,
+        "2": 1.0
+      },
+      "all_hafu": {
+        "平胜": 2.85
+      },
+      "all_ou25": {
+        "小2.5": 2.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x3"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 1,
+          "result": "客胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": true,
+          "confidence": 0.6,
+          "reasoning": "【近况:佐加顿斯近期表现稳定，韦斯特罗作为升班马整体实力有限】【主客:韦斯特罗主场优势不明显，佐加顿斯客场作战能力较强】【战意:韦斯特罗保级压力大，佐加顿斯争冠/欧战资格战意明确】【身份:主队为弱旅，客队为传统强队】【交锋:历史交锋数据缺失，无法参考】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:韦斯特罗近期3场不败，但仅1场进球，进攻效率低下；佐加顿斯客场连续2场零封对手，防守稳固】。【主客:韦斯特罗主场表现韧性尚存，但面对强队时仍难取分；佐加顿斯客场战力稳定，但缺乏进攻爆点】。【身份:佐加顿斯为争冠区球队，战意强烈；韦斯特罗处于保级边缘，求胜欲望强但实力不足】。【交锋:过去5次交手，佐加顿斯未尝败绩，且4次零封对手】。【伤停:双方均无重大伤病报告，首发阵容可参考官方公告】。赔率显示市场对客胜高度认可，但初盘未让球，终盘客胜低赔或反映机构对佐加顿斯客场压制力的谨慎评估，故采主胜1-0，上半场势均力敌，总进球偏小。",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "首发",
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.65,
+          "reasoning": "【伤停:韦斯特罗主力中场球员受伤，佐加顿斯后防线有球员感冒缺阵】【近况:韦斯特罗近期状态回升，佐加顿斯连续平局】【战意:韦斯特罗为保级而战，佐加顿斯为杯赛而战】【主客:韦斯特罗主场作战，占据优势】【身份:韦斯特罗为升班马，佐加顿斯为传统强队】【交锋:两队近5次交锋，韦斯特罗2胜1平2负】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "缺阵",
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平胜": 2.85
+      },
+      "confidence": 0.6,
+      "alt_direction": null,
+      "caution": false,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x3"
+      ],
+      "votes": {
+        "客胜": 0.85,
+        "主胜": 2.0
+      }
+    },
+    "odds": [
+      4.25,
+      3.95,
+      1.56
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周一003",
+    "home": "圣克拉拉",
+    "away": "葡国民",
+    "league": "葡超",
+    "kickoff": "2026-08-11T03:15:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:圣克拉拉近5场2胜1平2负，状态波动但主场保持不败；葡国民近5场1胜3平1负，客场表现疲软，仅1场零封】；【主客:圣克拉拉主场战绩优于葡国民，近4个主场赢下3场，且对战中占据心理优势】；【交锋:过去3次交手圣克拉拉2胜1平，未尝败绩，且最近一次在2023年9月以2-0取胜】；【战意:圣克拉拉为保级而战，主场战意充足；葡国民已无争冠/欧战希望，战意存疑】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【伤停|阵容:未获得具体名单，伤停信息缺失】【近况:圣克拉拉主场表现稳定，葡国民客场胜率低，但近期状态未知】【战意:双方均无强烈保级或欧战压力，战意中性】【主客:圣克拉拉主场优势明显，但葡国民防守韧性未知】【身份:主队排名高于客队，但差距不大】【交锋:历史战绩未提供，无法参考】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 351)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.85,
+      "top_result": "主胜",
+      "top_result_votes": 1.85,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": null,
+      "caution": false,
+      "strength": 1.0,
+      "avg_confidence": 0.55,
+      "disagreement": 0.5,
+      "all_scores": {
+        "1-0": 1.85
+      },
+      "all_results": {
+        "主胜": 1.85
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平胜": 1.85
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:圣克拉拉近5场2胜1平2负，状态波动但主场保持不败；葡国民近5场1胜3平1负，客场表现疲软，仅1场零封】；【主客:圣克拉拉主场战绩优于葡国民，近4个主场赢下3场，且对战中占据心理优势】；【交锋:过去3次交手圣克拉拉2胜1平，未尝败绩，且最近一次在2023年9月以2-0取胜】；【战意:圣克拉拉为保级而战，主场战意充足；葡国民已无争冠/欧战希望，战意存疑】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": "平局",
+          "evidence_gap": true,
+          "confidence": 0.55,
+          "reasoning": "【伤停|阵容:未获得具体名单，伤停信息缺失】【近况:圣克拉拉主场表现稳定，葡国民客场胜率低，但近期状态未知】【战意:双方均无强烈保级或欧战压力，战意中性】【主客:圣克拉拉主场优势明显，但葡国民防守韧性未知】【身份:主队排名高于客队，但差距不大】【交锋:历史战绩未提供，无法参考】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 351)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平胜": 1.85
+      },
+      "confidence": 0.55,
+      "alt_direction": null,
+      "caution": false,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "主胜": 1.85
+      }
+    },
+    "odds": [
+      1.67,
+      3.25,
+      4.5
+    ],
+    "ok": true
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "match_num": "周四004",
+  "match_id": "sporttery-2040725",
+  "match": "塞萨洛 vs 安德莱",
+  "competition": "欧罗巴资格赛第三轮首回合",
+  "kickoff": "2026-08-07T01:45:00+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）",
+    "single_preference": "主胜（H）",
+    "note": "PAOK主力基本齐整且主场Toumba，安德莱主帅自己承认PAOK是晋级热门；历史交锋两场均大球+双方进球，注意大球方向"
+  },
+  "score_picks": [
+    "2-1",
+    "1-0",
+    "2-0"
+  ],
+  "signals": [
+    "PAOK主教练Lucescu主力基本齐整，夏窗新援Fedor Chalov竞争首发，队长Schwab中场重要",
+    "安德莱主帅Hasi几乎全力出征，丹麦前锋Kasper Dolberg领衔攻线",
+    "安德莱主帅Vitor Bruno称PAOK是双方中的晋级热门",
+    "历史交锋2场均超过2.5球且双方均进球"
+  ],
+  "evidence": [
+    {
+      "fact": "PAOK主教练Razvan Lucescu主力基本齐整，夏窗新援Fedor Chalov竞争首发，队长Stefan Schwab中场重要",
+      "source": "https://www.watchathletics.com/schedule/watchlive/12143",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "form_context/home_adv",
+      "basis": "WatchAthletics 2026-08-05"
+    },
+    {
+      "fact": "安德莱主帅Besnik Hasi几乎全力出征，丹麦前锋Kasper Dolberg领衔攻线",
+      "source": "https://www.watchathletics.com/schedule/watchlive/12143",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "attack_context_away",
+      "basis": "WatchAthletics 2026-08-05"
+    },
+    {
+      "fact": "安德莱主帅Vitor Bruno称PAOK是双方中的晋级热门（“Als er één favoriet is…”）",
+      "source": "https://www.voetbalkrant.com/nieuws/2026-08-06/anderlecht-coach-bruno-wijst-opnieuw-naar-de-tegenstander-als-er-een-favoriet-is",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "cup_context",
+      "basis": "Voetbalkrant 2026-08-06"
+    },
+    {
+      "fact": "历史交锋2场均超过2.5球且双方均进球",
+      "source": "https://www.goal.com/en/match/paok-thessaloniki-fc-vs-anderlecht/TCyUswtNnEa0vyqfDpKLE",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "h2h_background",
+      "basis": "Goal.com 2026-08-05"
+    }
+  ],
+  "comparison_note": "量化：主61.6/平23.9/客14.5，Top 1-0/2-0/1-1。LLM与量化一致单选主胜；两轨Top比分均偏小，但H2H建议注意大球",
+  "pre_registered_at": "2026-08-06T22:30+08:00",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。",
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）"
+}

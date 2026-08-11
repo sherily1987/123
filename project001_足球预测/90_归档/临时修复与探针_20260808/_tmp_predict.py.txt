@@ -1,0 +1,433 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+LLM 轨道预测: 搜索证据驱动定性判断
+=================================
+读取 evidence_<date>/ 目录下的六类证据文件, 拼接官方赔率,
+调用多个免费LLM做定性判断(H/D/A方向+比分偏好, 不伪概率),
+聚合投票输出综合方向。
+
+用法:
+  python predict.py --input data/raw_2026-08-05.json --evidence-dir data/evidence_2026-08-05
+"""
+
+import argparse
+import glob
+import json
+import os
+import re
+import sys
+import threading
+import time
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import football_predictor as fp
+
+EVIDENCE_SYSTEM_PROMPT = """你是一名专业的足球数据分析师。以下是基于真实来源搜索整理的本场比赛证据(伤停/阵容、战意/动机、近况/状态、主客/旅行/天气、赔率异动、身份核验)和官方赔率。
+
+请基于证据做定性判断, 只输出一个 JSON 对象, 不要输出任何其他文字:
+{"direction": "主胜", "alt_direction": null, "score_pref": "2-1", "reasoning": "60字以内, 必须引用具体证据"}
+
+规则:
+1. direction 只能是 "主胜"/"平局"/"客胜" 之一(单选必填)。
+2. alt_direction 是备选方向(双选), 拿不准时可填 "主胜"/"平局"/"客胜" 之一, 确定单选则填 null。
+3. score_pref 是竞彩"正确比分"可兑奖选项(格式 "2-1"), 只能从以下选: 主胜 1-0/2-0/2-1/3-0/3-1/3-2/4-0/4-1/4-2/5-0/5-1/5-2/胜其他; 平局 0-0/1-1/2-2/3-3/平其他; 客胜 0-1/0-2/1-2/0-3/1-3/2-3/0-4/1-4/2-4/0-5/1-5/2-5/负其他。超出常规档位的比分(如6-0、7-1、4-4)填对应"其他"。不确定可填 null。
+4. reasoning 必须引用至少一条证据文件中的具体事实, 禁止编造; 引用格式: 【类别: 事实】。
+5. 禁止输出伪概率、伪xG。只做定性判断。
+6. 官方赔率只是市场参考, 不是事实真相。当赔率与伤停/状态/战意等基本面证据冲突时, 以证据为准, 独立判断。
+7. 两回合制/杯赛(资格赛/杯赛首回合)场次冷门频发, 大热方(尤其大热主胜)风险高, 拿不准时优先给双选。
+8. 竞彩结算口径: 比分/方向只按 90 分钟(含伤停补时)计算! 加时赛和点球大战的进球不计入最终比分。预测 score_pref 与 direction 必须基于 90 分钟结果, 即使比赛可能进入加时/点球(如杯赛淘汰赛), 也按 90 分钟内的比分预测。"""
+
+
+def load_evidence(evidence_dir):
+    """读取证据目录下所有 md 文件, 返回 {文件名: 内容}。"""
+    result = {}
+    for path in sorted(glob.glob(os.path.join(evidence_dir, "*.md"))):
+        with open(path, encoding="utf-8") as f:
+            result[os.path.basename(path)] = f.read()
+    return result
+
+
+def match_evidence_file(match_idx, evidence_files):
+    """按序号前缀匹配证据文件, 跳过 *_mcp.md (MCP 数据块, 由 match_mcp_file 单独取)。"""
+    prefix = f"evidence_{match_idx:03d}"
+    for name in evidence_files:
+        if name.startswith(prefix) and not name.endswith("_mcp.md"):
+            return name
+    return None
+
+
+def match_mcp_file(match_idx, evidence_files):
+    """按序号前缀匹配 *_mcp.md (apifootball MCP 数据证据块, mcp_evidence.py 生成)。"""
+    prefix = f"evidence_{match_idx:03d}"
+    for name in evidence_files:
+        if name.startswith(prefix) and name.endswith("_mcp.md"):
+            return name
+    return None
+
+
+def build_evidence_prompt(match, evidence_text, match_idx):
+    """证据 + 官方赔率 -> LLM prompt。
+    冷门规则: 两回合制/杯赛场次在 prompt 中提示冷门风险, 引导模型不盲从赔率。"""
+    lines = [f"比赛信息：{match['home']} VS {match['away']} | {match.get('league', '')} | {match.get('kickoff_local', '')}"]
+    # 官方赔率
+    mo = match.get("model_odds") or []
+    if len(mo) >= 3:
+        lines.append(f"官方胜平负赔率: 主胜{mo[0]} / 平{mo[1]} / 客胜{mo[2]}")
+    hh = match.get("model_hhad") or {}
+    if hh.get("odds"):
+        line = hh.get("line", 0)
+        sign = "+" if line > 0 else ""
+        lines.append(f"官方让球({sign}{line:g})赔率: 主胜{hh['odds'][0]} / 平{hh['odds'][1]} / 客胜{hh['odds'][2]}")
+    # 冷门提示: 两回合制赛事主队被高估风险
+    if is_two_legged(match.get("league", ""), evidence_text or ""):
+        lines.append("\n⚠️ 冷门提示: 本场为两回合制/杯赛(资格赛/杯赛首回合), 历史数据显示此类赛事"
+                     "主队胜率低于赔率隐含概率, 冷门频发。请特别警惕'大热主胜', 独立判断时"
+                     "不要盲从赔率, 优先参考伤停/状态/战意等基本面证据, 可考虑双选。")
+    # 证据
+    if evidence_text:
+        lines.append("\n=== 六类证据(来源已交叉验证, 采集时间 2026-08-05) ===")
+        lines.append(evidence_text.strip())
+    lines.append("\n请基于上述证据做定性判断(方向 + 比分偏好), 输出 JSON。")
+    return "\n".join(lines)
+
+
+def parse_evidence_prediction(content):
+    """解析模型输出的 JSON 定性判断。"""
+    text = content.strip()
+    # 去掉可能的 markdown 代码块
+    text = re.sub(r"^```(json)?\s*|\s*```$", "", text)
+    m = re.search(r"\{.*\}", text, re.S)
+    if not m:
+        return {"error": f"无JSON: {content[:80]}"}
+    try:
+        data = json.loads(m.group(0))
+    except json.JSONDecodeError as e:
+        return {"error": f"JSON解析失败: {e}"}
+    direction = str(data.get("direction", "")).strip()
+    if direction not in ("主胜", "平局", "客胜"):
+        return {"error": f"非法direction: {direction}"}
+    alt = str(data.get("alt_direction") or "").strip() or None
+    if alt not in (None, "主胜", "平局", "客胜"):
+        alt = None
+    sp = normalize_score_pref(data.get("score_pref"))
+    reasoning = str(data.get("reasoning", "")).strip()[:200]
+    return {"direction": direction, "alt_direction": alt,
+            "score_pref": sp, "reasoning": reasoning}
+
+
+# 竞彩"正确比分"(CRS)玩法可兑奖选项 + "其他"兜底 —— 预测必须落在这些选项内
+# 否则输出如 6-0 / 3-4 在体彩无法兑奖。格式统一用 "2-1" (score_pref 契约)
+CRS_OPTIONS = [
+    # 主胜 13 项
+    "1-0", "2-0", "2-1", "3-0", "3-1", "3-2",
+    "4-0", "4-1", "4-2", "5-0", "5-1", "5-2",
+    # 平局 5 项
+    "0-0", "1-1", "2-2", "3-3",
+    # 客胜 13 项
+    "0-1", "0-2", "1-2", "0-3", "1-3", "2-3",
+    "0-4", "1-4", "2-4", "0-5", "1-5", "2-5",
+]
+CRS_OTHER = {"主胜": "胜其他", "平局": "平其他", "客胜": "负其他"}
+CRS_VALID = set(CRS_OPTIONS) | set(CRS_OTHER.values())
+
+
+def map_score_to_crs(home, away):
+    """实际/预测比分(home, away 整数) -> 竞彩可兑奖比分选项。
+    在标准选项内返回该比分; 否则返回对应"其他"(如 6-0 -> 胜其他, 4-4 -> 平其他)。"""
+    if home > away:
+        s = f"{home}-{away}"
+        return s if s in CRS_OPTIONS else CRS_OTHER["主胜"]
+    if home == away:
+        s = f"{home}-{away}"
+        return s if s in CRS_OPTIONS else CRS_OTHER["平局"]
+    s = f"{home}-{away}"
+    return s if s in CRS_OPTIONS else CRS_OTHER["客胜"]
+
+
+def normalize_score_pref(raw):
+    """把模型输出的比分偏好规整为竞彩选项。
+    "2-1" 合法 -> "2-1"; "6-0" -> "胜其他"; "胜其他" 原样; 非法/空 -> None。"""
+    if not raw:
+        return None
+    raw = str(raw).strip()
+    if raw in CRS_VALID:
+        return raw
+    m = re.match(r"^(\d+)-(\d+)$", raw)
+    if m:
+        return map_score_to_crs(int(m.group(1)), int(m.group(2)))
+    return None
+
+
+def sanitize_for_zhipu(text):
+    """智谱 glm-4-flash 对博彩/盘口类词汇有内容过滤(400 code 1301)。
+    预测调用前替换为中性词, 不影响其他 provider。"""
+    t = re.sub(r'威廉希尔|立博|Bet365|bet365|Interwetten|澳门盘|澳门', '多家机构', text)
+    t = re.sub(r'初盘-终盘|初盘|终盘|盘口|水位|让球盘', '赔率变化', t)
+    t = re.sub(r'博彩', '数据', t)
+    return t
+
+
+# 角色差异化: 每个模型扮演不同分析角色, 让投票真正独立(降低同质化)。
+# 角色名按模型ID匹配, 未匹配的使用 EVIDENCE_SYSTEM_PROMPT(中性角色)。
+ROLE_PROMPTS = {
+    # 基本面派: 重伤停/状态/战意, 轻赔率
+    "zhipu/glm-4-flash": """你是一名注重基本面的足球分析师。你的核心信念: 伤病、状态、战意比赔率更可靠。
+重点关注: 伤停/阵容完整度、近期状态趋势、战意动机(杯赛轮次/保级/争冠)。
+官方赔率仅供参考, 若赔率与基本面证据冲突, 坚定相信基本面, 敢于反市场。""",
+    # 数据/赔率派: 重赔率异动与资金流
+    "qwen/qwen-flash": """你是一名市场分析派足球分析师。你的核心信念: 赔率是无数资金投票的结果, 赔率异动反映真实信息。
+重点关注: 赔率走势(初盘→当前)、资金流向、让球盘口变化。
+当赔率异动与静态证据矛盾时, 倾向相信市场的最新动向。""",
+    # 冷门猎手: 专门寻找被高估的热门
+    "groq/llama-3.3-70b-versatile": """你是一名专猎冷门的足球分析师。你的核心信念: 足球比赛冷门远比大众预期的多, 热门常被高估。
+重点关注: 两回合制/杯赛的首回合、大热主胜的风险、客队长途旅行的疲惫。
+你倾向给双选, 对'稳赢'的说法保持高度怀疑。""",
+    # 保守审慎派: 求稳, 倾向平局和低比分
+    "moonshot/kimi-k2.6": """你是一名保守审慎的足球分析师。你的核心信念: 足球比赛平局和低比分比想象中多, 激进预测常翻车。
+重点关注: 双方防守质量、近期平局率、总进球偏少的信号。
+你倾向平局和 1-1/2-1 这类常见比分, 不追大冷也不追大热。""",
+    # 技术流: 重阵型战术与人员
+    "gemini/gemini-3-flash-preview": """你是一名战术流足球分析师。你的核心信念: 比赛由阵型克制、核心球员、教练部署决定。
+重点关注: 预计首发、阵型对位、核心球员(射手/组织者)状态、新帅磨合。
+你重视主客场因素和天气对战术的影响。""",
+    # 逆向思维派: 专找市场错误定价
+    "ark/doubao-seed-evolving": """你是一名逆向思维足球分析师。你的核心信念: 市场赔率经常错误定价, 机会在赔率与实力差背离处。
+重点关注: 赔率隐含概率 vs 证据支撑强度的背离、被忽视的客队/弱队。
+当证据明确支持弱方时, 你敢给出反市场判断。""",
+    # 深度推理派: 综合所有证据做严谨推演
+    "deepseek/deepseek-chat": """你是一名深度推理派足球分析师。你的核心信念: 好预测来自对全部证据的系统推演, 而不是单一信号。
+你会: 先列关键证据(伤停/状态/战意/主客/赔率), 权衡正反两面, 再给结论。
+特别注意竞彩结算口径(90分钟含补时, 加时/点球不计入)与两回合制赛事的冷门风险。
+你的 reasoning 要体现推演链条: 证据 -> 权衡 -> 结论。""",
+}
+
+# 公共 JSON 输出规则段(角色化 prompt 与中性 prompt 共用)
+JSON_RULES_SUFFIX = """请基于证据做定性判断, 只输出一个 JSON 对象, 不要输出任何其他文字:
+{"direction": "主胜", "alt_direction": null, "score_pref": "2-1", "reasoning": "60字以内, 必须引用具体证据"}
+
+规则:
+1. direction 只能是 "主胜"/"平局"/"客胜" 之一(单选必填)。
+2. alt_direction 是备选方向(双选), 拿不准时可填 "主胜"/"平局"/"客胜" 之一, 确定单选则填 null。
+3. score_pref 是竞彩"正确比分"可兑奖选项(格式 "2-1"), 只能从以下选: 主胜 1-0/2-0/2-1/3-0/3-1/3-2/4-0/4-1/4-2/5-0/5-1/5-2/胜其他; 平局 0-0/1-1/2-2/3-3/平其他; 客胜 0-1/0-2/1-2/0-3/1-3/2-3/0-4/1-4/2-4/0-5/1-5/2-5/负其他。超出常规档位的比分(如6-0、7-1、4-4)填对应"其他"。不确定可填 null。
+4. reasoning 必须引用至少一条证据文件中的具体事实, 禁止编造; 引用格式: 【类别: 事实】。
+5. 禁止输出伪概率、伪xG。只做定性判断。
+6. 官方赔率只是市场参考, 不是事实真相。当赔率与伤停/状态/战意等基本面证据冲突时, 以证据为准, 独立判断。
+7. 两回合制/杯赛(资格赛/杯赛首回合)场次冷门频发, 大热方(尤其大热主胜)风险高, 拿不准时优先给双选。
+8. 竞彩结算口径: 比分/方向只按 90 分钟(含伤停补时)计算! 加时赛和点球大战的进球不计入最终比分。预测 score_pref 与 direction 必须基于 90 分钟结果, 即使比赛可能进入加时/点球(如杯赛淘汰赛), 也按 90 分钟内的比分预测。"""
+
+# 基础 System Prompt (中性角色, 用于未配置角色的模型)
+EVIDENCE_SYSTEM_PROMPT = """你是一名专业的足球数据分析师。以下是基于真实来源搜索整理的本场比赛证据(伤停/阵容、战意/动机、近况/状态、主客/旅行/天气、赔率异动、身份核验)和官方赔率。
+
+""" + JSON_RULES_SUFFIX
+
+
+def call_evidence_model(client, model, prompt):
+    """调用单个模型做定性判断, 重试逻辑与 call_model 一致。"""
+    err = "未知错误"
+    real_model = fp.strip_provider(model)
+    temperature = fp.MODEL_TEMPERATURE_OVERRIDES.get(real_model, 0.3)
+    for i in range(3):
+        try:
+            if model.startswith("zhipu/"):
+                prompt = sanitize_for_zhipu(prompt)
+            # 角色差异化: 每个模型用专属分析角色(角色段) + 公共JSON输出规则段
+            role_part = ROLE_PROMPTS.get(model)
+            if role_part:
+                sys_prompt = role_part + "\n\n" + JSON_RULES_SUFFIX
+            else:
+                sys_prompt = EVIDENCE_SYSTEM_PROMPT
+            resp = client.chat.completions.create(
+                model=real_model,
+                messages=[
+                    {"role": "system", "content": sys_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=temperature,
+            )
+            content = resp.choices[0].message.content
+            if content is None or not str(content).strip():
+                err = "模型返回空内容(None)"
+            else:
+                return model, parse_evidence_prediction(content)
+        except Exception as e:
+            err = str(e)[:120]
+            if "429" in err or "Rate limit" in err:
+                time.sleep(10 + i * 15)
+            else:
+                time.sleep(3)
+                break
+    return model, {"error": err}
+
+
+def is_two_legged(league, evidence_text):
+    """检测两回合制赛事(资格赛/杯赛): 这些场次冷门概率显著更高。
+    策略: 联赛名命中优先; 证据正文仅匹配"本场/本回合/本场比赛"上下文中的
+    首回合/次回合/资格赛等强信号, 排除"天皇杯/日联杯/两回合交锋记录"(H2H/荣誉)等干扰。"""
+    league = league or ""
+    # 1) 联赛名直接命中: 最可靠
+    if any(kw in league for kw in ["资格赛", "欧冠", "欧罗巴", "欧协联", "巴西杯",
+                                   "英联杯", "英联赛杯", "日联杯", "足协杯", "国王杯"]):
+        return True
+    # 2) 证据正文: 只看"本场/首回合/次回合"赛事阶段信号, 且排除 H2H/荣誉上下文
+    if evidence_text:
+        # 强信号: 明确提到"本场是...首回合/次回合/资格赛第N轮"
+        import re
+        strong_patterns = [
+            r"本场.{0,15}(首回合|次回合)",
+            r"本场比赛.{0,15}(首回合|次回合)",
+            r"第[一二三三四五六七八九十\d]+轮资格赛",
+            r"资格赛.{0,10}(首回合|次回合)",
+            r"欧罗巴.{0,10}(第[一二三\d]+轮|资格赛)",
+            r"欧冠.{0,10}(第[一二三\d]+轮|资格赛)",
+        ]
+        for pat in strong_patterns:
+            if re.search(pat, evidence_text):
+                return True
+        # 弱信号: "首回合"出现在行首附近(比赛信息区), 且不是"交锋记录/历史"
+        for m in re.finditer(r"首回合|次回合", evidence_text):
+            ctx = evidence_text[max(0, m.start()-60):m.end()+30]
+            if any(neg in ctx for neg in ["交锋", "H2H", "历史", "记录", "首回合0-", "首回合0-2", "战绩"]):
+                continue
+            if "本场" in ctx or "第" in ctx or "轮" in ctx or "资格" in ctx:
+                return True
+    return False
+
+
+def aggregate_directions(predictions):
+    """聚合方向投票: 单选计1票, 双选各计0.5票。
+    分歧规则: 强度<60% 视为低置信, 强制输出备选方向 + 谨慎标记。"""
+    valid = {md: p for md, p in predictions.items()
+             if isinstance(p, dict) and "error" not in p}
+    if not valid:
+        return {"error": "所有模型均调用失败",
+                "errors": [p for p in predictions.values() if isinstance(p, dict) and "error" in p]}
+    votes = Counter()
+    score_prefs = Counter()
+    for md, p in valid.items():
+        votes[p["direction"]] += 1.0
+        if p.get("alt_direction"):
+            votes[p["alt_direction"]] += 0.5
+        if p.get("score_pref"):
+            score_prefs[p["score_pref"]] += 1
+    top_dir, top_votes = votes.most_common(1)[0]
+    total_votes = sum(votes.values())
+    strength = top_votes / total_votes if total_votes else 0
+    top_score = score_prefs.most_common(1)[0][0] if score_prefs else None
+
+    # 分歧规则: 强度<60% 时给出备选方向(第二高票) + 谨慎标记
+    alt_dir = None
+    caution = False
+    if strength < 0.6 and len(votes) > 1:
+        second = votes.most_common(2)[1]
+        alt_dir = second[0]
+        caution = True
+
+    return {"direction": top_dir, "votes": top_votes, "total_votes": total_votes,
+            "strength": strength, "all_votes": dict(votes),
+            "top_score_pref": top_score, "score_prefs": dict(score_prefs),
+            "alt_direction": alt_dir, "caution": caution,
+            "individual": valid}
+
+
+def main():
+    ap = argparse.ArgumentParser(description="LLM轨道: 证据驱动定性预测")
+    ap.add_argument("--input", required=True, help="采集器输出的JSON文件")
+    ap.add_argument("--evidence-dir", required=True, help="证据文件目录")
+    ap.add_argument("--models", nargs="+", default=fp.DEFAULT_MODELS)
+    ap.add_argument("--match-id", type=int, default=None)
+    ap.add_argument("--max-matches", type=int, default=0)
+    args = ap.parse_args()
+
+    with open(args.input, encoding="utf-8") as f:
+        data = json.load(f)
+    matches = data["matches"]
+    if args.max_matches:
+        matches = matches[:args.max_matches]
+    if args.match_id:
+        matches = [m for m in matches if m["match_id"] == args.match_id]
+    if not matches:
+        print("没有符合条件的比赛")
+        return
+
+    evidence_files = load_evidence(args.evidence_dir)
+    print(f"📁 证据文件: {len(evidence_files)} 个")
+    for n in sorted(evidence_files):
+        print(f"   - {n}")
+
+    print(f"🎯 共 {len(matches)} 场比赛待预测, 每场 {len(args.models)} 个模型定性判断\n")
+
+    for i, m in enumerate(matches, 1):
+        if i > 1:
+            print("\n⏳ 场次冷却 5 秒...")
+            time.sleep(5)
+        idx = m.get("match_num", "")
+        # 用场次序号 i 匹配证据文件(evidence_001_~evidence_00N_), 避免 match_num
+        # 数字重复(如"周四001"与"周五001"都是001)导致错配
+        match_idx = i
+        ev_name = match_evidence_file(match_idx, evidence_files)
+        ev_text = evidence_files.get(ev_name, "") if ev_name else ""
+        mcp_name = match_mcp_file(match_idx, evidence_files)
+        if mcp_name:
+            mcp_text = evidence_files[mcp_name]
+            ev_text = (ev_text + "\n\n" + mcp_text) if ev_text else mcp_text
+            print(f"   数据块: {mcp_name} (MCP 已拼入)")
+        if not ev_text:
+            print(f"⚠️ 第{i}场 [{idx}] {m['home']} VS {m['away']} 无证据文件({ev_name or '未找到'}), 跳过")
+            continue
+
+        print("=" * 64)
+        print(f"⚽ 第{i}/{len(matches)}场 [{idx}] {m['home']} VS {m['away']} | {m.get('league', '')} | {m.get('kickoff_local', '')}")
+        print(f"   证据: {ev_name}")
+        print("=" * 64)
+
+        prompt = build_evidence_prompt(m, ev_text, match_idx)
+        predictions = {}
+        lock = threading.Lock()
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            futs = {ex.submit(call_evidence_model,
+                              fp.get_client(fp.provider_for(md)), md, prompt): md
+                    for md in args.models}
+            for fut in as_completed(futs):
+                md, p = fut.result()
+                with lock:
+                    predictions[md] = p
+                if "error" in p:
+                    print(f"     ✗ [{md}] 失败: {p['error'][:55]}")
+                else:
+                    alt = f" / {p['alt_direction']}" if p.get("alt_direction") else ""
+                    sp = f" 比分偏好:{p['score_pref']}" if p.get("score_pref") else ""
+                    print(f"     ✓ [{md.split('/')[-1].split(':')[0][:18]:<18}] "
+                          f"-> {p['direction']}{alt}{sp}")
+
+        agg = aggregate_directions(predictions)
+        if "error" in agg:
+            print(f"  [失败] {agg['error']}")
+            continue
+
+        print(f"\n  📊 综合方向: {agg['direction']}  "
+              f"({agg['votes']:.1f}/{agg['total_votes']:.1f}票, "
+              f"强度{agg['strength']*100:.0f}%)")
+        # 冷门/谨慎标记
+        if is_two_legged(m.get("league", ""), ev_text or ""):
+            print(f"  ⚠️ 两回合制/杯赛场次(冷门风险高)")
+        if agg.get("caution"):
+            alt_dir = agg.get("alt_direction") or "?"
+            print(f"  🚨 低置信(强度<60%): 建议双选 {agg['direction']}/{alt_dir}, 谨慎参考")
+        print(f"  🎯 比分偏好: {agg['top_score_pref'] or '分散'}")
+        print(f"  🗳️ 投票分布: " + " | ".join(
+            f"{k}:{v:.1f}" for k, v in
+            sorted(agg['all_votes'].items(), key=lambda x: -x[1])))
+        print(f"  🤖 各模型判断:")
+        for md, p in agg["individual"].items():
+            alt = f" (备选:{p['alt_direction']})" if p.get("alt_direction") else ""
+            sp = f" 比分:{p['score_pref']}" if p.get("score_pref") else ""
+            print(f"     [{md.split('/')[-1].split(':')[0][:20]:<20}] "
+                  f"{p['direction']}{alt}{sp} — {p['reasoning'][:60]}")
+        print()
+
+
+if __name__ == "__main__":
+    main()

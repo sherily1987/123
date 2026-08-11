@@ -1,0 +1,74 @@
+{
+  "home": "奥林匹亚科斯",
+  "away": "NEC奈梅亨",
+  "competition": "欧冠",
+  "stage": "欧冠资格赛第三轮首回合",
+  "kickoff": "2026-08-05T02:00:00+08:00",
+  "mode": "model_first",
+  "context_confirmed": true,
+  "elo_home": 1663,
+  "elo_away": 1532,
+  "attack_absence_home": 0.15,
+  "defense_absence_away": 0.18,
+  "field_meta": {
+    "elo_home": {
+      "reliability": 100,
+      "freshness": 80,
+      "source": "ClubElo api.clubelo.com/Olympiakos（希腊超级联赛俱乐部）",
+      "observed_at": "2026-08-02T20:30:00+08:00",
+      "status": "VALID",
+      "note": "Elo=1663.4；最新有效期2026-05-24~2026-07-03，休赛期按常值延续"
+    },
+    "elo_away": {
+      "reliability": 100,
+      "freshness": 85,
+      "source": "ClubElo api.clubelo.com/Nijmegen（荷甲俱乐部）",
+      "observed_at": "2026-08-02T20:30:00+08:00",
+      "status": "VALID",
+      "note": "Elo=1531.6；最新条目延续至2026-12-31"
+    },
+    "attack_absence_home": {
+      "reliability": 70,
+      "freshness": 95,
+      "source": "项目005复盘/预测报告汇总：Transfermarkt、Sportime、欧冠报名名单",
+      "observed_at": "2026-08-02T15:00:00+08:00",
+      "status": "VALID",
+      "note": "塔雷米、亚列姆丘克因转会事宜未注册欧冠名单，队内仅余埃尔卡比一名正印中锋；转会传闻未被官宣，仅作为落选原因背景"
+    },
+    "defense_absence_away": {
+      "reliability": 65,
+      "freshness": 95,
+      "source": "项目005复盘/预测报告汇总：VoetbalPrimeur、VI.nl 荷媒报道",
+      "observed_at": "2026-08-02T15:00:00+08:00",
+      "status": "VALID",
+      "note": "主力中卫桑德勒伤缺，莫斯利赫提前离场，乌韦扬身体状况存疑；伤情细节未经俱乐部官方伤停公告确认"
+    }
+  },
+  "adjustment_ledger": [
+    {
+      "field": "attack_absence_home",
+      "value": 0.15,
+      "fact": "奥林匹亚科斯欧冠名单仅注册一名正印中锋（塔雷米、亚列姆丘克因转会落选），锋线厚度下降",
+      "source": "项目005复盘/预测报告汇总（Transfermarkt、Sportime、俱乐部名单）",
+      "observed_at": "2026-08-02T15:00:00+08:00",
+      "mapping_basis": "启发式映射：进攻核心缺阵对进攻λ的小幅有界修正，未回测",
+      "calibration": "UNFITTED"
+    },
+    {
+      "field": "defense_absence_away",
+      "value": 0.18,
+      "fact": "NEC主力中卫桑德勒伤缺、莫斯利赫提前离场、乌韦扬存疑，防线人员不整",
+      "source": "VoetbalPrimeur、VI.nl（荷媒），未获俱乐部官方公告确认",
+      "observed_at": "2026-08-02T15:00:00+08:00",
+      "mapping_basis": "启发式映射：后防主力缺阵对客队防守λ的小幅有界修正，未回测",
+      "calibration": "UNFITTED"
+    }
+  ],
+  "assumptions": [
+    "体彩官方尚未开售本场（查询2026-08-03至08-06销售日均无此场），无市场赔率锚；使用ClubElo独立强度锚+结构化人员修正",
+    "两处人员修正系数均为UNFITTED启发式映射，未经过本引擎回测，仅作有界修正",
+    "阵容/伤停信息基于2026-08-02采集，8月3-4日名单可能变化",
+    "主场满场氛围与湿热天气仅作叙事背景，未做数值修正，避免与Elo主场加成重复计权"
+  ],
+  "seed": 42
+}

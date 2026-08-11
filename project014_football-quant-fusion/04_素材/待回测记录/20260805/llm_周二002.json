@@ -1,0 +1,31 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040727",
+  "match_num": "周二002",
+  "match": "米亚尔比 vs 布拉迪斯",
+  "competition": "欧冠资格赛第三轮首回合（Mjällby AIF vs Slovan Bratislava）",
+  "kickoff": "2026-08-05T00:00:00+08:00",
+  "pre_registered_at": "2026-08-04T22:25:00+08:00",
+  "direction": {
+    "pick": "双选 主胜/平局（H/D）",
+    "single_preference": "主胜（H）",
+    "note": "定性判断，非概率输出；主场人工草皮+单线作战+联赛全胜零失球支撑主队，但欧战经验劣势与进攻效率下滑对冲，双选覆盖平局"
+  },
+  "score_picks": ["1-0", "1-1", "2-1"],
+  "signals": [
+    "米亚尔比：瑞典超冠军黑马，新赛季联赛两战全胜零失球，单线作战主力轮换充分",
+    "米亚尔比近期进攻效率下滑（场均约1.4球），中场斯特劳德、后卫伊克巴尔等伤病影响",
+    "布拉迪斯拉发：斯洛伐克霸主，欧战常客，上赛季打进欧冠联赛阶段，淘汰赛经验远优于对手",
+    "布拉迪斯客场大概率稳守反击，只求客场进球或平局拿晋级主动权；两队历史首次交锋",
+    "斯特兰德瓦伦人工草皮主场，客队对场地适应存疑"
+  ],
+  "evidence": [
+    {"fact": "米亚尔比新赛季联赛两战全胜零失球、单线作战主力充分轮换；近期进攻效率下滑场均约1.4球，中场斯特劳德、后卫伊克巴尔受伤病影响", "source": "https://v2.news.7m.com.cn/news/20260804/733938.shtml", "collected_at": "2026-08-04T22:20+08:00", "mapped": "form_context/home_adv", "basis": "7m 前瞻 2026-08-04，与搜狐前瞻交叉一致"},
+    {"fact": "布拉迪斯拉发是欧战常客，上赛季打进欧冠联赛阶段，高压淘汰赛经验远超首次参加欧冠资格赛的米亚尔比；客场大概率稳守反击", "source": "https://www.sohu.com/a/1058744557_122897841", "collected_at": "2026-08-04T22:20+08:00", "mapped": "form_context/away_strategy", "basis": "搜狐前瞻 2026-08-03"},
+    {"fact": "北京时间8月5日凌晨00:00开球，斯特兰德瓦伦人工草皮球场，两队队史首次正式交锋", "source": "https://www.sohu.com/a/1058590417_120187034", "collected_at": "2026-08-04T22:20+08:00", "mapped": "home_adv/venue", "basis": "搜狐前瞻 2026-08-03"},
+    {"fact": "Slovan Bratislava 周二18:00（欧洲时间）在瑞典客场开启欧冠资格赛第三轮，被视为通往正赛的第二道关", "source": "https://www.ta3.com/clanok/1064187/slovan-caka-vo-svedsku-narocna-skuska-proti-aif-mjallby-zabojuje-o-priblizenie-sa-k-lige-majstrov", "collected_at": "2026-08-04T22:20+08:00", "mapped": "cup_context", "basis": "ta3（斯洛伐克）2026-08-03"}
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜44.9% 平29.3% 负25.8%，比分Top3: 1-1/1-0/2-1。LLM 方向与量化一致（偏主胜），依据为主场人工草皮+单线作战+客队客场求稳；比分偏好略偏小球。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

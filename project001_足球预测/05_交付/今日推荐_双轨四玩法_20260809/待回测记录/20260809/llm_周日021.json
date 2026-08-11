@@ -1,0 +1,214 @@
+{
+  "match_num": "周日021",
+  "home": "吉维森特",
+  "away": "里奥阿维",
+  "league": "葡超",
+  "kickoff": "2026-08-10T03:30:00+08:00",
+  "models": [
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": "平局",
+      "evidence_gap": true,
+      "confidence": 0.55,
+      "reasoning": "【近况:吉维森特主场状态一般，里奥阿维客场防守尚可，两队近期进攻效率均不高】【主客:吉维森特主场有一定优势，但胜率并不突出】【战意:双方均无强烈抢分压力，中游对阵可能保守】【身份:吉维森特主场让球方，赔率主胜1.84略受支持】【交锋:历史交锋平局较多，缺乏大胜样本】本场缺乏关键伤停和首发名单信息，证据缺口存在；综合看小球平胜格局，但平局风险不可忽视。",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "首发",
+          "战意",
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【近况:吉维森特近期主场连续3场不败，且上轮逼平强敌本菲卡，防守表现稳定；里奥阿维客场近5场仅1胜，攻防两端均显疲软】。【主客:吉维森特主场场均进球1.2，里奥阿维客场场均失球1.8，主队在主场具备一定优势】。【身份:吉维森特排名中游但保级压力不大，战意相对理性；里奥阿维处于争欧战资格边缘，战意较强但客场表现不可靠】。【交锋:近6次交手吉维森特2胜2平2负，无明显心理优势，但本赛季首回合主场1-0小胜】。【伤停:双方主力阵容完整，暂无重大缺阵报告，首发名单未公布，无法确认具体影响】。",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "阵容",
+          "首发",
+          "缺阵",
+          "战意",
+          "近况",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "error": "Extra data: line 13 column 4 (char 377)",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      1,
+      0
+    ],
+    "top_score_votes": 1.85,
+    "top_result": "主胜",
+    "top_result_votes": 1.85,
+    "top_total_goals": "1",
+    "top_hafu": "平胜",
+    "top_ou25": "小2.5",
+    "alt_direction": null,
+    "caution": false,
+    "strength": 1.0,
+    "avg_confidence": 0.55,
+    "disagreement": 0.5,
+    "all_scores": {
+      "1-0": 1.85
+    },
+    "all_results": {
+      "主胜": 1.85
+    },
+    "all_total_goals": {
+      "1": 1.85
+    },
+    "all_hafu": {
+      "平胜": 1.85
+    },
+    "all_ou25": {
+      "小2.5": 1.85
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "deepseek/deepseek-chat": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【近况:吉维森特主场状态一般，里奥阿维客场防守尚可，两队近期进攻效率均不高】【主客:吉维森特主场有一定优势，但胜率并不突出】【战意:双方均无强烈抢分压力，中游对阵可能保守】【身份:吉维森特主场让球方，赔率主胜1.84略受支持】【交锋:历史交锋平局较多，缺乏大胜样本】本场缺乏关键伤停和首发名单信息，证据缺口存在；综合看小球平胜格局，但平局风险不可忽视。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:吉维森特近期主场连续3场不败，且上轮逼平强敌本菲卡，防守表现稳定；里奥阿维客场近5场仅1胜，攻防两端均显疲软】。【主客:吉维森特主场场均进球1.2，里奥阿维客场场均失球1.8，主队在主场具备一定优势】。【身份:吉维森特排名中游但保级压力不大，战意相对理性；里奥阿维处于争欧战资格边缘，战意较强但客场表现不可靠】。【交锋:近6次交手吉维森特2胜2平2负，无明显心理优势，但本赛季首回合主场1-0小胜】。【伤停:双方主力阵容完整，暂无重大缺阵报告，首发名单未公布，无法确认具体影响】。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "Extra data: line 13 column 4 (char 377)"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "主胜",
+    "score": "1-0",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "hafu_votes": {
+      "平胜": 1.85
+    },
+    "confidence": 0.55,
+    "alt_direction": null,
+    "caution": false,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "主胜": 1.85
+    }
+  },
+  "odds": [
+    1.84,
+    3.15,
+    3.72
+  ],
+  "ok": true
+}

@@ -1,0 +1,213 @@
+{
+  "match_num": "周日019",
+  "home": "克里斯蒂",
+  "away": "莫尔德",
+  "league": "挪超",
+  "kickoff": "2026-08-10T01:15:00+08:00",
+  "models": [
+    {
+      "home_score": 0,
+      "away_score": 1,
+      "result": "客胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平负",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.6,
+      "reasoning": "【近况:克里斯蒂近期主场表现尚可但整体胜率偏低，莫尔德客场状态一般但整体实力占优】【主客:莫尔德客场作战但实力与排名明显高于主队】【身份:莫尔德为挪超传统强队，克里斯蒂中下游】【交锋:莫尔德历史交锋占据优势】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【近况:克里斯蒂近期3场不败，上轮逼平强敌斯托尔莫，防守端保持零封；莫尔德虽排名靠前但客场连续3场未胜，状态起伏明显】。【主客:克里斯蒂主场表现稳定，近5个主场4胜1平，具备主场优势】。【身份:克里斯蒂为中游偏上球队，莫尔德是争冠组主力，战意存在差异，但莫尔德近期无明确争冠压力】。【交锋:过去3次交手克里斯蒂均未能取胜，且场均失球超1.5，心理劣势明显】。【证据缺口:两队首发名单未公开，无法确认关键球员缺阵情况，伤停信息缺失】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "首发",
+          "缺阵",
+          "战意",
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "error": "比分越界: -1--1",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      0,
+      1
+    ],
+    "top_score_votes": 1.0,
+    "top_result": "客胜",
+    "top_result_votes": 1.0,
+    "top_total_goals": "1",
+    "top_hafu": "平负",
+    "top_ou25": "小2.5",
+    "alt_direction": "主胜",
+    "caution": true,
+    "strength": 0.5,
+    "avg_confidence": 0.575,
+    "disagreement": 1.0,
+    "all_scores": {
+      "0-1": 1.0,
+      "1-0": 1.0
+    },
+    "all_results": {
+      "客胜": 1.0,
+      "主胜": 1.0
+    },
+    "all_total_goals": {
+      "1": 2.0
+    },
+    "all_hafu": {
+      "平负": 1.0,
+      "平胜": 1.0
+    },
+    "all_ou25": {
+      "小2.5": 2.0
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "deepseek/deepseek-chat": {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.6,
+        "reasoning": "【近况:克里斯蒂近期主场表现尚可但整体胜率偏低，莫尔德客场状态一般但整体实力占优】【主客:莫尔德客场作战但实力与排名明显高于主队】【身份:莫尔德为挪超传统强队，克里斯蒂中下游】【交锋:莫尔德历史交锋占据优势】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:克里斯蒂近期3场不败，上轮逼平强敌斯托尔莫，防守端保持零封；莫尔德虽排名靠前但客场连续3场未胜，状态起伏明显】。【主客:克里斯蒂主场表现稳定，近5个主场4胜1平，具备主场优势】。【身份:克里斯蒂为中游偏上球队，莫尔德是争冠组主力，战意存在差异，但莫尔德近期无明确争冠压力】。【交锋:过去3次交手克里斯蒂均未能取胜，且场均失球超1.5，心理劣势明显】。【证据缺口:两队首发名单未公开，无法确认关键球员缺阵情况，伤停信息缺失】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "比分越界: -1--1"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "客胜",
+    "score": "0-1",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "hafu_votes": {
+      "平负": 1.0,
+      "平胜": 1.0
+    },
+    "confidence": 0.575,
+    "alt_direction": "主胜",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "客胜": 1.0,
+      "主胜": 1.0
+    }
+  },
+  "odds": [
+    4.0,
+    4.05,
+    1.58
+  ],
+  "ok": true
+}

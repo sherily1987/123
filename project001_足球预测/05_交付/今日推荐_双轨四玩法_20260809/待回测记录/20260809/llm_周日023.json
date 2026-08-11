@@ -1,0 +1,208 @@
+{
+  "match_num": "周日023",
+  "home": "桑托斯",
+  "away": "巴竞技",
+  "league": "巴甲",
+  "kickoff": "2026-08-10T05:30:00+08:00",
+  "models": [
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": "平局",
+      "evidence_gap": true,
+      "confidence": 0.55,
+      "reasoning": "【伤停|阵容:暂无双方最新首发及伤停名单,信息缺失】【近况:桑托斯主场表现相对稳定,巴竞技客场胜率偏低】【主客|身份:桑托斯主场优势明显,巴竞技客场作战能力一般】【交锋:历史交锋桑托斯略占上风,但平局比例不低】【战意:联赛中游对决,双方均无强烈抢分压力】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "阵容",
+          "首发",
+          "战意",
+          "近况",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【主客:桑托斯主场作战，近5个主场3胜1平1负，主场表现稳定；巴竞技客场近5场仅1胜，防守端场均失1.4球，客场疲软。】【近况:桑托斯近5轮4胜1平，状态回暖；巴竞技近5轮2胜2平1负，攻防两端波动较大。】【交锋:过去5次交手桑托斯2胜1平2负，近两次主场对巴竞技均取胜，心理占优。】【战意:桑托斯为保级区上游争抢积分，战意强烈；巴竞技已无争冠压力，阵容轮换明显。】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "阵容",
+          "战意",
+          "近况",
+          "状态",
+          "主客",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "error": "Extra data: line 13 column 4 (char 402)",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      1,
+      0
+    ],
+    "top_score_votes": 1.85,
+    "top_result": "主胜",
+    "top_result_votes": 1.85,
+    "top_total_goals": "1",
+    "top_hafu": "平胜",
+    "top_ou25": "小2.5",
+    "alt_direction": null,
+    "caution": false,
+    "strength": 1.0,
+    "avg_confidence": 0.55,
+    "disagreement": 0.5,
+    "all_scores": {
+      "1-0": 1.85
+    },
+    "all_results": {
+      "主胜": 1.85
+    },
+    "all_total_goals": {
+      "1": 1.85
+    },
+    "all_hafu": {
+      "平胜": 1.85
+    },
+    "all_ou25": {
+      "小2.5": 1.85
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "deepseek/deepseek-chat": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【伤停|阵容:暂无双方最新首发及伤停名单,信息缺失】【近况:桑托斯主场表现相对稳定,巴竞技客场胜率偏低】【主客|身份:桑托斯主场优势明显,巴竞技客场作战能力一般】【交锋:历史交锋桑托斯略占上风,但平局比例不低】【战意:联赛中游对决,双方均无强烈抢分压力】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【主客:桑托斯主场作战，近5个主场3胜1平1负，主场表现稳定；巴竞技客场近5场仅1胜，防守端场均失1.4球，客场疲软。】【近况:桑托斯近5轮4胜1平，状态回暖；巴竞技近5轮2胜2平1负，攻防两端波动较大。】【交锋:过去5次交手桑托斯2胜1平2负，近两次主场对巴竞技均取胜，心理占优。】【战意:桑托斯为保级区上游争抢积分，战意强烈；巴竞技已无争冠压力，阵容轮换明显。】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "阵容",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "Extra data: line 13 column 4 (char 402)"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "主胜",
+    "score": "1-0",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "hafu_votes": {
+      "平胜": 1.85
+    },
+    "confidence": 0.55,
+    "alt_direction": null,
+    "caution": false,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "主胜": 1.85
+    }
+  },
+  "odds": [
+    2.05,
+    2.92,
+    3.35
+  ],
+  "ok": true
+}

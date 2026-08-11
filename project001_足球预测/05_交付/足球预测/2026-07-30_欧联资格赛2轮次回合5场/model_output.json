@@ -1,0 +1,765 @@
+{
+  "status": "batch",
+  "results": [
+    {
+      "status": "ok",
+      "engine_version": "3.1",
+      "match": "中日德兰 vs 贝西克塔斯",
+      "mode": "market_only",
+      "quality": {
+        "completeness_pct": 20.0,
+        "source_reliability_pct": 55.0,
+        "freshness_pct": 55.0,
+        "overall_pct": 37.5,
+        "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+      },
+      "goal_total_used": {
+        "value": 2.75,
+        "source": "explicit"
+      },
+      "market_dependency_pct": 100,
+      "market_prob_pct": [
+        48.3,
+        25.5,
+        26.2
+      ],
+      "bookmaker_margin_pct": 6.1,
+      "model_1x2_pct": [
+        51.7,
+        21.8,
+        26.5
+      ],
+      "final_1x2_pct": [
+        48.3,
+        25.5,
+        26.2
+      ],
+      "edge_vs_market_pp": null,
+      "sensitivity": {
+        "lambda_perturbation_pct": 10.0,
+        "home_range_pct": [
+          48.3,
+          48.3
+        ],
+        "draw_range_pct": [
+          25.5,
+          25.5
+        ],
+        "away_range_pct": [
+          26.2,
+          26.2
+        ],
+        "note": "输入 λ 各扰动 ±10% 时最终 1X2 的取值范围。区间内的差异不具决策意义。"
+      },
+      "xg": [
+        1.745,
+        1.171
+      ],
+      "xg_tags": [
+        "PROXY_XG"
+      ],
+      "rho": -0.08,
+      "top_scores": [
+        {
+          "score": "1-0",
+          "prob_pct": 10.33
+        },
+        {
+          "score": "1-1",
+          "prob_pct": 10.18
+        },
+        {
+          "score": "2-1",
+          "prob_pct": 9.65
+        },
+        {
+          "score": "2-0",
+          "prob_pct": 8.24
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 7.22
+        },
+        {
+          "score": "1-2",
+          "prob_pct": 6.48
+        },
+        {
+          "score": "2-2",
+          "prob_pct": 5.65
+        },
+        {
+          "score": "3-1",
+          "prob_pct": 5.62
+        }
+      ],
+      "ht_top_scores": [
+        {
+          "score": "0-0",
+          "prob_pct": 26.47
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 21.58
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 14.63
+        }
+      ],
+      "ou_2_5": {
+        "line": 2.5,
+        "over_pct": 55.8,
+        "under_pct": 44.2,
+        "push_pct": -0.0
+      },
+      "ou_3_5": {
+        "line": 3.5,
+        "over_pct": 33.4,
+        "under_pct": 66.6,
+        "push_pct": 0.0
+      },
+      "btts": {
+        "yes_pct": 56.1,
+        "no_pct": 43.9
+      },
+      "asian_handicap_home": {
+        "line": -0.5,
+        "full_win_pct": 51.7,
+        "half_win_pct": 0.0,
+        "push_pct": 0,
+        "half_loss_pct": 0.0,
+        "full_loss_pct": 48.3
+      },
+      "advancement": {
+        "home_advance_pct": 41.2,
+        "away_advance_pct": 58.8,
+        "decided_in_90_pct": 76.1,
+        "to_extra_time_pct": 23.9,
+        "via_et_home_pct": 7.6,
+        "via_et_away_pct": 4.7,
+        "via_pens_home_pct": 5.8,
+        "via_pens_away_pct": 5.8,
+        "penalty_home_prob_used": 0.5
+      },
+      "reliability_flags": [
+        "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+        "UNFITTED_CONSTANTS: 本引擎多项系数尚未经回测拟合（见脚本顶部标注）。绝对概率仅供参考，建议先用 backtest.py 校准。"
+      ],
+      "assumptions": [
+        "赔率取抽水最低机构(立)即时盘 6.09%",
+        "goal_total 取市场大小球盘口 2.75",
+        "首回合 贝西克塔斯1-0中日德兰(7/23)"
+      ],
+      "disclaimer": "概率模型输出，非投注建议。"
+    },
+    {
+      "status": "ok",
+      "engine_version": "3.1",
+      "match": "帕福斯FC vs 哈伊杜克",
+      "mode": "market_only",
+      "quality": {
+        "completeness_pct": 20.0,
+        "source_reliability_pct": 55.0,
+        "freshness_pct": 55.0,
+        "overall_pct": 37.5,
+        "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+      },
+      "goal_total_used": {
+        "value": 2.5,
+        "source": "explicit"
+      },
+      "market_dependency_pct": 100,
+      "market_prob_pct": [
+        50.6,
+        26.0,
+        23.4
+      ],
+      "bookmaker_margin_pct": 6.8,
+      "model_1x2_pct": [
+        53.8,
+        22.6,
+        23.7
+      ],
+      "final_1x2_pct": [
+        50.6,
+        26.0,
+        23.4
+      ],
+      "edge_vs_market_pp": null,
+      "sensitivity": {
+        "lambda_perturbation_pct": 10.0,
+        "home_range_pct": [
+          50.6,
+          50.6
+        ],
+        "draw_range_pct": [
+          26.0,
+          26.0
+        ],
+        "away_range_pct": [
+          23.4,
+          23.4
+        ],
+        "note": "输入 λ 各扰动 ±10% 时最终 1X2 的取值范围。区间内的差异不具决策意义。"
+      },
+      "xg": [
+        1.659,
+        0.999
+      ],
+      "xg_tags": [
+        "PROXY_XG"
+      ],
+      "rho": -0.08,
+      "top_scores": [
+        {
+          "score": "1-0",
+          "prob_pct": 12.56
+        },
+        {
+          "score": "1-1",
+          "prob_pct": 10.69
+        },
+        {
+          "score": "2-0",
+          "prob_pct": 9.65
+        },
+        {
+          "score": "2-1",
+          "prob_pct": 9.64
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 7.93
+        },
+        {
+          "score": "0-0",
+          "prob_pct": 6.08
+        },
+        {
+          "score": "1-2",
+          "prob_pct": 5.8
+        },
+        {
+          "score": "3-0",
+          "prob_pct": 5.34
+        }
+      ],
+      "ht_top_scores": [
+        {
+          "score": "0-0",
+          "prob_pct": 29.83
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 22.98
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 13.99
+        }
+      ],
+      "ou_2_5": {
+        "line": 2.5,
+        "over_pct": 49.6,
+        "under_pct": 50.4,
+        "push_pct": 0.0
+      },
+      "ou_3_5": {
+        "line": 3.5,
+        "over_pct": 27.7,
+        "under_pct": 72.3,
+        "push_pct": 0.0
+      },
+      "btts": {
+        "yes_pct": 50.2,
+        "no_pct": 49.8
+      },
+      "asian_handicap_home": {
+        "line": -0.5,
+        "full_win_pct": 53.8,
+        "half_win_pct": 0.0,
+        "push_pct": 0,
+        "half_loss_pct": 0.0,
+        "full_loss_pct": 46.2
+      },
+      "advancement": {
+        "home_advance_pct": 21.6,
+        "away_advance_pct": 78.4,
+        "decided_in_90_pct": 83.8,
+        "to_extra_time_pct": 16.2,
+        "via_et_home_pct": 5.2,
+        "via_et_away_pct": 2.8,
+        "via_pens_home_pct": 4.1,
+        "via_pens_away_pct": 4.1,
+        "penalty_home_prob_used": 0.5
+      },
+      "reliability_flags": [
+        "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+        "UNFITTED_CONSTANTS: 本引擎多项系数尚未经回测拟合（见脚本顶部标注）。绝对概率仅供参考，建议先用 backtest.py 校准。"
+      ],
+      "assumptions": [
+        "赔率取立即时盘 6.83%",
+        "goal_total 取盘口 2.5",
+        "首回合 哈伊杜克2-0帕福斯(7/23)"
+      ],
+      "disclaimer": "概率模型输出，非投注建议。"
+    },
+    {
+      "status": "ok",
+      "engine_version": "3.1",
+      "match": "安德莱赫特 vs 哈马比",
+      "mode": "market_only",
+      "quality": {
+        "completeness_pct": 20.0,
+        "source_reliability_pct": 55.0,
+        "freshness_pct": 55.0,
+        "overall_pct": 37.5,
+        "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+      },
+      "goal_total_used": {
+        "value": 2.75,
+        "source": "explicit"
+      },
+      "market_dependency_pct": 100,
+      "market_prob_pct": [
+        42.4,
+        27.5,
+        30.1
+      ],
+      "bookmaker_margin_pct": 7.1,
+      "model_1x2_pct": [
+        44.2,
+        22.4,
+        33.4
+      ],
+      "final_1x2_pct": [
+        42.4,
+        27.5,
+        30.1
+      ],
+      "edge_vs_market_pp": null,
+      "sensitivity": {
+        "lambda_perturbation_pct": 10.0,
+        "home_range_pct": [
+          42.4,
+          42.4
+        ],
+        "draw_range_pct": [
+          27.5,
+          27.5
+        ],
+        "away_range_pct": [
+          30.1,
+          30.1
+        ],
+        "note": "输入 λ 各扰动 ±10% 时最终 1X2 的取值范围。区间内的差异不具决策意义。"
+      },
+      "xg": [
+        1.61,
+        1.364
+      ],
+      "xg_tags": [
+        "PROXY_XG"
+      ],
+      "rho": -0.08,
+      "top_scores": [
+        {
+          "score": "1-1",
+          "prob_pct": 10.32
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 9.12
+        },
+        {
+          "score": "2-1",
+          "prob_pct": 9.03
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 7.87
+        },
+        {
+          "score": "1-2",
+          "prob_pct": 7.66
+        },
+        {
+          "score": "2-0",
+          "prob_pct": 6.62
+        },
+        {
+          "score": "2-2",
+          "prob_pct": 6.16
+        },
+        {
+          "score": "3-1",
+          "prob_pct": 4.85
+        }
+      ],
+      "ht_top_scores": [
+        {
+          "score": "0-0",
+          "prob_pct": 25.76
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 19.46
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 16.57
+        }
+      ],
+      "ou_2_5": {
+        "line": 2.5,
+        "over_pct": 57.1,
+        "under_pct": 42.9,
+        "push_pct": 0.0
+      },
+      "ou_3_5": {
+        "line": 3.5,
+        "over_pct": 34.7,
+        "under_pct": 65.3,
+        "push_pct": 0.0
+      },
+      "btts": {
+        "yes_pct": 58.7,
+        "no_pct": 41.3
+      },
+      "asian_handicap_home": {
+        "line": -0.25,
+        "full_win_pct": 44.2,
+        "half_win_pct": 0,
+        "push_pct": 0,
+        "half_loss_pct": 22.4,
+        "full_loss_pct": 33.4
+      },
+      "advancement": {
+        "home_advance_pct": 56.0,
+        "away_advance_pct": 44.0,
+        "decided_in_90_pct": 77.6,
+        "to_extra_time_pct": 22.4,
+        "via_et_home_pct": 6.4,
+        "via_et_away_pct": 5.2,
+        "via_pens_home_pct": 5.4,
+        "via_pens_away_pct": 5.4,
+        "penalty_home_prob_used": 0.5
+      },
+      "reliability_flags": [
+        "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+        "UNFITTED_CONSTANTS: 本引擎多项系数尚未经回测拟合（见脚本顶部标注）。绝对概率仅供参考，建议先用 backtest.py 校准。"
+      ],
+      "assumptions": [
+        "赔率取立即时盘 7.12%",
+        "goal_total 取盘口 2.75",
+        "首回合 哈马比1-1安德莱赫特(7/23)"
+      ],
+      "disclaimer": "概率模型输出，非投注建议。"
+    },
+    {
+      "status": "ok",
+      "engine_version": "3.1",
+      "match": "费伦茨瓦罗斯 vs 特温特",
+      "mode": "market_only",
+      "quality": {
+        "completeness_pct": 20.0,
+        "source_reliability_pct": 55.0,
+        "freshness_pct": 55.0,
+        "overall_pct": 37.5,
+        "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+      },
+      "goal_total_used": {
+        "value": 2.75,
+        "source": "explicit"
+      },
+      "market_dependency_pct": 100,
+      "market_prob_pct": [
+        32.5,
+        25.9,
+        41.5
+      ],
+      "bookmaker_margin_pct": 7.1,
+      "model_1x2_pct": [
+        30.7,
+        22.5,
+        46.8
+      ],
+      "final_1x2_pct": [
+        32.5,
+        25.9,
+        41.5
+      ],
+      "edge_vs_market_pp": null,
+      "sensitivity": {
+        "lambda_perturbation_pct": 10.0,
+        "home_range_pct": [
+          32.5,
+          32.5
+        ],
+        "draw_range_pct": [
+          25.9,
+          25.9
+        ],
+        "away_range_pct": [
+          41.5,
+          41.5
+        ],
+        "note": "输入 λ 各扰动 ±10% 时最终 1X2 的取值范围。区间内的差异不具决策意义。"
+      },
+      "xg": [
+        1.272,
+        1.635
+      ],
+      "xg_tags": [
+        "PROXY_XG"
+      ],
+      "rho": -0.08,
+      "top_scores": [
+        {
+          "score": "1-1",
+          "prob_pct": 10.45
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 9.84
+        },
+        {
+          "score": "1-2",
+          "prob_pct": 9.29
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 7.86
+        },
+        {
+          "score": "0-2",
+          "prob_pct": 7.3
+        },
+        {
+          "score": "2-1",
+          "prob_pct": 7.23
+        },
+        {
+          "score": "2-2",
+          "prob_pct": 5.91
+        },
+        {
+          "score": "1-3",
+          "prob_pct": 5.06
+        }
+      ],
+      "ht_top_scores": [
+        {
+          "score": "0-0",
+          "prob_pct": 26.57
+        },
+        {
+          "score": "0-1",
+          "prob_pct": 20.34
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 15.93
+        }
+      ],
+      "ou_2_5": {
+        "line": 2.5,
+        "over_pct": 55.6,
+        "under_pct": 44.4,
+        "push_pct": -0.0
+      },
+      "ou_3_5": {
+        "line": 3.5,
+        "over_pct": 33.2,
+        "under_pct": 66.8,
+        "push_pct": 0.0
+      },
+      "btts": {
+        "yes_pct": 57.0,
+        "no_pct": 43.0
+      },
+      "asian_handicap_home": {
+        "line": 0.25,
+        "full_win_pct": 30.7,
+        "half_win_pct": 22.5,
+        "push_pct": 0,
+        "half_loss_pct": 0,
+        "full_loss_pct": 46.8
+      },
+      "advancement": {
+        "home_advance_pct": 63.8,
+        "away_advance_pct": 36.2,
+        "decided_in_90_pct": 77.0,
+        "to_extra_time_pct": 23.0,
+        "via_et_home_pct": 5.0,
+        "via_et_away_pct": 6.8,
+        "via_pens_home_pct": 5.6,
+        "via_pens_away_pct": 5.6,
+        "penalty_home_prob_used": 0.5
+      },
+      "reliability_flags": [
+        "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+        "UNFITTED_CONSTANTS: 本引擎多项系数尚未经回测拟合（见脚本顶部标注）。绝对概率仅供参考，建议先用 backtest.py 校准。"
+      ],
+      "assumptions": [
+        "赔率取立即时盘 7.07%",
+        "goal_total 取盘口 2.75",
+        "首回合 特温特1-2费伦茨瓦罗斯(7/23)"
+      ],
+      "disclaimer": "概率模型输出，非投注建议。"
+    },
+    {
+      "status": "ok",
+      "engine_version": "3.1",
+      "match": "本菲卡 vs 圣加仑",
+      "mode": "market_only",
+      "quality": {
+        "completeness_pct": 20.0,
+        "source_reliability_pct": 55.0,
+        "freshness_pct": 55.0,
+        "overall_pct": 37.5,
+        "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+      },
+      "goal_total_used": {
+        "value": 3.25,
+        "source": "explicit"
+      },
+      "market_dependency_pct": 100,
+      "market_prob_pct": [
+        80.9,
+        11.8,
+        7.3
+      ],
+      "bookmaker_margin_pct": 5.7,
+      "model_1x2_pct": [
+        74.4,
+        14.3,
+        11.3
+      ],
+      "final_1x2_pct": [
+        80.9,
+        11.8,
+        7.3
+      ],
+      "edge_vs_market_pp": null,
+      "sensitivity": {
+        "lambda_perturbation_pct": 10.0,
+        "home_range_pct": [
+          80.9,
+          80.9
+        ],
+        "draw_range_pct": [
+          11.8,
+          11.8
+        ],
+        "away_range_pct": [
+          7.3,
+          7.3
+        ],
+        "note": "输入 λ 各扰动 ±10% 时最终 1X2 的取值范围。区间内的差异不具决策意义。"
+      },
+      "xg": [
+        2.596,
+        0.897
+      ],
+      "xg_tags": [
+        "PROXY_XG"
+      ],
+      "rho": -0.08,
+      "top_scores": [
+        {
+          "score": "2-0",
+          "prob_pct": 10.25
+        },
+        {
+          "score": "2-1",
+          "prob_pct": 9.19
+        },
+        {
+          "score": "3-0",
+          "prob_pct": 8.87
+        },
+        {
+          "score": "1-0",
+          "prob_pct": 8.47
+        },
+        {
+          "score": "3-1",
+          "prob_pct": 7.95
+        },
+        {
+          "score": "1-1",
+          "prob_pct": 6.52
+        },
+        {
+          "score": "4-0",
+          "prob_pct": 5.76
+        },
+        {
+          "score": "4-1",
+          "prob_pct": 5.16
+        }
+      ],
+      "ht_top_scores": [
+        {
+          "score": "1-0",
+          "prob_pct": 24.66
+        },
+        {
+          "score": "0-0",
+          "prob_pct": 20.38
+        },
+        {
+          "score": "2-0",
+          "prob_pct": 14.17
+        }
+      ],
+      "ou_2_5": {
+        "line": 2.5,
+        "over_pct": 67.8,
+        "under_pct": 32.2,
+        "push_pct": 0.0
+      },
+      "ou_3_5": {
+        "line": 3.5,
+        "over_pct": 46.2,
+        "under_pct": 53.8,
+        "push_pct": 0.0
+      },
+      "btts": {
+        "yes_pct": 54.2,
+        "no_pct": 45.8
+      },
+      "asian_handicap_home": {
+        "line": -2.0,
+        "full_win_pct": 31.5,
+        "half_win_pct": 0.0,
+        "push_pct": 20.9,
+        "half_loss_pct": 0.0,
+        "full_loss_pct": 47.6
+      },
+      "advancement": {
+        "home_advance_pct": 67.1,
+        "away_advance_pct": 32.9,
+        "decided_in_90_pct": 78.0,
+        "to_extra_time_pct": 22.0,
+        "via_et_home_pct": 10.1,
+        "via_et_away_pct": 2.7,
+        "via_pens_home_pct": 4.6,
+        "via_pens_away_pct": 4.6,
+        "penalty_home_prob_used": 0.5
+      },
+      "reliability_flags": [
+        "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+        "UNFITTED_CONSTANTS: 本引擎多项系数尚未经回测拟合（见脚本顶部标注）。绝对概率仅供参考，建议先用 backtest.py 校准。"
+      ],
+      "assumptions": [
+        "赔率取立即时盘 5.66%",
+        "goal_total 取盘口 3.25",
+        "首回合 圣加仑2-1本菲卡(7/23)"
+      ],
+      "disclaimer": "概率模型输出，非投注建议。"
+    }
+  ]
+}

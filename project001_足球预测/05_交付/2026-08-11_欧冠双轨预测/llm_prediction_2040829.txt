@@ -1,0 +1,28 @@
+📁 证据文件: 1 个
+   - evidence_002_kairat_levski.md
+🎯 共 1 场比赛待预测, 每场 4 个模型定性判断
+
+================================================================
+⚽ 第1/1场 [周二002] 阿拉木图 VS 索列夫 | 欧冠 | 2026-08-11 23:00
+   证据: evidence_002_kairat_levski.md
+================================================================
+     ✓ [deepseek-chat     ] -> 平局 / 客胜 比分偏好:1-1
+     ✓ [glm-4-flash       ] -> 客胜 比分偏好:0-1
+     ✓ [qwen3.8-max       ] -> 客胜 / 平局 比分偏好:0-1
+     ✓ [kimi-k2.6         ] -> 客胜 / 平局 比分偏好:0-1
+
+  📊 综合方向: 客胜  (3.0/4.7票, 强度64%)
+  ⚠️ 两回合制/杯赛场次(冷门风险高)
+  🚨 谨慎(证据存在缺口): 建议双选 客胜/平局
+  🎯 比分偏好: 0-1
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平负
+  ⚠️ 坍缩标记: OU_COLLAPSE:小2.5x4
+  🗳️ 投票分布: 客胜:3.0 | 平局:1.7
+  🤖 各模型判断:
+     [deepseek-chat       ] 平局 (备选:客胜) 比分:1-1 — 【战意: 首回合列夫斯基1-0领先，凯拉特需追分，但客队保平即可晋级】【近况: 凯拉特近5场2胜1平2负，列夫斯基4胜1
+     [glm-4-flash         ] 客胜 比分:0-1 — 【战意: 凯拉特首回合0-1落后，需追分但面临客场作战的不利因素】【近况: 列夫斯基近期状态较好，客场作战能力不俗】【主
+     [qwen3.8-max         ] 客胜 (备选:平局) 比分:0-1 — 【战意:首回合列夫斯基1-0领先，主队需追分，客队可稳守反击】【近况:列夫斯基近5场4胜1平更稳，凯拉特首回合输球】未取
+     [kimi-k2.6           ] 客胜 (备选:平局) 比分:0-1 — 【战意: 列夫斯基首回合1-0领先，作客可立足防守反击；凯拉特必须进攻但恐暴露空当】【近况: 列夫斯基近五场4胜1平状态
+{"direction": "客胜", "votes": 2.975, "total_votes": 4.675, "strength": 0.6363636363636364, "all_votes": {"平局": 1.7, "客胜": 2.975}, "top_score_pref": "0-1", "score_prefs": {"1-1": 0.85, "0-1": 2.55}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 3.4}, "top_hafu": "平负", "all_hafu": {"平负": 2.55, "负胜": 0.85}, "alt_direction": "平局", "caution": true, "valid_model_count": 4, "minimum_valid_models": 3, "collapse_flags": ["OU_COLLAPSE:小2.5x4"], "individual": {"zhipu/glm-4-flash": {"model_id": "zhipu/glm-4-flash", "provider": "zhipu", "direction": "客胜", "alt_direction": null, "score_pref": "0-1", "ou25": "小2.5", "hafu": "负胜", "evidence_gap": true, "reasoning": "【战意: 凯拉特首回合0-1落后，需追分但面临客场作战的不利因素】【近况: 列夫斯基近期状态较好，客场作战能力不俗】【主客: 列夫斯基带一球优势作客，战意明确】【交锋: 历史数据显示此类赛事主队胜率低于赔率隐含概率】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "近况", "状态", "主客", "交锋"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "qwen/qwen3.8-max": {"model_id": "qwen/qwen3.8-max", "provider": "qwen", "direction": "客胜", "alt_direction": "平局", "score_pref": "0-1", "ou25": "小2.5", "hafu": "平负", "evidence_gap": true, "reasoning": "【战意:首回合列夫斯基1-0领先，主队需追分，客队可稳守反击】【近况:列夫斯基近5场4胜1平更稳，凯拉特首回合输球】未取得首发伤停，客队不败面大，防平。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "direction": "平局", "alt_direction": "客胜", "score_pref": "1-1", "ou25": "小2.5", "hafu": "平负", "evidence_gap": true, "reasoning": "【战意: 首回合列夫斯基1-0领先，凯拉特需追分，但客队保平即可晋级】【近况: 凯拉特近5场2胜1平2负，列夫斯基4胜1平状态更稳】【主客: 凯拉特主场作战但场地在Turkestan，天气炎热】【身份: 欧冠资格赛次回合，客队带优势，冷门风险高】【伤停: 双方首发及伤停信息缺失，无法评估阵容影响】综合看，主队有追分动力但客队状态与战术占优，平局可能性大，客胜为备选。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "阵容", "首发", "战意", "近况", "状态", "主客", "天气", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k2.6": {"model_id": "moonshot/kimi-k2.6", "provider": "moonshot", "direction": "客胜", "alt_direction": "平局", "score_pref": "0-1", "ou25": "小2.5", "hafu": "平负", "evidence_gap": true, "reasoning": "【战意: 列夫斯基首回合1-0领先，作客可立足防守反击；凯拉特必须进攻但恐暴露空当】【近况: 列夫斯基近五场4胜1平状态稳定】【主客: 比赛地突厥斯坦气温高达32°C，可能抑制高强度对攻】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "近况", "状态", "主客"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "llm_model_pool_sha256": "11cd187c1f294032a31e2ad5c878e1e0f6a821053b8eb5c2e71cab6ab6ed5add", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "f840af50d1551048e0f6fb1307d030b143ad8c6fe158d5890cda8b7d9811848f", "evidence_file_sha256": "a54abafae656c55f72055828104ed6cf9183c9dac52ae0791fded0cca0d3660b", "evidence_collected_at_min": "2026-08-11T17:29:06+08:00", "evidence_collected_at_max": "2026-08-11T17:29:06+08:00"}
+

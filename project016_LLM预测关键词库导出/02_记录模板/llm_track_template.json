@@ -1,0 +1,31 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-xxxxxxxx",
+  "match_num": "周二00X",
+  "match": "主队 vs 客队",
+  "competition": "欧冠资格赛第三轮首回合",
+  "kickoff": "YYYY-MM-DDTHH:MM:00+08:00",
+  "pre_registered_at": "YYYY-MM-DDTHH:MM+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）| 双选 主胜/平局（H/D）| 双选 平局/客胜（D/A）",
+    "single_preference": "主胜（H）",
+    "note": "定性判断，非概率输出；一句话说明核心依据"
+  },
+  "score_picks": ["1-0", "2-1", "1-1"],
+  "signals": [
+    "风险信号1：伤停/轮换/战意/赛制/天气等",
+    "风险信号2"
+  ],
+  "evidence": [
+    {
+      "fact": "事实陈述，须来自来源",
+      "source": "https://example.com/article",
+      "collected_at": "YYYY-MM-DDTHH:MM+08:00",
+      "mapped": "attack_absence_home",
+      "basis": "来源名 日期；与另一来源交叉一致"
+    }
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜/平/负%，比分Top3。LLM 与量化一致/分歧点。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

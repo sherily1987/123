@@ -1,0 +1,243 @@
+{
+  "schema_version": "league-kt-1.0",
+  "generated_at": "2026-08-02T20:37:49+08:00",
+  "devig_method": "power",
+  "protocol": "chronological 70/30; grid fit by train ECE; test reported",
+  "leagues": {
+    "FIN": {
+      "league": "FIN",
+      "n": 2530,
+      "train_n": 1771,
+      "test_n": 759,
+      "date_range": [
+        "2012-04-15",
+        "2025-10-27"
+      ],
+      "fitted": {
+        "draw_k": 0.95,
+        "temperature": 0.95,
+        "train_metrics": {
+          "n": 1771,
+          "brier_mean": 0.603636,
+          "log_loss": 1.009203,
+          "accuracy_pct": 49.69,
+          "ece": 0.00485
+        },
+        "test_metrics": {
+          "n": 759,
+          "brier_mean": 0.585116,
+          "log_loss": 0.98381,
+          "accuracy_pct": 54.15,
+          "ece": 0.026005
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 759,
+          "brier_mean": 0.588989,
+          "log_loss": 0.989135,
+          "accuracy_pct": 54.28,
+          "ece": 0.035595
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 759,
+          "brier_mean": 0.584948,
+          "log_loss": 0.983642,
+          "accuracy_pct": 54.15,
+          "ece": 0.025045
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 759,
+          "brier_mean": 0.584948,
+          "log_loss": 0.983642,
+          "accuracy_pct": 54.15,
+          "ece": 0.025045
+        }
+      }
+    },
+    "SWE": {
+      "league": "SWE",
+      "n": 3366,
+      "train_n": 2356,
+      "test_n": 1010,
+      "date_range": [
+        "2012-03-31",
+        "2025-10-27"
+      ],
+      "fitted": {
+        "draw_k": 1.05,
+        "temperature": 1.05,
+        "train_metrics": {
+          "n": 2356,
+          "brier_mean": 0.586566,
+          "log_loss": 0.983279,
+          "accuracy_pct": 51.91,
+          "ece": 0.005648
+        },
+        "test_metrics": {
+          "n": 1010,
+          "brier_mean": 0.584908,
+          "log_loss": 0.982616,
+          "accuracy_pct": 52.18,
+          "ece": 0.010281
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1010,
+          "brier_mean": 0.587872,
+          "log_loss": 0.987494,
+          "accuracy_pct": 52.18,
+          "ece": 0.019353
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1010,
+          "brier_mean": 0.58431,
+          "log_loss": 0.981486,
+          "accuracy_pct": 52.08,
+          "ece": 0.008422
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1010,
+          "brier_mean": 0.58431,
+          "log_loss": 0.981486,
+          "accuracy_pct": 52.08,
+          "ece": 0.008422
+        }
+      }
+    },
+    "BRA": {
+      "league": "BRA",
+      "n": 5275,
+      "train_n": 3692,
+      "test_n": 1583,
+      "date_range": [
+        "2012-05-19",
+        "2025-12-07"
+      ],
+      "fitted": {
+        "draw_k": 0.9,
+        "temperature": 1.0,
+        "train_metrics": {
+          "n": 3692,
+          "brier_mean": 0.598513,
+          "log_loss": 1.001506,
+          "accuracy_pct": 51.3,
+          "ece": 0.004968
+        },
+        "test_metrics": {
+          "n": 1583,
+          "brier_mean": 0.591428,
+          "log_loss": 0.990699,
+          "accuracy_pct": 52.31,
+          "ece": 0.012009
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1583,
+          "brier_mean": 0.594758,
+          "log_loss": 0.995286,
+          "accuracy_pct": 52.05,
+          "ece": 0.022425
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1583,
+          "brier_mean": 0.591702,
+          "log_loss": 0.990968,
+          "accuracy_pct": 52.18,
+          "ece": 0.013829
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1583,
+          "brier_mean": 0.591702,
+          "log_loss": 0.990968,
+          "accuracy_pct": 52.18,
+          "ece": 0.013829
+        }
+      }
+    }
+  },
+  "sporttery_sanity": {
+    "芬超": {
+      "n": 50,
+      "raw": {
+        "n": 50,
+        "brier_mean": 0.569544,
+        "log_loss": 0.955411,
+        "accuracy_pct": 52.0,
+        "ece": 0.064415
+      },
+      "with_fitted_kt": {
+        "n": 50,
+        "brier_mean": 0.570131,
+        "log_loss": 0.957584,
+        "accuracy_pct": 52.0,
+        "ece": 0.049487
+      },
+      "with_default_kt": {
+        "n": 50,
+        "brier_mean": 0.569534,
+        "log_loss": 0.955291,
+        "accuracy_pct": 52.0,
+        "ece": 0.052534
+      },
+      "fitted_used": [
+        0.95,
+        0.95
+      ]
+    },
+    "瑞超": {
+      "n": 49,
+      "raw": {
+        "n": 49,
+        "brier_mean": 0.609953,
+        "log_loss": 1.013997,
+        "accuracy_pct": 42.86,
+        "ece": 0.081155
+      },
+      "with_fitted_kt": {
+        "n": 49,
+        "brier_mean": 0.609828,
+        "log_loss": 1.012739,
+        "accuracy_pct": 42.86,
+        "ece": 0.073856
+      },
+      "with_default_kt": {
+        "n": 49,
+        "brier_mean": 0.604876,
+        "log_loss": 1.005071,
+        "accuracy_pct": 44.9,
+        "ece": 0.049538
+      },
+      "fitted_used": [
+        1.05,
+        1.05
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "production-router-gate-1.0",
+  "generated_at": "2026-08-09T00:45:00+08:00",
+  "status": "NOT_SWITCHED_INSUFFICIENT_CURRENT_PAIRS",
+  "production_switch": {
+    "current_mode": "MARKET_BASELINE",
+    "new_router_available": true,
+    "default_activation": false,
+    "fallback": "MARKET_BASELINE"
+  },
+  "build_identity": {
+    "skill_version": "1.4.0",
+    "fusion_version": "1.4.0",
+    "core_version": "3.4.4",
+    "fusion_schema_version": "1.3.0",
+    "prediction_code_sha256": "f80f02a97a9af435bd50c07f31a5943ec362b76ba5304b1ba9270665cfb4d80f",
+    "config_sha256": "9661de42aee490c0abfacef32a4ce5afde1f5750370138e243222524480f8b61",
+    "engine_bundle_sha256": "3f0a3e543a9a4ae3acdb213063a312d3131f0c05ed6dccc10301fc7c8474bb7b"
+  },
+  "routing": {
+    "understat_xg": "五大联赛开球前滚动xG",
+    "apifootball_goals_only": "六个指定其他联赛开球前Finished历史进球",
+    "missing_or_unknown": "MARKET_BASELINE",
+    "target_match_post_match_xg_forbidden": true,
+    "no_future_leakage": true
+  },
+  "data_assets": {
+    "understat_rows": 3503,
+    "understat_by_league": {"EPL": 760, "La_liga": 760, "Serie_A": 760, "Bundesliga": 612, "Ligue_1": 611},
+    "apifootball_events_file": "数据/apifootball_goals_only_events_20260809.jsonl",
+    "apifootball_finished_rows": 4246,
+    "apifootball_by_league": {"Eredivisie": 805, "Primeira Liga": 791, "Super Lig": 858, "Scottish Premiership": 591, "Swiss Super League": 593, "Eliteserien": 608}
+  },
+  "verification": {
+    "production_router_unit_tests": "4/4",
+    "production_route_evaluation_unit_tests": "3/3",
+    "engine_regression": "16/16",
+    "real_understat_route_smoke": "PASS",
+    "real_apifootball_goals_only_route_smoke": "PASS",
+    "current_registry_rows": 1520,
+    "current_strict_hash_rows": 0,
+    "current_same_match_market_baseline_pairs": 0,
+    "paired_oos_status": "INSUFFICIENT_CURRENT_VERSION_PAIRS"
+  },
+  "gate": {
+    "allow_weight_change": false,
+    "reason": "当前版本没有已登记的同场MARKET_BASELINE配对样本；Understat初次对照置信区间跨0；APIfootball goals-only尚未完成同场生产基线配对",
+    "required_next": [
+      "使用--production-route登记新的control/experiment成对预测",
+      "赛后回填同一官方90分钟赛果",
+      "达到每联赛100场后运行时间顺序OOS",
+      "对同场MARKET_BASELINE计算paired Brier/Log Loss/ECE和bootstrap CI",
+      "通过准入后创建下一完整身份哈希并显式启用"
+    ]
+  }
+}

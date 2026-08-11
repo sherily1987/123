@@ -1,0 +1,62 @@
+{
+  "schema_version": "refit-kt-power-1.0",
+  "generated_at": "2026-08-02T21:22:59+08:00",
+  "devig_method": "power",
+  "n": 1350,
+  "train_n": 940,
+  "test_n": 410,
+  "fitted": {
+    "draw_k": 1.16,
+    "temperature": 0.82,
+    "train_metrics": {
+      "n": 940,
+      "brier_mean": 0.600174,
+      "log_loss": 1.00338,
+      "accuracy_pct": 51.06,
+      "ece": 0.005414
+    },
+    "test_metrics": {
+      "n": 410,
+      "brier_mean": 0.557984,
+      "log_loss": 0.942237,
+      "accuracy_pct": 55.61,
+      "ece": 0.025482
+    }
+  },
+  "old_proportional_kt": {
+    "draw_k": 1.14,
+    "temperature": 0.96,
+    "train_metrics": {
+      "n": 940,
+      "brier_mean": 0.60199,
+      "log_loss": 1.006075,
+      "accuracy_pct": 51.06,
+      "ece": 0.019097
+    },
+    "test_metrics": {
+      "n": 410,
+      "brier_mean": 0.555395,
+      "log_loss": 0.937828,
+      "accuracy_pct": 55.61,
+      "ece": 0.017181
+    }
+  },
+  "no_cal": {
+    "draw_k": 1.0,
+    "temperature": 1.0,
+    "train_metrics": {
+      "n": 940,
+      "brier_mean": 0.605849,
+      "log_loss": 1.011397,
+      "accuracy_pct": 50.32,
+      "ece": 0.036266
+    },
+    "test_metrics": {
+      "n": 410,
+      "brier_mean": 0.558207,
+      "log_loss": 0.942181,
+      "accuracy_pct": 56.1,
+      "ece": 0.021048
+    }
+  }
+}

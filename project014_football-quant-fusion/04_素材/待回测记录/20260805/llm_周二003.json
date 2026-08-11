@@ -1,0 +1,31 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040728",
+  "match_num": "周二003",
+  "match": "奥林匹亚 vs 奈梅亨",
+  "competition": "欧冠资格赛第三轮首回合（Olympiacos Piraeus vs NEC Nijmegen）",
+  "kickoff": "2026-08-05T02:00:00+08:00",
+  "pre_registered_at": "2026-08-04T22:25:00+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）",
+    "single_preference": "主胜（H）",
+    "note": "定性判断，非概率输出；对手几乎整条防线伤缺+主队主力基本齐整+主场，主胜方向明确"
+  },
+  "score_picks": ["2-0", "1-0", "2-1"],
+  "signals": [
+    "NEC 首次参加欧冠资格赛（队史），上赛季荷甲第三、全季77球攻击力强但丢53球",
+    "NEC 防线伤停惨烈：桑德勒、舒尔斯、奥韦扬、努伊廷克、Moslih 五名后卫缺阵，几乎整条主力防线被拔",
+    "NEC 前锋小川航基缺阵；主帅需决定 Tadic 是否首发",
+    "奥林匹亚科斯中场 Hezze 伤缺（能否首发存疑）、中卫 David Carmo 不可用，其余主力基本齐整，El Kaabi 领衔锋线",
+    "主场卡拉伊斯卡基斯，欧冠资格赛首战志在必得；胜者附加赛对阵圣吉联合/博德闪耀胜者"
+  ],
+  "evidence": [
+    {"fact": "NEC 五名后卫因伤缺阵：桑德勒、舒尔斯、奥韦扬、努伊廷克、Moslih，几乎整条主力防线被连根拔起；上赛季丢53球", "source": "https://beta.dongqiudi.com/articles/6120037.html", "collected_at": "2026-08-04T22:20+08:00", "mapped": "defense_absence_nec", "basis": "懂球帝彩经前瞻 2026-08-03，与荷兰媒体交叉一致"},
+    {"fact": "奥林匹亚科斯中场 Hezze 伤缺（可能无法首发）、David Carmo 后卫不可用；Scipioni 接近首发；门将 Popovic、中锋 El Kaabi 领衔", "source": "https://www.vi.nl/nieuws/griekse-media-zijn-verdeeld-over-vermoedelijke-cl-opstelling-olympiakos-tegen-nec", "collected_at": "2026-08-04T22:20+08:00", "mapped": "defense_absence_olympiacos/attack_context", "basis": "VI.nl 2026-08-03，与 ERT/Onefootball 交叉一致"},
+    {"fact": "NEC 首次参加欧冠资格赛，上赛季荷甲第三力压阿贾克斯、全季77球攻击力仅次于埃因霍温；时隔17年重返欧战", "source": "https://www.toutiao.com/article/7670063176855192079/", "collected_at": "2026-08-04T22:20+08:00", "mapped": "cup_context/form_context", "basis": "今日头条前瞻 2026-08-03"},
+    {"fact": "北京时间8月5日凌晨02:00于卡拉伊斯卡基斯球场开球；奥林匹亚科斯若晋级将战圣吉联合vs博德闪耀胜者", "source": "https://gogoal.com.tw/archives/83200", "collected_at": "2026-08-04T22:20+08:00", "mapped": "cup_context", "basis": "GoGoal 2026-08-03"}
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜64.7% 平21.5% 负13.8%，比分Top3: 2-0/2-1/1-0。LLM 方向与量化一致（单选主胜），依据为客队防线残阵+主队主场；比分偏好与量化接近（2-0/1-0/2-1）。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

@@ -1,0 +1,109 @@
+{
+  "schema": "big5-fusion-backtest-1.0",
+  "snapshot": "t_minus_6h",
+  "note": "market_only 下 final_1x2 固定为去水市场，模型与市场基线一致属预期",
+  "leagues": {
+    "英超": {
+      "n": 57,
+      "model": {
+        "n": 57,
+        "brier": 0.709685,
+        "logloss": 1.155676,
+        "ece": 0.103222,
+        "argmax_hit_pct": 36.84
+      },
+      "market": {
+        "n": 47,
+        "brier": 0.718478,
+        "logloss": 1.167361,
+        "ece": 0.125255,
+        "argmax_hit_pct": 36.17
+      }
+    },
+    "西甲": {
+      "n": 98,
+      "model": {
+        "n": 98,
+        "brier": 0.587577,
+        "logloss": 0.987908,
+        "ece": 0.051728,
+        "argmax_hit_pct": 55.1
+      },
+      "market": {
+        "n": 81,
+        "brier": 0.573908,
+        "logloss": 0.969531,
+        "ece": 0.060177,
+        "argmax_hit_pct": 55.56
+      }
+    },
+    "意甲": {
+      "n": 105,
+      "model": {
+        "n": 105,
+        "brier": 0.616156,
+        "logloss": 1.025268,
+        "ece": 0.085762,
+        "argmax_hit_pct": 55.24
+      },
+      "market": {
+        "n": 88,
+        "brier": 0.611846,
+        "logloss": 1.020012,
+        "ece": 0.098295,
+        "argmax_hit_pct": 54.55
+      }
+    },
+    "德甲": {
+      "n": 53,
+      "model": {
+        "n": 53,
+        "brier": 0.52882,
+        "logloss": 0.90663,
+        "ece": 0.072981,
+        "argmax_hit_pct": 56.6
+      },
+      "market": {
+        "n": 44,
+        "brier": 0.504127,
+        "logloss": 0.87314,
+        "ece": 0.087841,
+        "argmax_hit_pct": 61.36
+      }
+    },
+    "法甲": {
+      "n": 56,
+      "model": {
+        "n": 56,
+        "brier": 0.65146,
+        "logloss": 1.070937,
+        "ece": 0.088363,
+        "argmax_hit_pct": 41.07
+      },
+      "market": {
+        "n": 44,
+        "brier": 0.650151,
+        "logloss": 1.068133,
+        "ece": 0.112917,
+        "argmax_hit_pct": 43.18
+      }
+    }
+  },
+  "overall": {
+    "model": {
+      "n": 369,
+      "brier": 0.615827,
+      "logloss": 1.025381,
+      "ece": 0.031163,
+      "argmax_hit_pct": 50.41
+    },
+    "market": {
+      "n": 304,
+      "brier": 0.608177,
+      "logloss": 1.01505,
+      "ece": 0.034857,
+      "argmax_hit_pct": 51.32
+    },
+    "n": 369
+  }
+}

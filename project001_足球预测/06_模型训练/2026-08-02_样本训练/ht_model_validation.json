@@ -1,0 +1,32 @@
+{
+  "schema_version": "ht-model-1.0",
+  "generated_at": "2026-08-02T21:48:57+08:00",
+  "n": 46692,
+  "train_n": 32684,
+  "test_n": 14008,
+  "models": {
+    "dc": {
+      "temperature": 1.2,
+      "test": {
+        "n": 14008,
+        "score_log_loss": 2.02099,
+        "top1_acc_pct": 29.28,
+        "top3_acc_pct": 66.04,
+        "ht_1x2_acc_pct": 45.8,
+        "ece": 0.00068
+      }
+    },
+    "bp": {
+      "lambda3": 0.02,
+      "temperature": 1.2,
+      "test": {
+        "n": 14008,
+        "score_log_loss": 2.02083,
+        "top1_acc_pct": 29.21,
+        "top3_acc_pct": 66.04,
+        "ht_1x2_acc_pct": 45.58,
+        "ece": 0.00076
+      }
+    }
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "schema": "dual-track-backtest-1.0",
+  "date": null,
+  "records_dir": "H:\\claude AI自媒体\\project014_football-quant-fusion\\04_素材\\待回测记录\\20260806",
+  "generated_at": "2026-08-10T12:27:08.649145+08:00",
+  "summary": {
+    "settled": 4,
+    "quant_1x2": {
+      "n": 4,
+      "hit": 1,
+      "hit_rate_pct": 25.0
+    },
+    "llm_double": {
+      "n": 4,
+      "hit": 2,
+      "hit_rate_pct": 50.0
+    },
+    "llm_single": {
+      "n": 4,
+      "hit": 1,
+      "hit_rate_pct": 25.0
+    },
+    "score": {
+      "top1": {
+        "n": 4,
+        "hit": 0,
+        "hit_rate_pct": 0.0,
+        "quant": 0.0,
+        "llm": 0.0
+      },
+      "top3": {
+        "n": 4,
+        "hit": 0,
+        "hit_rate_pct": 0.0,
+        "quant": 0.0,
+        "llm": 25.0
+      }
+    }
+  },
+  "divergence": [
+    {
+      "match_id": "sporttery-2040718",
+      "match": "维多利亚 vs 巴竞技",
+      "quant": "H",
+      "llm_single": "A",
+      "actual": "H",
+      "winner": "quant"
+    },
+    {
+      "match_id": "sporttery-2040724",
+      "match": "比亚韦 vs 流浪者",
+      "quant": "A",
+      "llm_single": "H",
+      "actual": "H",
+      "winner": "llm"
+    }
+  ],
+  "detail": [
+    {
+      "match_id": "sporttery-2040718",
+      "actual": "4-0",
+      "actual_1x2": "H",
+      "status": "settled",
+      "quant": {
+        "match_num": "周四001",
+        "match": "维多利亚 vs 巴竞技",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-1",
+          "1-0",
+          "0-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      },
+      "llm": {
+        "match_num": "周四001",
+        "pick": "双选 平局/客胜（D/A）",
+        "double": [
+          "A",
+          "D"
+        ],
+        "single": "A",
+        "double_hit": false,
+        "single_hit": false,
+        "score_picks": [
+          "0-1",
+          "1-1",
+          "0-2"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040724",
+      "actual": "2-1",
+      "actual_1x2": "H",
+      "status": "settled",
+      "quant": {
+        "match_num": "周四003",
+        "match": "比亚韦 vs 流浪者",
+        "pred_1x2": "A",
+        "hit": false,
+        "top_scores": [
+          "1-1",
+          "0-1",
+          "1-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      },
+      "llm": {
+        "match_num": "周四003",
+        "pick": "双选 主胜/平局（H/D）",
+        "double": [
+          "D",
+          "H"
+        ],
+        "single": "H",
+        "double_hit": true,
+        "single_hit": true,
+        "score_picks": [
+          "1-0",
+          "1-1",
+          "2-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": true
+      }
+    },
+    {
+      "match_id": "sporttery-2040725",
+      "actual": "0-1",
+      "actual_1x2": "A",
+      "status": "settled",
+      "quant": {
+        "match_num": "周四004",
+        "match": "塞萨洛 vs 安德莱",
+        "pred_1x2": "H",
+        "hit": false,
+        "top_scores": [
+          "1-0",
+          "2-0",
+          "1-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      },
+      "llm": {
+        "match_num": "周四004",
+        "pick": "单选 主胜（H）",
+        "double": [
+          "H"
+        ],
+        "single": "H",
+        "double_hit": false,
+        "single_hit": false,
+        "score_picks": [
+          "2-1",
+          "1-0",
+          "2-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040729",
+      "actual": "0-0",
+      "actual_1x2": "D",
+      "status": "settled",
+      "quant": {
+        "match_num": "周四002",
+        "match": "库奥皮奥 vs 克拉约瓦",
+        "pred_1x2": "A",
+        "hit": false,
+        "top_scores": [
+          "1-1",
+          "0-1",
+          "1-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      },
+      "llm": {
+        "match_num": "周四002",
+        "pick": "双选 平局/客胜（D/A）",
+        "double": [
+          "A",
+          "D"
+        ],
+        "single": "A",
+        "double_hit": true,
+        "single_hit": false,
+        "score_picks": [
+          "0-1",
+          "1-1",
+          "1-2"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    }
+  ],
+  "caveat": "n=3 单日样本，不构成两轨优劣结论；按 SKILL 纪律累计 >=100 场评估命中率、>=200 场做结论。"
+}

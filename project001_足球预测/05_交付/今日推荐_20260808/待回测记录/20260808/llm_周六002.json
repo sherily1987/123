@@ -1,0 +1,69 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM证据驱动（3模型：zhipu/qwen/deepseek）",
+  "match_num": "周六002",
+  "match_id": "sporttery-2040797",
+  "match": "大宫松鼠 vs 新潟天鹅",
+  "competition": "日乙",
+  "kickoff": "2026-08-08T18:00:00+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）",
+    "single_preference": "主胜（H）",
+    "strength_pct": 100,
+    "votes": {
+      "主胜": 3.0
+    },
+    "caution": false,
+    "note": "证据以体彩官方盘口+身份核验为主；伤停/近况深搜本轮缺口。"
+  },
+  "score_picks": [
+    "2-1"
+  ],
+  "models": [
+    {
+      "model": "qwen-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "让球盘口客胜赔率1.69，反映市场对客队让负信心强，主胜方向受捧。"
+    },
+    {
+      "model": "deepseek-chat",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【赔率异动: 主胜1.88/让球-1主胜3.85】市场对主队支持明确，主胜概率47.1%为最高；【主客/旅行: 大宫松鼠"
+    },
+    {
+      "model": "glm-4-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【战意/动机: 日乙联赛属性】【赔率异动: 体彩胜平负 HAD 主胜 1.88】"
+    }
+  ],
+  "signals": [
+    "体彩HAD=[1.88, 3.16, 3.56]",
+    "HHAD={'line': -1.0, 'odds': [3.85, 3.6, 1.69]}",
+    "LLM强度=100%"
+  ],
+  "evidence": [
+    {
+      "fact": "体彩官方胜平负 [1.88, 3.16, 3.56]；更新 2026-08-08 17:54:55",
+      "source": "https://webapi.sporttery.cn/gateway/uniform/football/getFixedBonusV1.qry?clientCode=3001&matchId=2040797",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "odds_official",
+      "basis": "sales-day collect 2026-08-08"
+    },
+    {
+      "fact": "身份核验 主=大宫松鼠RB 客=新潟天鹅",
+      "source": "sporttery team_ids",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "identity",
+      "basis": "raw.json"
+    }
+  ],
+  "comparison_note": "量化 final=[46.6, 30.1, 23.3] market=[49.0, 27.2, 23.8]；LLM 单选 主胜（H） 强度100%",
+  "pre_registered_at": "2026-08-08T20:04+0800",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

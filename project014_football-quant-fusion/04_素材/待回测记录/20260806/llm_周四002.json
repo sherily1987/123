@@ -1,0 +1,51 @@
+{
+  "match_num": "周四002",
+  "match_id": "sporttery-2040729",
+  "match": "库奥皮奥 vs 克拉约瓦",
+  "competition": "欧罗巴资格赛第三轮首回合",
+  "kickoff": "2026-08-06T23:00:00+08:00",
+  "direction": {
+    "pick": "双选 平局/客胜（D/A）",
+    "single_preference": "客胜（A）",
+    "note": "主队中场伤缺（膝伤+长期缺阵），但主场且从欧冠资格赛掉入欧罗巴有实力；客队罗马尼亚班底稳固；市场偏客胜与LLM一致，双选覆盖平局"
+  },
+  "score_picks": [
+    "0-1",
+    "1-1",
+    "1-2"
+  ],
+  "signals": [
+    "KuPS中场膝伤球员继续缺阵，Jerry Voutilainen几乎整年未上场",
+    "KuPS从欧冠资格赛掉入欧罗巴第三轮，主场作战",
+    "克拉约瓦（CSU Craiova）为罗马尼亚强队，对阵芬兰球队史上首次",
+    "主队球员Antwi表示准备充分、队内质量充足"
+  ],
+  "evidence": [
+    {
+      "fact": "KuPS中场球员因膝伤继续缺阵，Jerry Voutilainen已缺阵接近一年；平台信息对伤停报告不一致（Goal.com显示无缺阵球员）",
+      "source": "https://www.sportsmole.co.uk/football/kups/europa-league/preview/kups-vs-u-craiova-prediction-team-news-lineups_602418.html",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "midfield_absence_home",
+      "basis": "Sports Mole 2026-08-03；Goal.com信息冲突已记录"
+    },
+    {
+      "fact": "首回合于北京时间8月6日23:00在Kuopion Keskuskentta进行，双方均从欧冠资格赛掉入欧罗巴资格赛",
+      "source": "https://www.watchathletics.com/schedule/watchlive/12136",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "cup_context",
+      "basis": "WatchAthletics 2026-08-05"
+    },
+    {
+      "fact": "KuPS球员Clinton Antwi强调准备充分、队内质量充足",
+      "source": "https://www.veikkausliiga.com/uutiset/2026/08/06/kupsn-antwi-luottavaisena-meilla-on-omassa-joukkueessamme-paljon-laatua",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "form_context",
+      "basis": "芬兰超官方 2026-08-06"
+    }
+  ],
+  "comparison_note": "量化：主26.2/平30.1/客43.6，Top 1-1/0-1/1-0。LLM与量化一致偏客胜，双选防平",
+  "pre_registered_at": "2026-08-06T22:30+08:00",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。",
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）"
+}

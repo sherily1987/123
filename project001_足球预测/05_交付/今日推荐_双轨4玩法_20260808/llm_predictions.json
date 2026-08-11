@@ -1,0 +1,3463 @@
+[
+  {
+    "match_num": "周六014",
+    "home": "米亚尔比",
+    "away": "埃夫斯堡",
+    "league": "瑞超",
+    "kickoff": "2026-08-08T23:30:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "米亚尔比主场作战占优，埃夫斯堡防守偏弱，历史交锋主队不败，预计主队小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 1,
+        "result": "平局",
+        "total_goals": "2",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "两队实力接近，客队稍占优势但主队有主场之利。赔率显示差距微小，进球数可能不多，预计2球左右，平局可能性较高。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "主队近期状态较好，赔率也显示主胜概率较高。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "1-1": 1
+      },
+      "all_results": {
+        "主胜": 2,
+        "平局": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平平": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "米亚尔比主场作战占优，埃夫斯堡防守偏弱，历史交锋主队不败，预计主队小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 1,
+          "result": "平局",
+          "total_goals": "2",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "两队实力接近，客队稍占优势但主队有主场之利。赔率显示差距微小，进球数可能不多，预计2球左右，平局可能性较高。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "主队近期状态较好，赔率也显示主胜概率较高。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平平": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 2,
+        "平局": 1
+      }
+    },
+    "odds": [
+      2.62,
+      3.12,
+      2.34
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六015",
+    "home": "雅罗",
+    "away": "瓦萨",
+    "league": "芬超",
+    "kickoff": "2026-08-09T00:00:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.7,
+        "reasoning": "客队瓦萨赔率1.68明显占优，市场倾向客胜；主队雅罗主场优势不显著，结合盘口结构判断客队小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.58,
+        "reasoning": "体彩赔率明显倾向客胜（客1.68），但主队主场应有一定抵抗力。预计客队小胜，总进球3球，上半场可能胶着。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "主场作战的雅罗有望取得胜利，赔率结构显示客队优势，但主场因素可能影响最终结果。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        2
+      ],
+      "top_score_votes": 2,
+      "top_result": "客胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "平负",
+      "avg_confidence": 0.6766666666666666,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "1-2": 2,
+        "2-1": 1
+      },
+      "all_results": {
+        "客胜": 2,
+        "主胜": 1
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "平负": 2,
+        "胜胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.7,
+          "reasoning": "客队瓦萨赔率1.68明显占优，市场倾向客胜；主队雅罗主场优势不显著，结合盘口结构判断客队小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.58,
+          "reasoning": "体彩赔率明显倾向客胜（客1.68），但主队主场应有一定抵抗力。预计客队小胜，总进球3球，上半场可能胶着。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "主场作战的雅罗有望取得胜利，赔率结构显示客队优势，但主场因素可能影响最终结果。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "客胜",
+      "score": "1-2",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "平负",
+      "hafu_votes": {
+        "平负": 2,
+        "胜胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "客胜": 2,
+        "主胜": 1
+      }
+    },
+    "odds": [
+      4.0,
+      3.55,
+      1.68
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六016",
+    "home": "前进之鹰",
+    "away": "威廉二世",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T00:45:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "揭幕战主场优势明显，前进之鹰热身赛取胜士气足，升班马威廉二世需适应顶级联赛节奏，预计主队率先破门并掌控场面。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "confidence": 0.62,
+        "reasoning": "主队主场作战且热身赛状态佳，客队升班马实力有限，赔率明显倾向主胜。预计主队掌控局面，半场领先，最终2-0取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "威廉二世升班后状态未知，前进之鹰主场作战且战意强烈，预计主队占优。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6733333333333333,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "2-0": 1
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "揭幕战主场优势明显，前进之鹰热身赛取胜士气足，升班马威廉二世需适应顶级联赛节奏，预计主队率先破门并掌控场面。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "主胜",
+          "confidence": 0.62,
+          "reasoning": "主队主场作战且热身赛状态佳，客队升班马实力有限，赔率明显倾向主胜。预计主队掌控局面，半场领先，最终2-0取胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "威廉二世升班后状态未知，前进之鹰主场作战且战意强烈，预计主队占优。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.39,
+      4.35,
+      5.55
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六017",
+    "home": "吉马良斯",
+    "away": "阿罗卡",
+    "league": "葡超",
+    "kickoff": "2026-08-09T01:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "新帅带队主场作战，吉马良斯战意更强；阿罗卡客场疲软，初期交锋占优但难破防线。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.6,
+        "reasoning": "吉马良斯主场优势明显，赔率支持主胜。赛季初状态未知，但主队新帅上任或有积极影响，预计小胜，上半场可能试探为主。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "吉马良斯主场优势明显，新帅上任后战意强烈，赔率支持主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6666666666666666,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "新帅带队主场作战，吉马良斯战意更强；阿罗卡客场疲软，初期交锋占优但难破防线。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.6,
+          "reasoning": "吉马良斯主场优势明显，赔率支持主胜。赛季初状态未知，但主队新帅上任或有积极影响，预计小胜，上半场可能试探为主。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "吉马良斯主场优势明显，新帅上任后战意强烈，赔率支持主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.79,
+      3.25,
+      3.8
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六018",
+    "home": "埃因霍温",
+    "away": "福图纳",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T02:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "埃因霍温为卫冕冠军且主场作战，战意强烈；福图纳客场挑战实力占优，预计主队上半场率先破门，最终小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 3,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.8,
+        "reasoning": "PSV主场实力远超福图纳，卫冕冠军揭幕战力强，赔率支持主胜大球，预计上半场即领先并保持零封。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "埃因霍温作为卫冕冠军，主场作战且实力占优，预计将保持领先。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.7333333333333334,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "3-0": 1
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "埃因霍温为卫冕冠军且主场作战，战意强烈；福图纳客场挑战实力占优，预计主队上半场率先破门，最终小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 3,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.8,
+          "reasoning": "PSV主场实力远超福图纳，卫冕冠军揭幕战力强，赔率支持主胜大球，预计上半场即领先并保持零封。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "埃因霍温作为卫冕冠军，主场作战且实力占优，预计将保持领先。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": null,
+    "ok": true
+  },
+  {
+    "match_num": "周六019",
+    "home": "波城FC",
+    "away": "阿纳西",
+    "league": "法乙",
+    "kickoff": "2026-08-09T02:45:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "主队波城FC主场优势明显，客队阿纳西战意与实力稍弱，赔率显示客胜略低但主胜更受市场青睐，预计主队小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 1,
+        "result": "平局",
+        "total_goals": "2",
+        "half_result": "平局",
+        "confidence": 0.6,
+        "reasoning": "客队赔率略低，市场略倾向客队，但主队主场有一定优势。双方实力接近，且缺少伤停数据，平局可能性较大，总进球不会太多。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "主队波城FC主场作战，且体彩赔率支持主胜，综合分析预计主队将取得胜利。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6333333333333333,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "1-1": 1
+      },
+      "all_results": {
+        "主胜": 2,
+        "平局": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平平": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "主队波城FC主场优势明显，客队阿纳西战意与实力稍弱，赔率显示客胜略低但主胜更受市场青睐，预计主队小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 1,
+          "result": "平局",
+          "total_goals": "2",
+          "half_result": "平局",
+          "confidence": 0.6,
+          "reasoning": "客队赔率略低，市场略倾向客队，但主队主场有一定优势。双方实力接近，且缺少伤停数据，平局可能性较大，总进球不会太多。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "主队波城FC主场作战，且体彩赔率支持主胜，综合分析预计主队将取得胜利。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平平": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 2,
+        "平局": 1
+      }
+    },
+    "odds": [
+      2.64,
+      3.05,
+      2.37
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六020",
+    "home": "蒙彼利埃",
+    "away": "第戎",
+    "league": "法乙",
+    "kickoff": "2026-08-09T02:45:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "主队蒙彼利埃主场优势明显，赔率支持度高，市场倾向主胜；客队第戎战力偏弱，预计难以全身而退。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.55,
+        "reasoning": "主胜赔率1.66明显偏低，让一球盘口支持主队优势。蒙彼利埃主场作战，第戎客场实力较弱，但缺乏伤停和近况数据，保守预测主队小胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "蒙彼利埃主场优势明显，近期状态较好，且赔率支持主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "主队蒙彼利埃主场优势明显，赔率支持度高，市场倾向主胜；客队第戎战力偏弱，预计难以全身而退。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.55,
+          "reasoning": "主胜赔率1.66明显偏低，让一球盘口支持主队优势。蒙彼利埃主场作战，第戎客场实力较弱，但缺乏伤停和近况数据，保守预测主队小胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "蒙彼利埃主场优势明显，近期状态较好，且赔率支持主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.66,
+      3.34,
+      4.4
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六021",
+    "home": "南特",
+    "away": "圣旺红星",
+    "league": "法乙",
+    "kickoff": "2026-08-09T02:45:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "南特主场优势明显，赔率支持主队不败，让球盘口合理，预计主队上半场领先，最终小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "confidence": 0.72,
+        "reasoning": "主胜赔率低至1.61，南特主场优势明显，让球盘-1也支持主胜。客队实力较弱，预计南特上半场就取得领先并零封对手。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.7,
+        "reasoning": "南特主场优势明显，近期状态稳定，结合赔率支持主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.69,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "2-0": 1
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "南特主场优势明显，赔率支持主队不败，让球盘口合理，预计主队上半场领先，最终小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "主胜",
+          "confidence": 0.72,
+          "reasoning": "主胜赔率低至1.61，南特主场优势明显，让球盘-1也支持主胜。客队实力较弱，预计南特上半场就取得领先并零封对手。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.7,
+          "reasoning": "南特主场优势明显，近期状态稳定，结合赔率支持主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.61,
+      3.45,
+      4.6
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六022",
+    "home": "阿尔克马",
+    "away": "海牙",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T03:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "confidence": 0.7,
+        "reasoning": "阿尔克马主场实力明显占优，赔率极强支持主胜。海牙升班马首战客场，阵容差距大，主队有望零封取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "主队主场优势明显，且赔率强烈倾向主胜；升班马海牙战意虽强但首战经验不足，预计主队控场并率先破门。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "阿尔克马主场作战，且体彩赔率支持主胜。海牙为新晋球队，适应新联赛可能需要时间。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.7,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-0": 1,
+        "2-1": 2
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "2": 1,
+        "3": 2
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "主胜",
+          "confidence": 0.7,
+          "reasoning": "阿尔克马主场实力明显占优，赔率极强支持主胜。海牙升班马首战客场，阵容差距大，主队有望零封取胜。"
+        },
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "主队主场优势明显，且赔率强烈倾向主胜；升班马海牙战意虽强但首战经验不足，预计主队控场并率先破门。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "阿尔克马主场作战，且体彩赔率支持主胜。海牙为新晋球队，适应新联赛可能需要时间。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.28,
+      4.9,
+      6.95
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六023",
+    "home": "格雷米奥",
+    "away": "圣保罗",
+    "league": "巴甲",
+    "kickoff": "2026-08-09T03:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "格雷米奥主场火力强，近战绩含5-3高比分；圣保罗客场防守一般，赔率暗示主队略优，预计主胜小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "主队格雷米奥主场有一定优势，赔率略倾向主队，近期有高比分纪录，但客队圣保罗实力不弱，预计上半场胶着，下半场主队发力取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "格雷米奥近期状态良好，且主场作战，对抗圣保罗有优势。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "格雷米奥主场火力强，近战绩含5-3高比分；圣保罗客场防守一般，赔率暗示主队略优，预计主胜小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "主队格雷米奥主场有一定优势，赔率略倾向主队，近期有高比分纪录，但客队圣保罗实力不弱，预计上半场胶着，下半场主队发力取胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "格雷米奥近期状态良好，且主场作战，对抗圣保罗有优势。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      2.3,
+      2.75,
+      3.02
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周六024",
+    "home": "阿马多拉",
+    "away": "里斯本",
+    "league": "葡超",
+    "kickoff": "2026-08-09T03:30:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.72,
+        "reasoning": "里斯本实力明显占优，阿马多拉主场战力有限，但上半场可能僵持，下半场客队发力取胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 0,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "2",
+        "half_result": "客胜",
+        "confidence": 0.55,
+        "reasoning": "本菲卡实力远超阿马多拉，且客场作战但整体阵容占优。阿马多拉主场防守尚可，但进攻乏力，预计客队小胜并零封。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "里斯本实力强于阿马多拉，但阿马多拉主场作战，且赔率显示主胜机会较大。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        2
+      ],
+      "top_score_votes": 1,
+      "top_result": "客胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "平负",
+      "avg_confidence": 0.6733333333333333,
+      "disagreement": 1.0,
+      "all_scores": {
+        "1-2": 1,
+        "0-2": 1,
+        "2-1": 1
+      },
+      "all_results": {
+        "客胜": 2,
+        "主胜": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "平负": 1,
+        "负负": 1,
+        "胜胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.72,
+          "reasoning": "里斯本实力明显占优，阿马多拉主场战力有限，但上半场可能僵持，下半场客队发力取胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "2",
+          "half_result": "客胜",
+          "confidence": 0.55,
+          "reasoning": "本菲卡实力远超阿马多拉，且客场作战但整体阵容占优。阿马多拉主场防守尚可，但进攻乏力，预计客队小胜并零封。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "里斯本实力强于阿马多拉，但阿马多拉主场作战，且赔率显示主胜机会较大。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "客胜",
+      "score": "1-2",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "平负",
+      "hafu_votes": {
+        "平负": 1,
+        "负负": 1,
+        "胜胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "客胜": 2,
+        "主胜": 1
+      }
+    },
+    "odds": null,
+    "ok": true
+  },
+  {
+    "match_num": "周六025",
+    "home": "博塔弗戈",
+    "away": "弗鲁米嫩",
+    "league": "巴甲",
+    "kickoff": "2026-08-09T08:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "同城德比战意十足，主队主场优势明显；赔率显示主胜稍受追捧，结合历史交锋与战意，预计主队小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 1,
+        "result": "平局",
+        "total_goals": "2",
+        "half_result": "平局",
+        "confidence": 0.35,
+        "reasoning": "同城德比战意相当，主客赔率接近，平赔偏低，双方实力均衡，建议防平。近况数据不足，把握有限。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "同城德比战意强，博塔弗戈近期状态佳，赔率支持主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.5833333333333334,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "1-1": 1
+      },
+      "all_results": {
+        "主胜": 2,
+        "平局": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平平": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "同城德比战意十足，主队主场优势明显；赔率显示主胜稍受追捧，结合历史交锋与战意，预计主队小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 1,
+          "result": "平局",
+          "total_goals": "2",
+          "half_result": "平局",
+          "confidence": 0.35,
+          "reasoning": "同城德比战意相当，主客赔率接近，平赔偏低，双方实力均衡，建议防平。近况数据不足，把握有限。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "同城德比战意强，博塔弗戈近期状态佳，赔率支持主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平平": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 2,
+        "平局": 1
+      }
+    },
+    "odds": [
+      2.2,
+      3.0,
+      2.93
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日001",
+    "home": "东京绿茵",
+    "away": "川崎前锋",
+    "league": "日职",
+    "kickoff": "2026-08-09T17:00:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.68,
+        "reasoning": "川崎前锋实力占优，东京绿茵主场优势有限，预计客队小胜，上半场胶着，全场总进球3球",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 1,
+        "result": "平局",
+        "total_goals": "2",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "川崎实力占优但客场不稳，东京主场韧性足。赔率接近，平局概率较高，总进球数偏少。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.7,
+        "reasoning": "东京绿茵近况佳，主场优势明显，川崎前锋客场战绩一般，双方近期交锋东京绿茵占据优势。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        2
+      ],
+      "top_score_votes": 1,
+      "top_result": "客胜",
+      "top_result_votes": 1,
+      "top_total_goals": "3",
+      "top_hafu": "平负",
+      "avg_confidence": 0.6433333333333333,
+      "disagreement": 1.0,
+      "all_scores": {
+        "1-2": 1,
+        "1-1": 1,
+        "2-1": 1
+      },
+      "all_results": {
+        "客胜": 1,
+        "平局": 1,
+        "主胜": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "平负": 1,
+        "平平": 1,
+        "胜胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.68,
+          "reasoning": "川崎前锋实力占优，东京绿茵主场优势有限，预计客队小胜，上半场胶着，全场总进球3球"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 1,
+          "result": "平局",
+          "total_goals": "2",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "川崎实力占优但客场不稳，东京主场韧性足。赔率接近，平局概率较高，总进球数偏少。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.7,
+          "reasoning": "东京绿茵近况佳，主场优势明显，川崎前锋客场战绩一般，双方近期交锋东京绿茵占据优势。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "客胜",
+      "score": "1-2",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "平负",
+      "hafu_votes": {
+        "平负": 1,
+        "平平": 1,
+        "胜胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "客胜": 1,
+        "平局": 1,
+        "主胜": 1
+      }
+    },
+    "odds": [
+      2.76,
+      3.05,
+      2.28
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日002",
+    "home": "长崎航海",
+    "away": "京都",
+    "league": "日职",
+    "kickoff": "2026-08-09T18:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "长崎主场韧性足，京都客场防守不稳，主队更可能率先破门并掌控节奏，预计小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "客队赔率较低稍占优，长崎主场有一定韧性。总进球数2-3球合理，半场可能胶着，下半场客队发力。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.7,
+        "reasoning": "根据赔率，主场优势明显，结合近期状态，看好主队不败。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6333333333333333,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "1-2": 1
+      },
+      "all_results": {
+        "主胜": 2,
+        "客胜": 1
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平负": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "长崎主场韧性足，京都客场防守不稳，主队更可能率先破门并掌控节奏，预计小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "客队赔率较低稍占优，长崎主场有一定韧性。总进球数2-3球合理，半场可能胶着，下半场客队发力。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.7,
+          "reasoning": "根据赔率，主场优势明显，结合近期状态，看好主队不败。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平负": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 2,
+        "客胜": 1
+      }
+    },
+    "odds": [
+      2.85,
+      3.15,
+      2.17
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日003",
+    "home": "山形山神",
+    "away": "枥木城",
+    "league": "日乙",
+    "kickoff": "2026-08-09T18:00:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 1,
+        "result": "平局",
+        "total_goals": "2",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "两队实力接近，主队略占主场优势但赔率支持平局，进攻效率一般，预计上半场互交白卷，全场1-1战平。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "山形山神主场优势明显，枥木城防守偏弱，预计主队半场领先，全场小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "山形山神主场作战，赔率倾向主胜，且两队近期状态对比更有利。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "1-1": 1,
+        "2-1": 2
+      },
+      "all_results": {
+        "平局": 1,
+        "主胜": 2
+      },
+      "all_total_goals": {
+        "2": 1,
+        "3": 2
+      },
+      "all_hafu": {
+        "平平": 1,
+        "胜胜": 2
+      },
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 1,
+          "result": "平局",
+          "total_goals": "2",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "两队实力接近，主队略占主场优势但赔率支持平局，进攻效率一般，预计上半场互交白卷，全场1-1战平。"
+        },
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "山形山神主场优势明显，枥木城防守偏弱，预计主队半场领先，全场小胜"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "山形山神主场作战，赔率倾向主胜，且两队近期状态对比更有利。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "平平": 1,
+        "胜胜": 2
+      },
+      "confidence": null,
+      "votes": {
+        "平局": 1,
+        "主胜": 2
+      }
+    },
+    "odds": [
+      2.32,
+      3.25,
+      2.56
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日004",
+    "home": "鹿斯巴达",
+    "away": "费耶诺德",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T18:15:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "费耶诺德实力占优，但鹿斯巴达主场防守韧性较强，预计主队不败，客队小胜，上半场主队可能率先得分。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 0,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "2",
+        "half_result": "客胜",
+        "confidence": 0.7,
+        "reasoning": "费耶诺德实力明显占优，客胜赔率低，鹿斯巴达主场难有作为。总进球数适中，客队有望上半场领先。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "费耶诺德实力更强，但鹿斯巴达近期状态不俗，预测主队小胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.7,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "0-2": 1
+      },
+      "all_results": {
+        "主胜": 2,
+        "客胜": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "负负": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "费耶诺德实力占优，但鹿斯巴达主场防守韧性较强，预计主队不败，客队小胜，上半场主队可能率先得分。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "2",
+          "half_result": "客胜",
+          "confidence": 0.7,
+          "reasoning": "费耶诺德实力明显占优，客胜赔率低，鹿斯巴达主场难有作为。总进球数适中，客队有望上半场领先。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "费耶诺德实力更强，但鹿斯巴达近期状态不俗，预测主队小胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "负负": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 2,
+        "客胜": 1
+      }
+    },
+    "odds": [
+      4.35,
+      3.95,
+      1.55
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日005",
+    "home": "圣保利",
+    "away": "菲尔特",
+    "league": "德乙",
+    "kickoff": "2026-08-09T19:30:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "圣保利主场战斗力强，菲尔特客场防守薄弱，主队占优但难大胜，预计小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "confidence": 0.55,
+        "reasoning": "圣保利主场优势明显，赔率支持主胜。菲尔特客场疲软，但主队进攻效率一般，预计2-0小胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "圣保利近期状态较好，且主场作战有优势，赔率也倾向主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6166666666666667,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "2-0": 1
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "圣保利主场战斗力强，菲尔特客场防守薄弱，主队占优但难大胜，预计小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "主胜",
+          "confidence": 0.55,
+          "reasoning": "圣保利主场优势明显，赔率支持主胜。菲尔特客场疲软，但主队进攻效率一般，预计2-0小胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "圣保利近期状态较好，且主场作战有优势，赔率也倾向主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.65,
+      3.7,
+      3.95
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日006",
+    "home": "纽伦堡",
+    "away": "德累斯顿",
+    "league": "德乙",
+    "kickoff": "2026-08-09T19:30:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "纽伦堡主场战斗力强，德累斯顿防守偏弱，主队有望率先破门，上半场领先，最终小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "纽伦堡主场略占优，赔率支持主胜但客队有一定实力。总进球倾向2-3球，上半场可能僵持，下半场主队发力取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "纽伦堡近期表现强劲，且主场优势明显，赔率倾向主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "纽伦堡主场战斗力强，德累斯顿防守偏弱，主队有望率先破门，上半场领先，最终小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "纽伦堡主场略占优，赔率支持主胜但客队有一定实力。总进球倾向2-3球，上半场可能僵持，下半场主队发力取胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "纽伦堡近期表现强劲，且主场优势明显，赔率倾向主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      2.0,
+      3.38,
+      3.0
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日007",
+    "home": "哈马比",
+    "away": "赫根",
+    "league": "瑞超",
+    "kickoff": "2026-08-09T20:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "哈马比主场强势，赫根客场疲软，主队进攻效率高，预计上半场领先，最终小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.6,
+        "reasoning": "主胜赔率极低，哈马比主场优势明显，赫根客战乏力。TTG档位指向3球，结合主队进攻效率，预测2-1获胜，半场领先。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "哈马比近期表现强势，赔率也显示主队优势明显，预计主队至少能赢一球。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6666666666666666,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "哈马比主场强势，赫根客场疲软，主队进攻效率高，预计上半场领先，最终小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.6,
+          "reasoning": "主胜赔率极低，哈马比主场优势明显，赫根客战乏力。TTG档位指向3球，结合主队进攻效率，预测2-1获胜，半场领先。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "哈马比近期表现强势，赔率也显示主队优势明显，预计主队至少能赢一球。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.46,
+      4.35,
+      4.65
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日008",
+    "home": "库奥皮奥",
+    "away": "TPS图尔",
+    "league": "芬超",
+    "kickoff": "2026-08-09T20:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "库奥皮奥主场优势明显，进攻效率较高；TPS客场表现一般，防守偏弱。结合赔率及基本面，主队小胜概率大。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "confidence": 0.55,
+        "reasoning": "主队赔率明显低于客队，实力占优。但进球数赔率显示总进球可能偏少，主队可能小胜，半场领先概率大。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "主队近期状态较好，赔率倾向主胜，预计双方总进球数为3。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "2-0": 1
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "库奥皮奥主场优势明显，进攻效率较高；TPS客场表现一般，防守偏弱。结合赔率及基本面，主队小胜概率大。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "主胜",
+          "confidence": 0.55,
+          "reasoning": "主队赔率明显低于客队，实力占优。但进球数赔率显示总进球可能偏少，主队可能小胜，半场领先概率大。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "主队近期状态较好，赔率倾向主胜，预计双方总进球数为3。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.34,
+      4.55,
+      6.15
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日009",
+    "home": "兹沃勒",
+    "away": "阿贾克斯",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T20:30:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.72,
+        "reasoning": "阿贾克斯实力远超兹沃勒，赔率显示其取胜概率高，但主队主场有一定抵抗能力，预计小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 0,
+        "away_score": 3,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "客胜",
+        "confidence": 0.72,
+        "reasoning": "阿贾克斯实力远强于兹沃勒，客胜赔率极低，总进球3球符合双方攻防特点，上半场客队有望领先。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "阿贾克斯虽实力强大，但兹沃勒主场表现强势，赔率也倾向于主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        2
+      ],
+      "top_score_votes": 1,
+      "top_result": "客胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "平负",
+      "avg_confidence": 0.6966666666666667,
+      "disagreement": 1.0,
+      "all_scores": {
+        "1-2": 1,
+        "0-3": 1,
+        "2-1": 1
+      },
+      "all_results": {
+        "客胜": 2,
+        "主胜": 1
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "平负": 1,
+        "负负": 1,
+        "胜胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.72,
+          "reasoning": "阿贾克斯实力远超兹沃勒，赔率显示其取胜概率高，但主队主场有一定抵抗能力，预计小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 3,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "客胜",
+          "confidence": 0.72,
+          "reasoning": "阿贾克斯实力远强于兹沃勒，客胜赔率极低，总进球3球符合双方攻防特点，上半场客队有望领先。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "阿贾克斯虽实力强大，但兹沃勒主场表现强势，赔率也倾向于主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "客胜",
+      "score": "1-2",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "平负",
+      "hafu_votes": {
+        "平负": 1,
+        "负负": 1,
+        "胜胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "客胜": 2,
+        "主胜": 1
+      }
+    },
+    "odds": [
+      5.55,
+      4.45,
+      1.38
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日010",
+    "home": "格罗宁根",
+    "away": "乌德勒支",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T20:30:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "格罗宁根主场优势明显，攻防较稳；乌德勒支客场防守一般，易被反击打穿，预计主队小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "格罗宁根主场优势，赔率略支持主队，但两队实力接近，平局概率不低。总进球数3球符合市场低赔档，半场可能僵持，下半场分胜负。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "格罗宁根近期表现稳定，乌德勒支防守较弱，主队有望保持领先。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6166666666666667,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "格罗宁根主场优势明显，攻防较稳；乌德勒支客场防守一般，易被反击打穿，预计主队小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "格罗宁根主场优势，赔率略支持主队，但两队实力接近，平局概率不低。总进球数3球符合市场低赔档，半场可能僵持，下半场分胜负。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "格罗宁根近期表现稳定，乌德勒支防守较弱，主队有望保持领先。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      2.22,
+      3.25,
+      2.7
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日011",
+    "home": "利勒斯特",
+    "away": "罗森博格",
+    "league": "挪超",
+    "kickoff": "2026-08-09T20:30:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "利勒斯特主场防守稳固，罗森博格客场进攻效率一般，双方战意明确但控场能力有限，预计主队小胜。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "主队利勒斯特有主场优势且赔率略低，罗森博格客场能力一般。TTG档位3球赔率低暗示总进球可能为3，看好主队小胜但半场或胶着。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "主队近期状态良好，客队防守能力有限，预计双方总进球数3球，主队取胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "利勒斯特主场防守稳固，罗森博格客场进攻效率一般，双方战意明确但控场能力有限，预计主队小胜。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "主队利勒斯特有主场优势且赔率略低，罗森博格客场能力一般。TTG档位3球赔率低暗示总进球可能为3，看好主队小胜但半场或胶着。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "主队近期状态良好，客队防守能力有限，预计双方总进球数3球，主队取胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      2.15,
+      3.55,
+      2.61
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日012",
+    "home": "国际图尔",
+    "away": "拉赫蒂",
+    "league": "芬超",
+    "kickoff": "2026-08-09T22:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "主队主场优势明显，拉赫蒂客场防守不稳，预计主队率先破门并保持领先",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "confidence": 0.6,
+        "reasoning": "主队赔率1.6明显占优，TTG最低赔档2球，主队实力强于客队，半场可能领先，但进球数不会太多。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "主队近期状态良好，客队防守较弱，预计主队至少能进两球。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6666666666666666,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "2-0": 1
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "胜胜": 3
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "主队主场优势明显，拉赫蒂客场防守不稳，预计主队率先破门并保持领先"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "2",
+          "half_result": "主胜",
+          "confidence": 0.6,
+          "reasoning": "主队赔率1.6明显占优，TTG最低赔档2球，主队实力强于客队，半场可能领先，但进球数不会太多。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "主队近期状态良好，客队防守较弱，预计主队至少能进两球。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 3
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.6,
+      3.5,
+      4.6
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日013",
+    "home": "哈尔姆斯",
+    "away": "盖斯",
+    "league": "瑞超",
+    "kickoff": "2026-08-09T22:30:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.7,
+        "reasoning": "盖斯实力占优，赔率显示客胜低水，主队主场优势有限，预计客队小胜，上半场胶着。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 0,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "2",
+        "half_result": "客胜",
+        "confidence": 0.68,
+        "reasoning": "客队盖斯赔率极低（1.47），实力占优。哈尔姆斯主场乏力，总进球倾向小球（TTG3档偏低），预计客队控场取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "主队近期状态佳，客队客场表现不佳，且赔率倾向主胜。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        2
+      ],
+      "top_score_votes": 1,
+      "top_result": "客胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "平负",
+      "avg_confidence": 0.71,
+      "disagreement": 1.0,
+      "all_scores": {
+        "1-2": 1,
+        "0-2": 1,
+        "2-1": 1
+      },
+      "all_results": {
+        "客胜": 2,
+        "主胜": 1
+      },
+      "all_total_goals": {
+        "3": 2,
+        "2": 1
+      },
+      "all_hafu": {
+        "平负": 1,
+        "负负": 1,
+        "胜胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.7,
+          "reasoning": "盖斯实力占优，赔率显示客胜低水，主队主场优势有限，预计客队小胜，上半场胶着。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "2",
+          "half_result": "客胜",
+          "confidence": 0.68,
+          "reasoning": "客队盖斯赔率极低（1.47），实力占优。哈尔姆斯主场乏力，总进球倾向小球（TTG3档偏低），预计客队控场取胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "主队近期状态佳，客队客场表现不佳，且赔率倾向主胜。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "客胜",
+      "score": "1-2",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "平负",
+      "hafu_votes": {
+        "平负": 1,
+        "负负": 1,
+        "胜胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "客胜": 2,
+        "主胜": 1
+      }
+    },
+    "odds": [
+      5.2,
+      3.9,
+      1.47
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日014",
+    "home": "哥德堡",
+    "away": "卡尔马",
+    "league": "瑞超",
+    "kickoff": "2026-08-09T22:30:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "哥德堡主场强势，卡尔马客场疲软，数据支持主队不败。上半场主队有望率先破门，最终小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "两队实力接近，赔率显示主队略占优。哥德堡主场有一定优势，但卡尔马客场韧性足。总进球数3球概率较高，上半场可能僵持，下半场主队发力取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.7,
+        "reasoning": "哥德堡主场作战，近况较好，赔率亦倾向主胜，预计至少2-1领先。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.6333333333333333,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "哥德堡主场强势，卡尔马客场疲软，数据支持主队不败。上半场主队有望率先破门，最终小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "两队实力接近，赔率显示主队略占优。哥德堡主场有一定优势，但卡尔马客场韧性足。总进球数3球概率较高，上半场可能僵持，下半场主队发力取胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.7,
+          "reasoning": "哥德堡主场作战，近况较好，赔率亦倾向主胜，预计至少2-1领先。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      2.28,
+      3.4,
+      2.52
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日015",
+    "home": "海伦芬",
+    "away": "特温特",
+    "league": "荷甲",
+    "kickoff": "2026-08-09T22:45:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "海伦芬主场防守稳固，特温特客场进攻效率一般，预计主队能守住优势并把握机会反超。",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 1,
+        "away_score": 2,
+        "result": "客胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "客队特温特实力占优，赔率支持客胜，但海伦芬主场有韧性，预计上半场僵持，下半场客队发力取胜。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "海伦芬近期状态较好，特温特防守不稳，预计主队占优。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 2,
+      "top_result": "主胜",
+      "top_result_votes": 2,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.6666666666666666,
+      "all_scores": {
+        "2-1": 2,
+        "1-2": 1
+      },
+      "all_results": {
+        "主胜": 2,
+        "客胜": 1
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平负": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "海伦芬主场防守稳固，特温特客场进攻效率一般，预计主队能守住优势并把握机会反超。"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 2,
+          "result": "客胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "客队特温特实力占优，赔率支持客胜，但海伦芬主场有韧性，预计上半场僵持，下半场客队发力取胜。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "海伦芬近期状态较好，特温特防守不稳，预计主队占优。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平负": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 2,
+        "客胜": 1
+      }
+    },
+    "odds": [
+      2.7,
+      3.55,
+      2.1
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日016",
+    "home": "汉坎",
+    "away": "奥勒松",
+    "league": "挪超",
+    "kickoff": "2026-08-09T23:00:00+08:00",
+    "models": [
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.65,
+        "reasoning": "汉坎主场优势明显，奥勒松客场防守偏弱，预计主队率先破门，半场领先，全场小胜",
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "平局",
+        "confidence": 0.55,
+        "reasoning": "主队赔率略占优，但客队有一定实力。挪超主场优势明显，预计主队小胜，半场可能僵持。",
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 2,
+        "away_score": 1,
+        "result": "主胜",
+        "total_goals": "3",
+        "half_result": "主胜",
+        "confidence": 0.75,
+        "reasoning": "汉坎近期状态较好，奥勒松客场表现不稳定，预计主队占优。",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        2,
+        1
+      ],
+      "top_score_votes": 3,
+      "top_result": "主胜",
+      "top_result_votes": 3,
+      "top_total_goals": "3",
+      "top_hafu": "胜胜",
+      "avg_confidence": 0.65,
+      "disagreement": 0.3333333333333333,
+      "all_scores": {
+        "2-1": 3
+      },
+      "all_results": {
+        "主胜": 3
+      },
+      "all_total_goals": {
+        "3": 3
+      },
+      "all_hafu": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "individual": {
+        "qwen/qwen-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.65,
+          "reasoning": "汉坎主场优势明显，奥勒松客场防守偏弱，预计主队率先破门，半场领先，全场小胜"
+        },
+        "deepseek/deepseek-chat": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "平局",
+          "confidence": 0.55,
+          "reasoning": "主队赔率略占优，但客队有一定实力。挪超主场优势明显，预计主队小胜，半场可能僵持。"
+        },
+        "zhipu/glm-4-flash": {
+          "home_score": 2,
+          "away_score": 1,
+          "result": "主胜",
+          "total_goals": "3",
+          "half_result": "主胜",
+          "confidence": 0.75,
+          "reasoning": "汉坎近期状态较好，奥勒松客场表现不稳定，预计主队占优。"
+        }
+      },
+      "errors": [],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 3
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "2-1",
+      "ttg": "3",
+      "ou25": "大2.5",
+      "hafu": "胜胜",
+      "hafu_votes": {
+        "胜胜": 2,
+        "平胜": 1
+      },
+      "confidence": null,
+      "votes": {
+        "主胜": 3
+      }
+    },
+    "odds": [
+      1.93,
+      3.6,
+      3.0
+    ],
+    "ok": true
+  }
+]

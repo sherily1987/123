@@ -1,0 +1,1273 @@
+[
+  {
+    "match_num": "周日017",
+    "home": "AC奥卢",
+    "away": "赫尔辛基",
+    "league": "芬超",
+    "kickoff": "2026-08-10T00:00:00+08:00",
+    "models": [
+      {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【近况:AC奥卢近期状态一般，赫尔辛基作为传统强队稳定性更强】【主客:奥卢主场有一定韧性，但赫尔辛基客场战绩不俗】【身份:赫尔辛基为芬超豪门，整体实力和阵容深度占优】【交锋:历史交锋赫尔辛基占据心理优势】【伤停:双方具体伤停信息未明确，存在不确定性】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:AC奥卢近期联赛3轮不败，上轮客场逼平强敌哈卡，防守端表现稳健；赫尔辛基则连续2场平局，进攻效率下滑明显】。【主客:主场作战的AC奥卢本赛季主场胜率仅40%，但面对中下游球队时具备一定压制力；赫尔辛基客场战绩为7胜3平2负，但近3个客场仅进1球，攻防失衡】。【身份:赫尔辛基为卫冕冠军，战意强烈，但已无争冠压力，重心或转向杯赛；AC奥卢保级压力仍存，战意充足】。【交锋:过去5次交手赫尔辛基4胜1平，心理占优，但最近一次在芬超客场以1-2告负，且数据盘口未体现明显优势】。【伤停:官方未公布首发名单，暂无明确缺阵信息，存在证据缺口】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 362)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.0,
+      "top_result": "主胜",
+      "top_result_votes": 1.0,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": "客胜",
+      "caution": true,
+      "strength": 0.5405405405405405,
+      "avg_confidence": 0.55,
+      "disagreement": 1.0,
+      "all_scores": {
+        "0-1": 0.85,
+        "1-0": 1.0
+      },
+      "all_results": {
+        "客胜": 0.85,
+        "主胜": 1.0
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平负": 0.85,
+        "平胜": 1.0
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 1,
+          "result": "客胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平负",
+          "ou_from_score": false,
+          "alt_direction": "平局",
+          "evidence_gap": true,
+          "confidence": 0.55,
+          "reasoning": "【近况:AC奥卢近期状态一般，赫尔辛基作为传统强队稳定性更强】【主客:奥卢主场有一定韧性，但赫尔辛基客场战绩不俗】【身份:赫尔辛基为芬超豪门，整体实力和阵容深度占优】【交锋:历史交锋赫尔辛基占据心理优势】【伤停:双方具体伤停信息未明确，存在不确定性】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:AC奥卢近期联赛3轮不败，上轮客场逼平强敌哈卡，防守端表现稳健；赫尔辛基则连续2场平局，进攻效率下滑明显】。【主客:主场作战的AC奥卢本赛季主场胜率仅40%，但面对中下游球队时具备一定压制力；赫尔辛基客场战绩为7胜3平2负，但近3个客场仅进1球，攻防失衡】。【身份:赫尔辛基为卫冕冠军，战意强烈，但已无争冠压力，重心或转向杯赛；AC奥卢保级压力仍存，战意充足】。【交锋:过去5次交手赫尔辛基4胜1平，心理占优，但最近一次在芬超客场以1-2告负，且数据盘口未体现明显优势】。【伤停:官方未公布首发名单，暂无明确缺阵信息，存在证据缺口】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "首发",
+              "缺阵",
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 362)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平负": 0.85,
+        "平胜": 1.0
+      },
+      "confidence": 0.55,
+      "alt_direction": "客胜",
+      "caution": true,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "客胜": 0.85,
+        "主胜": 1.0
+      }
+    },
+    "odds": [
+      3.2,
+      3.45,
+      1.9
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日019",
+    "home": "克里斯蒂",
+    "away": "莫尔德",
+    "league": "挪超",
+    "kickoff": "2026-08-10T01:15:00+08:00",
+    "models": [
+      {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.6,
+        "reasoning": "【近况:克里斯蒂近期主场表现尚可但整体胜率偏低，莫尔德客场状态一般但整体实力占优】【主客:莫尔德客场作战但实力与排名明显高于主队】【身份:莫尔德为挪超传统强队，克里斯蒂中下游】【交锋:莫尔德历史交锋占据优势】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:克里斯蒂近期3场不败，上轮逼平强敌斯托尔莫，防守端保持零封；莫尔德虽排名靠前但客场连续3场未胜，状态起伏明显】。【主客:克里斯蒂主场表现稳定，近5个主场4胜1平，具备主场优势】。【身份:克里斯蒂为中游偏上球队，莫尔德是争冠组主力，战意存在差异，但莫尔德近期无明确争冠压力】。【交锋:过去3次交手克里斯蒂均未能取胜，且场均失球超1.5，心理劣势明显】。【证据缺口:两队首发名单未公开，无法确认关键球员缺阵情况，伤停信息缺失】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "error": "比分越界: -1--1",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        0,
+        1
+      ],
+      "top_score_votes": 1.0,
+      "top_result": "客胜",
+      "top_result_votes": 1.0,
+      "top_total_goals": "1",
+      "top_hafu": "平负",
+      "top_ou25": "小2.5",
+      "alt_direction": "主胜",
+      "caution": true,
+      "strength": 0.5,
+      "avg_confidence": 0.575,
+      "disagreement": 1.0,
+      "all_scores": {
+        "0-1": 1.0,
+        "1-0": 1.0
+      },
+      "all_results": {
+        "客胜": 1.0,
+        "主胜": 1.0
+      },
+      "all_total_goals": {
+        "1": 2.0
+      },
+      "all_hafu": {
+        "平负": 1.0,
+        "平胜": 1.0
+      },
+      "all_ou25": {
+        "小2.5": 2.0
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 1,
+          "result": "客胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平负",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.6,
+          "reasoning": "【近况:克里斯蒂近期主场表现尚可但整体胜率偏低，莫尔德客场状态一般但整体实力占优】【主客:莫尔德客场作战但实力与排名明显高于主队】【身份:莫尔德为挪超传统强队，克里斯蒂中下游】【交锋:莫尔德历史交锋占据优势】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:克里斯蒂近期3场不败，上轮逼平强敌斯托尔莫，防守端保持零封；莫尔德虽排名靠前但客场连续3场未胜，状态起伏明显】。【主客:克里斯蒂主场表现稳定，近5个主场4胜1平，具备主场优势】。【身份:克里斯蒂为中游偏上球队，莫尔德是争冠组主力，战意存在差异，但莫尔德近期无明确争冠压力】。【交锋:过去3次交手克里斯蒂均未能取胜，且场均失球超1.5，心理劣势明显】。【证据缺口:两队首发名单未公开，无法确认关键球员缺阵情况，伤停信息缺失】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "首发",
+              "缺阵",
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "比分越界: -1--1"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "客胜",
+      "score": "0-1",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平负",
+      "hafu_votes": {
+        "平负": 1.0,
+        "平胜": 1.0
+      },
+      "confidence": 0.575,
+      "alt_direction": "主胜",
+      "caution": true,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "客胜": 1.0,
+        "主胜": 1.0
+      }
+    },
+    "odds": [
+      4.0,
+      4.05,
+      1.58
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日021",
+    "home": "吉维森特",
+    "away": "里奥阿维",
+    "league": "葡超",
+    "kickoff": "2026-08-10T03:30:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【近况:吉维森特主场状态一般，里奥阿维客场防守尚可，两队近期进攻效率均不高】【主客:吉维森特主场有一定优势，但胜率并不突出】【战意:双方均无强烈抢分压力，中游对阵可能保守】【身份:吉维森特主场让球方，赔率主胜1.84略受支持】【交锋:历史交锋平局较多，缺乏大胜样本】本场缺乏关键伤停和首发名单信息，证据缺口存在；综合看小球平胜格局，但平局风险不可忽视。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:吉维森特近期主场连续3场不败，且上轮逼平强敌本菲卡，防守表现稳定；里奥阿维客场近5场仅1胜，攻防两端均显疲软】。【主客:吉维森特主场场均进球1.2，里奥阿维客场场均失球1.8，主队在主场具备一定优势】。【身份:吉维森特排名中游但保级压力不大，战意相对理性；里奥阿维处于争欧战资格边缘，战意较强但客场表现不可靠】。【交锋:近6次交手吉维森特2胜2平2负，无明显心理优势，但本赛季首回合主场1-0小胜】。【伤停:双方主力阵容完整，暂无重大缺阵报告，首发名单未公布，无法确认具体影响】。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 377)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.85,
+      "top_result": "主胜",
+      "top_result_votes": 1.85,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": null,
+      "caution": false,
+      "strength": 1.0,
+      "avg_confidence": 0.55,
+      "disagreement": 0.5,
+      "all_scores": {
+        "1-0": 1.85
+      },
+      "all_results": {
+        "主胜": 1.85
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平胜": 1.85
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": "平局",
+          "evidence_gap": true,
+          "confidence": 0.55,
+          "reasoning": "【近况:吉维森特主场状态一般，里奥阿维客场防守尚可，两队近期进攻效率均不高】【主客:吉维森特主场有一定优势，但胜率并不突出】【战意:双方均无强烈抢分压力，中游对阵可能保守】【身份:吉维森特主场让球方，赔率主胜1.84略受支持】【交锋:历史交锋平局较多，缺乏大胜样本】本场缺乏关键伤停和首发名单信息，证据缺口存在；综合看小球平胜格局，但平局风险不可忽视。",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "首发",
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:吉维森特近期主场连续3场不败，且上轮逼平强敌本菲卡，防守表现稳定；里奥阿维客场近5场仅1胜，攻防两端均显疲软】。【主客:吉维森特主场场均进球1.2，里奥阿维客场场均失球1.8，主队在主场具备一定优势】。【身份:吉维森特排名中游但保级压力不大，战意相对理性；里奥阿维处于争欧战资格边缘，战意较强但客场表现不可靠】。【交锋:近6次交手吉维森特2胜2平2负，无明显心理优势，但本赛季首回合主场1-0小胜】。【伤停:双方主力阵容完整，暂无重大缺阵报告，首发名单未公布，无法确认具体影响】。",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "首发",
+              "缺阵",
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 377)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平胜": 1.85
+      },
+      "confidence": 0.55,
+      "alt_direction": null,
+      "caution": false,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "主胜": 1.85
+      }
+    },
+    "odds": [
+      1.84,
+      3.15,
+      3.72
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日022",
+    "home": "摩雷伦斯",
+    "away": "布拉加",
+    "league": "葡超",
+    "kickoff": "2026-08-10T03:30:00+08:00",
+    "models": [
+      {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": true,
+        "confidence": 0.6,
+        "reasoning": "【近况:摩雷伦斯近期主场表现尚可但整体实力有限，布拉加客场战绩稳定且攻防均衡】【主客:布拉加客场胜率较高，面对中下游球队时掌控力强】【身份:布拉加为葡超传统强队，摩雷伦斯属中游偏下】【交锋:布拉加近年对阵摩雷伦斯占据心理优势】【伤停:双方具体伤停信息未明，但布拉加阵容厚度更佳】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:摩雷伦斯近期3场不败但仅1胜，防守端场均失1.3球；布拉加客场近5场仅1负，但进攻效率下降至场均1.1球】；【主客:摩雷伦斯主场近6场1胜4负，战意不足；布拉加为争冠组球队，客场战意强】；【身份:布拉加联赛第3，具备抢分需求；摩雷伦斯位列中下游，保级压力小】；【交锋:近5次交手布拉加4胜1平，心理占优】；【伤停:无公开首发名单变动，但布拉加主力中场佩德罗·阿劳霍缺阵影响控球节奏】；市场初盘主让半球，终盘升至半一，机构倾向主队方向，但赔率主胜高达5.05，反映市场对主胜信心不足。此赔率异动更可能反映对布拉加客场能力的高估而非主队实力提升，故初盘让球线未有效支撑主胜结论。综合基本面与赔率信号，虽主胜方向有市场支持，但缺乏足够强度支撑，判断为小比分主胜，上半场势均力敌，进球数受限。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 375)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.0,
+      "top_result": "主胜",
+      "top_result_votes": 1.0,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": "客胜",
+      "caution": true,
+      "strength": 0.5405405405405405,
+      "avg_confidence": 0.575,
+      "disagreement": 1.0,
+      "all_scores": {
+        "0-1": 0.85,
+        "1-0": 1.0
+      },
+      "all_results": {
+        "客胜": 0.85,
+        "主胜": 1.0
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平负": 0.85,
+        "平胜": 1.0
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 0,
+          "away_score": 1,
+          "result": "客胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平负",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": true,
+          "confidence": 0.6,
+          "reasoning": "【近况:摩雷伦斯近期主场表现尚可但整体实力有限，布拉加客场战绩稳定且攻防均衡】【主客:布拉加客场胜率较高，面对中下游球队时掌控力强】【身份:布拉加为葡超传统强队，摩雷伦斯属中游偏下】【交锋:布拉加近年对阵摩雷伦斯占据心理优势】【伤停:双方具体伤停信息未明，但布拉加阵容厚度更佳】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【近况:摩雷伦斯近期3场不败但仅1胜，防守端场均失1.3球；布拉加客场近5场仅1负，但进攻效率下降至场均1.1球】；【主客:摩雷伦斯主场近6场1胜4负，战意不足；布拉加为争冠组球队，客场战意强】；【身份:布拉加联赛第3，具备抢分需求；摩雷伦斯位列中下游，保级压力小】；【交锋:近5次交手布拉加4胜1平，心理占优】；【伤停:无公开首发名单变动，但布拉加主力中场佩德罗·阿劳霍缺阵影响控球节奏】；市场初盘主让半球，终盘升至半一，机构倾向主队方向，但赔率主胜高达5.05，反映市场对主胜信心不足。此赔率异动更可能反映对布拉加客场能力的高估而非主队实力提升，故初盘让球线未有效支撑主胜结论。综合基本面与赔率信号，虽主胜方向有市场支持，但缺乏足够强度支撑，判断为小比分主胜，上半场势均力敌，进球数受限。",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "首发",
+              "缺阵",
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 375)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平负": 0.85,
+        "平胜": 1.0
+      },
+      "confidence": 0.575,
+      "alt_direction": "客胜",
+      "caution": true,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "客胜": 0.85,
+        "主胜": 1.0
+      }
+    },
+    "odds": [
+      5.05,
+      3.65,
+      1.52
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日023",
+    "home": "桑托斯",
+    "away": "巴竞技",
+    "league": "巴甲",
+    "kickoff": "2026-08-10T05:30:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【伤停|阵容:暂无双方最新首发及伤停名单,信息缺失】【近况:桑托斯主场表现相对稳定,巴竞技客场胜率偏低】【主客|身份:桑托斯主场优势明显,巴竞技客场作战能力一般】【交锋:历史交锋桑托斯略占上风,但平局比例不低】【战意:联赛中游对决,双方均无强烈抢分压力】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【主客:桑托斯主场作战，近5个主场3胜1平1负，主场表现稳定；巴竞技客场近5场仅1胜，防守端场均失1.4球，客场疲软。】【近况:桑托斯近5轮4胜1平，状态回暖；巴竞技近5轮2胜2平1负，攻防两端波动较大。】【交锋:过去5次交手桑托斯2胜1平2负，近两次主场对巴竞技均取胜，心理占优。】【战意:桑托斯为保级区上游争抢积分，战意强烈；巴竞技已无争冠压力，阵容轮换明显。】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "阵容",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 402)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.85,
+      "top_result": "主胜",
+      "top_result_votes": 1.85,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": null,
+      "caution": false,
+      "strength": 1.0,
+      "avg_confidence": 0.55,
+      "disagreement": 0.5,
+      "all_scores": {
+        "1-0": 1.85
+      },
+      "all_results": {
+        "主胜": 1.85
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平胜": 1.85
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": "平局",
+          "evidence_gap": true,
+          "confidence": 0.55,
+          "reasoning": "【伤停|阵容:暂无双方最新首发及伤停名单,信息缺失】【近况:桑托斯主场表现相对稳定,巴竞技客场胜率偏低】【主客|身份:桑托斯主场优势明显,巴竞技客场作战能力一般】【交锋:历史交锋桑托斯略占上风,但平局比例不低】【战意:联赛中游对决,双方均无强烈抢分压力】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "首发",
+              "战意",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【主客:桑托斯主场作战，近5个主场3胜1平1负，主场表现稳定；巴竞技客场近5场仅1胜，防守端场均失1.4球，客场疲软。】【近况:桑托斯近5轮4胜1平，状态回暖；巴竞技近5轮2胜2平1负，攻防两端波动较大。】【交锋:过去5次交手桑托斯2胜1平2负，近两次主场对巴竞技均取胜，心理占优。】【战意:桑托斯为保级区上游争抢积分，战意强烈；巴竞技已无争冠压力，阵容轮换明显。】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "阵容",
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 402)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平胜": 1.85
+      },
+      "confidence": 0.55,
+      "alt_direction": null,
+      "caution": false,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "主胜": 1.85
+      }
+    },
+    "odds": [
+      2.05,
+      2.92,
+      3.35
+    ],
+    "ok": true
+  },
+  {
+    "match_num": "周日024",
+    "home": "弗拉门戈",
+    "away": "维多利亚",
+    "league": "巴甲",
+    "kickoff": "2026-08-10T06:30:00+08:00",
+    "models": [
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": true,
+        "confidence": 0.6,
+        "reasoning": "【近况:弗拉门戈主场强势但近期进攻效率一般，多小胜；维多利亚客场防守顽强但进攻乏力】【主客:弗拉门戈主场龙，维多利亚客场虫】【身份:巴甲传统豪门对保级队，实力差距明显】【交锋:弗拉门戈近5次主场对维多利亚3胜2平，但赢球多为1球小胜】【伤停|阵容:未获取官方首发，存在关键球员轮换不确定性】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "deepseek/deepseek-chat"
+      },
+      {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【主客:弗拉门戈主场作战，近5场主场4胜1平，主场优势明显】；【近况:弗拉门戈近期状态稳定，过去3场取得2胜1平，进攻端效率尚可】；【战意:弗拉门戈目前排名靠前，保级压力小但争冠有动力，战意充足】；【交锋:近3次对阵维多利亚保持全胜，心理占优】；【身份:弗拉门戈为巴甲传统强队，阵容深度优于维多利亚】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "阵容",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        },
+        "model": "qwen/qwen-flash"
+      },
+      {
+        "error": "Extra data: line 13 column 4 (char 376)",
+        "model": "zhipu/glm-4-flash"
+      }
+    ],
+    "aggregate": {
+      "top_score": [
+        1,
+        0
+      ],
+      "top_score_votes": 1.85,
+      "top_result": "主胜",
+      "top_result_votes": 1.85,
+      "top_total_goals": "1",
+      "top_hafu": "平胜",
+      "top_ou25": "小2.5",
+      "alt_direction": null,
+      "caution": false,
+      "strength": 1.0,
+      "avg_confidence": 0.575,
+      "disagreement": 0.5,
+      "all_scores": {
+        "1-0": 1.85
+      },
+      "all_results": {
+        "主胜": 1.85
+      },
+      "all_total_goals": {
+        "1": 1.85
+      },
+      "all_hafu": {
+        "平胜": 1.85
+      },
+      "all_ou25": {
+        "小2.5": 1.85
+      },
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "individual": {
+        "deepseek/deepseek-chat": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": true,
+          "confidence": 0.6,
+          "reasoning": "【近况:弗拉门戈主场强势但近期进攻效率一般，多小胜；维多利亚客场防守顽强但进攻乏力】【主客:弗拉门戈主场龙，维多利亚客场虫】【身份:巴甲传统豪门对保级队，实力差距明显】【交锋:弗拉门戈近5次主场对维多利亚3胜2平，但赢球多为1球小胜】【伤停|阵容:未获取官方首发，存在关键球员轮换不确定性】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "伤停",
+              "阵容",
+              "首发",
+              "近况",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        },
+        "qwen/qwen-flash": {
+          "home_score": 1,
+          "away_score": 0,
+          "result": "主胜",
+          "total_goals": "1",
+          "half_result": "平局",
+          "ou25": "小2.5",
+          "hafu": "平胜",
+          "ou_from_score": false,
+          "alt_direction": null,
+          "evidence_gap": false,
+          "confidence": 0.55,
+          "reasoning": "【主客:弗拉门戈主场作战，近5场主场4胜1平，主场优势明显】；【近况:弗拉门戈近期状态稳定，过去3场取得2胜1平，进攻端效率尚可】；【战意:弗拉门戈目前排名靠前，保级压力小但争冠有动力，战意充足】；【交锋:近3次对阵维多利亚保持全胜，心理占优】；【身份:弗拉门戈为巴甲传统强队，阵容深度优于维多利亚】",
+          "reasoning_ok": true,
+          "reasoning_flags": {
+            "ok": true,
+            "has_bracket": true,
+            "tags": [
+              "阵容",
+              "战意",
+              "近况",
+              "状态",
+              "主客",
+              "身份",
+              "交锋"
+            ],
+            "odds_only": false,
+            "invalid_reason": null
+          }
+        }
+      },
+      "errors": [
+        {
+          "error": "Extra data: line 13 column 4 (char 376)"
+        }
+      ],
+      "models_used": [
+        "zhipu/glm-4-flash",
+        "qwen/qwen-flash",
+        "deepseek/deepseek-chat"
+      ],
+      "valid_count": 2
+    },
+    "markets": {
+      "1x2": "主胜",
+      "score": "1-0",
+      "ttg": "1",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "hafu_votes": {
+        "平胜": 1.85
+      },
+      "confidence": 0.575,
+      "alt_direction": null,
+      "caution": false,
+      "collapse_flags": [
+        "OU_COLLAPSE:小2.5x2"
+      ],
+      "votes": {
+        "主胜": 1.85
+      }
+    },
+    "odds": [
+      1.15,
+      5.8,
+      11.5
+    ],
+    "ok": true
+  }
+]

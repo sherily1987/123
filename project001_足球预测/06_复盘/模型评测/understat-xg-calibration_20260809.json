@@ -1,0 +1,111 @@
+{
+  "n": 3503,
+  "train_n": 2452,
+  "test_n": 1051,
+  "best_scale": 0.9,
+  "test": {
+    "xg_model": {
+      "n": 1051,
+      "brier_mean": 0.542692,
+      "log_loss": 0.919378,
+      "accuracy_pct": 58.33,
+      "ece": 0.024922
+    },
+    "market": {
+      "n": 1051,
+      "brier_mean": 0.545052,
+      "log_loss": 0.926858,
+      "accuracy_pct": 58.61,
+      "ece": 0.042525
+    },
+    "by_league": {
+      "Bundesliga": {
+        "n": 188,
+        "xg_model": {
+          "n": 188,
+          "brier_mean": 0.527637,
+          "log_loss": 0.902562,
+          "accuracy_pct": 59.57,
+          "ece": 0.032077
+        },
+        "market": {
+          "n": 188,
+          "brier_mean": 0.527268,
+          "log_loss": 0.900918,
+          "accuracy_pct": 60.64,
+          "ece": 0.048083
+        }
+      },
+      "EPL": {
+        "n": 230,
+        "xg_model": {
+          "n": 230,
+          "brier_mean": 0.587629,
+          "log_loss": 0.981382,
+          "accuracy_pct": 54.35,
+          "ece": 0.06061
+        },
+        "market": {
+          "n": 230,
+          "brier_mean": 0.594171,
+          "log_loss": 0.991568,
+          "accuracy_pct": 53.91,
+          "ece": 0.083154
+        }
+      },
+      "La_liga": {
+        "n": 226,
+        "xg_model": {
+          "n": 226,
+          "brier_mean": 0.54133,
+          "log_loss": 0.91751,
+          "accuracy_pct": 58.41,
+          "ece": 0.043009
+        },
+        "market": {
+          "n": 226,
+          "brier_mean": 0.542895,
+          "log_loss": 0.92404,
+          "accuracy_pct": 60.18,
+          "ece": 0.034565
+        }
+      },
+      "Ligue_1": {
+        "n": 169,
+        "xg_model": {
+          "n": 169,
+          "brier_mean": 0.553624,
+          "log_loss": 0.92421,
+          "accuracy_pct": 57.99,
+          "ece": 0.040984
+        },
+        "market": {
+          "n": 169,
+          "brier_mean": 0.563695,
+          "log_loss": 0.949827,
+          "accuracy_pct": 57.4,
+          "ece": 0.049654
+        }
+      },
+      "Serie_A": {
+        "n": 238,
+        "xg_model": {
+          "n": 238,
+          "brier_mean": 0.504688,
+          "log_loss": 0.871084,
+          "accuracy_pct": 61.34,
+          "ece": 0.021829
+        },
+        "market": {
+          "n": 238,
+          "brier_mean": 0.500443,
+          "log_loss": 0.871177,
+          "accuracy_pct": 60.92,
+          "ece": 0.030805
+        }
+      }
+    }
+  },
+  "note": "xG-as-λ 未经任何盘口信息；market 为 Understat 内置博彩 forecast。",
+  "generated_at": "2026-08-09T00:29:35+08:00"
+}

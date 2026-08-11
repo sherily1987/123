@@ -1,0 +1,213 @@
+{
+  "match_num": "周日022",
+  "home": "摩雷伦斯",
+  "away": "布拉加",
+  "league": "葡超",
+  "kickoff": "2026-08-10T03:30:00+08:00",
+  "models": [
+    {
+      "home_score": 0,
+      "away_score": 1,
+      "result": "客胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平负",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": true,
+      "confidence": 0.6,
+      "reasoning": "【近况:摩雷伦斯近期主场表现尚可但整体实力有限，布拉加客场战绩稳定且攻防均衡】【主客:布拉加客场胜率较高，面对中下游球队时掌控力强】【身份:布拉加为葡超传统强队，摩雷伦斯属中游偏下】【交锋:布拉加近年对阵摩雷伦斯占据心理优势】【伤停:双方具体伤停信息未明，但布拉加阵容厚度更佳】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "阵容",
+          "近况",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【近况:摩雷伦斯近期3场不败但仅1胜，防守端场均失1.3球；布拉加客场近5场仅1负，但进攻效率下降至场均1.1球】；【主客:摩雷伦斯主场近6场1胜4负，战意不足；布拉加为争冠组球队，客场战意强】；【身份:布拉加联赛第3，具备抢分需求；摩雷伦斯位列中下游，保级压力小】；【交锋:近5次交手布拉加4胜1平，心理占优】；【伤停:无公开首发名单变动，但布拉加主力中场佩德罗·阿劳霍缺阵影响控球节奏】；市场初盘主让半球，终盘升至半一，机构倾向主队方向，但赔率主胜高达5.05，反映市场对主胜信心不足。此赔率异动更可能反映对布拉加客场能力的高估而非主队实力提升，故初盘让球线未有效支撑主胜结论。综合基本面与赔率信号，虽主胜方向有市场支持，但缺乏足够强度支撑，判断为小比分主胜，上半场势均力敌，进球数受限。",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "首发",
+          "缺阵",
+          "战意",
+          "近况",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "error": "Extra data: line 13 column 4 (char 375)",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      1,
+      0
+    ],
+    "top_score_votes": 1.0,
+    "top_result": "主胜",
+    "top_result_votes": 1.0,
+    "top_total_goals": "1",
+    "top_hafu": "平胜",
+    "top_ou25": "小2.5",
+    "alt_direction": "客胜",
+    "caution": true,
+    "strength": 0.5405405405405405,
+    "avg_confidence": 0.575,
+    "disagreement": 1.0,
+    "all_scores": {
+      "0-1": 0.85,
+      "1-0": 1.0
+    },
+    "all_results": {
+      "客胜": 0.85,
+      "主胜": 1.0
+    },
+    "all_total_goals": {
+      "1": 1.85
+    },
+    "all_hafu": {
+      "平负": 0.85,
+      "平胜": 1.0
+    },
+    "all_ou25": {
+      "小2.5": 1.85
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "deepseek/deepseek-chat": {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": true,
+        "confidence": 0.6,
+        "reasoning": "【近况:摩雷伦斯近期主场表现尚可但整体实力有限，布拉加客场战绩稳定且攻防均衡】【主客:布拉加客场胜率较高，面对中下游球队时掌控力强】【身份:布拉加为葡超传统强队，摩雷伦斯属中游偏下】【交锋:布拉加近年对阵摩雷伦斯占据心理优势】【伤停:双方具体伤停信息未明，但布拉加阵容厚度更佳】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:摩雷伦斯近期3场不败但仅1胜，防守端场均失1.3球；布拉加客场近5场仅1负，但进攻效率下降至场均1.1球】；【主客:摩雷伦斯主场近6场1胜4负，战意不足；布拉加为争冠组球队，客场战意强】；【身份:布拉加联赛第3，具备抢分需求；摩雷伦斯位列中下游，保级压力小】；【交锋:近5次交手布拉加4胜1平，心理占优】；【伤停:无公开首发名单变动，但布拉加主力中场佩德罗·阿劳霍缺阵影响控球节奏】；市场初盘主让半球，终盘升至半一，机构倾向主队方向，但赔率主胜高达5.05，反映市场对主胜信心不足。此赔率异动更可能反映对布拉加客场能力的高估而非主队实力提升，故初盘让球线未有效支撑主胜结论。综合基本面与赔率信号，虽主胜方向有市场支持，但缺乏足够强度支撑，判断为小比分主胜，上半场势均力敌，进球数受限。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "Extra data: line 13 column 4 (char 375)"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "主胜",
+    "score": "1-0",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "hafu_votes": {
+      "平负": 0.85,
+      "平胜": 1.0
+    },
+    "confidence": 0.575,
+    "alt_direction": "客胜",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "客胜": 0.85,
+      "主胜": 1.0
+    }
+  },
+  "odds": [
+    5.05,
+    3.65,
+    1.52
+  ],
+  "ok": true
+}

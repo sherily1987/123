@@ -1,0 +1,69 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM证据驱动（3模型：zhipu/qwen/deepseek）",
+  "match_num": "周六020",
+  "match_id": "sporttery-2040768",
+  "match": "蒙彼利埃 vs 第戎",
+  "competition": "法乙",
+  "kickoff": "2026-08-09T02:45:00+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）",
+    "single_preference": "主胜（H）",
+    "strength_pct": 100,
+    "votes": {
+      "主胜": 3.0
+    },
+    "caution": false,
+    "note": "证据以体彩官方盘口+身份核验为主；伤停/近况深搜本轮缺口。"
+  },
+  "score_picks": [
+    "2-1"
+  ],
+  "models": [
+    {
+      "model": "qwen-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "让球盘口-1.0下客胜赔率1.88，反映市场对主队让一球信心强【让球盘口: 客胜1.88】"
+    },
+    {
+      "model": "deepseek-chat",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【赔率异动: 主胜1.69/平3.26/客4.35】主胜赔率明显偏低，市场倾向主队；【主客: 蒙彼利埃主场对阵第戎】主场"
+    },
+    {
+      "model": "glm-4-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【战意/动机: 法乙联赛属性】【主客/旅行/天气: 主场对阵】蒙彼利埃在主场作战且处于法乙联赛，战意强烈，主场优势明显，"
+    }
+  ],
+  "signals": [
+    "体彩HAD=[1.69, 3.26, 4.35]",
+    "HHAD={'line': -1.0, 'odds': [3.45, 3.25, 1.88]}",
+    "LLM强度=100%"
+  ],
+  "evidence": [
+    {
+      "fact": "体彩官方胜平负 [1.69, 3.26, 4.35]；更新 2026-08-08 19:19:05",
+      "source": "https://webapi.sporttery.cn/gateway/uniform/football/getFixedBonusV1.qry?clientCode=3001&matchId=2040768",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "odds_official",
+      "basis": "sales-day collect 2026-08-08"
+    },
+    {
+      "fact": "身份核验 主=蒙彼利埃 客=第戎",
+      "source": "sporttery team_ids",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "identity",
+      "basis": "raw.json"
+    }
+  ],
+  "comparison_note": "量化 final=[52.3, 29.0, 18.7] market=[55.1, 26.1, 18.8]；LLM 单选 主胜（H） 强度100%",
+  "pre_registered_at": "2026-08-08T20:04+0800",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

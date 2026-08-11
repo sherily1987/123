@@ -1,0 +1,33 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040700",
+  "match": "巴西国际 vs 科林蒂安",
+  "competition": "巴西杯（Copa do Brasil）八强首回合",
+  "kickoff": "2026-08-03T06:30:00+08:00",
+  "pre_registered_at": "2026-08-03T00:15:00+08:00",
+  "direction": {
+    "pick": "双选 主胜/平局（H/D）",
+    "single_preference": "平局（D）",
+    "note": "定性判断，非概率输出；由搜索证据+比赛性质推断，不做数值概率声明"
+  },
+  "score_picks": ["1-0", "1-1", "0-0"],
+  "signals": [
+    "双方大面积伤停，进攻端均残阵，进球数倾向偏低",
+    "两回合赛制首回合，主队巴西国际主场求稳，客队科林蒂安残阵客场保守",
+    "巴西杯历史交锋6场67%平局，近5次巴西国际主场对科林蒂安不败（1胜4平）",
+    "科林蒂安头号射手Yuri Alberto+边锋Labyad(赛季报销)+Memphis(谈判缺席)缺阵，进攻火力大减",
+    "巴西国际主力门将Rochet+主力中卫Gabriel缺阵，防线有缺口但主场加持",
+    "近期交锋：本赛季巴甲第10轮巴西国际客场1-0小胜科林蒂安（4月5日）"
+  ],
+  "evidence": [
+    {"fact": "科林蒂安：Yuri Alberto右大腿后侧肌肉伤缺阵；Labyad左膝前交叉韧带+半月板伤，赛季报销", "source": "https://www.cnnbrasil.com.br/esportes/futebol/corinthians/fora-do-confronto-contra-o-inter-corinthians-detalha-lesao-de-yuri-alberto/", "collected_at": "2026-08-03T00:10+08:00", "mapped": "attack_absence_corinthians", "basis": "官方伤停披露，CNN Brasil 2026-08-01"},
+    {"fact": "科林蒂安：Memphis Depay因合同续约谈判缺席；Hugo Farias(膝)、Alex Santana(耻骨)、Vitinho(膝)、Kayke(十字韧带赛季报销)缺阵", "source": "https://k.sina.cn/article_1436416680_559dfaa800101fdda.html", "collected_at": "2026-08-03T00:10+08:00", "mapped": "attack_absence_corinthians/defense_absence_corinthians", "basis": "新浪体育前瞻 2026-08-01，与onefootball/gazeta交叉一致"},
+    {"fact": "巴西国际：主力中卫加布里埃尔、主力门将罗切特缺阵，锋线主力几乎全部缺阵", "source": "https://bbs.hupu.com/641490483.html", "collected_at": "2026-08-03T00:10+08:00", "mapped": "gk_absence_internacional/defense_absence_internacional/attack_absence_internacional", "basis": "虎扑前瞻 2026-08-01"},
+    {"fact": "巴西杯历史交锋6场：科林蒂安1胜、平局4场、巴西国际1胜（67%平局）", "source": "https://www.otempo.com.br/sports/lancepedia/2026/8/2/corinthians-x-internacional-na-copa-do-brasil-retrospecto-e-estatisticas", "collected_at": "2026-08-03T00:10+08:00", "mapped": "h2h_background", "basis": "统计站，2026-08-02"},
+    {"fact": "近5次巴西国际主场对科林蒂安不败（1胜4平）；本赛季巴甲巴西国际客场1-0胜科林蒂安", "source": "https://www.sohu.com/a/1057691758_121119509", "collected_at": "2026-08-03T00:10+08:00", "mapped": "h2h_background/home_adv", "basis": "搜狐前瞻 2026-08-01"},
+    {"fact": "科林蒂安状态：巴甲19轮7胜6平6负（27分）；巴西国际近期2胜3负（近5场40%胜率，进10失10）", "source": "https://english.news.cn/20260724/17d063a49dcf438f81953287b4e659de/c.html", "collected_at": "2026-08-03T00:10+08:00", "mapped": "form_context", "basis": "新华社英文积分榜 2026-07-23 / fotmob"}
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜41.7% 平31.8% 负26.5%，比分Top3: 1-0/0-0/1-1。LLM 轨道方向与量化一致（偏向主胜/平局），但单选偏好平局、比分更偏小球；赛后按统一回测对比命中。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

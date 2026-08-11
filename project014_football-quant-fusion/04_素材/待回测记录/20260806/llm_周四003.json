@@ -1,0 +1,51 @@
+{
+  "match_num": "周四003",
+  "match_id": "sporttery-2040724",
+  "match": "比亚韦 vs 流浪者",
+  "competition": "欧罗巴资格赛第三轮首回合",
+  "kickoff": "2026-08-07T00:00:00+08:00",
+  "direction": {
+    "pick": "双选 主胜/平局（H/D）",
+    "single_preference": "主胜（H）",
+    "note": "流浪者后卫Godfrey伤缺、Souttar/Bajrami未注册欧战，新帅McInnes首场欧战客场；媒体预测流浪者客场可能落后；波兰主队主场战意充沛——与量化客胜倾向分歧，赛后重点对比"
+  },
+  "score_picks": [
+    "1-0",
+    "1-1",
+    "2-1"
+  ],
+  "signals": [
+    "流浪者后卫Ben Godfrey伤缺；John Souttar、Nedim Bajrami未进欧战名单",
+    "流浪者新主帅Derek McInnes首场欧洲赛事，上周末联赛1-1邓迪联",
+    "媒体预测流浪者客场面对波兰球队不会轻松，可能带着劣势进入次回合",
+    "Jagiellonia主帅Siemieniec期待挑战“巨头”流浪者，主场战意高"
+  ],
+  "evidence": [
+    {
+      "fact": "流浪者后卫Ben Godfrey伤缺缺阵，John Souttar和Nedim Bajrami未被纳入欧战名单",
+      "source": "https://athlonsports.com/soccer/jagiellonia-bialystok-vs-rangers-lineups-live-streaming-how-where-to-watch-on-tv-europe-league",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "defense_absence_away",
+      "basis": "Athlon Sports 2026-08-05"
+    },
+    {
+      "fact": "流浪者新主帅Derek McInnes将迎来首场欧洲赛事，上周末联赛1-1平邓迪联",
+      "source": "https://www.heraldscotland.com/sport/football/26440362.bialystok-boss-expects-tough-test-huge-club-rangers/",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "form_context/away_strategy",
+      "basis": "Herald Scotland 2026-08-04"
+    },
+    {
+      "fact": "Record Sport作者预测流浪者客场不会轻松，可能带着劣势回到Ibrox主场进行次回合",
+      "source": "https://www.dailyrecord.co.uk/sport/football/football-news/who-win-jagiellonia-bialystok-vs-37516698",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "cup_context/away_strategy",
+      "basis": "Daily Record 2026-08-04"
+    }
+  ],
+  "comparison_note": "量化：主29.4/平30.3/客40.3，Top 1-1/0-1/1-0。LLM与量化分歧：量化客胜倾向、LLM基于流浪者伤停/新帅/客场偏主不败——赛后重点对比",
+  "pre_registered_at": "2026-08-06T22:30+08:00",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。",
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）"
+}

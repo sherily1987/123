@@ -1,0 +1,668 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-08-02T09:57:45.851302+00:00",
+  "sample_size": 23,
+  "deduped_duplicates": 3,
+  "deduped_detail": [
+    {
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_fc-4ba6140f7e__fc-617bcab767",
+      "snapshot_type": "T-7h",
+      "superseded_prediction_id": "u-b53e3648aa_na_20260801T1830Z_fc-4ba6140f7e__fc-617bcab767__v3-4-1__20260801T021151Z__t-7h"
+    },
+    {
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_u-f74c3ef2de__fc-5e1083e6f3",
+      "snapshot_type": "T-7h",
+      "superseded_prediction_id": "u-b53e3648aa_na_20260801T1830Z_u-f74c3ef2de__fc-5e1083e6f3__v3-4-1__20260801T021157Z__t-7h"
+    },
+    {
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_u-42226aa31b__u-4449a5217f",
+      "snapshot_type": "T-7h",
+      "superseded_prediction_id": "u-b53e3648aa_na_20260801T1830Z_u-42226aa31b__u-4449a5217f__v3-4-1__20260801T021203Z__t-7h"
+    }
+  ],
+  "warning": "样本<200时结论不可靠。",
+  "one_x_two": {
+    "accuracy_pct": 39.13,
+    "brier_sum": 0.6777566787337952,
+    "brier_mean": 0.22591889291126507,
+    "log_loss": 1.1286961856081128,
+    "ece": 0.16916,
+    "calibration_bins": [
+      {
+        "bin": "0.0-0.1",
+        "n": 2,
+        "avg_prob": 0.0971,
+        "actual_rate": 0.0,
+        "abs_error": 0.0971
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 15,
+        "avg_prob": 0.1701,
+        "actual_rate": 0.2667,
+        "abs_error": 0.0966
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 25,
+        "avg_prob": 0.2434,
+        "actual_rate": 0.4,
+        "abs_error": 0.1566
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 6,
+        "avg_prob": 0.3435,
+        "actual_rate": 0.0,
+        "abs_error": 0.3435
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 5,
+        "avg_prob": 0.4403,
+        "actual_rate": 0.4,
+        "abs_error": 0.0403
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 7,
+        "avg_prob": 0.5712,
+        "actual_rate": 0.1429,
+        "abs_error": 0.4283
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 7,
+        "avg_prob": 0.6258,
+        "actual_rate": 0.5714,
+        "abs_error": 0.0544
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 2,
+        "avg_prob": 0.7637,
+        "actual_rate": 1.0,
+        "abs_error": 0.2363
+      }
+    ]
+  },
+  "baselines": {
+    "frequency_probs": [
+      0.30434782608695654,
+      0.34782608695652173,
+      0.34782608695652173
+    ],
+    "frequency_brier_sum": 0.6654064272211719,
+    "market_brier_sum": 0.678254,
+    "market_log_loss": 1.1300279863794018
+  },
+  "score": {
+    "top1_accuracy_pct": 8.7,
+    "top3_accuracy_pct": 52.17,
+    "top5_accuracy_pct": 56.52,
+    "log_loss": 2.9253686789184963
+  },
+  "ou_2_5": {
+    "brier": 0.23481926086956523
+  },
+  "btts": {
+    "brier": 0.24273413043478262
+  },
+  "advancement": {
+    "brier": null
+  },
+  "records": [
+    {
+      "prediction_id": "_na_20260801T0100Z_____v3-3-0__20260731T004952Z__t-6h",
+      "match_id": "_na_20260801T0100Z___",
+      "actual_score": "0-3",
+      "actual_idx": 2,
+      "probs": [
+        0.5941950042798225,
+        0.2133374834643218,
+        0.19246751225585557
+      ],
+      "pick_correct": false,
+      "brier_sum": 1.0506893037242349,
+      "log_loss": 1.6478279069991846,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 4.826960544937865,
+      "mode": "market_only",
+      "version": "3.3.0",
+      "market_brier_sum": 1.051069,
+      "market_log_loss": 1.6502599069543555,
+      "ou25_brier": 0.2530089999999999,
+      "btts_brier": 0.22944099999999998
+    },
+    {
+      "prediction_id": "_na_20260801T0300Z_____v3-3-0__20260731T004953Z__t-6h",
+      "match_id": "_na_20260801T0300Z___",
+      "actual_score": "4-0",
+      "actual_idx": 0,
+      "probs": [
+        0.7565422299392286,
+        0.14510728016867172,
+        0.0983504898920997
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.09000062742292884,
+      "log_loss": 0.2789969245236194,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 2.7808585750812873,
+      "mode": "market_only",
+      "version": "3.3.0",
+      "market_brier_sum": 0.089678,
+      "market_log_loss": 0.2783920255446883,
+      "ou25_brier": 0.145924,
+      "btts_brier": 0.22184100000000004
+    },
+    {
+      "prediction_id": "_na_20260801T0730Z___fc__v3-3-0__20260731T004954Z__t-6h",
+      "match_id": "_na_20260801T0730Z___fc",
+      "actual_score": "1-1",
+      "actual_idx": 1,
+      "probs": [
+        0.5824657674752551,
+        0.22996051079542537,
+        0.18757372172931946
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.9674110862983685,
+      "log_loss": 1.4698476769935365,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.247476043464067,
+      "mode": "market_only",
+      "version": "3.3.0",
+      "market_brier_sum": 0.966968,
+      "market_log_loss": 1.4696759700589417,
+      "ou25_brier": 0.18062499999999998,
+      "btts_brier": 0.33524099999999996
+    },
+    {
+      "prediction_id": "2026-08-01_valerenga_hamkam",
+      "match_id": "2026-08-01_valerenga_hamkam",
+      "actual_score": "0-3",
+      "actual_idx": 2,
+      "probs": [
+        0.5988859045153143,
+        0.20715499772084148,
+        0.19395909776384418
+      ],
+      "pick_correct": false,
+      "brier_sum": 1.0512794557855243,
+      "log_loss": 1.640107978416744,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 4.7571003826582,
+      "mode": "hybrid",
+      "version": "3.4.0",
+      "market_brier_sum": 1.051069,
+      "market_log_loss": 1.6502599069543555,
+      "ou25_brier": 0.19448100000000004,
+      "btts_brier": 0.27878400000000003
+    },
+    {
+      "prediction_id": "2026-08-01_bodo_lillestrom",
+      "match_id": "2026-08-01_bodo_lillestrom",
+      "actual_score": "4-0",
+      "actual_idx": 0,
+      "probs": [
+        0.7708422879896355,
+        0.13331187661838073,
+        0.09584583539198382
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.07947173758332678,
+      "log_loss": 0.26027148147972257,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 2.7390592269156993,
+      "mode": "hybrid",
+      "version": "3.4.0",
+      "market_brier_sum": 0.089678,
+      "market_log_loss": 0.2783920255446883,
+      "ou25_brier": 0.064516,
+      "btts_brier": 0.3283289999999999
+    },
+    {
+      "prediction_id": "2026-08-02_nycfc_toronto",
+      "match_id": "2026-08-02_nycfc_toronto",
+      "actual_score": "1-1",
+      "actual_idx": 1,
+      "probs": [
+        0.5824657674752551,
+        0.22996051079542537,
+        0.18757372172931946
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.9674110862983685,
+      "log_loss": 1.4698476769935365,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.2641549812651576,
+      "mode": "market_only",
+      "version": "3.4.0",
+      "market_brier_sum": 0.966968,
+      "market_log_loss": 1.4696759700589417,
+      "ou25_brier": 0.20702500000000001,
+      "btts_brier": 0.3091360000000001
+    },
+    {
+      "prediction_id": "u-b53e3648aa_na_20260801T1830Z_fc-4ba6140f7e__fc-617bcab767__v3-4-1__20260801T013557Z__closing",
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_fc-4ba6140f7e__fc-617bcab767",
+      "actual_score": "0-3",
+      "actual_idx": 2,
+      "probs": [
+        0.6464139417043545,
+        0.22707361541922197,
+        0.12651244287642366
+      ],
+      "pick_correct": false,
+      "brier_sum": 1.2323939232990304,
+      "log_loss": 2.067414612992376,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 5.374230396068383,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 1.2309739999999998,
+      "market_log_loss": 2.0635681925235456,
+      "ou25_brier": 0.28090000000000004,
+      "btts_brier": 0.17639999999999997
+    },
+    {
+      "prediction_id": "u-b53e3648aa_na_20260801T1830Z_u-f74c3ef2de__fc-5e1083e6f3__v3-4-1__20260801T013558Z__closing",
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_u-f74c3ef2de__fc-5e1083e6f3",
+      "actual_score": "0-0",
+      "actual_idx": 1,
+      "probs": [
+        0.3472454090150251,
+        0.2838063439065108,
+        0.36894824707846413
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.7696355361328425,
+      "log_loss": 1.2594631610651876,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 2.897039044660924,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.769226,
+      "market_log_loss": 1.258781040820931,
+      "ou25_brier": 0.265225,
+      "btts_brier": 0.29811600000000005
+    },
+    {
+      "prediction_id": "u-b53e3648aa_na_20260801T1830Z_u-42226aa31b__u-4449a5217f__v3-4-1__20260801T013559Z__closing",
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_u-42226aa31b__u-4449a5217f",
+      "actual_score": "0-1",
+      "actual_idx": 2,
+      "probs": [
+        0.4366451556064578,
+        0.29061956258397026,
+        0.27273528180957207
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.8040326923956884,
+      "log_loss": 1.2992536179263545,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.2770107811056213,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.804179,
+      "market_log_loss": 1.2982834837971773,
+      "ou25_brier": 0.19448100000000001,
+      "btts_brier": 0.22944099999999998
+    },
+    {
+      "prediction_id": "u-b53e3648aa_na_20260801T1830Z_fc-4ba6140f7e__fc-617bcab767__v3-4-1__20260801T030906Z__t-7h",
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_fc-4ba6140f7e__fc-617bcab767",
+      "actual_score": "0-3",
+      "actual_idx": 2,
+      "probs": [
+        0.6326148078725398,
+        0.2361761949390815,
+        0.1312089971883786
+      ],
+      "pick_correct": false,
+      "brier_sum": 1.2107784967619362,
+      "log_loss": 2.030963828692449,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 5.354950513400551,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 1.211546,
+      "market_log_loss": 2.0325579557809856,
+      "ou25_brier": 0.31024900000000005,
+      "btts_brier": 0.16321599999999997
+    },
+    {
+      "prediction_id": "u-b53e3648aa_na_20260801T1830Z_u-f74c3ef2de__fc-5e1083e6f3__v3-4-1__20260801T030911Z__t-7h",
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_u-f74c3ef2de__fc-5e1083e6f3",
+      "actual_score": "0-0",
+      "actual_idx": 1,
+      "probs": [
+        0.3472454090150251,
+        0.2838063439065108,
+        0.36894824707846413
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.7696355361328425,
+      "log_loss": 1.2594631610651876,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 2.7060567803161004,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.769226,
+      "market_log_loss": 1.258781040820931,
+      "ou25_brier": 0.22372899999999998,
+      "btts_brier": 0.262144
+    },
+    {
+      "prediction_id": "u-b53e3648aa_na_20260801T1830Z_u-42226aa31b__u-4449a5217f__v3-4-1__20260801T030916Z__t-7h",
+      "match_id": "u-b53e3648aa_na_20260801T1830Z_u-42226aa31b__u-4449a5217f",
+      "actual_score": "0-1",
+      "actual_idx": 2,
+      "probs": [
+        0.4366451556064578,
+        0.29061956258397026,
+        0.27273528180957207
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.8040326923956884,
+      "log_loss": 1.2992536179263545,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.2149736859328755,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.804179,
+      "market_log_loss": 1.2982834837971773,
+      "ou25_brier": 0.16646399999999997,
+      "btts_brier": 0.204304
+    },
+    {
+      "prediction_id": "u-6c72935bf4_na_20260801T2000Z_tps-387380b934__u-54e6523e30__v3-4-1__20260801T030921Z__t-7h",
+      "match_id": "u-6c72935bf4_na_20260801T2000Z_tps-387380b934__u-54e6523e30",
+      "actual_score": "3-0",
+      "actual_idx": 0,
+      "probs": [
+        0.6381150741994273,
+        0.20627440770632646,
+        0.15561051809424628
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.1977244641378416,
+      "log_loss": 0.4492366448177922,
+      "top1": false,
+      "top3": false,
+      "top5": true,
+      "score_log_loss": 2.6180988091057515,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.197816,
+      "market_log_loss": 0.44941699563734716,
+      "ou25_brier": 0.17056899999999994,
+      "btts_brier": 0.28090000000000004
+    },
+    {
+      "prediction_id": "u-7d6efb4c98_na_20260801T2100Z_u-d8bf589c2b__u-ba914fc496__v3-4-1__20260801T030926Z__t-7h",
+      "match_id": "u-7d6efb4c98_na_20260801T2100Z_u-d8bf589c2b__u-ba914fc496",
+      "actual_score": "1-1",
+      "actual_idx": 1,
+      "probs": [
+        0.5273818454613654,
+        0.2331582895723931,
+        0.23945986496624153
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.9235188467034238,
+      "log_loss": 1.4560377016852164,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.386595563267778,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.923139,
+      "market_log_loss": 1.4567168254164364,
+      "ou25_brier": 0.385641,
+      "btts_brier": 0.15288100000000002
+    },
+    {
+      "prediction_id": "u-31fc443c17_na_20260801T2200Z_u-5a5a2d7f20__u-21cdfae94a__v3-4-1__20260801T030931Z__t-7h",
+      "match_id": "u-31fc443c17_na_20260801T2200Z_u-5a5a2d7f20__u-21cdfae94a",
+      "actual_score": "1-0",
+      "actual_idx": 0,
+      "probs": [
+        0.41212257267931307,
+        0.26449657649567854,
+        0.32338085082500845
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.5201334832114303,
+      "log_loss": 0.8864344673757079,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.3377502551573994,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.5197689999999999,
+      "market_log_loss": 0.8867319296326106,
+      "ou25_brier": 0.29593600000000003,
+      "btts_brier": 0.3214890000000001
+    },
+    {
+      "prediction_id": "u-6c72935bf4_na_20260801T2300Z_u-4ab584e8ea__u-17ff6ef727__v3-4-1__20260801T030936Z__t-7h",
+      "match_id": "u-6c72935bf4_na_20260801T2300Z_u-4ab584e8ea__u-17ff6ef727",
+      "actual_score": "2-0",
+      "actual_idx": 0,
+      "probs": [
+        0.5980715244721103,
+        0.22128646405468083,
+        0.18064201147320882
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.24314573492308386,
+      "log_loss": 0.5140449260430967,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.278107174726357,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.24320600000000003,
+      "market_log_loss": 0.5141645250315053,
+      "ou25_brier": 0.3069159999999999,
+      "btts_brier": 0.273529
+    },
+    {
+      "prediction_id": "u-31fc443c17_na_20260802T0000Z_u-77fdca9076__u-cdc2fad02e__v3-4-1__20260801T031115Z__t-7h",
+      "match_id": "u-31fc443c17_na_20260802T0000Z_u-77fdca9076__u-cdc2fad02e",
+      "actual_score": "0-3",
+      "actual_idx": 2,
+      "probs": [
+        0.1594673761496054,
+        0.19451515112754064,
+        0.6460174727228539
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.18856961769172517,
+      "log_loss": 0.4369287280067164,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 2.6842331403290065,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.18862200000000007,
+      "market_log_loss": 0.4369557751995353,
+      "ou25_brier": 0.12040899999999999,
+      "btts_brier": 0.34574399999999994
+    },
+    {
+      "prediction_id": "u-6c72935bf4_na_20260802T0000Z_u-8e3a6cbbcc__u-351fb3a8b6__v3-4-1__20260801T031120Z__t-7h",
+      "match_id": "u-6c72935bf4_na_20260802T0000Z_u-8e3a6cbbcc__u-351fb3a8b6",
+      "actual_score": "0-1",
+      "actual_idx": 2,
+      "probs": [
+        0.2860186024929871,
+        0.24976272330373525,
+        0.46421867420327756
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.4312496879966332,
+      "log_loss": 0.7673995571631977,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.3483538064173275,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.4315920000000001,
+      "market_log_loss": 0.7678707267558819,
+      "ou25_brier": 0.32376099999999997,
+      "btts_brier": 0.3364
+    },
+    {
+      "prediction_id": "u-564efa9922_na_20260802T0730Z_u-c5ff03cd61__u-18c4acdd4f__v3-4-1__20260801T031125Z__t-7h",
+      "match_id": "u-564efa9922_na_20260802T0730Z_u-c5ff03cd61__u-18c4acdd4f",
+      "actual_score": "2-2",
+      "actual_idx": 1,
+      "probs": [
+        0.6021348417115227,
+        0.20116777666271327,
+        0.19669738162576406
+      ],
+      "pick_correct": false,
+      "brier_sum": 1.0393891485833848,
+      "log_loss": 1.6036160093347769,
+      "top1": false,
+      "top3": false,
+      "top5": false,
+      "score_log_loss": 2.7900071056816103,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 1.0396139999999998,
+      "market_log_loss": 1.6044503709230613,
+      "ou25_brier": 0.08584899999999995,
+      "btts_brier": 0.11833600000000005
+    },
+    {
+      "prediction_id": "u-564efa9922_na_20260802T0730Z_u-ab9fe034bf__fc-6658a9f032__v3-4-1__20260801T031130Z__t-7h",
+      "match_id": "u-564efa9922_na_20260802T0730Z_u-ab9fe034bf__fc-6658a9f032",
+      "actual_score": "1-1",
+      "actual_idx": 1,
+      "probs": [
+        0.5148592022101665,
+        0.23427455761944083,
+        0.2508662401703927
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.9143493216666212,
+      "log_loss": 1.4512615282700914,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.401930314170044,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.9149820000000001,
+      "market_log_loss": 1.4524341636244358,
+      "ou25_brier": 0.400689,
+      "btts_brier": 0.142884
+    },
+    {
+      "prediction_id": "u-564efa9922_na_20260802T0830Z_u-6de99512ac__fc-b187df6269__v3-4-1__20260801T031140Z__t-7h",
+      "match_id": "u-564efa9922_na_20260802T0830Z_u-6de99512ac__fc-b187df6269",
+      "actual_score": "2-1",
+      "actual_idx": 0,
+      "probs": [
+        0.6147146034099333,
+        0.20681986656782803,
+        0.17846553002223872
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.22306923943881773,
+      "log_loss": 0.486597178380594,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.331943637411217,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.222758,
+      "market_log_loss": 0.4861330111756192,
+      "ou25_brier": 0.11559999999999998,
+      "btts_brier": 0.15366400000000002
+    },
+    {
+      "prediction_id": "u-564efa9922_na_20260802T0830Z_u-f67073dc3c__u-cf44f7ab91__v3-4-1__20260801T031145Z__t-7h",
+      "match_id": "u-564efa9922_na_20260802T0830Z_u-f67073dc3c__u-cf44f7ab91",
+      "actual_score": "1-1",
+      "actual_idx": 1,
+      "probs": [
+        0.4519062459975238,
+        0.24266746360414979,
+        0.30542629039832647
+      ],
+      "pick_correct": false,
+      "brier_sum": 0.8710570447218291,
+      "log_loss": 1.4160632353759186,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.363965626633068,
+      "mode": "market_only",
+      "version": "3.4.1",
+      "market_brier_sum": 0.8703780000000001,
+      "market_log_loss": 1.4146938356415886,
+      "ou25_brier": 0.391876,
+      "btts_brier": 0.13764099999999999
+    },
+    {
+      "prediction_id": "u-6c72935bf4_na_20260801T2300Z_u-4ab584e8ea__u-17ff6ef727__v3-4-1__20260801T145354Z__t-0h",
+      "match_id": "u-6c72935bf4_na_20260801T2300Z_u-4ab584e8ea__u-17ff6ef727",
+      "actual_score": "2-0",
+      "actual_idx": 0,
+      "probs": [
+        0.6006873792254255,
+        0.21081413067014923,
+        0.18849849010442532
+      ],
+      "pick_correct": true,
+      "brier_sum": 0.23942484757171806,
+      "log_loss": 0.5096806474592298,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "score_log_loss": 2.302623226419126,
+      "mode": "hybrid",
+      "version": "3.4.1",
+      "market_brier_sum": 0.24320600000000003,
+      "market_log_loss": 0.5141645250315053,
+      "ou25_brier": 0.31696899999999995,
+      "btts_brier": 0.28302400000000005
+    }
+  ]
+}

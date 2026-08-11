@@ -1,0 +1,419 @@
+{
+  "schema_version": "score-half-calibration-1.0",
+  "generated_at": "2026-08-02T18:30:02+0800",
+  "source": "football-data 五大联赛 football_data_big5_all_fields.jsonl",
+  "method": "logits temperature scaling on score grid; p^(1/T) normalized; fitted by train score LogLoss",
+  "sample": {
+    "with_odds_ft": 15566,
+    "train": 10896,
+    "test": 4670,
+    "date_range": [
+      "2000-07-28",
+      "2026-05-24"
+    ],
+    "ft_solved_train": 10896,
+    "ft_solved_test": 4670,
+    "ht_available_train": 10896,
+    "ht_available_test": 4669
+  },
+  "calibration": {
+    "ft_score_temperature": 1.4,
+    "ht_score_temperature": 1.22,
+    "train_score_log_loss": {
+      "ft": 2.88159,
+      "ht": 1.95176
+    },
+    "status": "TRAINED_ON_SAMPLE_VALIDATED_ON_HOLDOUT",
+    "note": "温度仅作用于比分/半场分布；1X2/OU/BTTS 校准层不受影响，仍沿用体彩1348场参数。"
+  },
+  "metrics": {
+    "ft_train_before": {
+      "n": 10896,
+      "log_loss": 2.94594,
+      "top1_acc_pct": 11.53,
+      "top3_acc_pct": 30.8,
+      "top5_acc_pct": 49.37,
+      "ece": 0.00166,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 1719581,
+          "avg_prob": 0.00055,
+          "actual_rate": 0.00109
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 44099,
+          "avg_prob": 0.03205,
+          "actual_rate": 0.04227
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 35477,
+          "avg_prob": 0.07251,
+          "actual_rate": 0.07678
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 40301,
+          "avg_prob": 0.1374,
+          "actual_rate": 0.10392
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 1959,
+          "avg_prob": 0.21303,
+          "actual_rate": 0.12455
+        },
+        {
+          "bin": "0.4-1.0",
+          "n": 7,
+          "avg_prob": 0.51853,
+          "actual_rate": 0.28571
+        }
+      ]
+    },
+    "ft_train_after": {
+      "n": 10896,
+      "log_loss": 2.88159,
+      "top1_acc_pct": 11.53,
+      "top3_acc_pct": 30.8,
+      "top5_acc_pct": 49.37,
+      "ece": 0.00043,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 1699900,
+          "avg_prob": 0.00085,
+          "actual_rate": 0.00082
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 59580,
+          "avg_prob": 0.03298,
+          "actual_rate": 0.03573
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 50640,
+          "avg_prob": 0.07382,
+          "actual_rate": 0.07832
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 31276,
+          "avg_prob": 0.11976,
+          "actual_rate": 0.10906
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 25,
+          "avg_prob": 0.25067,
+          "actual_rate": 0.12
+        },
+        {
+          "bin": "0.4-1.0",
+          "n": 3,
+          "avg_prob": 0.45261,
+          "actual_rate": 0.33333
+        }
+      ]
+    },
+    "ft_test_before": {
+      "n": 4670,
+      "log_loss": 2.94909,
+      "top1_acc_pct": 11.2,
+      "top3_acc_pct": 30.06,
+      "top5_acc_pct": 48.09,
+      "ece": 0.00135,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 733840,
+          "avg_prob": 0.00062,
+          "actual_rate": 0.00108
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 20757,
+          "avg_prob": 0.03262,
+          "actual_rate": 0.04215
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 18500,
+          "avg_prob": 0.07346,
+          "actual_rate": 0.07103
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 15912,
+          "avg_prob": 0.13413,
+          "actual_rate": 0.1037
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 221,
+          "avg_prob": 0.20942,
+          "actual_rate": 0.19005
+        }
+      ]
+    },
+    "ft_test_after": {
+      "n": 4670,
+      "log_loss": 2.91178,
+      "top1_acc_pct": 11.2,
+      "top3_acc_pct": 30.06,
+      "top5_acc_pct": 48.09,
+      "ece": 0.00036,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 724429,
+          "avg_prob": 0.0009,
+          "actual_rate": 0.00078
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 29069,
+          "avg_prob": 0.03289,
+          "actual_rate": 0.03629
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 25784,
+          "avg_prob": 0.07353,
+          "actual_rate": 0.07524
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 9948,
+          "avg_prob": 0.11699,
+          "actual_rate": 0.11188
+        }
+      ]
+    },
+    "ht_train_before": {
+      "n": 10896,
+      "log_loss": 1.9775,
+      "top1_acc_pct": 31.47,
+      "top3_acc_pct": 68.58,
+      "top5_acc_pct": 86.57,
+      "ece": 0.00381,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 464637,
+          "avg_prob": 0.0012,
+          "actual_rate": 0.00198
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 17597,
+          "avg_prob": 0.0306,
+          "actual_rate": 0.04046
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 19378,
+          "avg_prob": 0.07055,
+          "actual_rate": 0.09464
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 12474,
+          "avg_prob": 0.1517,
+          "actual_rate": 0.15272
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 13465,
+          "avg_prob": 0.28346,
+          "actual_rate": 0.24909
+        },
+        {
+          "bin": "0.4-1.0",
+          "n": 6353,
+          "avg_prob": 0.42895,
+          "actual_rate": 0.34173
+        }
+      ]
+    },
+    "ht_train_after": {
+      "n": 10896,
+      "log_loss": 1.95176,
+      "top1_acc_pct": 31.47,
+      "top3_acc_pct": 68.58,
+      "top5_acc_pct": 86.57,
+      "ece": 0.00112,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 449905,
+          "avg_prob": 0.00138,
+          "actual_rate": 0.0012
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 28576,
+          "avg_prob": 0.03052,
+          "actual_rate": 0.0309
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 21992,
+          "avg_prob": 0.0759,
+          "actual_rate": 0.0873
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 14929,
+          "avg_prob": 0.15264,
+          "actual_rate": 0.1552
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 18234,
+          "avg_prob": 0.2931,
+          "actual_rate": 0.28195
+        },
+        {
+          "bin": "0.4-1.0",
+          "n": 268,
+          "avg_prob": 0.42194,
+          "actual_rate": 0.35075
+        }
+      ]
+    },
+    "ht_test_before": {
+      "n": 4669,
+      "log_loss": 2.02871,
+      "top1_acc_pct": 29.13,
+      "top3_acc_pct": 67.1,
+      "top5_acc_pct": 84.49,
+      "ece": 0.00322,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 196844,
+          "avg_prob": 0.00124,
+          "actual_rate": 0.00199
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 9344,
+          "avg_prob": 0.03091,
+          "actual_rate": 0.03992
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 8305,
+          "avg_prob": 0.07439,
+          "actual_rate": 0.09091
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 5826,
+          "avg_prob": 0.15034,
+          "actual_rate": 0.14899
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 6948,
+          "avg_prob": 0.28636,
+          "actual_rate": 0.25317
+        },
+        {
+          "bin": "0.4-1.0",
+          "n": 1514,
+          "avg_prob": 0.43138,
+          "actual_rate": 0.34544
+        }
+      ]
+    },
+    "ht_test_after": {
+      "n": 4669,
+      "log_loss": 2.00888,
+      "top1_acc_pct": 29.13,
+      "top3_acc_pct": 67.1,
+      "top5_acc_pct": 84.49,
+      "ece": 0.00067,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.02",
+          "n": 190944,
+          "avg_prob": 0.00149,
+          "actual_rate": 0.0013
+        },
+        {
+          "bin": "0.02-0.05",
+          "n": 13576,
+          "avg_prob": 0.03168,
+          "actual_rate": 0.03108
+        },
+        {
+          "bin": "0.05-0.1",
+          "n": 9551,
+          "avg_prob": 0.07776,
+          "actual_rate": 0.08376
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 6955,
+          "avg_prob": 0.15117,
+          "actual_rate": 0.15298
+        },
+        {
+          "bin": "0.2-0.4",
+          "n": 7675,
+          "avg_prob": 0.27726,
+          "actual_rate": 0.27283
+        },
+        {
+          "bin": "0.4-1.0",
+          "n": 80,
+          "avg_prob": 0.40951,
+          "actual_rate": 0.5
+        }
+      ]
+    },
+    "ht_1x2_train": {
+      "n_ht": 10896,
+      "ht_1x2_log_loss": 1.03054,
+      "ht_1x2_acc_pct": 46.27
+    },
+    "ht_1x2_test": {
+      "n_ht": 4669,
+      "ht_1x2_log_loss": 1.03457,
+      "ht_1x2_acc_pct": 44.72
+    },
+    "per_league_test_top1_after": {
+      "英超": {
+        "n": 1001,
+        "top1_acc_pct": 10.39,
+        "score_log_loss": 2.94015
+      },
+      "意甲": {
+        "n": 997,
+        "top1_acc_pct": 12.44,
+        "score_log_loss": 2.86144
+      },
+      "西甲": {
+        "n": 995,
+        "top1_acc_pct": 13.87,
+        "score_log_loss": 2.81544
+      },
+      "法甲": {
+        "n": 876,
+        "top1_acc_pct": 11.64,
+        "score_log_loss": 2.89648
+      },
+      "德甲": {
+        "n": 801,
+        "top1_acc_pct": 6.87,
+        "score_log_loss": 3.07539
+      }
+    }
+  },
+  "disclaimer": "概率模型输出，非投注建议。"
+}

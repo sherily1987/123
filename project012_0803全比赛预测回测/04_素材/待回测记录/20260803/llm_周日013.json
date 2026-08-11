@@ -1,0 +1,35 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040706",
+  "match": "米拉索尔 vs 格雷米奥",
+  "competition": "巴西杯（Copa do Brasil）1/8决赛首回合",
+  "kickoff": "2026-08-03T05:00:00+08:00",
+  "pre_registered_at": "2026-08-03T00:20:00+08:00",
+  "direction": {
+    "pick": "双选 主胜/平局（H/D）",
+    "single_preference": "主胜（H）",
+    "note": "定性判断，非概率输出；H2H全胜+主场不败+客队客场虫共同支撑主胜，杯赛两回合首回合存在保守因素故双选覆盖平局"
+  },
+  "score_picks": ["1-0", "2-1", "1-1"],
+  "signals": [
+    "H2H血脉压制：两队4次交锋米拉索尔全胜（含本赛季巴甲第19轮主场2-1），3次主场对阵格雷米奥全胜；主帅瓜纳斯执教生涯5次对阵格雷米奥3胜1平1负",
+    "米拉索尔主场强势：近8个主场不败（7胜1平），近4个主场连胜（布拉甘蒂诺/弗鲁米嫩塞/格雷米奥/里莫）；近3场2胜1平处于上升期",
+    "格雷米奥状态低迷：各条战线近6场不胜（4负），南美杯被玻利瓦尔双杀2-4出局；巴甲第17位22分，开赛即身处降级区",
+    "格雷米奥客场虫：本赛季巴甲客场0胜（快照0-4-6），近3个客场不胜且近2个客场连败",
+    "格雷米奥防线隐患+帅位承压：主力中卫Kannemann停赛由Wagner Leonardo顶替，主帅路易斯·卡斯特罗赛前已承认帅位压力",
+    "格雷米奥利空有对冲：门将Weverton解禁回归、前锋Carlos Vinícius解禁复出；米拉索尔主力门将Walter同样解禁回归",
+    "米拉索尔进攻端有伤缺：边锋阿莱森(4助攻)、内格巴(2球)、主力后腰阿尔多(肌肉伤约缺阵3个月)、中前卫内托-莫拉缺阵；杯赛两回合制首回合坐镇主场占先机"
+  ],
+  "evidence": [
+    {"fact": "两队4次交锋米拉索尔全胜，含本赛季巴甲第19轮主场2-1；3次主场对阵格雷米奥全胜；主帅瓜纳斯5次对阵格雷米奥3胜1平1负", "source": "https://www.sohu.com/a/1057691759_121119509", "collected_at": "2026-08-03T00:19+08:00", "mapped": "h2h_background", "basis": "搜狐前瞻 2026-08-02"},
+    {"fact": "米拉索尔巴甲第14位23分，领先降级区1分；近3场2胜1平；近8个主场7胜1平不败", "source": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/08/02/gremio-pega-o-mirassol-nas-oitavas-da-copa-do-brasil-para-virar-chave-na-temporada.htm", "collected_at": "2026-08-03T00:19+08:00", "mapped": "form_context/home_adv", "basis": "UOL 2026-08-02，与搜狐前瞻交叉一致"},
+    {"fact": "格雷米奥巴甲第17位22分开赛即降级区；各条战线近6场不胜（4负），南美杯被玻利瓦尔两回合2-4淘汰；主帅路易斯·卡斯特罗赛前承压", "source": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/08/02/gremio-pega-o-mirassol-nas-oitavas-da-copa-do-brasil-para-virar-chave-na-temporada.htm", "collected_at": "2026-08-03T00:19+08:00", "mapped": "form_context", "basis": "UOL 2026-08-02"},
+    {"fact": "格雷米奥本赛季巴甲客场0胜（快照0-4-6，16位21分）；近3个客场不胜且近2个客场连败", "source": "https://fbref.com/en/squads/d5ae3703/2026/matchlogs/c24/misc/Gremio-Match-Logs-Serie-A", "collected_at": "2026-08-03T00:19+08:00", "mapped": "away_weakness", "basis": "FBref 2026-07-19快照 + 搜狐前瞻2026-08-02交叉"},
+    {"fact": "格雷米奥主力中卫Kannemann停赛（Wagner Leonardo顶替）；门将Weverton、前锋Carlos Vinícius解禁回归；米拉索尔门将Walter解禁回归", "source": "https://www.band.com.br/esportes/gremio-pega-o-mirassol-nas-oitavas-da-copa-do-brasil-para-virar-chave-na-temporada-202608020642", "collected_at": "2026-08-03T00:19+08:00", "mapped": "defense_absence_gremio/gk_return", "basis": "Band 2026-08-01/02，与UOL首发一致"},
+    {"fact": "米拉索尔缺主力边锋阿莱森(4助攻)、内格巴(2球)、主力后腰阿尔多(肌肉伤约缺阵3个月)、中前卫内托-莫拉；格雷米奥仅替补中前卫罗杰缺阵", "source": "https://www.sohu.com/a/1057691759_121119509", "collected_at": "2026-08-03T00:19+08:00", "mapped": "attack_absence_mirassol", "basis": "搜狐前瞻 2026-08-02；阿尔多伤情与GZH报道一致"},
+    {"fact": "巴西杯1/8决赛首回合，次回合8/5格雷米奥主场；格雷米奥上轮两回合5-0淘汰康费安卡，米拉索尔两回合3-2淘汰布拉甘蒂诺；格雷米奥5冠豪门 vs 米拉索尔第3次参赛", "source": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/08/02/gremio-pega-o-mirassol-nas-oitavas-da-copa-do-brasil-para-virar-chave-na-temporada.htm", "collected_at": "2026-08-03T00:19+08:00", "mapped": "cup_context", "basis": "UOL 2026-08-02"}
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜52.0% 平27.8% 负20.3%，比分Top3: 1-0/1-1/0-0。LLM 轨道方向与量化一致（主胜），但依据为H2H全胜+主场不败+客队客场虫的组合信号，比分Top3含2-1——赛后重点对比。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

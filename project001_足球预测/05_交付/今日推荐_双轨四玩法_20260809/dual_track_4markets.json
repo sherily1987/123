@@ -1,0 +1,569 @@
+{
+  "schema": "dual-track-4markets-1.0",
+  "sales_day": "2026-08-09",
+  "generated_at": "2026-08-09T15:17:48.293031",
+  "quant_count": 6,
+  "llm_count": 6,
+  "agreement_rates": {
+    "1x2": {
+      "n": 6,
+      "agree": 4,
+      "pct": 66.67
+    },
+    "score": {
+      "n": 6,
+      "agree": 1,
+      "pct": 16.67
+    },
+    "ou25": {
+      "n": 6,
+      "agree": 3,
+      "pct": 50.0
+    },
+    "hafu": {
+      "n": 6,
+      "agree": 0,
+      "pct": 0.0
+    }
+  },
+  "rows": [
+    {
+      "match_num": "周日017",
+      "home": "AC奥卢",
+      "away": "赫尔辛基",
+      "league": "芬超",
+      "kickoff": "2026-08-10T00:00:00+08:00",
+      "quant": {
+        "direction": "客胜",
+        "prob_pct": [
+          27.6,
+          24.2,
+          48.2
+        ],
+        "score": "1-1",
+        "ou25": "大2.5",
+        "ou25_detail": {
+          "line": 2.5,
+          "calibration": {
+            "applied": true,
+            "method": "platt",
+            "a": 1.03,
+            "b": -0.08,
+            "uncalibrated_over_pct": 56.0,
+            "shift_pp": -1.8,
+            "test_set_ece": "0.06470→0.04710",
+            "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+          },
+          "over_pct": 54.2,
+          "under_pct": 45.8,
+          "push_pct": 0.0
+        },
+        "hafu": "负负",
+        "banker": false,
+        "market_dependency_pct": 100,
+        "mode": "market_only",
+        "flags": [
+          "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+          "MULTI_MARKET_FIT: λ已由HAD,HHAD,TTG,HAFU联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+          "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+          "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+          "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+          "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+        ]
+      },
+      "llm": {
+        "1x2": "主胜",
+        "score": "1-0",
+        "ttg": "1",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "hafu_votes": {
+          "平负": 0.85,
+          "平胜": 1.0
+        },
+        "confidence": 0.55,
+        "alt_direction": "客胜",
+        "caution": true,
+        "collapse_flags": [
+          "OU_COLLAPSE:小2.5x2"
+        ],
+        "votes": {
+          "客胜": 0.85,
+          "主胜": 1.0
+        }
+      },
+      "llm_models": [
+        {
+          "model": "deepseek/deepseek-chat",
+          "result": "客胜",
+          "home_score": 0,
+          "away_score": 1,
+          "half_result": "平局",
+          "total_goals": "1"
+        },
+        {
+          "model": "qwen/qwen-flash",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        }
+      ],
+      "agreement": {
+        "1x2": false,
+        "score": false,
+        "ou25": false,
+        "hafu": false
+      }
+    },
+    {
+      "match_num": "周日019",
+      "home": "克里斯蒂",
+      "away": "莫尔德",
+      "league": "挪超",
+      "kickoff": "2026-08-10T01:15:00+08:00",
+      "quant": {
+        "direction": "客胜",
+        "prob_pct": [
+          20.5,
+          22.9,
+          56.7
+        ],
+        "score": "1-2",
+        "ou25": "大2.5",
+        "ou25_detail": {
+          "line": 2.5,
+          "calibration": {
+            "applied": true,
+            "method": "platt",
+            "a": 1.03,
+            "b": -0.08,
+            "uncalibrated_over_pct": 65.9,
+            "shift_pp": -1.37,
+            "test_set_ece": "0.06470→0.04710",
+            "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+          },
+          "over_pct": 64.6,
+          "under_pct": 35.4,
+          "push_pct": 0.0
+        },
+        "hafu": "负负",
+        "banker": false,
+        "market_dependency_pct": 100,
+        "mode": "market_only",
+        "flags": [
+          "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+          "MULTI_MARKET_FIT: λ已由HAD,HHAD,TTG,HAFU联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+          "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+          "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+          "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+          "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+        ]
+      },
+      "llm": {
+        "1x2": "客胜",
+        "score": "0-1",
+        "ttg": "1",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "hafu_votes": {
+          "平负": 1.0,
+          "平胜": 1.0
+        },
+        "confidence": 0.575,
+        "alt_direction": "主胜",
+        "caution": true,
+        "collapse_flags": [
+          "OU_COLLAPSE:小2.5x2"
+        ],
+        "votes": {
+          "客胜": 1.0,
+          "主胜": 1.0
+        }
+      },
+      "llm_models": [
+        {
+          "model": "deepseek/deepseek-chat",
+          "result": "客胜",
+          "home_score": 0,
+          "away_score": 1,
+          "half_result": "平局",
+          "total_goals": "1"
+        },
+        {
+          "model": "qwen/qwen-flash",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        }
+      ],
+      "agreement": {
+        "1x2": true,
+        "score": false,
+        "ou25": false,
+        "hafu": false
+      }
+    },
+    {
+      "match_num": "周日021",
+      "home": "吉维森特",
+      "away": "里奥阿维",
+      "league": "葡超",
+      "kickoff": "2026-08-10T03:30:00+08:00",
+      "quant": {
+        "direction": "主胜",
+        "prob_pct": [
+          47.7,
+          30.1,
+          22.2
+        ],
+        "score": "1-0",
+        "ou25": "小2.5",
+        "ou25_detail": {
+          "line": 2.5,
+          "calibration": {
+            "applied": true,
+            "method": "platt",
+            "a": 1.03,
+            "b": -0.08,
+            "uncalibrated_over_pct": 44.0,
+            "shift_pp": -2.14,
+            "test_set_ece": "0.06470→0.04710",
+            "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+          },
+          "over_pct": 41.8,
+          "under_pct": 58.2,
+          "push_pct": 0.0
+        },
+        "hafu": "胜胜",
+        "banker": false,
+        "market_dependency_pct": 100,
+        "mode": "market_only",
+        "flags": [
+          "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+          "MULTI_MARKET_FIT: λ已由HAD,HHAD,TTG,HAFU联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+          "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+          "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+          "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+          "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+        ]
+      },
+      "llm": {
+        "1x2": "主胜",
+        "score": "1-0",
+        "ttg": "1",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "hafu_votes": {
+          "平胜": 1.85
+        },
+        "confidence": 0.55,
+        "alt_direction": null,
+        "caution": false,
+        "collapse_flags": [
+          "OU_COLLAPSE:小2.5x2"
+        ],
+        "votes": {
+          "主胜": 1.85
+        }
+      },
+      "llm_models": [
+        {
+          "model": "deepseek/deepseek-chat",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        },
+        {
+          "model": "qwen/qwen-flash",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        }
+      ],
+      "agreement": {
+        "1x2": true,
+        "score": true,
+        "ou25": true,
+        "hafu": false
+      }
+    },
+    {
+      "match_num": "周日022",
+      "home": "摩雷伦斯",
+      "away": "布拉加",
+      "league": "葡超",
+      "kickoff": "2026-08-10T03:30:00+08:00",
+      "quant": {
+        "direction": "客胜",
+        "prob_pct": [
+          15.7,
+          25.4,
+          58.9
+        ],
+        "score": "0-1",
+        "ou25": "小2.5",
+        "ou25_detail": {
+          "line": 2.5,
+          "calibration": {
+            "applied": true,
+            "method": "platt",
+            "a": 1.03,
+            "b": -0.08,
+            "uncalibrated_over_pct": 47.5,
+            "shift_pp": -2.06,
+            "test_set_ece": "0.06470→0.04710",
+            "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+          },
+          "over_pct": 45.4,
+          "under_pct": 54.6,
+          "push_pct": 0.0
+        },
+        "hafu": "负负",
+        "banker": false,
+        "market_dependency_pct": 100,
+        "mode": "market_only",
+        "flags": [
+          "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+          "MULTI_MARKET_FIT: λ已由HAD,HHAD,TTG,HAFU联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+          "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+          "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+          "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+          "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+        ]
+      },
+      "llm": {
+        "1x2": "主胜",
+        "score": "1-0",
+        "ttg": "1",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "hafu_votes": {
+          "平负": 0.85,
+          "平胜": 1.0
+        },
+        "confidence": 0.575,
+        "alt_direction": "客胜",
+        "caution": true,
+        "collapse_flags": [
+          "OU_COLLAPSE:小2.5x2"
+        ],
+        "votes": {
+          "客胜": 0.85,
+          "主胜": 1.0
+        }
+      },
+      "llm_models": [
+        {
+          "model": "deepseek/deepseek-chat",
+          "result": "客胜",
+          "home_score": 0,
+          "away_score": 1,
+          "half_result": "平局",
+          "total_goals": "1"
+        },
+        {
+          "model": "qwen/qwen-flash",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        }
+      ],
+      "agreement": {
+        "1x2": false,
+        "score": false,
+        "ou25": true,
+        "hafu": false
+      }
+    },
+    {
+      "match_num": "周日023",
+      "home": "桑托斯",
+      "away": "巴竞技",
+      "league": "巴甲",
+      "kickoff": "2026-08-10T05:30:00+08:00",
+      "quant": {
+        "direction": "主胜",
+        "prob_pct": [
+          42.4,
+          32.8,
+          24.9
+        ],
+        "score": "1-1",
+        "ou25": "小2.5",
+        "ou25_detail": {
+          "line": 2.5,
+          "calibration": {
+            "applied": true,
+            "method": "platt",
+            "a": 1.03,
+            "b": -0.08,
+            "uncalibrated_over_pct": 40.9,
+            "shift_pp": -2.18,
+            "test_set_ece": "0.06470→0.04710",
+            "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+          },
+          "over_pct": 38.7,
+          "under_pct": 61.3,
+          "push_pct": 0.0
+        },
+        "hafu": "胜胜",
+        "banker": false,
+        "market_dependency_pct": 100,
+        "mode": "market_only",
+        "flags": [
+          "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+          "MULTI_MARKET_FIT: λ已由HAD,HHAD,TTG,HAFU联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+          "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+          "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+          "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+          "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+        ]
+      },
+      "llm": {
+        "1x2": "主胜",
+        "score": "1-0",
+        "ttg": "1",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "hafu_votes": {
+          "平胜": 1.85
+        },
+        "confidence": 0.55,
+        "alt_direction": null,
+        "caution": false,
+        "collapse_flags": [
+          "OU_COLLAPSE:小2.5x2"
+        ],
+        "votes": {
+          "主胜": 1.85
+        }
+      },
+      "llm_models": [
+        {
+          "model": "deepseek/deepseek-chat",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        },
+        {
+          "model": "qwen/qwen-flash",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        }
+      ],
+      "agreement": {
+        "1x2": true,
+        "score": false,
+        "ou25": true,
+        "hafu": false
+      }
+    },
+    {
+      "match_num": "周日024",
+      "home": "弗拉门戈",
+      "away": "维多利亚",
+      "league": "巴甲",
+      "kickoff": "2026-08-10T06:30:00+08:00",
+      "quant": {
+        "direction": "主胜",
+        "prob_pct": [
+          81.5,
+          13.3,
+          5.2
+        ],
+        "score": "2-0",
+        "ou25": "大2.5",
+        "ou25_detail": {
+          "line": 2.5,
+          "calibration": {
+            "applied": true,
+            "method": "platt",
+            "a": 1.03,
+            "b": -0.08,
+            "uncalibrated_over_pct": 60.2,
+            "shift_pp": -1.63,
+            "test_set_ece": "0.06470→0.04710",
+            "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+          },
+          "over_pct": 58.6,
+          "under_pct": 41.4,
+          "push_pct": 0.0
+        },
+        "hafu": "胜胜",
+        "banker": false,
+        "market_dependency_pct": 100,
+        "mode": "market_only",
+        "flags": [
+          "EXTREME_LAMBDA_FALLBACK_TO_HAD: multi-market λ=[2.515, 0.53]触发极端审计，已回退HAD反解λ=[2.594, 0.439]；比分及衍生市场按回退结果计算。",
+          "EXTREME_CLEAN_SHEET_HOME: 客队零球概率=64.5% (>55%)；零封结论对λ误差敏感，不能表述为稳胆。",
+          "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+          "MULTI_MARKET_FIT_REJECTED: 联合拟合结果仅保留诊断，不用于最终λ和衍生市场。",
+          "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+          "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+          "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+          "OVER_DISTRIBUTED_ACROSS_SCORES: 大2.5概率过半但Top1为小比分，大球概率由多个比分合计贡献；请同时查看大球侧Top比分。",
+          "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+        ]
+      },
+      "llm": {
+        "1x2": "主胜",
+        "score": "1-0",
+        "ttg": "1",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "hafu_votes": {
+          "平胜": 1.85
+        },
+        "confidence": 0.575,
+        "alt_direction": null,
+        "caution": false,
+        "collapse_flags": [
+          "OU_COLLAPSE:小2.5x2"
+        ],
+        "votes": {
+          "主胜": 1.85
+        }
+      },
+      "llm_models": [
+        {
+          "model": "deepseek/deepseek-chat",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        },
+        {
+          "model": "qwen/qwen-flash",
+          "result": "主胜",
+          "home_score": 1,
+          "away_score": 0,
+          "half_result": "平局",
+          "total_goals": "1"
+        }
+      ],
+      "agreement": {
+        "1x2": true,
+        "score": false,
+        "ou25": false,
+        "hafu": false
+      }
+    }
+  ],
+  "disclaimer": "概率模型输出，非投注建议；MARKET_BASELINE不代表独立edge。"
+}

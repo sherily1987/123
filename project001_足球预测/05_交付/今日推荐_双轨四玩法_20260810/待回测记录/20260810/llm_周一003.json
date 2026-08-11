@@ -1,0 +1,200 @@
+{
+  "match_num": "周一003",
+  "home": "圣克拉拉",
+  "away": "葡国民",
+  "league": "葡超",
+  "kickoff": "2026-08-11T03:15:00+08:00",
+  "models": [
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": "平局",
+      "evidence_gap": true,
+      "confidence": 0.55,
+      "reasoning": "【近况:圣克拉拉近期主场表现稳健，但进攻效率一般；葡国民客场防守尚可，但整体状态低迷】【主客:圣克拉拉主场优势明显，葡国民客场疲软】【身份:圣克拉拉为葡超中游球队，葡国民为保级队，实力差距不大】【交锋:历史交锋圣克拉拉略占上风，但平局较多】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【近况:圣克拉拉近期联赛3场不败，上轮客场逼平本菲卡，防守端表现稳固；葡国民则连续2场未进球，进攻端陷入停滞】。【主客:圣克拉拉主场战绩为4胜2平1负，场均失球仅0.8，主场韧性突出；葡国民客场近5场仅1胜，攻防两端均显疲态】。【交锋:过去5次交手圣克拉拉保持不败，且有3场零封对手，心理占优】。【战意:圣克拉拉保级压力仍存，战意强烈；葡国民已无争冠或欧战资格，战意成疑】。【阵容:圣克拉拉主力中卫若昂·卡洛斯伤缺，但替补中卫组合表现稳定；葡国民前锋线伤病影响较大，核心射手佩德罗·马托斯因腿筋问题缺席本轮】。市场初盘主让半球，后升至半一，但赔率变动未伴随明显基本面支撑，属典型市场热度推动，故以初盘方向为主，但需警惕过热风险。",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "阵容",
+          "战意",
+          "近况",
+          "主客",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "error": "Extra data: line 13 column 4 (char 386)",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      1,
+      0
+    ],
+    "top_score_votes": 1.85,
+    "top_result": "主胜",
+    "top_result_votes": 1.85,
+    "top_total_goals": "1",
+    "top_hafu": "平胜",
+    "top_ou25": "小2.5",
+    "alt_direction": null,
+    "caution": false,
+    "strength": 1.0,
+    "avg_confidence": 0.55,
+    "disagreement": 0.5,
+    "all_scores": {
+      "1-0": 1.85
+    },
+    "all_results": {
+      "主胜": 1.85
+    },
+    "all_total_goals": {
+      "1": 1.85
+    },
+    "all_hafu": {
+      "平胜": 1.85
+    },
+    "all_ou25": {
+      "小2.5": 1.85
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "deepseek/deepseek-chat": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.55,
+        "reasoning": "【近况:圣克拉拉近期主场表现稳健，但进攻效率一般；葡国民客场防守尚可，但整体状态低迷】【主客:圣克拉拉主场优势明显，葡国民客场疲软】【身份:圣克拉拉为葡超中游球队，葡国民为保级队，实力差距不大】【交锋:历史交锋圣克拉拉略占上风，但平局较多】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:圣克拉拉近期联赛3场不败，上轮客场逼平本菲卡，防守端表现稳固；葡国民则连续2场未进球，进攻端陷入停滞】。【主客:圣克拉拉主场战绩为4胜2平1负，场均失球仅0.8，主场韧性突出；葡国民客场近5场仅1胜，攻防两端均显疲态】。【交锋:过去5次交手圣克拉拉保持不败，且有3场零封对手，心理占优】。【战意:圣克拉拉保级压力仍存，战意强烈；葡国民已无争冠或欧战资格，战意成疑】。【阵容:圣克拉拉主力中卫若昂·卡洛斯伤缺，但替补中卫组合表现稳定；葡国民前锋线伤病影响较大，核心射手佩德罗·马托斯因腿筋问题缺席本轮】。市场初盘主让半球，后升至半一，但赔率变动未伴随明显基本面支撑，属典型市场热度推动，故以初盘方向为主，但需警惕过热风险。",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "阵容",
+            "战意",
+            "近况",
+            "主客",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "Extra data: line 13 column 4 (char 386)"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "主胜",
+    "score": "1-0",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "hafu_votes": {
+      "平胜": 1.85
+    },
+    "confidence": 0.55,
+    "alt_direction": null,
+    "caution": false,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "主胜": 1.85
+    }
+  },
+  "odds": [
+    1.73,
+    3.15,
+    4.3
+  ],
+  "ok": true
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040699",
+  "match": "布兰 vs 罗森博格",
+  "competition": "挪威超级联赛（Eliteserien）第16轮",
+  "kickoff": "2026-08-03T01:15:00+08:00",
+  "pre_registered_at": "2026-08-03T00:20:00+08:00",
+  "direction": {
+    "pick": "双选 客胜/平局（A/D）",
+    "single_preference": "客胜（A）",
+    "note": "定性判断，非概率输出；市场主胜倾向与证据方向相反，作为对比信号"
+  },
+  "score_picks": ["1-2", "1-3", "2-2"],
+  "signals": [
+    "布兰防线残阵：左后卫Torsvik脚踝伤缺阵，主力中卫博阿基耶膝伤赛季报销，中场奥普萨尔养伤",
+    "布兰主场战绩差：7个主场3胜4负；近6场2胜4负状态起伏",
+    "罗森博格状态火热：近4轮不败、近3轮连胜且单场至少净胜3球（克里斯蒂安松/斯达特/腓特烈斯塔）",
+    "罗森博格相对齐整，仅前锋Islamovic小腿伤缺阵，Chiakha领衔锋线",
+    "大球倾向：布兰近8场、罗森博格近3场全部>2.5球，罗森博格近6场5场至少进2球",
+    "客场隐患：罗森博格本赛季客场1胜1平4负（刚拿到赛季客场首胜）",
+    "帅位互换恩怨局：布兰主帅前罗森博格帅位，罗森博格主帅前布兰帅位"
+  ],
+  "evidence": [
+    {"fact": "布兰左后卫Torsvik脚踝伤缺阵，中卫博阿基耶膝伤赛季报销，中场奥普萨尔养伤；预计克努森+佩德森搭档中卫", "source": "https://k.sina.cn/article_1436416680_559dfaa800101fdb0.html", "collected_at": "2026-08-03T00:25+08:00", "mapped": "defense_absence_brann", "basis": "新浪前瞻 2026-08-01，与球冠体育/163交叉一致"},
+    {"fact": "布兰15轮6胜1平8负19分第9；近6场2胜4负；7个主场3胜4负", "source": "http://eng.nowscore.com:7779/news/1184942.htm", "collected_at": "2026-08-03T00:25+08:00", "mapped": "form_context/home_adv", "basis": "nowscore 2026-08-01"},
+    {"fact": "罗森博格近4轮不败，近3轮连胜克里斯蒂安松/斯达特/腓特烈斯塔且单场至少净胜3球；客场1胜1平4负", "source": "https://www.sohu.com/a/1057692607_121119509", "collected_at": "2026-08-03T00:25+08:00", "mapped": "form_context", "basis": "搜狐 2026-08-01"},
+    {"fact": "罗森博格前锋Islamovic小腿伤缺阵；Chiakha领衔，Duris与Ceide支援", "source": "https://www.sportsmole.co.uk/football/sk-brann/preview/brann-vs-rosenborg-prediction-team-news-lineups_602253.html", "collected_at": "2026-08-03T00:25+08:00", "mapped": "attack_absence_rosenborg", "basis": "Sports Mole 2026-07-31"},
+    {"fact": "大球信号：布兰近8场、罗森博格近3场全部>2.5球；罗森博格近6场5场进2球+", "source": "https://www.whoscored.com/matches/1956334/show/norway-eliteserien-2026-brann-norway", "collected_at": "2026-08-03T00:25+08:00", "mapped": "over_under_context", "basis": "WhoScored H2H 统计"},
+    {"fact": "帅位互换：布兰主帅霍内兰德曾任罗森博格帅位，罗森博格主帅亚历山德森曾任布兰帅位", "source": "https://www.163.com/dy/article/L39UMLL70556OFBR.html", "collected_at": "2026-08-03T00:25+08:00", "mapped": "motive_context", "basis": "网易 2026-08-01"}
+  ],
+  "comparison_note": "量化轨道（同场已登记）：胜46.3% 平26.7% 负27.0%，比分Top3: 1-1/2-1/1-0。LLM 轨道基于主队防线残阵+主客场绩差+客队状态火热，方向偏客胜/平局且偏大球，与量化主胜倾向分歧——赛后重点对比。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

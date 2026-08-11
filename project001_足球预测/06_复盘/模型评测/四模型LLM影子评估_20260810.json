@@ -1,0 +1,27 @@
+{
+  "status": "collecting",
+  "purpose": "四模型LLM影子样本积累；独立评估，不改变生产量化路线。",
+  "model_pool": [
+    "zhipu/glm-4-flash",
+    "qwen/qwen-flash",
+    "deepseek/deepseek-chat",
+    "moonshot/kimi-k2.6"
+  ],
+  "sample_thresholds": {
+    "under_30": "仅JSON失败率、证据拒绝率、模型分歧、坍缩率；禁止优胜结论",
+    "at_30": "仅描述性指标",
+    "at_100": "才可提出模型权重调整评审；此前禁止调整",
+    "at_200": "才可评审生产改权重；此前禁止生产改权重结论"
+  },
+  "production_quant_route": "MARKET_BASELINE/market_only",
+  "formal_banker_count": 0,
+  "settlement_gate": {
+    "accepted": [
+      "official_formal + finished + 90min + valid score_90",
+      "user_confirmed_official + verified_by=user_confirmed_official_sporttery_result + non-empty verification_note + non-empty evidence_reference + finished + 90min + valid score_90"
+    ],
+    "rejected": "加时、点球、延期、取消、弃权及其他非普通90分钟语义一律不纳入"
+  },
+  "input_contract": "仅读取调用方明确给定的JSON records；不扫描或修改历史预测、赛果或cohort目录。",
+  "cohorts": {}
+}

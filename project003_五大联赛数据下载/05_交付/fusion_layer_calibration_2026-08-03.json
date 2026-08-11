@@ -1,0 +1,223 @@
+{
+  "schema_version": "fusion-layer-calibration-1.0",
+  "generated_at": "2026-08-03T01:15:37+08:00",
+  "protocol": "chronological 60/20/20; band table + edge threshold fitted on train, edge threshold cross-checked on val, reported on test",
+  "pool": "attributed vunknown (fusion-1.4.0-era/core-3.4.4, 体彩官方)",
+  "results": {
+    "closing": {
+      "snapshot": "closing",
+      "n": 369,
+      "split": {
+        "train": 221,
+        "val": 74,
+        "test": 74
+      },
+      "date_range": [
+        "2026-01-13",
+        "2026-05-30"
+      ],
+      "bands": [
+        {
+          "lo": 0.0,
+          "hi": 0.4,
+          "n_train": 52,
+          "prob": 0.3654
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.5,
+          "n_train": 54,
+          "prob": 0.4815
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.6,
+          "n_train": 50,
+          "prob": 0.6
+        },
+        {
+          "lo": 0.6,
+          "hi": 1.01,
+          "n_train": 65,
+          "prob": 0.5692
+        }
+      ],
+      "edge": {
+        "candidates": {
+          "0": {
+            "n": 110,
+            "hit": 0.5091,
+            "market_implied": 0.5324,
+            "edge_realized_pp": -2.33
+          }
+        },
+        "selected_edge_pp": 0,
+        "val_selected": [
+          0.32072948462822387,
+          0,
+          0.5429,
+          0.4886,
+          35
+        ]
+      },
+      "test": {
+        "model_1x2": {
+          "n": 74,
+          "brier": 0.587173,
+          "logloss": 0.985792,
+          "ece": 0.012937
+        },
+        "market_1x2": {
+          "n": 74,
+          "brier": 0.585072,
+          "logloss": 0.990327,
+          "ece": 0.030438
+        },
+        "band_ece": {
+          "raw": 0.080432,
+          "market": 0.080844,
+          "calibrated": 0.071469
+        },
+        "edge_strategy": {
+          "n": 35,
+          "hit_pct": 54.29,
+          "market_implied_pct": 48.12,
+          "edge_realized_pp": 6.17
+        }
+      },
+      "ready_to_flip": true
+    },
+    "all": {
+      "snapshot": "all",
+      "n": 1439,
+      "split": {
+        "train": 863,
+        "val": 288,
+        "test": 288
+      },
+      "date_range": [
+        "2026-01-13",
+        "2026-05-30"
+      ],
+      "bands": [
+        {
+          "lo": 0.0,
+          "hi": 0.4,
+          "n_train": 539,
+          "prob": 0.4174
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.5,
+          "n_train": 103,
+          "prob": 0.4757
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.6,
+          "n_train": 98,
+          "prob": 0.6122
+        },
+        {
+          "lo": 0.6,
+          "hi": 1.01,
+          "n_train": 123,
+          "prob": 0.561
+        }
+      ],
+      "edge": {
+        "candidates": {
+          "0": {
+            "n": 384,
+            "hit": 0.3958,
+            "market_implied": 0.3972,
+            "edge_realized_pp": -0.14
+          },
+          "1": {
+            "n": 172,
+            "hit": 0.2733,
+            "market_implied": 0.2197,
+            "edge_realized_pp": 5.36
+          },
+          "2": {
+            "n": 167,
+            "hit": 0.2814,
+            "market_implied": 0.2156,
+            "edge_realized_pp": 6.59
+          },
+          "3": {
+            "n": 161,
+            "hit": 0.2671,
+            "market_implied": 0.2105,
+            "edge_realized_pp": 5.65
+          },
+          "4": {
+            "n": 161,
+            "hit": 0.2671,
+            "market_implied": 0.2105,
+            "edge_realized_pp": 5.65
+          },
+          "5": {
+            "n": 153,
+            "hit": 0.2484,
+            "market_implied": 0.2044,
+            "edge_realized_pp": 4.4
+          },
+          "6": {
+            "n": 146,
+            "hit": 0.2603,
+            "market_implied": 0.1988,
+            "edge_realized_pp": 6.15
+          },
+          "7": {
+            "n": 142,
+            "hit": 0.2676,
+            "market_implied": 0.1958,
+            "edge_realized_pp": 7.18
+          },
+          "8": {
+            "n": 135,
+            "hit": 0.2519,
+            "market_implied": 0.1902,
+            "edge_realized_pp": 6.16
+          }
+        },
+        "selected_edge_pp": 0,
+        "val_selected": [
+          0.14067200015344286,
+          0,
+          0.4274,
+          0.4143,
+          117
+        ]
+      },
+      "test": {
+        "model_1x2": {
+          "n": 288,
+          "brier": 0.626637,
+          "logloss": 1.040061,
+          "ece": 0.007469
+        },
+        "market_1x2": {
+          "n": 288,
+          "brier": 0.585642,
+          "logloss": 0.991627,
+          "ece": 0.029872
+        },
+        "band_ece": {
+          "raw": 0.060167,
+          "market": 0.122812,
+          "calibrated": 0.04384
+        },
+        "edge_strategy": {
+          "n": 118,
+          "hit_pct": 40.68,
+          "market_implied_pct": 39.5,
+          "edge_realized_pp": 1.18
+        }
+      },
+      "ready_to_flip": true
+    }
+  },
+  "draft_policy": "H:\\claude AI自媒体\\project003_五大联赛数据下载\\04_素材\\recommendation_policy.draft.json"
+}

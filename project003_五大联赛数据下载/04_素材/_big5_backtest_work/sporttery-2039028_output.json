@@ -1,0 +1,932 @@
+{
+  "fusion_schema_version": "1.3.0",
+  "version_manifest": null,
+  "fusion_status": "ok",
+  "core_engine_version": "3.4.4",
+  "match": "塞维利亚 vs 马德里竞技",
+  "mode": "market_only",
+  "input_coverage": {
+    "completeness_pct": 10.0,
+    "source_reliability_pct": 100.0,
+    "freshness_pct": 50.0,
+    "overall_pct": 45.0,
+    "note": "输入覆盖/来源/新鲜度评分，不是预测置信度。"
+  },
+  "data_quality": {
+    "completeness_pct": 10.0,
+    "source_reliability_pct": 100.0,
+    "freshness_pct": 50.0,
+    "overall_pct": 45.0,
+    "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+  },
+  "source_evidence": null,
+  "field_meta": {
+    "odds": {
+      "reliability": 100,
+      "freshness": 100,
+      "source": "中国体彩官方移动端 oddsHistory / getFixedBonusV1",
+      "observed_at": "2026-04-11T17:13:29+08:00"
+    }
+  },
+  "market_freshness": {
+    "had": {
+      "status": "AGING",
+      "factor": 0.5,
+      "age_hours": 9.775,
+      "observed_at": "2026-04-11T17:13:29+08:00"
+    },
+    "hhad": {
+      "status": "UNKNOWN",
+      "factor": 0.0,
+      "age_hours": null,
+      "observed_at": null
+    },
+    "ou": {
+      "status": "UNKNOWN",
+      "factor": 0.0,
+      "age_hours": null,
+      "observed_at": null
+    },
+    "ttg": {
+      "status": "UNKNOWN",
+      "factor": 0.0,
+      "age_hours": null,
+      "observed_at": null
+    },
+    "hafu": {
+      "status": "UNKNOWN",
+      "factor": 0.0,
+      "age_hours": null,
+      "observed_at": null
+    },
+    "crs": {
+      "status": "UNKNOWN",
+      "factor": 0.0,
+      "age_hours": null,
+      "observed_at": null
+    }
+  },
+  "data_usage_audit": {
+    "used_pools": [
+      "had"
+    ],
+    "downweighted_pools": [
+      "had"
+    ],
+    "excluded_pools": [
+      "hhad",
+      "ou",
+      "ttg",
+      "hafu",
+      "crs"
+    ],
+    "freshness": {
+      "had": {
+        "status": "AGING",
+        "factor": 0.5,
+        "age_hours": 9.775,
+        "observed_at": "2026-04-11T17:13:29+08:00"
+      },
+      "hhad": {
+        "status": "UNKNOWN",
+        "factor": 0.0,
+        "age_hours": null,
+        "observed_at": null
+      },
+      "ou": {
+        "status": "UNKNOWN",
+        "factor": 0.0,
+        "age_hours": null,
+        "observed_at": null
+      },
+      "ttg": {
+        "status": "UNKNOWN",
+        "factor": 0.0,
+        "age_hours": null,
+        "observed_at": null
+      },
+      "hafu": {
+        "status": "UNKNOWN",
+        "factor": 0.0,
+        "age_hours": null,
+        "observed_at": null
+      },
+      "crs": {
+        "status": "UNKNOWN",
+        "factor": 0.0,
+        "age_hours": null,
+        "observed_at": null
+      }
+    },
+    "used_adjustments": [],
+    "double_count_risk": false,
+    "market_anchor": "HAD",
+    "note": "market_anchor为NONE_OR_STALE时，不把陈旧/未知HAD当作新鲜市场锚。"
+  },
+  "recommendation_gate": {
+    "banker_allowed": false,
+    "confidence_pct": null,
+    "confidence_status": "UNFITTED",
+    "calibration_status": "UNFITTED",
+    "primary_edge_significant": false,
+    "market_dependency_pct": 100.0,
+    "hhad": {
+      "line": null,
+      "model_prob_pct": [],
+      "let_win_pct": null,
+      "let_draw_or_one_goal_pct": null,
+      "let_loss_pct": null
+    },
+    "one_goal_risk_pct": null,
+    "stale_pools": [],
+    "reasons": [
+      "UNFITTED_OR_NO_SIGNIFICANT_EDGE",
+      "CALIBRATED_PROBABILITY_UNAVAILABLE"
+    ],
+    "thresholds": {
+      "one_goal_draw_risk_pct": 18.0,
+      "min_samples_for_recalibration": 100,
+      "target_samples_for_threshold_review": 200
+    },
+    "note": "未达到批准的时间序列校准条件前，不生成数值confidence，不允许出胆。"
+  },
+  "injury": null,
+  "market_weights": null,
+  "market_weights_meta": null,
+  "forecast": {
+    "market_prob_pct": [
+      43.4,
+      27.0,
+      29.7
+    ],
+    "model_1x2_pct": [
+      43.3,
+      27.0,
+      29.7
+    ],
+    "final_1x2_pct": [
+      43.4,
+      27.0,
+      29.7
+    ],
+    "final_1x2_display": {
+      "主胜": "43.4%",
+      "平局": "27.0%",
+      "客胜": "29.7%"
+    },
+    "goal_rate": {
+      "home": 1.215,
+      "away": 0.945,
+      "kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "real_event_xg": null,
+      "note": "主字段是goal_rate。xg仅为兼容别名，不等于StatsBomb/Opta事件xG。"
+    },
+    "xg_compat_alias": [
+      1.215,
+      0.945
+    ],
+    "top_scores": [
+      {
+        "score": "1-0",
+        "prob_pct": 10.95
+      },
+      {
+        "score": "1-1",
+        "prob_pct": 10.83
+      },
+      {
+        "score": "0-0",
+        "prob_pct": 9.43
+      },
+      {
+        "score": "0-1",
+        "prob_pct": 9.03
+      },
+      {
+        "score": "2-1",
+        "prob_pct": 7.62
+      },
+      {
+        "score": "2-0",
+        "prob_pct": 7.46
+      },
+      {
+        "score": "1-2",
+        "prob_pct": 6.28
+      },
+      {
+        "score": "0-2",
+        "prob_pct": 5.07
+      }
+    ],
+    "ou_2_5": {
+      "line": 2.5,
+      "calibration": {
+        "applied": true,
+        "method": "platt",
+        "a": 1.03,
+        "b": -0.08,
+        "uncalibrated_over_pct": 39.2,
+        "shift_pp": -2.2,
+        "test_set_ece": "0.06470→0.04710",
+        "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+      },
+      "over_pct": 37.0,
+      "under_pct": 63.0,
+      "push_pct": 0.0
+    },
+    "ou_3_5": {
+      "line": 3.5,
+      "calibration": {
+        "applied": true,
+        "method": "platt",
+        "a": 1.05,
+        "b": -0.11,
+        "uncalibrated_over_pct": 19.6,
+        "shift_pp": -2.69,
+        "test_set_ece": "0.06196→0.03611",
+        "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+      },
+      "over_pct": 16.9,
+      "under_pct": 83.1,
+      "push_pct": 0.0
+    },
+    "btts": {
+      "yes_pct": 45.8,
+      "no_pct": 54.2,
+      "calibration": {
+        "applied": false,
+        "reason": "已在1348场上测试过Platt校准，测试集ECE 0.02130→0.02650 反而恶化24.4%。BTTS原始输出本已良好校准，故刻意不施加校准。",
+        "test_set_ece": 0.0213
+      }
+    },
+    "sporttery_hhad_3way": null,
+    "asian_handicap_home": null,
+    "crs_overlap_audit": null,
+    "advancement": null
+  },
+  "core_calibration": {
+    "one_x2_calibration": {
+      "applied": true,
+      "method": "draw_multiplier + temperature_scaling",
+      "league_key": "BIG5",
+      "league_basis": "football-data五大联赛46696场 时间外推test验证 无额外校准最优",
+      "draw_k": 1.0,
+      "temperature": 1.0,
+      "fitted_on": "football-data五大联赛46696场 时间外推test验证 无额外校准最优",
+      "uncalibrated_pct": [
+        43.4,
+        27.0,
+        29.7
+      ],
+      "shift_pp": {
+        "home": 0.0,
+        "draw": 0.0,
+        "away": 0.0
+      },
+      "test_set_effect": {
+        "brier": "0.18657→0.18644",
+        "log_loss": "0.94512→0.94413",
+        "ece": "0.04697→0.03456",
+        "argmax_hit_pct": "55.80→55.31"
+      },
+      "note": "校准改善的是概率数值可信度（ECE降26.4%），不是命中率。argmax命中率基本不变甚至略降——不要期待它让你多猜中比赛。五大联赛(顶级)已按2026-08-02 football-data 46696场验证切换参数；芬超/瑞超/巴西甲(含巴西杯代理)已按Pinnacle收盘分联赛拟合(2026-08-02)；其余联赛沿用体彩默认参数。"
+    },
+    "confidence": {
+      "stars": 2,
+      "label": "★★☆☆☆",
+      "pick": "主胜",
+      "pick_prob_pct": 43.4,
+      "band_observed_hit_pct": 47.4,
+      "band_sample_n": 114,
+      "basis": "按 final_1x2 最大概率落入的已拟合星级区间",
+      "note": "★=2：该档在405场测试集中实测命中 47.4%（n=114）。星级只是最大概率的分档标签，不是独立信息；概率百分比才是完整输出，星级不可替代概率。"
+    },
+    "derived_market_status": {
+      "note": "各衍生盘口的拟合状态互不相同，不可一概而论。",
+      "one_x_two": "FITTED — 1348场，平局修正+温度缩放，测试集ECE 0.04697→0.03456",
+      "ou_2_5": "FITTED — Platt校准，测试集ECE 0.06470→0.04710",
+      "ou_3_5": "FITTED — Platt校准，测试集ECE 0.06196→0.03611",
+      "btts": "VALIDATED_NO_CHANGE — 已验证原始输出ECE 0.0213良好，校准无效故不施加",
+      "rho_dixon_coles": "FITTED-CONFIRMED — 测试集验证 -0.08 优于拟合值 -0.07，维持默认",
+      "first_half_share": "FITTED-CONFIRMED — 1348场实测0.444/0.450，维持0.45",
+      "top_scores": "CALIBRATED — 双变量泊松λ3=0.05+T=1.30（46696场OOS：比分LL 2.914 vs DC 2.925、Top1 11.56% vs 10.92%）",
+      "asian_handicap": "UNFITTED — 由比分矩阵推导，未做独立盘口回测",
+      "advancement": "FITTED-SMALL — 点球主队概率0.38(n=24, CI 0.21-0.57)、加时倍率0.83(n=31, CI 0.63-1.02)；样本仍小，绝对概率谨慎解读",
+      "hafu_half_time": "PARTIALLY-CALIBRATED — 半场比分温度T=1.22（test ECE 0.00322→0.00067）；半场1X2聚合仍由矩阵推导，未做独立盘口回测"
+    },
+    "note": "这是底层核心引擎(zu-yu-dashi-3)对1X2/O-U2.5/O-U3.5等单项盘口的时间序列切分校准结果，已在测试集验证，见 derived_market_status 逐盘口状态。它不等同于融合层(fusion)推荐置信度——fusion的组合/edge路径仍是 UNFITTED_FUSION，recommendation_gate.banker_allowed 不因此自动放行。两者是不同层级的校准状态，禁止混用其中一个描述另一个。"
+  },
+  "market_dependency_pct": 100,
+  "sensitivity": {
+    "lambda_perturbation_pct": 10.0,
+    "one_x_two_status": "FIXED_TO_MARKET",
+    "home_range_pct": [
+      43.4,
+      43.4
+    ],
+    "draw_range_pct": [
+      27.0,
+      27.0
+    ],
+    "away_range_pct": [
+      29.7,
+      29.7
+    ],
+    "over_2_5_range_pct": [
+      28.6,
+      40.2
+    ],
+    "btts_yes_range_pct": [
+      37.0,
+      46.6
+    ],
+    "ah_effective_cover_range_pct": null,
+    "top1_score_candidates": [
+      "1-0"
+    ],
+    "note": "这不是统计置信区间。market_only的最终1X2固定为市场，但比分/O-U/BTTS/AH仍随λ波动。无无显式ah_line时不输出亚洲盘敏感性。"
+  },
+  "reliability_flags": [
+    "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+    "MULTI_MARKET_FIT: λ已由HAD联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+    "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+    "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+    "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+    "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+  ],
+  "assumptions": [
+    "2026 历史快照登记回测：t_minus_6h 官方HAD"
+  ],
+  "adjustment_ledger_audit": {
+    "entries": [],
+    "system_generated_entries": [],
+    "unledgered_adjustments": [],
+    "invalid_entries": [],
+    "status": "ok"
+  },
+  "fusion_decision": {
+    "status": "MARKET_BASELINE",
+    "probability_rank": [
+      {
+        "outcome": "H",
+        "prob_pct": 43.4
+      },
+      {
+        "outcome": "A",
+        "prob_pct": 29.7
+      },
+      {
+        "outcome": "D",
+        "prob_pct": 27.0
+      }
+    ],
+    "primary_outcome": "H",
+    "top_gap_pp": 13.7,
+    "result_sensitivity_widths_pp": {
+      "H": 0.0,
+      "D": 0.0,
+      "A": 0.0
+    },
+    "sensitivity_width_pp": 0.0,
+    "derivative_market_widths_pp": {
+      "ou_2_5": 11.6,
+      "btts_yes": 9.6,
+      "ah_effective_cover": 0.0
+    },
+    "derivative_market_max_width_pp": 11.6,
+    "result_uncertainty_level": "低",
+    "derivative_uncertainty_level": "中",
+    "uncertainty_level": "中",
+    "edge_pp_for_primary": null,
+    "edge_significant_vs_sensitivity": null,
+    "market_dependency_pct": 100.0,
+    "unfitted_fusion": true,
+    "action": "市场主方向 H，仅作基线",
+    "severe_flags": [],
+    "derivative_market_risks": [],
+    "note": "数据质量、结果概率、模型不确定性与决策价值彼此独立；衍生市场不继承1X2置信度。"
+  },
+  "core_output": {
+    "status": "ok",
+    "schema_version": "3.3",
+    "engine_version": "3.4.4",
+    "match": "塞维利亚 vs 马德里竞技",
+    "mode": "market_only",
+    "quality": {
+      "completeness_pct": 10.0,
+      "source_reliability_pct": 100.0,
+      "freshness_pct": 50.0,
+      "overall_pct": 45.0,
+      "note": "本分数衡量输入字段的完整度与来源等级，不代表预测准确度。填满字段但填错值，分数依然很高。"
+    },
+    "goal_total_input": {
+      "value": 2.55,
+      "source": "league_table:西甲",
+      "used_by_lambda_solver": false,
+      "note": "goal_total 未参与 λ 求解——λ 由赔率直接拟合/反解，填写或改动 goal_total 不会改变本次结果。"
+    },
+    "implied_goal_total": 2.16,
+    "lambda_solver": "multi_market_fit",
+    "multi_market_fit": {
+      "lambda_home": 1.215,
+      "lambda_away": 0.945,
+      "loss": 1.9401587949597852e-08,
+      "loss_parts": {
+        "had": 3.8803175899195704e-08
+      },
+      "sources": [
+        "HAD"
+      ],
+      "weights": {
+        "had": 0.5
+      },
+      "freshness": {
+        "had": {
+          "status": "AGING",
+          "factor": 0.5,
+          "age_hours": 9.775,
+          "observed_at": "2026-04-11T17:13:29+08:00"
+        },
+        "hhad": {
+          "status": "UNKNOWN",
+          "factor": 0.0,
+          "age_hours": null,
+          "observed_at": null
+        },
+        "ou": {
+          "status": "UNKNOWN",
+          "factor": 0.0,
+          "age_hours": null,
+          "observed_at": null
+        },
+        "ttg": {
+          "status": "UNKNOWN",
+          "factor": 0.0,
+          "age_hours": null,
+          "observed_at": null
+        },
+        "hafu": {
+          "status": "UNKNOWN",
+          "factor": 0.0,
+          "age_hours": null,
+          "observed_at": null
+        },
+        "crs": {
+          "status": "UNKNOWN",
+          "factor": 0.0,
+          "age_hours": null,
+          "observed_at": null
+        }
+      },
+      "method": "grid_coordinate_v2"
+    },
+    "market_dependency_pct": 100,
+    "market_prob_pct": [
+      43.4,
+      27.0,
+      29.7
+    ],
+    "bookmaker_margin_pct": 12.9,
+    "devig_method": "power",
+    "devig_available_methods": [
+      "proportional",
+      "additive",
+      "power",
+      "shin"
+    ],
+    "model_1x2": [
+      0.4333636491514048,
+      0.2697742331230279,
+      0.2968621177255673
+    ],
+    "final_1x2": [
+      0.4335194523169938,
+      0.26973090925189747,
+      0.2967496384311087
+    ],
+    "model_1x2_pct": [
+      43.3,
+      27.0,
+      29.7
+    ],
+    "final_1x2_pct": [
+      43.4,
+      27.0,
+      29.7
+    ],
+    "final_1x2_display": {
+      "主胜": "43.4%",
+      "平局": "27.0%",
+      "客胜": "29.7%"
+    },
+    "calibration": {
+      "applied": true,
+      "method": "draw_multiplier + temperature_scaling",
+      "league_key": "BIG5",
+      "league_basis": "football-data五大联赛46696场 时间外推test验证 无额外校准最优",
+      "draw_k": 1.0,
+      "temperature": 1.0,
+      "fitted_on": "football-data五大联赛46696场 时间外推test验证 无额外校准最优",
+      "uncalibrated_pct": [
+        43.4,
+        27.0,
+        29.7
+      ],
+      "shift_pp": {
+        "home": 0.0,
+        "draw": 0.0,
+        "away": 0.0
+      },
+      "test_set_effect": {
+        "brier": "0.18657→0.18644",
+        "log_loss": "0.94512→0.94413",
+        "ece": "0.04697→0.03456",
+        "argmax_hit_pct": "55.80→55.31"
+      },
+      "note": "校准改善的是概率数值可信度（ECE降26.4%），不是命中率。argmax命中率基本不变甚至略降——不要期待它让你多猜中比赛。五大联赛(顶级)已按2026-08-02 football-data 46696场验证切换参数；芬超/瑞超/巴西甲(含巴西杯代理)已按Pinnacle收盘分联赛拟合(2026-08-02)；其余联赛沿用体彩默认参数。"
+    },
+    "confidence": {
+      "stars": 2,
+      "label": "★★☆☆☆",
+      "pick": "主胜",
+      "pick_prob_pct": 43.4,
+      "band_observed_hit_pct": 47.4,
+      "band_sample_n": 114,
+      "basis": "按 final_1x2 最大概率落入的已拟合星级区间",
+      "note": "★=2：该档在405场测试集中实测命中 47.4%（n=114）。星级只是最大概率的分档标签，不是独立信息；概率百分比才是完整输出，星级不可替代概率。"
+    },
+    "edge_vs_market_pp": null,
+    "sensitivity": {
+      "lambda_perturbation_pct": 10.0,
+      "one_x_two_status": "FIXED_TO_MARKET",
+      "home_range_pct": [
+        43.4,
+        43.4
+      ],
+      "draw_range_pct": [
+        27.0,
+        27.0
+      ],
+      "away_range_pct": [
+        29.7,
+        29.7
+      ],
+      "over_2_5_range_pct": [
+        28.6,
+        40.2
+      ],
+      "btts_yes_range_pct": [
+        37.0,
+        46.6
+      ],
+      "ah_effective_cover_range_pct": null,
+      "top1_score_candidates": [
+        "1-0"
+      ],
+      "note": "这不是统计置信区间。market_only的最终1X2固定为市场，但比分/O-U/BTTS/AH仍随λ波动。无无显式ah_line时不输出亚洲盘敏感性。"
+    },
+    "xg": [
+      1.215,
+      0.945
+    ],
+    "lambda_audit": {
+      "lambda_home": 1.215,
+      "lambda_away": 0.945,
+      "lambda_total": 2.16,
+      "lambda_ratio_high_low": 1.286,
+      "home_clean_sheet_pct": 38.9,
+      "away_clean_sheet_pct": 29.7,
+      "thresholds": {
+        "lambda_high": 3.2,
+        "lambda_low": 0.45,
+        "lambda_ratio": 6.0,
+        "clean_sheet_warning_pct": 55.0
+      },
+      "flags": []
+    },
+    "xg_tags": [
+      "MULTI_MARKET_XG"
+    ],
+    "rho": -0.08,
+    "top_scores": [
+      {
+        "score": "1-0",
+        "prob_pct": 10.95
+      },
+      {
+        "score": "1-1",
+        "prob_pct": 10.83
+      },
+      {
+        "score": "0-0",
+        "prob_pct": 9.43
+      },
+      {
+        "score": "0-1",
+        "prob_pct": 9.03
+      },
+      {
+        "score": "2-1",
+        "prob_pct": 7.62
+      },
+      {
+        "score": "2-0",
+        "prob_pct": 7.46
+      },
+      {
+        "score": "1-2",
+        "prob_pct": 6.28
+      },
+      {
+        "score": "0-2",
+        "prob_pct": 5.07
+      }
+    ],
+    "score_matrix": {
+      "0-0": 0.10970064852088113,
+      "0-1": 0.10366711285223268,
+      "0-2": 0.04898271082267994,
+      "0-3": 0.015429553909144175,
+      "0-4": 0.003645232111035312,
+      "0-5": 0.000688948868985674,
+      "0-6": 0.00010850944686524363,
+      "0-7": 1.4648775326807889e-05,
+      "0-8": 1.7303865854791817e-06,
+      "0-9": 1.8169059147531405e-07,
+      "0-10": 1.716976089441718e-08,
+      "0-11": 1.4750385495658394e-09,
+      "0-12": 1.2521126779046017e-10,
+      "1-0": 0.13328628795287056,
+      "1-1": 0.13144057454150673,
+      "1-2": 0.06469734929216776,
+      "1-3": 0.02119604354074417,
+      "1-4": 0.005200434710365113,
+      "1-5": 0.0010193344813693595,
+      "1-6": 0.00016628642139055472,
+      "1-7": 2.322373436533377e-05,
+      "1-8": 2.834858467697601e-06,
+      "1-9": 3.0727339791646573e-07,
+      "1-10": 2.994578906048258e-08,
+      "1-11": 2.6506598824433537e-09,
+      "1-12": 2.3163090801014574e-10,
+      "2-0": 0.08097141993136889,
+      "2-1": 0.08318230623278712,
+      "2-2": 0.04258965405852959,
+      "2-3": 0.014494030183306278,
+      "2-4": 0.003689165175065411,
+      "2-5": 0.0007492565651910138,
+      "2-6": 0.00012650236302899596,
+      "2-7": 1.8265579161704132e-05,
+      "2-8": 2.3027698782596364e-06,
+      "2-9": 2.57540050926693e-07,
+      "2-10": 2.587390180215481e-08,
+      "2-11": 2.358920605096402e-09,
+      "2-12": 2.121462443007406e-10,
+      "3-0": 0.032793425072204396,
+      "3-1": 0.0350383576898016,
+      "3-2": 0.018635181664250936,
+      "3-3": 0.006579909791881202,
+      "3-4": 0.0017356790656232624,
+      "3-5": 0.0003649349951534508,
+      "3-6": 6.372106644659361e-05,
+      "3-7": 9.50593227764011e-06,
+      "3-8": 1.2370481200568883e-06,
+      "3-9": 1.4268321859630458e-07,
+      "3-10": 1.4771264411984248e-08,
+      "3-11": 1.3865945417666233e-09,
+      "3-12": 1.2829831176789753e-10,
+      "4-0": 0.009961002865682085,
+      "4-1": 0.01105281896167979,
+      "4-2": 0.006098415901638742,
+      "4-3": 0.002231587370087052,
+      "4-4": 0.000609461388581581,
+      "4-5": 0.00013254499309815147,
+      "4-6": 2.3916961372570947e-05,
+      "4-7": 3.683940259915603e-06,
+      "4-8": 4.945775199377813e-07,
+      "4-9": 5.8803129149338624e-08,
+      "4-10": 6.270311797594024e-09,
+      "4-11": 6.058188972114151e-10,
+      "4-12": 5.7653713955272394e-11,
+      "5-0": 0.0024205236963607472,
+      "5-1": 0.002785445036345011,
+      "5-2": 0.0015924432537150128,
+      "5-3": 0.0006032598899475411,
+      "5-4": 0.00017041499112619479,
+      "5-5": 3.830304720866664e-05,
+      "5-6": 7.137271544516255e-06,
+      "5-7": 1.1343670968852015e-06,
+      "5-8": 1.5702173994403688e-07,
+      "5-9": 1.923493558266711e-08,
+      "5-10": 2.1117170583087345e-09,
+      "5-11": 2.0991710999831409e-10,
+      "5-12": 2.0540139903196543e-11,
+      "6-0": 0.0004901560485130515,
+      "6-1": 0.000584223650662871,
+      "6-2": 0.0003456818008468318,
+      "6-3": 0.00013543048816200225,
+      "6-4": 3.953620145261729e-05,
+      "6-5": 9.176491985806617e-06,
+      "6-6": 1.7644895478367638e-06,
+      "6-7": 2.891865999902221e-07,
+      "6-8": 4.124996147937748e-08,
+      "6-9": 5.203588955023731e-09,
+      "6-10": 5.87913834163078e-10,
+      "6-11": 6.01058569272314e-11,
+      "6-12": 6.045006564771479e-12,
+      "7-0": 8.507708556333678e-05,
+      "7-1": 0.00010490564828300585,
+      "7-2": 6.417351008029205e-05,
+      "7-3": 2.5976019022739188e-05,
+      "7-4": 7.829715596147162e-06,
+      "7-5": 1.8751782621979865e-06,
+      "7-6": 3.7181134284457125e-07,
+      "7-7": 6.279802805427974e-08,
+      "7-8": 9.22543331385068e-09,
+      "7-9": 1.1978369506175302e-09,
+      "7-10": 1.3921353660847522e-10,
+      "7-11": 1.463204398210572e-11,
+      "7-12": 1.5120243206435567e-12,
+      "8-0": 1.2921082369931772e-05,
+      "8-1": 1.6464277117752363e-05,
+      "8-2": 1.0402012145213139e-05,
+      "8-3": 4.3461923270803375e-06,
+      "8-4": 1.3514881750569698e-06,
+      "8-5": 3.3372842104723887e-07,
+      "8-6": 6.818871183325666e-08,
+      "8-7": 1.18612714035223e-08,
+      "8-8": 1.7936003598803202e-09,
+      "8-9": 2.395804450866041e-10,
+      "8-10": 2.862953681377173e-11,
+      "8-11": 3.0923262835852776e-12,
+      "8-12": 3.2821544356159673e-13,
+      "9-0": 1.7443461199407896e-06,
+      "9-1": 2.294461201840635e-06,
+      "9-2": 1.4957398458135092e-06,
+      "9-3": 6.445249205181411e-07,
+      "9-4": 2.0659641656091507e-07,
+      "9-5": 5.256160448058267e-08,
+      "9-6": 1.1059522881085423e-08,
+      "9-7": 1.9800978163269376e-09,
+      "9-8": 3.080320008256338e-10,
+      "9-9": 4.2307806530471115e-11,
+      "9-10": 5.1959899425625395e-12,
+      "9-11": 5.765170305827443e-13,
+      "9-12": 6.282743481513837e-14,
+      "10-0": 2.1193805357280596e-07,
+      "10-1": 2.874987666233411e-07,
+      "10-2": 1.9320469727554458e-07,
+      "10-3": 8.578847707202167e-08,
+      "10-4": 2.8324089214741892e-08,
+      "10-5": 7.419217027195369e-09,
+      "10-6": 1.6065400524547926e-09,
+      "10-7": 2.9587949908915013e-10,
+      "10-8": 4.732637718194921e-11,
+      "10-9": 6.680558497580409e-12,
+      "10-10": 8.428518106737041e-13,
+      "10-11": 9.602676892861616e-14,
+      "10-12": 1.0740750623016857e-14,
+      "11-0": 2.3409521371905382e-08,
+      "11-1": 3.271890037509089e-08,
+      "11-2": 2.2647149592813977e-08,
+      "11-3": 1.0353930409662143e-08,
+      "11-4": 3.5184720226829533e-09,
+      "11-5": 9.48232104434497e-10,
+      "11-6": 2.1117336500839462e-10,
+      "11-7": 3.998369036509608e-11,
+      "11-8": 6.572320293684165e-12,
+      "11-9": 9.530179485143327e-13,
+      "11-10": 1.2346298862250648e-13,
+      "11-11": 1.4437737707450346e-14,
+      "11-12": 1.656864172573711e-15,
+      "12-0": 2.612647548673308e-09,
+      "12-1": 3.7591482538287734e-09,
+      "12-2": 2.677835054576334e-09,
+      "12-3": 1.259577653242732e-09,
+      "12-4": 4.4023728853908126e-10,
+      "12-5": 1.219883799670307e-10,
+      "12-6": 2.792334060913276e-11,
+      "12-7": 5.43231449030841e-12,
+      "12-8": 9.17150633360955e-13,
+      "12-9": 1.3654836898019918e-13,
+      "12-10": 1.815630010923252e-14,
+      "12-11": 2.1783876036779444e-15,
+      "12-12": 2.5639401443066235e-16
+    },
+    "ht_top_scores": [
+      {
+        "score": "0-0",
+        "prob_pct": 31.56
+      },
+      {
+        "score": "1-0",
+        "prob_pct": 19.66
+      },
+      {
+        "score": "0-1",
+        "prob_pct": 16.06
+      }
+    ],
+    "score_calibration": {
+      "ft_temperature": 1.3,
+      "ht_temperature": 1.22,
+      "status": "FITTED-CALIBRATED",
+      "basis": "football-data五大联赛46696场 时间切分(训练16343/测试7005) 双变量泊松λ3=0.05 + 温度T=1.30 按比分LogLoss网格选优",
+      "note": "衍生市场（比分/O-U/BTTS/HHAD/AH/晋级）使用双变量泊松矩阵（λ3=0.05, T=1.30）；1X2 路径维持 DC 矩阵与已拟合校准层。"
+    },
+    "hafu_model": null,
+    "ou_2_5": {
+      "line": 2.5,
+      "calibration": {
+        "applied": true,
+        "method": "platt",
+        "a": 1.03,
+        "b": -0.08,
+        "uncalibrated_over_pct": 39.2,
+        "shift_pp": -2.2,
+        "test_set_ece": "0.06470→0.04710",
+        "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+      },
+      "over_pct": 37.0,
+      "under_pct": 63.0,
+      "push_pct": 0.0
+    },
+    "ou_3_5": {
+      "line": 3.5,
+      "calibration": {
+        "applied": true,
+        "method": "platt",
+        "a": 1.05,
+        "b": -0.11,
+        "uncalibrated_over_pct": 19.6,
+        "shift_pp": -2.69,
+        "test_set_ece": "0.06196→0.03611",
+        "fitted_on": "体彩2026全联赛1348场，训练943/测试405"
+      },
+      "over_pct": 16.9,
+      "under_pct": 83.1,
+      "push_pct": 0.0
+    },
+    "ttg_score_consistency": null,
+    "score_market_consistency": {
+      "over_2_5_pct": 37.0,
+      "under_2_5_pct": 63.0,
+      "top_score": {
+        "score": "1-0",
+        "prob_pct": 13.33
+      },
+      "top_over_score": [
+        "2-1",
+        8.32
+      ],
+      "top_under_score": [
+        "1-0",
+        13.33
+      ],
+      "relation": "UNDER_ALIGNED_OR_DISTRIBUTED",
+      "note": "Top比分是单格众数；大小球是总进球分布聚合，方向不一致不代表计算矛盾。"
+    },
+    "btts": {
+      "yes_pct": 45.8,
+      "no_pct": 54.2,
+      "calibration": {
+        "applied": false,
+        "reason": "已在1348场上测试过Platt校准，测试集ECE 0.02130→0.02650 反而恶化24.4%。BTTS原始输出本已良好校准，故刻意不施加校准。",
+        "test_set_ece": 0.0213
+      }
+    },
+    "derived_market_status": {
+      "note": "各衍生盘口的拟合状态互不相同，不可一概而论。",
+      "one_x_two": "FITTED — 1348场，平局修正+温度缩放，测试集ECE 0.04697→0.03456",
+      "ou_2_5": "FITTED — Platt校准，测试集ECE 0.06470→0.04710",
+      "ou_3_5": "FITTED — Platt校准，测试集ECE 0.06196→0.03611",
+      "btts": "VALIDATED_NO_CHANGE — 已验证原始输出ECE 0.0213良好，校准无效故不施加",
+      "rho_dixon_coles": "FITTED-CONFIRMED — 测试集验证 -0.08 优于拟合值 -0.07，维持默认",
+      "first_half_share": "FITTED-CONFIRMED — 1348场实测0.444/0.450，维持0.45",
+      "top_scores": "CALIBRATED — 双变量泊松λ3=0.05+T=1.30（46696场OOS：比分LL 2.914 vs DC 2.925、Top1 11.56% vs 10.92%）",
+      "asian_handicap": "UNFITTED — 由比分矩阵推导，未做独立盘口回测",
+      "advancement": "FITTED-SMALL — 点球主队概率0.38(n=24, CI 0.21-0.57)、加时倍率0.83(n=31, CI 0.63-1.02)；样本仍小，绝对概率谨慎解读",
+      "hafu_half_time": "PARTIALLY-CALIBRATED — 半场比分温度T=1.22（test ECE 0.00322→0.00067）；半场1X2聚合仍由矩阵推导，未做独立盘口回测"
+    },
+    "asian_handicap_home": null,
+    "sporttery_hhad_3way": null,
+    "advancement": null,
+    "reliability_flags": [
+      "HIGH_MARKET_DEPENDENCY: 市场依赖度 100%，本次输出主要在复述盘口。",
+      "MULTI_MARKET_FIT: λ已由HAD联合拟合；仍需用独立历史样本验证比分与衍生市场校准。",
+      "DEVIG_METHOD: 使用power去水；不同方法须按时间切分回测，不能默认视为更准。",
+      "PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。未拟合项的绝对概率仅可用于相对比较。",
+      "DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——1348场实测市场把平局列为最大概率仅 6/1348(0.4%)，实际平局率却有 27.3%。这是三分类概率结构的固有性质，不是模型缺陷。因此「按最大概率打单」会系统性漏掉全部平局；要覆盖平局必须用双选(如主胜/平)或让球盘，不能靠调高平局概率解决。",
+      "UNFITTED_FUSION: 融合1.2新组合路径尚未完成独立大样本回测，不得声称优于市场或旧Skill。"
+    ],
+    "assumptions": [
+      "2026 历史快照登记回测：t_minus_6h 官方HAD"
+    ],
+    "disclaimer": "概率模型输出，非投注建议。"
+  },
+  "disclaimer": "概率模型输出，非投注建议。"
+}

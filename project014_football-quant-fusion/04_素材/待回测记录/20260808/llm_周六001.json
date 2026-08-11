@@ -1,0 +1,69 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM证据驱动（3模型：zhipu/qwen/deepseek）",
+  "match_num": "周六001",
+  "match_id": "sporttery-2040750",
+  "match": "大阪樱花 vs 冈山绿雉",
+  "competition": "日职",
+  "kickoff": "2026-08-08T18:00:00+08:00",
+  "direction": {
+    "pick": "单选 主胜（H）",
+    "single_preference": "主胜（H）",
+    "strength_pct": 100,
+    "votes": {
+      "主胜": 3.0
+    },
+    "caution": false,
+    "note": "证据以体彩官方盘口+身份核验为主；伤停/近况深搜本轮缺口。"
+  },
+  "score_picks": [
+    "2-1"
+  ],
+  "models": [
+    {
+      "model": "qwen-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "让球盘口主胜赔率4.05，客胜1.68，反映市场对客队让一球有强烈信心，但主胜方向仍被看好【赔率异动：让球盘口主胜4.0"
+    },
+    {
+      "model": "deepseek-chat",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【赔率异动: 主胜1.9/平3.28/客3.35】市场倾向主队，且主队大阪樱花坐镇主场【主客: 大阪樱花主场】；让球-1"
+    },
+    {
+      "model": "glm-4-flash",
+      "direction": "主胜",
+      "alt": null,
+      "score": "2-1",
+      "reason": "【战意/动机: 日职联赛属性】大阪樱花主场作战，战意强烈。"
+    }
+  ],
+  "signals": [
+    "体彩HAD=[1.9, 3.28, 3.35]",
+    "HHAD={'line': -1.0, 'odds': [4.05, 3.5, 1.68]}",
+    "LLM强度=100%"
+  ],
+  "evidence": [
+    {
+      "fact": "体彩官方胜平负 [1.9, 3.28, 3.35]；更新 2026-08-08 17:52:13",
+      "source": "https://webapi.sporttery.cn/gateway/uniform/football/getFixedBonusV1.qry?clientCode=3001&matchId=2040750",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "odds_official",
+      "basis": "sales-day collect 2026-08-08"
+    },
+    {
+      "fact": "身份核验 主=大阪樱花 客=冈山绿雉",
+      "source": "sporttery team_ids",
+      "collected_at": "2026-08-08T20:04+0800",
+      "mapped": "identity",
+      "basis": "raw.json"
+    }
+  ],
+  "comparison_note": "量化 final=[46.1, 28.9, 24.9] market=[48.4, 26.1, 25.5]；LLM 单选 主胜（H） 强度100%",
+  "pre_registered_at": "2026-08-08T20:04+0800",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

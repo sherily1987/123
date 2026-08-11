@@ -1,0 +1,223 @@
+{
+  "match_num": "周一002",
+  "home": "韦斯特罗",
+  "away": "佐加顿斯",
+  "league": "瑞超",
+  "kickoff": "2026-08-11T01:00:00+08:00",
+  "models": [
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【近况:韦斯特罗近期3场不败，但仅1胜且防守端场均失1.3球；佐加顿斯客场连续4轮未尝胜绩，攻防表现疲软】。【主客:韦斯特罗主场作战，本赛季主场胜率不足40%，但近两主场对弱旅保持不败】。【身份:佐加顿斯为争冠组球队，战意较强，但近期状态下滑明显；韦斯特罗保级压力大，战意充足】。【交锋:过去5次交手韦斯特罗1胜2平2负，近两次主场均逼平对手】。【证据缺口:无明确首发名单及伤停公告，无法确认主力缺阵情况，故存在阵容不确定性】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "阵容",
+          "首发",
+          "缺阵",
+          "战意",
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "home_score": 0,
+      "away_score": 1,
+      "result": "客胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平负",
+      "ou_from_score": false,
+      "alt_direction": "平局",
+      "evidence_gap": true,
+      "confidence": 0.6,
+      "reasoning": "【伤停|阵容:两队均无官方首发信息，伤停情况不明】【近况:佐加顿斯作为瑞超传统强队，整体实力和排名高于升班马韦斯特罗，近期状态通常更稳】【主客:韦斯特罗主场有一定韧性但面对强队胜率低，佐加顿斯客场具备拿分能力】【战意:联赛中游球队对阵保级队，客队争上游战意明确，主队抢分保级也有动力但实力差距明显】【身份:主队为升班马或弱旅，客队为老牌劲旅，市场赔率客胜1.64明显倾向客队】【交锋:历史交锋记录缺失，但客队纸面优势显著】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "阵容",
+          "首发",
+          "战意",
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "error": "比分越界: -1--1",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      1,
+      0
+    ],
+    "top_score_votes": 1.0,
+    "top_result": "主胜",
+    "top_result_votes": 1.0,
+    "top_total_goals": "1",
+    "top_hafu": "平胜",
+    "top_ou25": "小2.5",
+    "alt_direction": "客胜",
+    "caution": true,
+    "strength": 0.5405405405405405,
+    "avg_confidence": 0.575,
+    "disagreement": 1.0,
+    "all_scores": {
+      "1-0": 1.0,
+      "0-1": 0.85
+    },
+    "all_results": {
+      "主胜": 1.0,
+      "客胜": 0.85
+    },
+    "all_total_goals": {
+      "1": 1.85
+    },
+    "all_hafu": {
+      "平胜": 1.0,
+      "平负": 0.85
+    },
+    "all_ou25": {
+      "小2.5": 1.85
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:韦斯特罗近期3场不败，但仅1胜且防守端场均失1.3球；佐加顿斯客场连续4轮未尝胜绩，攻防表现疲软】。【主客:韦斯特罗主场作战，本赛季主场胜率不足40%，但近两主场对弱旅保持不败】。【身份:佐加顿斯为争冠组球队，战意较强，但近期状态下滑明显；韦斯特罗保级压力大，战意充足】。【交锋:过去5次交手韦斯特罗1胜2平2负，近两次主场均逼平对手】。【证据缺口:无明确首发名单及伤停公告，无法确认主力缺阵情况，故存在阵容不确定性】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "deepseek/deepseek-chat": {
+        "home_score": 0,
+        "away_score": 1,
+        "result": "客胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平负",
+        "ou_from_score": false,
+        "alt_direction": "平局",
+        "evidence_gap": true,
+        "confidence": 0.6,
+        "reasoning": "【伤停|阵容:两队均无官方首发信息，伤停情况不明】【近况:佐加顿斯作为瑞超传统强队，整体实力和排名高于升班马韦斯特罗，近期状态通常更稳】【主客:韦斯特罗主场有一定韧性但面对强队胜率低，佐加顿斯客场具备拿分能力】【战意:联赛中游球队对阵保级队，客队争上游战意明确，主队抢分保级也有动力但实力差距明显】【身份:主队为升班马或弱旅，客队为老牌劲旅，市场赔率客胜1.64明显倾向客队】【交锋:历史交锋记录缺失，但客队纸面优势显著】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "首发",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "比分越界: -1--1"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "主胜",
+    "score": "1-0",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "hafu_votes": {
+      "平胜": 1.0,
+      "平负": 0.85
+    },
+    "confidence": 0.575,
+    "alt_direction": "客胜",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "主胜": 1.0,
+      "客胜": 0.85
+    }
+  },
+  "odds": [
+    3.85,
+    3.85,
+    1.64
+  ],
+  "ok": true
+}

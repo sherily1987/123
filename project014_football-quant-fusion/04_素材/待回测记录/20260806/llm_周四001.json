@@ -1,0 +1,51 @@
+{
+  "match_num": "周四001",
+  "match_id": "sporttery-2040718",
+  "match": "维多利亚 vs 巴竞技",
+  "competition": "巴西杯 1/8决赛次回合",
+  "kickoff": "2026-08-07T07:00:00+08:00",
+  "direction": {
+    "pick": "双选 平局/客胜（D/A）",
+    "single_preference": "客胜（A）",
+    "note": "首回合已落后0-2，主队近4场零进球且伤兵满营，翻盘难度大；巴竞技近期对主队两跞全胜零封，客场稳守反击有优势；但主队主场战绩好（70%胜率）且必须进攻，双选覆盖平局"
+  },
+  "score_picks": [
+    "0-1",
+    "1-1",
+    "0-2"
+  ],
+  "signals": [
+    "首回合巴竞技主场2-0完胜，晋级主动权在客队",
+    "维多利亚近四场正式赛事1平3负且全程零进球，攻防两端低迷",
+    "主队近期伤兵满营（主场龙伤兵情况严重）",
+    "本赛季两次交手巴竞技全胜且零封；维多利亚近三次主场对巴竞技均一球小负"
+  ],
+  "evidence": [
+    {
+      "fact": "首回合巴竞技主场2-0完胜维多利亚；本季两次交手全胜零封（巴甲客场3-1、巴西杯主场2-0）",
+      "source": "https://www.163.com/dy/article/L3M0S7EN0529C4FJ.html",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "h2h_background",
+      "basis": "163前瞻 2026-08-05，与sohu/七米交叉一致"
+    },
+    {
+      "fact": "维多利亚近四场正式赛1平3负且零进球；但主场战绩卓越（巴甲主场10战7胜1平2负，主场胜率70%排巴甲第4）",
+      "source": "http://news.7m.com.cn/news/20260806/734163.shtml",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "form_context/home_adv",
+      "basis": "7m前瞻 2026-08-06，与dszuqiu交叉一致"
+    },
+    {
+      "fact": "主队近期伤兵满营，首回合被零封，次回合需净胜2球才能翻盘",
+      "source": "https://www.dszuqiu.com/articles/lottery/2097467.html",
+      "collected_at": "2026-08-06T22:30+08:00",
+      "mapped": "attack_absence_home/cup_context",
+      "basis": "大神足球前瞻 2026-08-05"
+    }
+  ],
+  "comparison_note": "量化：主37.7/平25.9/客36.4，Top 1-1/1-0/0-1。LLM与量化分歧：量化微主胜、LLM偏客不败（首回合优势+客队状态）——赛后重点对比",
+  "pre_registered_at": "2026-08-06T22:30+08:00",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。",
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）"
+}

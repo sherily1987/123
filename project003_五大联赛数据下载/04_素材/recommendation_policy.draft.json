@@ -1,0 +1,97 @@
+{
+  "calibration_status": "VALID",
+  "min_samples_for_recalibration": 100,
+  "target_samples_for_threshold_review": 200,
+  "one_goal_draw_risk_pct": 18.0,
+  "stale_market_factor": {
+    "fresh_hours": 6,
+    "half_hours": 12,
+    "max_hours": 24
+  },
+  "calibration_params": {
+    "primary_probability": {
+      "method": "band_table_plus_edge",
+      "bands": [
+        {
+          "lo": 0.0,
+          "hi": 0.4,
+          "n_train": 539,
+          "prob": 0.4174
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.5,
+          "n_train": 103,
+          "prob": 0.4757
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.6,
+          "n_train": 98,
+          "prob": 0.6122
+        },
+        {
+          "lo": 0.6,
+          "hi": 1.01,
+          "n_train": 123,
+          "prob": 0.561
+        }
+      ],
+      "edge_min_pp": 0,
+      "fitted_on": "全快照池(1439) attributed 2026-08-03 audit pool, 60/20/20 chronological",
+      "pool_notes": "bands 取全快照池（样本更稳，n_train 539/103/98/123）；closing 池 test ECE raw 0.0804->cal 0.0715，全池 raw 0.0602->cal 0.0438",
+      "validated": {
+        "all": {
+          "model_1x2": {
+            "n": 288,
+            "brier": 0.626637,
+            "logloss": 1.040061,
+            "ece": 0.007469
+          },
+          "market_1x2": {
+            "n": 288,
+            "brier": 0.585642,
+            "logloss": 0.991627,
+            "ece": 0.029872
+          },
+          "band_ece": {
+            "raw": 0.060167,
+            "market": 0.122812,
+            "calibrated": 0.04384
+          },
+          "edge_strategy": {
+            "n": 118,
+            "hit_pct": 40.68,
+            "market_implied_pct": 39.5,
+            "edge_realized_pp": 1.18
+          }
+        },
+        "closing": {
+          "model_1x2": {
+            "n": 74,
+            "brier": 0.587173,
+            "logloss": 0.985792,
+            "ece": 0.012937
+          },
+          "market_1x2": {
+            "n": 74,
+            "brier": 0.585072,
+            "logloss": 0.990327,
+            "ece": 0.030438
+          },
+          "band_ece": {
+            "raw": 0.080432,
+            "market": 0.080844,
+            "calibrated": 0.071469
+          },
+          "edge_strategy": {
+            "n": 35,
+            "hit_pct": 54.29,
+            "market_implied_pct": 48.12,
+            "edge_realized_pp": 6.17
+          }
+        }
+      }
+    }
+  }
+}

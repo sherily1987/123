@@ -1,0 +1,73 @@
+{
+  "schema": "big5-fusion-backtest-1.0",
+  "snapshot": "t_minus_24h",
+  "note": "market_only 下 final_1x2 固定为去水市场，模型与市场基线一致属预期",
+  "leagues": {
+    "英超": {
+      "n": 43,
+      "model": {
+        "n": 43,
+        "brier": 0.668924,
+        "logloss": 1.101668,
+        "ece": 0.033217,
+        "argmax_hit_pct": 39.53
+      },
+      "market": null
+    },
+    "西甲": {
+      "n": 90,
+      "model": {
+        "n": 90,
+        "brier": 0.654917,
+        "logloss": 1.079045,
+        "ece": 0.00537,
+        "argmax_hit_pct": 52.22
+      },
+      "market": null
+    },
+    "意甲": {
+      "n": 104,
+      "model": {
+        "n": 104,
+        "brier": 0.658588,
+        "logloss": 1.084974,
+        "ece": 0.004744,
+        "argmax_hit_pct": 40.38
+      },
+      "market": null
+    },
+    "德甲": {
+      "n": 41,
+      "model": {
+        "n": 41,
+        "brier": 0.672493,
+        "logloss": 1.107433,
+        "ece": 0.043049,
+        "argmax_hit_pct": 34.15
+      },
+      "market": null
+    },
+    "法甲": {
+      "n": 54,
+      "model": {
+        "n": 54,
+        "brier": 0.662983,
+        "logloss": 1.092073,
+        "ece": 0.016852,
+        "argmax_hit_pct": 42.59
+      },
+      "market": null
+    }
+  },
+  "overall": {
+    "model": {
+      "n": 332,
+      "brier": 0.661363,
+      "logloss": 1.089457,
+      "ece": 0.01239,
+      "argmax_hit_pct": 43.07
+    },
+    "market": null,
+    "n": 332
+  }
+}

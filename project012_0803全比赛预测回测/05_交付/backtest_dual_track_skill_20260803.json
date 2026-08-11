@@ -1,0 +1,172 @@
+{
+  "schema": "dual-track-backtest-1.0",
+  "date": "20260803",
+  "records_dir": "H:\\claude AI自媒体\\project012_0803全比赛预测回测\\04_素材\\待回测记录\\20260803",
+  "generated_at": "2026-08-04T21:48:35.489197+08:00",
+  "summary": {
+    "settled": 3,
+    "quant_1x2": {
+      "n": 3,
+      "hit": 2,
+      "hit_rate_pct": 66.67
+    },
+    "llm_double": {
+      "n": 3,
+      "hit": 2,
+      "hit_rate_pct": 66.67
+    },
+    "llm_single": {
+      "n": 3,
+      "hit": 0,
+      "hit_rate_pct": 0.0
+    },
+    "score": {
+      "top1": {
+        "n": 3,
+        "hit": 0,
+        "hit_rate_pct": 0.0,
+        "quant": 0.0,
+        "llm": 0.0
+      },
+      "top3": {
+        "n": 3,
+        "hit": 1,
+        "hit_rate_pct": 33.33,
+        "quant": 33.33,
+        "llm": 33.33
+      }
+    }
+  },
+  "divergence": [
+    {
+      "match_id": "sporttery-2040699",
+      "match": "布兰 vs 罗森博格",
+      "quant": "H",
+      "llm_single": "A",
+      "actual": "H",
+      "winner": "quant"
+    },
+    {
+      "match_id": "sporttery-2040700",
+      "match": "巴西国际 vs 科林蒂安",
+      "quant": "H",
+      "llm_single": "D",
+      "actual": "H",
+      "winner": "quant"
+    }
+  ],
+  "detail": [
+    {
+      "match_id": "sporttery-2040699",
+      "actual": "3-2",
+      "actual_1x2": "H",
+      "status": "settled",
+      "quant": {
+        "match_num": "周日012",
+        "match": "布兰 vs 罗森博格",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-1",
+          "2-1",
+          "1-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      },
+      "llm": {
+        "match_num": "周日012",
+        "pick": "双选 客胜/平局（A/D）",
+        "double": [
+          "A",
+          "D"
+        ],
+        "single": "A",
+        "double_hit": false,
+        "single_hit": false,
+        "score_picks": [
+          "1-2",
+          "1-3",
+          "2-2"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040700",
+      "actual": "2-0",
+      "actual_1x2": "H",
+      "status": "settled",
+      "quant": {
+        "match_num": "周日014",
+        "match": "巴西国际 vs 科林蒂安",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-0",
+          "0-0",
+          "1-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      },
+      "llm": {
+        "match_num": "周日014",
+        "pick": "双选 主胜/平局（H/D）",
+        "double": [
+          "D",
+          "H"
+        ],
+        "single": "D",
+        "double_hit": true,
+        "single_hit": false,
+        "score_picks": [
+          "1-0",
+          "1-1",
+          "0-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040706",
+      "actual": "1-1",
+      "actual_1x2": "D",
+      "status": "settled",
+      "quant": {
+        "match_num": "周日013",
+        "match": "米拉索尔 vs 格雷米奥",
+        "pred_1x2": "H",
+        "hit": false,
+        "top_scores": [
+          "1-0",
+          "1-1",
+          "0-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": true
+      },
+      "llm": {
+        "match_num": "周日013",
+        "pick": "双选 主胜/平局（H/D）",
+        "double": [
+          "D",
+          "H"
+        ],
+        "single": "H",
+        "double_hit": true,
+        "single_hit": false,
+        "score_picks": [
+          "1-0",
+          "2-1",
+          "1-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": true
+      }
+    }
+  ],
+  "caveat": "n=3 单日样本，不构成两轨优劣结论；按 SKILL 纪律累计 >=100 场评估命中率、>=200 场做结论。"
+}

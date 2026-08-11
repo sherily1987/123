@@ -1,0 +1,124 @@
+{
+  "schema_version": "model-cohort-lock-1.0",
+  "created_at": "2026-08-08T23:20:00+08:00",
+  "project": "F:\\HM足球比赛预测",
+  "status": "COLLECTING",
+  "current_identity": {
+    "skill_version": "1.4.0",
+    "fusion_version": "1.4.0",
+    "core_version": "3.4.4",
+    "fusion_schema_version": "1.3.0",
+    "prediction_code_sha256": "9d029b348a7cded5be0e90a05b958eb79e8462d63ef0afa90c9a1511f31fc49b",
+    "config_sha256": "9661de42aee490c0abfacef32a4ce5afde1f5750370138e243222524480f8b61",
+    "engine_bundle_sha256": "4fc6b10d779d275b78864b5fad94097f053dc782ecc8d1bdeecb0c18a8bf2f8e"
+  },
+  "cohorts": {
+    "control": {
+      "snapshot": "prematch",
+      "mode": "market_only",
+      "description": "当前生产控制组；只使用体彩市场和既有引擎，不启用未经OOS校准的API独立λ。"
+    },
+    "experiment": {
+      "snapshot": "api-hybrid",
+      "mode": "hybrid",
+      "description": "APIfootball动态λ实验组；与control使用同一场比赛、同一开球前快照，不进入生产权重。"
+    }
+  },
+  "evaluation_rules": {
+    "evaluation_unit": "match",
+    "snapshot_policy": "latest_before_kickoff",
+    "result_policy": "official_score_90_only_for_1x2",
+    "no_future_leakage": true,
+    "market_comparison": "paired_same_match",
+    "old_legacy_unknown_records": "exclude_from_current_cohort"
+  },
+  "thresholds": {
+    "recalibration_min_matches": 100,
+    "production_threshold_review_matches": 200,
+    "target_sample": 200
+  },
+  "progress": {
+    "control_settled": 0,
+    "experiment_settled": 0,
+    "paired_settled": 0,
+    "last_evaluation": "2026-08-08",
+    "note": "从本清单创建后生成的新预测开始累计；旧记录不迁移。"
+  },
+  "required_metrics": [
+    "1x2_accuracy",
+    "1x2_brier",
+    "1x2_log_loss",
+    "calibration_ece",
+    "score_top1",
+    "score_top3",
+    "score_log_loss",
+    "market_delta_brier",
+    "market_delta_log_loss",
+    "coverage",
+    "missing_rate"
+  ],
+  "online_adaptation_policy": {
+    "goal": "下一场快速吸收新状态，但不会因单场结果改变长期判断",
+    "fast_layer": {
+      "updates_after": "official_finished_score_90_and_valid_prematch_features",
+      "features": [
+        "recent_goals_for",
+        "recent_goals_against",
+        "recent_shots",
+        "recent_shots_allowed",
+        "rest_days",
+        "confirmed_lineup_and_missing_players"
+      ],
+      "method": "time_decay_or_bayesian_shrinkage",
+      "state_as_of_required": true,
+      "single_match_change_cap_required": true
+    },
+    "slow_layer": {
+      "contains": [
+        "long_term_attack_strength",
+        "long_term_defence_strength",
+        "home_advantage",
+        "dixon_coles_rho",
+        "probability_calibration",
+        "market_weights"
+      ],
+      "update": "only_after_walk_forward_oos_review",
+      "minimum_recalibration_matches": 100
+    },
+    "audit": {
+      "required_fields": [
+        "state_as_of",
+        "collected_at",
+        "source",
+        "state_version",
+        "update_reason",
+        "no_future_leakage"
+      ]
+    },
+    "fallback": {
+      "invalid_or_extreme_update": "keep_previous_state",
+      "insufficient_history": "long_term_prior",
+      "market_anchor_unusable": "block_or_safe_baseline",
+      "never_silently_switch_mode": true
+    },
+    "evaluation": {
+      "control": "market_only",
+      "experiment": "fast_adaptation_hybrid",
+      "same_match_pairing_required": true,
+      "metrics": [
+        "brier",
+        "log_loss",
+        "ece",
+        "score_top3",
+        "coverage",
+        "market_delta"
+      ]
+    }
+  },
+  "change_policy": {
+    "code_or_config_change": "create_new_cohort_identity",
+    "do_not_merge_different_hashes": true,
+    "do_not_recalibrate_before_minimum_sample": true,
+    "do_not_change_production_weights_before_oos_review": true
+  }
+}

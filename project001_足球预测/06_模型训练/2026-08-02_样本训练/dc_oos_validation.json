@@ -1,0 +1,104 @@
+{
+  "n": 1680,
+  "skip": 72,
+  "model": {
+    "n": 1680,
+    "brier_mean": 0.599335,
+    "log_loss": 1.004105,
+    "accuracy_pct": 50.71
+  },
+  "market": {
+    "n": 1680,
+    "brier_mean": 0.583348,
+    "log_loss": 0.979914,
+    "accuracy_pct": 53.1
+  },
+  "frequency_baseline": {
+    "n": 1680,
+    "brier_mean": 0.647754,
+    "log_loss": 1.071047,
+    "probs": [
+      0.4572,
+      0.2589,
+      0.2838
+    ]
+  },
+  "by_league": {
+    "英超": {
+      "n": 380,
+      "model": {
+        "n": 380,
+        "brier_mean": 0.634618,
+        "log_loss": 1.052928,
+        "accuracy_pct": 46.32
+      },
+      "market": {
+        "n": 380,
+        "brier_mean": 0.610299,
+        "log_loss": 1.015829,
+        "accuracy_pct": 49.47
+      }
+    },
+    "法甲": {
+      "n": 272,
+      "model": {
+        "n": 272,
+        "brier_mean": 0.586456,
+        "log_loss": 0.983797,
+        "accuracy_pct": 53.31
+      },
+      "market": {
+        "n": 272,
+        "brier_mean": 0.573585,
+        "log_loss": 0.963868,
+        "accuracy_pct": 55.15
+      }
+    },
+    "西甲": {
+      "n": 380,
+      "model": {
+        "n": 380,
+        "brier_mean": 0.587028,
+        "log_loss": 0.988205,
+        "accuracy_pct": 50.79
+      },
+      "market": {
+        "n": 380,
+        "brier_mean": 0.571431,
+        "log_loss": 0.964095,
+        "accuracy_pct": 54.74
+      }
+    },
+    "德甲": {
+      "n": 306,
+      "model": {
+        "n": 306,
+        "brier_mean": 0.577002,
+        "log_loss": 0.974817,
+        "accuracy_pct": 53.27
+      },
+      "market": {
+        "n": 306,
+        "brier_mean": 0.562769,
+        "log_loss": 0.953033,
+        "accuracy_pct": 54.25
+      }
+    },
+    "意甲": {
+      "n": 342,
+      "model": {
+        "n": 342,
+        "brier_mean": 0.604029,
+        "log_loss": 1.009881,
+        "accuracy_pct": 51.17
+      },
+      "market": {
+        "n": 342,
+        "brier_mean": 0.59282,
+        "log_loss": 0.9944,
+        "accuracy_pct": 52.63
+      }
+    }
+  },
+  "generated_at": "2026-08-02T20:30:55+08:00"
+}

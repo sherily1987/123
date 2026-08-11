@@ -1,0 +1,64 @@
+{
+  "schema_version": "goals-only-experiment-manifest-1.0",
+  "experiment_id": "apifootball-goals-only-experiment",
+  "created_at": "2026-08-09T00:35:00+08:00",
+  "status": "PLANNED",
+  "data_source": {
+    "provider": "apifootball.com",
+    "endpoint": "get_events",
+    "field_scope": ["match_id", "league_id", "kickoff", "90min_score", "match_status", "team_ids"],
+    "xg_used": false,
+    "statistics_used": false,
+    "odds_used_in_independent_model": false
+  },
+  "scope": {
+    "leagues": [
+      {"league_id": 244, "name": "Eredivisie", "country": "Netherlands", "target_matches": 100},
+      {"league_id": 266, "name": "Primeira Liga", "country": "Portugal", "target_matches": 100},
+      {"league_id": 322, "name": "Super Lig", "country": "Turkey", "target_matches": 100},
+      {"league_id": 279, "name": "Scottish Premiership", "country": "Scotland", "target_matches": 100},
+      {"league_id": 308, "name": "Swiss Super League", "country": "Switzerland", "target_matches": 100},
+      {"league_id": 253, "name": "Eliteserien", "country": "Norway", "target_matches": 100}
+    ],
+    "target_total_matches": 600,
+    "current_registered_matches": 0,
+    "sample_selection": "按开球时间排序，每联赛前70%用于拟合，后30%用于时间顺序样本外验证",
+    "match_eligibility": [
+      "match_status=Finished",
+      "只使用官方90分钟比分",
+      "排除After ET、After Pen.、Postponed、Cancelled、Awarded",
+      "主客队ID和比赛ID可匹配",
+      "训练特征严格满足as_of < kickoff"
+    ]
+  },
+  "model": {
+    "version": "apifootball-goals-only-experiment",
+    "variant": "goals_only_dynamic_dixon_coles",
+    "purpose": ["历史进球动态攻防强度", "赛果概率校准"],
+    "control_mode": "MARKET_BASELINE",
+    "experiment_mode": "goals_only",
+    "production_weight_change_allowed": false,
+    "not_an_xg_experiment": true
+  },
+  "evaluation": {
+    "comparison_groups": ["market_baseline", "goals_only"],
+    "metrics": ["1X2_accuracy", "Brier", "Log_Loss", "ECE", "score_top1", "score_top3"],
+    "promotion_requires": [
+      "每联赛至少100场普通90分钟Finished比赛",
+      "时间顺序样本外验证",
+      "goals_only不劣于market_baseline",
+      "按联赛和时间段分层检查",
+      "paired差值和bootstrap置信区间",
+      "无未来信息泄漏",
+      "新权重生成新的完整模型身份哈希"
+    ],
+    "promotion_status": "NOT_ELIGIBLE"
+  },
+  "audit": {
+    "source_metadata_required": true,
+    "state_as_of_required": true,
+    "no_future_leakage_required": true,
+    "secrets_saved": false,
+    "xg_claim_allowed": false
+  }
+}

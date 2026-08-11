@@ -1,0 +1,50 @@
+{
+  "schema": "football-skill-routing-policy-1.0",
+  "production": {
+    "quant": "football-quant-fusion-prediction",
+    "llm_ops": "llm-football-prediction-ops",
+    "llm_models": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen3.8-max",
+      "deepseek/deepseek-chat",
+      "moonshot/kimi-k2.6"
+    ],
+    "evidence": "football-evidence-collection",
+    "evidence_reasoning": "evidence-driven-llm-prediction",
+    "data_validation": "football-data-source-validation",
+    "settlement_source": "中国体彩网移动端官方90分钟赛果"
+  },
+  "experiment": {
+    "quant_routes": [
+      "understat-xg-experiment",
+      "apifootball-goals-only-experiment"
+    ],
+    "overseas_llm": "independent_process_only"
+  },
+  "legacy_only": [
+    "football-llm-ensemble-prediction",
+    "football-match-evidence",
+    "multi-llm-ensemble",
+    "multi-llm-ensembles",
+    "multi-llm-voting",
+    "llm-ensemble-prediction"
+  ],
+  "proxy_policy": {
+    "domestic_llm": "unset_all_proxy",
+    "overseas_llm": "dedicated_process_proxy_only",
+    "browser_cli": "unset_all_proxy_before_agent_browser"
+  },
+  "contracts": {
+    "quant_production_mode": "MARKET_BASELINE/market_only",
+    "llm_pick_format": "单选 主胜（H） | 单选 平局（D） | 单选 客胜（A）",
+    "settlement": "finished + settlement_scope=90min + complete score_90 + official sporttery source",
+    "identity_fields": [
+      "prediction_code_sha256",
+      "config_sha256",
+      "engine_bundle_sha256",
+      "snapshot",
+      "route",
+      "prediction_as_of"
+    ]
+  }
+}

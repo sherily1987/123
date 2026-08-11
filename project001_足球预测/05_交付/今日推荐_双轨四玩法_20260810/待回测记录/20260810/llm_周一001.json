@@ -1,0 +1,214 @@
+{
+  "match_num": "周一001",
+  "home": "天狼星",
+  "away": "布鲁马波",
+  "league": "瑞超",
+  "kickoff": "2026-08-11T01:00:00+08:00",
+  "models": [
+    {
+      "home_score": 2,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "2",
+      "half_result": "主胜",
+      "ou25": "小2.5",
+      "hafu": "胜胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": true,
+      "confidence": 0.6,
+      "reasoning": "【伤停|阵容:暂无双方具体伤停名单，证据缺失】【近况:天狼星主场表现稳定，布鲁马波客场战绩一般】【主客:天狼星主场优势明显，赔率主胜1.25支持】【交锋:历史交锋天狼星占优】【战意:联赛中游竞争，双方均需分数】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "阵容",
+          "战意",
+          "近况",
+          "主客",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "deepseek/deepseek-chat"
+    },
+    {
+      "home_score": 1,
+      "away_score": 0,
+      "result": "主胜",
+      "total_goals": "1",
+      "half_result": "平局",
+      "ou25": "小2.5",
+      "hafu": "平胜",
+      "ou_from_score": false,
+      "alt_direction": null,
+      "evidence_gap": false,
+      "confidence": 0.55,
+      "reasoning": "【近况:天狼星近5场3胜1平1负，状态回暖；布鲁马波近5场仅1胜，客场连续3场不胜，防守端失球率偏高】；【主客:天狼星主场近6场保持不败，且场均进球达1.5球；布鲁马波客场战绩仅为2胜2平2负，客场攻防表现疲软】；【身份:天狼星目前位列积分榜第4，具备争欧战资格的战意；布鲁马波排名中下游，保级压力不大，战意相对松懈】；【交锋:双方近3次交手，天狼星2胜1平，占据心理优势】；【伤停:无公开首发缺阵信息，但布鲁马波主力后腰因黄牌停赛影响中场拦截能力，暂未确认是否出战】",
+      "reasoning_ok": true,
+      "reasoning_flags": {
+        "ok": true,
+        "has_bracket": true,
+        "tags": [
+          "伤停",
+          "首发",
+          "缺阵",
+          "战意",
+          "近况",
+          "状态",
+          "主客",
+          "身份",
+          "交锋"
+        ],
+        "odds_only": false,
+        "invalid_reason": null
+      },
+      "model": "qwen/qwen-flash"
+    },
+    {
+      "error": "Extra data: line 13 column 4 (char 369)",
+      "model": "zhipu/glm-4-flash"
+    }
+  ],
+  "aggregate": {
+    "top_score": [
+      1,
+      0
+    ],
+    "top_score_votes": 1.0,
+    "top_result": "主胜",
+    "top_result_votes": 1.85,
+    "top_total_goals": "1",
+    "top_hafu": "平胜",
+    "top_ou25": "小2.5",
+    "alt_direction": null,
+    "caution": false,
+    "strength": 1.0,
+    "avg_confidence": 0.575,
+    "disagreement": 1.0,
+    "all_scores": {
+      "2-0": 0.85,
+      "1-0": 1.0
+    },
+    "all_results": {
+      "主胜": 1.85
+    },
+    "all_total_goals": {
+      "2": 0.85,
+      "1": 1.0
+    },
+    "all_hafu": {
+      "胜胜": 0.85,
+      "平胜": 1.0
+    },
+    "all_ou25": {
+      "小2.5": 1.85
+    },
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "individual": {
+      "deepseek/deepseek-chat": {
+        "home_score": 2,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "2",
+        "half_result": "主胜",
+        "ou25": "小2.5",
+        "hafu": "胜胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": true,
+        "confidence": 0.6,
+        "reasoning": "【伤停|阵容:暂无双方具体伤停名单，证据缺失】【近况:天狼星主场表现稳定，布鲁马波客场战绩一般】【主客:天狼星主场优势明显，赔率主胜1.25支持】【交锋:历史交锋天狼星占优】【战意:联赛中游竞争，双方均需分数】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "阵容",
+            "战意",
+            "近况",
+            "主客",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      },
+      "qwen/qwen-flash": {
+        "home_score": 1,
+        "away_score": 0,
+        "result": "主胜",
+        "total_goals": "1",
+        "half_result": "平局",
+        "ou25": "小2.5",
+        "hafu": "平胜",
+        "ou_from_score": false,
+        "alt_direction": null,
+        "evidence_gap": false,
+        "confidence": 0.55,
+        "reasoning": "【近况:天狼星近5场3胜1平1负，状态回暖；布鲁马波近5场仅1胜，客场连续3场不胜，防守端失球率偏高】；【主客:天狼星主场近6场保持不败，且场均进球达1.5球；布鲁马波客场战绩仅为2胜2平2负，客场攻防表现疲软】；【身份:天狼星目前位列积分榜第4，具备争欧战资格的战意；布鲁马波排名中下游，保级压力不大，战意相对松懈】；【交锋:双方近3次交手，天狼星2胜1平，占据心理优势】；【伤停:无公开首发缺阵信息，但布鲁马波主力后腰因黄牌停赛影响中场拦截能力，暂未确认是否出战】",
+        "reasoning_ok": true,
+        "reasoning_flags": {
+          "ok": true,
+          "has_bracket": true,
+          "tags": [
+            "伤停",
+            "首发",
+            "缺阵",
+            "战意",
+            "近况",
+            "状态",
+            "主客",
+            "身份",
+            "交锋"
+          ],
+          "odds_only": false,
+          "invalid_reason": null
+        }
+      }
+    },
+    "errors": [
+      {
+        "error": "Extra data: line 13 column 4 (char 369)"
+      }
+    ],
+    "models_used": [
+      "zhipu/glm-4-flash",
+      "qwen/qwen-flash",
+      "deepseek/deepseek-chat"
+    ],
+    "valid_count": 2
+  },
+  "markets": {
+    "1x2": "主胜",
+    "score": "1-0",
+    "ttg": "1",
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "hafu_votes": {
+      "胜胜": 0.85,
+      "平胜": 1.0
+    },
+    "confidence": 0.575,
+    "alt_direction": null,
+    "caution": false,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "votes": {
+      "主胜": 1.85
+    }
+  },
+  "odds": [
+    1.25,
+    5.25,
+    7.25
+  ],
+  "ok": true
+}

@@ -1,0 +1,85 @@
+{
+  "schema": "pending-backtest-1.0",
+  "records_dir": "H:\\claude AI自媒体\\project012_0803全比赛预测回测\\04_素材\\待回测记录\\20260803",
+  "generated_at": "2026-08-02T23:56:41.900845",
+  "summary": {
+    "total_records": 3,
+    "settled": 3,
+    "not_finished": 0,
+    "x1x2": {
+      "n": 3,
+      "hit": 2,
+      "hit_rate_pct": 66.67
+    },
+    "score": {
+      "n": 3,
+      "top1_hit": 0,
+      "top1_hit_rate_pct": 0.0,
+      "top3_hit": 1,
+      "top3_hit_rate_pct": 33.33
+    }
+  },
+  "by_league": {
+    "挪超": {
+      "n": 1,
+      "hit": 1,
+      "hit_rate_pct": 100.0
+    },
+    "巴西杯": {
+      "n": 2,
+      "hit": 1,
+      "hit_rate_pct": 50.0
+    }
+  },
+  "pending": [],
+  "detail": [
+    {
+      "match_id": "sporttery-2040699",
+      "match": "布兰 vs 罗森博格",
+      "league": "挪超",
+      "pred_1x2": "H",
+      "actual": "3-2",
+      "1x2_hit": true,
+      "pred_top3": [
+        "1-1",
+        "2-1",
+        "1-0"
+      ],
+      "score_top1_hit": false,
+      "score_top3_hit": false,
+      "status": "settled"
+    },
+    {
+      "match_id": "sporttery-2040706",
+      "match": "米拉索尔 vs 格雷米奥",
+      "league": "巴西杯",
+      "pred_1x2": "H",
+      "actual": "1-1",
+      "1x2_hit": false,
+      "pred_top3": [
+        "1-0",
+        "1-1",
+        "0-0"
+      ],
+      "score_top1_hit": false,
+      "score_top3_hit": true,
+      "status": "settled"
+    },
+    {
+      "match_id": "sporttery-2040700",
+      "match": "巴西国际 vs 科林蒂安",
+      "league": "巴西杯",
+      "pred_1x2": "H",
+      "actual": "2-0",
+      "1x2_hit": true,
+      "pred_top3": [
+        "1-0",
+        "0-0",
+        "1-1"
+      ],
+      "score_top1_hit": false,
+      "score_top3_hit": false,
+      "status": "settled"
+    }
+  ]
+}

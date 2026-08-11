@@ -1,0 +1,114 @@
+{
+  "schema": "llm-track-1.0",
+  "generated_at": "2026-08-04T21:45:00+08:00",
+  "scope": "中国体彩2026-08-04销售日，90分钟胜平负",
+  "note": "本轨道只做证据驱动的定性对照，不生成概率，不进入量化模型或推荐门控。",
+  "matches": [
+    {
+      "match_num": "周二001",
+      "match": "里莫 vs 桑托斯",
+      "direction": ["D", "A"],
+      "single_preference": "A",
+      "score_picks": ["0-1", "1-1"],
+      "signals": ["巴西杯十六强次回合", "里莫主场", "淘汰赛语境增加平局与谨慎开局风险"],
+      "evidence": [
+        {
+          "fact": "官方赛程确认次回合于8月4日21:30在Mangueirao进行。",
+          "source": "https://www.clubedoremo.com.br/ler-noticia.php?id=4065",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "身份与赛制核验，不映射为数值修正"
+        }
+      ]
+    },
+    {
+      "match_num": "周二002",
+      "match": "米亚尔比 vs 布拉迪斯拉发",
+      "direction": ["H", "D"],
+      "single_preference": "H",
+      "score_picks": ["1-0", "1-1"],
+      "signals": ["欧冠资格赛首回合", "米亚尔比主场", "布拉迪斯拉发为连续夺冠的成熟欧战队伍"],
+      "evidence": [
+        {
+          "fact": "抽签信息确认米亚尔比在本轮先主场作赛。",
+          "source": "https://www.fotbollskanalen.se/artiklar/champions-league-kval/klart-dem-stalls-mjallby-mot-vid-seger-i-cl-kvalet",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "主客与赛制核验，不映射为数值修正"
+        }
+      ]
+    },
+    {
+      "match_num": "周二003",
+      "match": "奥林匹亚科斯 vs NEC奈梅亨",
+      "direction": ["H"],
+      "single_preference": "H",
+      "score_picks": ["2-0", "2-1"],
+      "signals": ["欧冠资格赛首回合", "奥林匹亚科斯主场", "主队被外部前瞻列为该路径实力较强球队之一"],
+      "evidence": [
+        {
+          "fact": "奥林匹亚科斯官方确认首回合在卡雷斯卡基斯球场进行，次回合8月11日在荷兰。",
+          "source": "https://www.olympiacos.org/2026/07/20/i-klirosi-gia-ton-g-prokrimatiko-gyro-tou-uefa-champions-league/",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "身份与赛制核验，不映射为数值修正"
+        },
+        {
+          "fact": "赛前综述将奥林匹亚科斯列为联赛路径实力较强的球队之一。",
+          "source": "https://as.com/futbol/internacional/la-champions-se-calienta-f202608-n/",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "仅作LLM定性背景，不作为量化概率"
+        }
+      ]
+    },
+    {
+      "match_num": "周二004",
+      "match": "圣吉罗斯联合 vs 博德闪耀",
+      "direction": ["D", "A"],
+      "single_preference": "D",
+      "score_picks": ["1-1", "1-2"],
+      "signals": ["欧冠资格赛首回合", "博德闪耀近期连胜", "双方2024年交手0-0", "主队主场抵消部分客队状态优势"],
+      "evidence": [
+        {
+          "fact": "博德闪耀官方确认首回合客场、次回合8月11日主场；双方2024年交手为0-0。",
+          "source": "https://www.glimt.no/nyheter/glimt-far-belgisk-motstand",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "赛制与历史背景，H2H仅作低权重叙事"
+        },
+        {
+          "fact": "圣吉罗斯官方确认比赛于8月4日20:00在奥斯坦德进行。",
+          "source": "https://rusg.brussels/en/news/mobility-union-fk-bodoglimt-oostende",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "身份与场地核验，不映射为数值修正"
+        }
+      ]
+    },
+    {
+      "match_num": "周二005",
+      "match": "布拉格斯巴达 vs 里昂",
+      "direction": ["D", "A"],
+      "single_preference": "A",
+      "score_picks": ["1-1", "1-2"],
+      "signals": ["欧冠资格赛首回合", "里昂为种子队", "双方均有伤停", "布拉格高温与主场增加比赛波动"],
+      "evidence": [
+        {
+          "fact": "里昂为本轮种子队，首回合在布拉格、次回合8月11日在里昂。",
+          "source": "https://www.lequipe.fr/Football/Actualites/L-ol-affrontera-le-sparta-prague-au-3e-tour-preliminaire-de-la-ligue-des-champions/1705883",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "赛制与球队层级背景，不映射为数值修正"
+        },
+        {
+          "fact": "赛前页面列出斯巴达和里昂两队多名伤员，并给出约32摄氏度天气预报。",
+          "source": "https://www.fotmob.com/en-GB/matches/lyon-vs-sparta-prague/3b0z2m",
+          "collected_at": "2026-08-04T21:30:00+08:00",
+          "mapped": null,
+          "basis": "未完成官方双源核验，故只作定性风险信号"
+        }
+      ]
+    }
+  ]
+}
