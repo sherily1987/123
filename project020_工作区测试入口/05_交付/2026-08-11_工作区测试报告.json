@@ -1,0 +1,98 @@
+{
+  "ok": true,
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "archived_failures": 1
+  },
+  "suites": [
+    {
+      "id": "project001",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": ".............                                                            [100%]\n13 passed in 0.46s\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": null
+    },
+    {
+      "id": "project007",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": ".......................                                                  [100%]\n23 passed in 1.27s\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": null
+    },
+    {
+      "id": "project018-llm",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": ".....................................                                    [100%]\n37 passed in 0.10s\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": null
+    },
+    {
+      "id": "project018-fusion",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": ".........................                                          [100%]\n25 passed, 6 subtests passed in 3.45s\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": null
+    },
+    {
+      "id": "project018-workspace",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "..                                                                       [100%]\n2 passed in 0.03s\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": null
+    },
+    {
+      "id": "project020-runner",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": ".....                                                                    [100%]\n5 passed in 0.77s\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": null
+    },
+    {
+      "id": "project018-engine",
+      "required": true,
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "{\n  \"summary\": {\n    \"total\": 16,\n    \"pass\": 16,\n    \"fail\": 0\n  }\n}\n[PASS] 去水方法 :: 4方法×4组赔率，概率和=1\n[PASS] 矩阵归一化 :: DC/BP矩阵、温度缩放均归一化\n[PASS] 1X2校准 :: 校准层概率和=1\n[PASS] λ反解复现市场 :: λ反解还原市场1X2（≤0.5pp）\n[PASS] market_only新鲜盘口 :: 1X2=校准市场、MARKET_BASELINE\n[PASS] market_only远期新鲜快照 :: 显式新鲜快照不因距离开球超过24小时而降级\n[PASS] model_first显式λ :: λ=显式值、kind=model_goal_rate\n[PASS] market_only陈旧HAD明确阻断 :: 陈旧HAD→market_only明确阻断，不静默切换model_first\n[PASS] 两回合晋级 :: 晋级概率和=100、点球主队0.38、ET=29.8%\n[PASS] 极端赔率 :: 极端赔率不崩溃、1X2和=100\n[PASS] market_only极端λ回退HAD :: 拒绝4.0/0.1，回退HAD λ=[1.025, 0.943]\n[PASS] 4场生产批量不变量 :: 4场不变量全部通过\n[PASS] 模型常数 :: 常数校验 通过\n[PASS] DC团队强度 :: Arsenal vs Liverpool λ=1.575/1.2838；覆盖外→UNFITTED_TEAM\n[PASS] Understat查询 :: Man Utd vs Fulham xG=1.84362/1.71998\n[PASS] 注册库健康 :: sample_audit 正常\n",
+      "stderr": "",
+      "archive_reason": null,
+      "engine_summary": {
+        "total": 16,
+        "pass": 16,
+        "fail": 0
+      }
+    },
+    {
+      "id": "project017-archived-export",
+      "required": false,
+      "status": "ARCHIVED_FAILURE",
+      "returncode": 0,
+      "stdout": "{\n  \"summary\": {\n    \"total\": 14,\n    \"pass\": 13,\n    \"fail\": 1\n  }\n}\n[PASS] 去水方法 :: 4方法×4组赔率，概率和=1\n[PASS] 矩阵归一化 :: DC/BP矩阵、温度缩放均归一化\n[PASS] 1X2校准 :: 校准层概率和=1\n[PASS] λ反解复现市场 :: λ反解还原市场1X2（≤0.5pp）\n[PASS] market_only新鲜盘口 :: 1X2=校准市场、MARKET_BASELINE\n[PASS] model_first显式λ :: λ=显式值、kind=model_goal_rate\n[FAIL] 陈旧盘口无锚回退 :: stale_had: status=blocked tags=[]\n[PASS] 两回合晋级 :: 晋级概率和=100、点球主队0.38、ET=29.8%\n[PASS] 极端赔率 :: 极端赔率不崩溃、1X2和=100\n[PASS] 4场生产批量不变量 :: 4场不变量全部通过\n[PASS] 模型常数 :: 常数校验 通过\n[PASS] DC团队强度 :: Arsenal vs Liverpool λ=1.575/1.2838；覆盖外→UNFITTED_TEAM\n[PASS] Understat查询 :: Man Utd vs Fulham xG=1.84362/1.71998\n[PASS] 注册库健康 :: sample_audit 正常\n",
+      "stderr": "",
+      "archive_reason": "Historical Hermes export uses an older stale-odds policy assertion; it is diagnostic only and must not gate the active workspace.",
+      "engine_summary": {
+        "total": 14,
+        "pass": 13,
+        "fail": 1
+      }
+    }
+  ]
+}

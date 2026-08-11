@@ -1,0 +1,12 @@
+{
+  "suites": [
+    {"id": "project001", "kind": "pytest", "cwd": "project001_足球预测/02_脚本/tests", "required": true},
+    {"id": "project007", "kind": "pytest", "cwd": "project007_APIFootball数据接入/02_脚本", "required": true},
+    {"id": "project018-llm", "kind": "pytest", "cwd": "project018_技能工作区整合/02_脚本/llm/football-llm-predictor", "required": true},
+    {"id": "project018-fusion", "kind": "pytest", "cwd": "project018_技能工作区整合/02_脚本/skill/football-quant-fusion", "target": "tests", "required": true},
+    {"id": "project018-workspace", "kind": "pytest", "cwd": "project018_技能工作区整合/02_脚本", "target": "tests", "required": true},
+    {"id": "project020-runner", "kind": "pytest", "cwd": "project020_工作区测试入口/02_脚本", "target": "test_run_workspace_tests.py", "required": true},
+    {"id": "project018-engine", "kind": "command", "cwd": "project018_技能工作区整合/02_脚本/skill/football-quant-fusion", "command": ["scripts/test_engine_full.py", "--output", "{root}/project020_工作区测试入口/04_素材/engine_full_project018.json"], "result_report": "project020_工作区测试入口/04_素材/engine_full_project018.json", "required": true},
+    {"id": "project017-archived-export", "kind": "command", "cwd": "project017_football-quant-fusion技能导出/01_技能本体/football-quant-fusion", "command": ["scripts/test_engine_full.py", "--output", "{root}/project020_工作区测试入口/04_素材/engine_full_project017.json"], "result_report": "project020_工作区测试入口/04_素材/engine_full_project017.json", "required": false, "archive_reason": "Historical Hermes export uses an older stale-odds policy assertion; it is diagnostic only and must not gate the active workspace."}
+  ]
+}
