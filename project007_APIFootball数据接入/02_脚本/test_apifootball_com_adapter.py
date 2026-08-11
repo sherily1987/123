@@ -6,6 +6,7 @@ These tests never use a real API key or make a network request.
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
 import os
 import subprocess
@@ -127,6 +128,24 @@ def test_client_reads_only_dedicated_environment_variable(monkeypatch):
         assert "APIFOOTBALL_COM_KEY" in str(exc)
     else:
         raise AssertionError("missing dedicated key must fail closed")
+
+
+def test_request_keeps_no_event_404_as_a_valid_empty_events_response(monkeypatch):
+    class Response(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    monkeypatch.setenv("APIFOOTBALL_COM_KEY", "test-key")
+    payload = adapter.request(
+        "get_events",
+        {"league_id": 152, "from": "2021-07-01", "to": "2021-07-31"},
+        opener=lambda request, timeout: Response(b'{"error": 404, "message": "No event found (please check your plan)!"}'),
+    )
+
+    assert payload == {"error": 404, "message": "No event found (please check your plan)!"}
 
 
 def test_skill_runtime_entry_uses_its_own_workspace_source():
