@@ -257,6 +257,8 @@ python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/
 
 ```sh
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/fusion_cli.py settle --date YYYY-MM-DD --dry-run
+# 体彩官方结果缺失时，显式启用 APIFootball 欧冠 fallback；默认关闭
+python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/fusion_cli.py settle --date YYYY-MM-DD --apifootball-fallback --dry-run
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/fusion_cli.py backtest --snapshot closing
 # 该命令评估 football-quant-fusion 实际输出，不是仅评估底层 3.4.4 核心引擎
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/fusion_cli.py odds-add --source raw.json
@@ -297,6 +299,9 @@ python3 .../backtest_dual_track.py --records-dir <待回测记录目录> --outpu
 ```sh
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/auto_backtest.py \
   --workspace "H:\claude AI自媒体" --output-dir <项目>/05_交付/auto_backtest
+# 允许回填并显式启用 APIFootball 欧冠 fallback
+python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/auto_backtest.py \
+  --settle --apifootball-fallback --workspace "F:\HM足球比赛预测" --output-dir <项目>/05_交付/auto_backtest
 ```
 
 流程：① settle 回填共享库官方赛果（幂等）→ ② fusion_backtest 统计共享库量化记录 →
@@ -304,6 +309,8 @@ python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/
 （`auto_backtest_report_<日期>.md/json`，每日期明细写入所属项目 `05_交付/`）。
 
 同 `(match_id, snapshot_type)` 只算一个样本。至少分版本、联赛、市场、快照报告；样本 <200 不宣称优于市场。命中率只作辅指标，主指标为 Brier、Log Loss、ECE；有固定赛前策略与赔率才评 ROI。
+
+APIFootball fallback 仅补全普通完赛欧冠赛果。供应商存在加时/点球字段但无法确认90分钟比分时标记 `needs_review`，不得进入正式回测分母；体彩官方结果与供应商结果冲突时标记 `source_conflict`，不得静默覆盖。
 
 ## 赛事模拟
 

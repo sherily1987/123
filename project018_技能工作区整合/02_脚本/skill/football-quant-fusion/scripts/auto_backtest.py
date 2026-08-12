@@ -180,6 +180,8 @@ def main():
     ap.add_argument("--store", default=str(DEFAULT_STORE))
     ap.add_argument("--output-dir", default=None, help="合并报告输出目录（默认 <cwd>/05_交付/auto_backtest）")
     ap.add_argument("--settle", action="store_true", help="Explicitly permit shared-store result settlement (default: never settle).")
+    ap.add_argument("--apifootball-fallback", action="store_true",
+                    help="When --settle is enabled, use APIFootball for unresolved UCL results.")
     ap.add_argument("--skip-settle", action="store_true", help="Deprecated compatibility flag; settle is already off by default.")
     ap.add_argument("--skip-store-backtest", action="store_true", help="跳过共享库量化回测")
     a = ap.parse_args()
@@ -206,7 +208,10 @@ def main():
 
     # 1) 共享库赛果回填
     if a.settle and not a.skip_settle:
-        r = run([sys.executable, str(FUSION_CLI), "settle", "--store", a.store])
+        settle_cmd = [sys.executable, str(FUSION_CLI), "settle", "--store", a.store]
+        if a.apifootball_fallback:
+            settle_cmd.append("--apifootball-fallback")
+        r = run(settle_cmd)
         try:
             report["settle"] = json.loads(r["stdout"])
         except Exception:

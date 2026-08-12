@@ -63,6 +63,8 @@ def main():
     ap.add_argument('--snapshot', default='T-7h')
     ap.add_argument('--store', default=STORE)
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--apifootball-fallback', action='store_true',
+                    help='体彩官方赛果缺失时显式启用 APIFootball 欧冠补全')
     a = ap.parse_args()
 
     today = datetime.now(CST)
@@ -72,13 +74,21 @@ def main():
               'intl_odds': None}
 
     # 1) Settle already-finished matches first (official matchId preferred).
-    r = run([CORE_DIR / 'settle_from_sporttery.py', '--store', a.store]
-            + (['--dry-run'] if a.dry_run else []), retries=2)
+    r = run([HERE / 'fusion_settle.py', '--store', a.store]
+            + (['--dry-run'] if a.dry_run else [])
+            + (['--apifootball-fallback'] if a.apifootball_fallback else []), retries=2)
     try:
         s = json.loads(r.stdout)
-        report['settle'] = {'settled': s.get('settled'), 'pending': s.get('pending'),
-                            'detail': [x for x in s.get('report', [])
-                                       if x.get('status') in ('settled', 'would_settle')]}
+        official = s.get('official') or {}
+        provider = s.get('apifootball_fallback') or {}
+        detail = [x for x in official.get('report', [])
+                  if x.get('status') in ('settled', 'would_settle')]
+        detail.extend(x for x in provider.get('report', [])
+                      if x.get('status') in ('settled', 'would_settle'))
+        report['settle'] = {'settled': s.get('settled'),
+                            'pending': official.get('pending'),
+                            'apifootball_fallback': provider or None,
+                            'detail': detail}
     except (ValueError, AttributeError):
         report['settle'] = {'error': (r.stderr or r.stdout)[:200]}
 

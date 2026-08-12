@@ -190,7 +190,7 @@ def main():
         sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
         raise SystemExit(proc.returncode)
     if cmd == "settle":
-        p = core_scripts_dir() / "settle_from_sporttery.py"
+        p = HERE / "fusion_settle.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
         proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
