@@ -118,3 +118,11 @@ def test_only_date_limits_registry_scope(tmp_path):
 
     assert report["pending"] == 1
     assert [row["match_id"] for row in report["report"]] == ["sporttery-1"]
+
+
+def test_verified_kairat_levski_aliases_are_available():
+    aliases = runner.load_aliases()
+    assert aliases["阿拉木图"] == "Kairat Almaty"
+    assert aliases["阿拉木图凯拉特"] == "Kairat Almaty"
+    assert aliases["索列夫"] == "Levski Sofia"
+    assert aliases["索菲亚列夫斯基"] == "Levski Sofia"
