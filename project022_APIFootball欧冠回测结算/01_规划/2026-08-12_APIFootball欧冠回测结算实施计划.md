@@ -31,7 +31,7 @@
 - Consumes: APIFootball `get_events` 单场原始 dict 与 ISO `collected_at`。
 - Produces: `normalize_event(event: dict, collected_at: str) -> dict`，schema 为 `apifootball-settlement-candidate-1.0`。
 
-- [ ] **Step 1: 写普通完赛、未完赛、加时和点球的失败测试**
+- [x] **Step 1: 写普通完赛、未完赛、加时和点球的失败测试**
 
 ```python
 from apifootball_settlement import normalize_event
@@ -80,13 +80,13 @@ def test_penalties_without_explicit_90_score_are_ambiguous():
     assert row["score_90_status"] == "ambiguous_penalties"
 ```
 
-- [ ] **Step 2: 运行测试并确认因模块缺失而失败**
+- [x] **Step 2: 运行测试并确认因模块缺失而失败**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_apifootball_settlement.py`
 
 Expected: FAIL，`ModuleNotFoundError: No module named 'apifootball_settlement'`。
 
-- [ ] **Step 3: 实现最小标准化器**
+- [x] **Step 3: 实现最小标准化器**
 
 ```python
 def _int(value):
@@ -140,13 +140,13 @@ def normalize_event(event, collected_at):
     }
 ```
 
-- [ ] **Step 4: 运行测试并确认通过**
+- [x] **Step 4: 运行测试并确认通过**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_apifootball_settlement.py`
 
 Expected: `4 passed`。
 
-- [ ] **Step 5: 提交该任务**
+- [x] **Step 5: 提交该任务**
 
 ```powershell
 git add -- project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/apifootball_settlement.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_apifootball_settlement.py
@@ -166,7 +166,7 @@ git commit -m "feat: normalize APIFootball settlement scores safely"
 - Consumes: 登记记录 dict、Task 1 候选列表、别名配置 dict、时间窗口分钟数。
 - Produces: `match_record(record: dict, candidates: list[dict], aliases: dict[str, str], tolerance_minutes: int = 30) -> dict`，返回 `matched`、`no_match` 或 `ambiguous_match`。
 
-- [ ] **Step 1: 写精确 ID、唯一身份匹配和歧义拒绝的失败测试**
+- [x] **Step 1: 写精确 ID、唯一身份匹配和歧义拒绝的失败测试**
 
 ```python
 from apifootball_matcher import match_record
@@ -210,13 +210,13 @@ def test_reversed_home_and_away_do_not_match():
     assert result["status"] == "no_match"
 ```
 
-- [ ] **Step 2: 运行测试并确认因模块缺失而失败**
+- [x] **Step 2: 运行测试并确认因模块缺失而失败**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_apifootball_matcher.py`
 
 Expected: FAIL，`ModuleNotFoundError: No module named 'apifootball_matcher'`。
 
-- [ ] **Step 3: 实现严格匹配器和空的已验证别名配置**
+- [x] **Step 3: 实现严格匹配器和空的已验证别名配置**
 
 ```python
 def match_record(record, candidates, aliases, tolerance_minutes=30):
@@ -253,13 +253,13 @@ def match_record(record, candidates, aliases, tolerance_minutes=30):
 }
 ```
 
-- [ ] **Step 4: 运行测试并确认通过**
+- [x] **Step 4: 运行测试并确认通过**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_apifootball_matcher.py`
 
 Expected: `4 passed`。
 
-- [ ] **Step 5: 提交该任务**
+- [x] **Step 5: 提交该任务**
 
 ```powershell
 git add -- project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/apifootball_matcher.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_apifootball_matcher.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/config/apifootball_team_aliases.json
@@ -279,7 +279,7 @@ git commit -m "feat: match APIFootball settlement candidates strictly"
 - Consumes: `--store`、可选 `--date`、`--dry-run`、`--output-dir`，以及 `APIFOOTBALL_COM_KEY`。
 - Produces: `run_settlement(store: Path, raw_events: list[dict], aliases: dict, dry_run: bool, settle_writer: Callable) -> dict`；CLI 输出同一汇总 JSON。
 
-- [ ] **Step 1: 写幂等、冲突、歧义和密钥脱敏的失败测试**
+- [x] **Step 1: 写幂等、冲突、歧义和密钥脱敏的失败测试**
 
 ```python
 def test_verified_candidate_is_written_once(tmp_path):
@@ -313,13 +313,13 @@ def test_redact_removes_api_key_from_errors():
     assert "secret" not in runner.redact("URL?APIkey=secret&league_id=3")
 ```
 
-- [ ] **Step 2: 运行测试并确认因运行器缺失而失败**
+- [x] **Step 2: 运行测试并确认因运行器缺失而失败**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_settle_from_apifootball.py`
 
 Expected: FAIL，`ModuleNotFoundError: No module named 'settle_from_apifootball'`。
 
-- [ ] **Step 3: 实现运行器**
+- [x] **Step 3: 实现运行器**
 
 实现必须包含以下具体行为：
 
@@ -358,13 +358,13 @@ def default_output_dir():
 
 每次运行先写临时目录，全部报告成功落盘后再原子改名为 `<timestamp>`；输出 `candidates.jsonl`、`settlement_audit.json`、`settled.json`、`conflicts.json` 和 `run_metadata.json`。
 
-- [ ] **Step 4: 运行任务测试并确认通过**
+- [x] **Step 4: 运行任务测试并确认通过**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_settle_from_apifootball.py`
 
 Expected: `5 passed`。
 
-- [ ] **Step 5: 提交该任务**
+- [x] **Step 5: 提交该任务**
 
 ```powershell
 git add -- project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/settle_from_apifootball.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_settle_from_apifootball.py
@@ -387,7 +387,7 @@ git commit -m "feat: add audited APIFootball settlement runner"
 - Consumes: `fusion_cli.py settle [--apifootball-fallback]`；`auto_backtest.py --settle [--apifootball-fallback]`。
 - Produces: 合并结果 `{"official": ..., "apifootball_fallback": ..., "settled": N}`；未加 fallback 参数时保持官方结算默认路径。
 
-- [ ] **Step 1: 写默认关闭与显式启用的失败测试**
+- [x] **Step 1: 写默认关闭与显式启用的失败测试**
 
 ```python
 def test_build_commands_defaults_to_official_only(tmp_path):
@@ -411,13 +411,13 @@ def test_combined_report_does_not_hide_official_success_when_provider_fails():
     assert report["official"]["settled"] == 2
 ```
 
-- [ ] **Step 2: 运行测试并确认因编排器缺失而失败**
+- [x] **Step 2: 运行测试并确认因编排器缺失而失败**
 
 Run: `pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_fusion_settle.py`
 
 Expected: FAIL，`ModuleNotFoundError: No module named 'fusion_settle'`。
 
-- [ ] **Step 3: 实现编排器并修改三个入口**
+- [x] **Step 3: 实现编排器并修改三个入口**
 
 `fusion_settle.py` 的命令构造固定为：
 
@@ -444,7 +444,7 @@ python auto_backtest.py --settle --apifootball-fallback --workspace "F:\HM足球
 
 并注明：普通完赛可补全；加时/点球无法确认90分钟时为 `needs_review`，不进入正式分母。
 
-- [ ] **Step 4: 运行新增测试与现有融合测试**
+- [x] **Step 4: 运行新增测试与现有融合测试**
 
 Run:
 
@@ -455,7 +455,7 @@ pytest -q project018_技能工作区整合/02_脚本/skill/football-quant-fusion
 
 Expected: 新增 `3 passed`；现有融合测试全部通过。
 
-- [ ] **Step 5: 运行真实历史 dry-run 并验证审计边界**
+- [x] **Step 5: 运行真实历史 dry-run 并验证审计边界**
 
 Run:
 
@@ -466,7 +466,7 @@ python project018_技能工作区整合/02_脚本/skill/football-quant-fusion/sc
 
 Expected: 命令退出码为0；输出同时含 `official` 与 `apifootball_fallback`；未完赛、未匹配、加时/点球歧义没有 `would_settle`；报告目录位于 project022 的 `05_交付/settlement_runs/`。
 
-- [ ] **Step 6: 提交入口接入**
+- [x] **Step 6: 提交入口接入**
 
 ```powershell
 git add -- project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/fusion_settle.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/test_fusion_settle.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/fusion_cli.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/fusion_daily_pipeline.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/scripts/auto_backtest.py project018_技能工作区整合/02_脚本/skill/football-quant-fusion/SKILL.md
@@ -485,7 +485,7 @@ git commit -m "feat: add APIFootball fallback to fusion settlement"
 - Consumes: Tasks 1–4 的测试输出、dry-run 审计和 Git 提交。
 - Produces: 可复核验收报告，包含测试数、真实 dry-run 数量、未完成项和数据边界。
 
-- [ ] **Step 1: 运行完整相关测试集**
+- [x] **Step 1: 运行完整相关测试集**
 
 Run:
 
@@ -500,7 +500,7 @@ pytest -q \
 
 Expected: 退出码0、0 failures。
 
-- [ ] **Step 2: 核验安全与工作区边界**
+- [x] **Step 2: 核验安全与工作区边界**
 
 Run:
 
@@ -512,7 +512,7 @@ git status --short
 
 Expected: 交付文件中没有密钥值；`git diff --check` 无错误；只提交本计划列明文件，不带入其他项目改动。
 
-- [ ] **Step 3: 写验收报告**
+- [x] **Step 3: 写验收报告**
 
 报告必须列出：
 
@@ -523,7 +523,7 @@ Expected: 交付文件中没有密钥值；`git diff --check` 无错误；只提
 - 加时/点球无法确认90分钟时不会自动结算；
 - 仍需人工补充的已验证球队别名。
 
-- [ ] **Step 4: 提交验收文档和计划勾选**
+- [x] **Step 4: 提交验收文档和计划勾选**
 
 ```powershell
 git add -- project022_APIFootball欧冠回测结算/01_规划/2026-08-12_APIFootball欧冠回测结算实施计划.md project022_APIFootball欧冠回测结算/05_交付/2026-08-12_实施验收报告.md
