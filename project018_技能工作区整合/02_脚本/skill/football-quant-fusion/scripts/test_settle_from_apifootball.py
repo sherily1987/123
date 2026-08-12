@@ -88,3 +88,33 @@ def test_ambiguous_extra_time_is_needs_review(tmp_path):
 
 def test_redact_removes_api_key_from_errors():
     assert "secret" not in runner.redact("URL?APIkey=secret&league_id=3")
+
+
+def test_only_date_limits_registry_scope(tmp_path):
+    store, _ = make_pending_store(tmp_path, provider_match_id=7)
+    second_path = store / "records" / "prediction-2.json"
+    second_record = {
+        "match_id": "sporttery-2",
+        "provider_refs": {"apifootball_match_id": 8},
+        "match": {
+            "home": "Inter",
+            "away": "Milan",
+            "kickoff": "2026-03-12T20:00:00+08:00",
+            "league": "欧冠",
+        },
+    }
+    second_path.write_text(json.dumps(second_record), encoding="utf-8")
+    with (store / "registry.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"match_id": "sporttery-2", "path": str(second_path)}) + "\n")
+
+    report = runner.run_settlement(
+        store,
+        [finished_event(7)],
+        {},
+        True,
+        lambda _: None,
+        only_date="2026-03-11",
+    )
+
+    assert report["pending"] == 1
+    assert [row["match_id"] for row in report["report"]] == ["sporttery-1"]

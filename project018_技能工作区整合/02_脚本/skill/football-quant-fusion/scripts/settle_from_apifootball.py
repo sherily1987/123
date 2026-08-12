@@ -89,12 +89,19 @@ def run_settlement(
     aliases: dict[str, str],
     dry_run: bool,
     settle_writer: Callable[[dict[str, Any]], Any],
+    only_date: str | None = None,
 ) -> dict[str, Any]:
     collected_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     candidates = [normalize_event(event, collected_at) for event in raw_events]
     report: list[dict[str, Any]] = []
+    records = load_records(Path(store))
+    if only_date:
+        records = [
+            record for record in records
+            if str(((record.get("match") or {}).get("kickoff") or ""))[:10] == only_date
+        ]
 
-    for record in load_records(Path(store)):
+    for record in records:
         match_id = str(record["match_id"])
         matched = match_record(record, candidates, aliases)
         if matched["status"] != "matched":
@@ -143,7 +150,7 @@ def run_settlement(
 
     return {
         "schema": "apifootball-settlement-run-1.0",
-        "pending": len(load_records(Path(store))),
+        "pending": len(records),
         "settled": sum(row["status"] == "settled" for row in report),
         "would_settle": sum(row["status"] == "would_settle" for row in report),
         "needs_review": sum(row["status"] == "needs_review" for row in report),
@@ -243,7 +250,7 @@ def main() -> None:
     try:
         raw_events = fetch_events(load_records(store), args.date)
         result = run_settlement(store, raw_events, load_aliases(), args.dry_run,
-                                make_writer(store))
+                                make_writer(store), only_date=args.date)
         archive = archive_run(args.output_dir, result, sys.argv)
         public = {key: value for key, value in result.items() if not key.startswith("_")}
         public["archive"] = str(archive)
