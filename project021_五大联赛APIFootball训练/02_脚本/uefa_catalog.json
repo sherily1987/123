@@ -1,0 +1,9 @@
+{
+  "window": {"from": "2021-07-01", "to": "2026-06-30"},
+  "report_name": "uefa_pipeline_report.json",
+  "note": "洲际赛事。kind=continental_cup 会被 league_training_audit 判 excluded，这是设计规则：欧战球队来自不同国内联赛、强度尺度不可比，且每队每季只踢 6-10 场，独立拟合噪声过大。本管线仍完整采集赛果/统计/赔率，供跨联赛评估使用。",
+  "leagues": [
+    {"id": 3, "slug": "uefa_champions_league", "name": "UEFA Champions League", "country": "Europe", "kind": "continental_cup"},
+    {"id": 4, "slug": "uefa_europa_league", "name": "UEFA Europa League", "country": "Europe", "kind": "continental_cup"}
+  ]
+}

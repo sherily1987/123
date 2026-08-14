@@ -75,8 +75,8 @@
 
 ## 4. 经验教训（追加于 2026-08-02 导出事故）
 
-- **不要在 PRoot 环境下对 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills 用 `cp -al`（硬链接复制）**：overlay 不支持跨层硬链接，会留下 `.l2s.*` 临时文件并损坏部分 dentry（文件 open ENOENT 但 listdir 可见）。
-- **写入 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills 必须用 Minis 的 file_write 工具**（走 app 通道）；shell 的 python open 写入可能生成 `.l2s.xxx0001` 临时态（owner 10408）而非正式文件。
+- **不要在 PRoot 环境下对 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills 用 `cp -al`（硬链接复制）**：overlay 不支持跨层硬链接，会留下 `.l2s.*` 临时文件并损坏部分 dentry（文件 open ENOENT 但 listdir 可见）。
+- **写入 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills 必须用 Minis 的 file_write 工具**（走 app 通道）；shell 的 python open 写入可能生成 `.l2s.xxx0001` 临时态（owner 10408）而非正式文件。
 - 导出/备份用流式 `zip -r` 直接从源目录打包，不要先建 staging 复制目录。
 - 若发现"listdir 有文件但 open ENOENT"：立即停止一切删除操作，先用 `file_read`（app 通道）尝试读取，再从对话/记忆/运行产物重建。
 

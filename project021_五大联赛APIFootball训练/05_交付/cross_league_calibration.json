@@ -1,0 +1,131 @@
+{
+  "cutoff": "2025-03-05",
+  "leagues": [
+    "belgium_first_division_a",
+    "bundesliga",
+    "la_liga",
+    "ligue_1",
+    "portugal_primeira_liga",
+    "premier_league",
+    "serie_a"
+  ],
+  "domestic_fit": {
+    "premier_league": {
+      "n_matches": 1411,
+      "teams": 26,
+      "home_adv": 0.28497709236686075
+    },
+    "la_liga": {
+      "n_matches": 1399,
+      "teams": 25,
+      "home_adv": 0.3113901911385831
+    },
+    "serie_a": {
+      "n_matches": 1411,
+      "teams": 26,
+      "home_adv": 0.2225897917818381
+    },
+    "bundesliga": {
+      "n_matches": 1139,
+      "teams": 26,
+      "home_adv": 0.22089332811711668
+    },
+    "ligue_1": {
+      "n_matches": 1284,
+      "teams": 24,
+      "home_adv": 0.2660314652307357
+    },
+    "belgium_first_division_a": {
+      "n_matches": 1197,
+      "teams": 22,
+      "home_adv": 0.2581533371161154
+    },
+    "portugal_primeira_liga": {
+      "n_matches": 1138,
+      "teams": 25,
+      "home_adv": 0.2506313352649101
+    }
+  },
+  "n_fit": 427,
+  "n_test": 183,
+  "naive": {
+    "home_adv": 0.1894705601838399,
+    "offsets": {
+      "belgium_first_division_a": 0.0,
+      "bundesliga": 0.0,
+      "la_liga": 0.0,
+      "ligue_1": 0.0,
+      "portugal_primeira_liga": 0.0,
+      "premier_league": 0.0,
+      "serie_a": 0.0
+    },
+    "converged": true,
+    "n_fit": 427
+  },
+  "calibrated": {
+    "home_adv": 0.19895279531101132,
+    "offsets": {
+      "belgium_first_division_a": -0.3569816877051097,
+      "bundesliga": 0.1307513111068253,
+      "la_liga": 0.06624314706591984,
+      "ligue_1": -0.011556844308376857,
+      "portugal_primeira_liga": -0.2229320229350913,
+      "premier_league": 0.3025665819827828,
+      "serie_a": 0.09190951479304993
+    },
+    "converged": true,
+    "n_fit": 427
+  },
+  "test": {
+    "naive": {
+      "n": 183,
+      "model": {
+        "n": 183,
+        "brier_mean": 0.618777,
+        "log_loss": 1.028337,
+        "accuracy_pct": 47.54
+      },
+      "provider_market": {
+        "n": 119,
+        "brier_mean": 0.557055,
+        "log_loss": 0.94209,
+        "accuracy_pct": 60.5
+      },
+      "frequency_baseline": {
+        "n": 183,
+        "brier_mean": 0.616673,
+        "log_loss": 1.024712,
+        "probs": [
+          0.4543,
+          0.2459,
+          0.2998
+        ]
+      }
+    },
+    "calibrated": {
+      "n": 183,
+      "model": {
+        "n": 183,
+        "brier_mean": 0.548187,
+        "log_loss": 0.930573,
+        "accuracy_pct": 59.56
+      },
+      "provider_market": {
+        "n": 119,
+        "brier_mean": 0.557055,
+        "log_loss": 0.94209,
+        "accuracy_pct": 60.5
+      },
+      "frequency_baseline": {
+        "n": 183,
+        "brier_mean": 0.616673,
+        "log_loss": 1.024712,
+        "probs": [
+          0.4543,
+          0.2459,
+          0.2998
+        ]
+      }
+    }
+  }
+}

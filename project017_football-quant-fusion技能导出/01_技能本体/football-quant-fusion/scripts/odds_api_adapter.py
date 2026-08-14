@@ -38,7 +38,7 @@ HERE = Path(__file__).resolve().parent
 SKILL_ROOT = HERE.parent
 DEFAULT_CONFIG = SKILL_ROOT / "config" / "intl_odds_sources.json"
 DEFAULT_STORE = Path(
-    "H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/odds"
+    "F:\HM足球比赛预测\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/odds"
 )
 
 
@@ -269,19 +269,36 @@ def load_config(path):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="The Odds API 国际盘对照（可选）")
+    ap = argparse.ArgumentParser(description="国际盘赔率对照（The Odds API / APIfootball，可选）")
     ap.add_argument("--match-file", help="体彩采集 raw/input JSON（含 matches）")
     ap.add_argument("--out", help="快照报告 JSON 输出路径")
     ap.add_argument("--store", default=str(DEFAULT_STORE), help="追加 JSONL 的 odds 目录")
     ap.add_argument("--sport-keys", help="覆盖默认 sport key 列表（逗号分隔）")
     ap.add_argument("--markets", help="覆盖默认市场（逗号分隔，如 h2h,totals）")
     ap.add_argument("--config", default=str(DEFAULT_CONFIG), help="配置文件路径")
+    ap.add_argument("--provider", choices=["the-odds-api", "apifootball"], default=None,
+                    help="数据源；默认取配置文件的 provider 字段")
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不发起网络请求")
     ap.add_argument("--check-sports", action="store_true", help="拉取 sports 列表校验配置")
     a = ap.parse_args()
 
     config = load_config(a.config)
     key = load_api_key()
+    provider = a.provider or config.get("provider", "the-odds-api")
+
+    if provider == "apifootball":
+        # apifootball 用自己的环境变量 API_FOOTBALL_KEY（与 The Odds API 的 ODDS_API_KEY 不同）
+        apifb_key = os.environ.get("API_FOOTBALL_KEY", "")
+        if sys.platform.startswith("win") and not apifb_key:
+            try:
+                import winreg
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as k:
+                    apifb_key = winreg.QueryValueEx(k, "API_FOOTBALL_KEY")[0]
+            except Exception:
+                pass
+        run_apifootball(a, config, apifb_key)
+        return
+
     adapter = OddsApiAdapter(config, key)
 
     if a.check_sports:
@@ -303,6 +320,193 @@ def main():
     keys = [k.strip() for k in (a.sport_keys or "").split(",") if k.strip()] or None
     markets = [k.strip() for k in (a.markets or "").split(",") if k.strip()] or config.get("default_markets", ["h2h"])
     report = adapter.run(a.match_file, a.out, a.store, keys, markets, a.dry_run)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+
+
+def run_apifootball(a, config, key):
+    """APIfootball.com provider：按联赛拉国际盘，与体彩场次 best-effort 匹配。
+
+    - 数据源：apiv3.apifootball.com（老牌独立足球 API，与 api-sports.io 无关）
+    - 认证：环境变量 API_FOOTBALL_KEY（query 参数 APIkey）
+    - get_odds 限制：日期区间 ≤5 天；每场返回多家博彩公司（bet365/WilliamHill/10Bet...）
+    - 覆盖 55 联赛（欧洲主流+挪超/芬超/瑞超/苏超/土超等，2026/2027 当前赛季）
+    - 赔率一律以体彩官方为准；本数据仅作移动赔率/CLV 参考，不参与建模、不进推荐门控。
+    """
+    if a.check_sports:
+        print(json.dumps({
+            "status": "ok",
+            "provider": "apifootball",
+            "note": "apifootball 无 sports 列表接口；覆盖 55 联赛见 apifootball_adapter.py leagues",
+        }, ensure_ascii=False, indent=2))
+        return
+
+    report = {
+        "schema": "intl-odds-snapshot-1.0",
+        "provider": "apifootball",
+        "status": "ok",
+        "ran_at": now_iso(),
+        "requests": [],
+        "matches": [],
+        "unmatched": [],
+        "store_file": None,
+        "dry_run": a.dry_run,
+    }
+    if not key:
+        report.update(status="skipped", reason="API_FOOTBALL_KEY 未设置，国际盘对照默认不启用")
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    if a.dry_run:
+        report["note"] = "dry-run：未发起任何网络请求"
+
+    # 1) 配置里的 league_map（中文联赛名 -> apifootball league_id）
+    league_map = config.get("league_map_apifootball") or {}
+    if not league_map:
+        report.update(status="error", reason="config/intl_odds_sources.json 缺 league_map_apifootball")
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+
+    matches = []
+    if a.match_file:
+        try:
+            raw = json.loads(Path(a.match_file).read_text(encoding="utf-8"))
+            matches = raw.get("matches", [])
+        except (OSError, ValueError) as exc:
+            report.update(status="error", reason=f"match-file 读取失败: {exc}")
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return
+
+    # 2) 对每个体彩场次查 apifootball odds（按联赛 + 开球日期前后 2 天）
+    import urllib.parse
+    for m in matches:
+        meta = m.get("sporttery_meta") or m.get("team_ids") or {}
+        mid = f"sporttery-{(meta.get('match_id') or m.get('match_id') or '?')}"
+        num = meta.get("match_num") or m.get("match_num") or "?"
+        league = m.get("league") or m.get("competition") or ""
+        home, away = m.get("home", ""), m.get("away", "")
+        kickoff = m.get("kickoff") or m.get("kickoff_iso") or ""
+        lid = league_map.get(league)
+        if not lid:
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "league": league,
+                 "reason": f"no_apifootball_league_id（league_map_apifootball 未配置: {league}）"})
+            continue
+        if a.dry_run:
+            report["requests"].append({"league_id": lid, "league": league, "note": "dry-run 不请求"})
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "match": f"{home} vs {away}",
+                 "league": league, "reason": "dry_run"})
+            continue
+        # 日期窗口：开球日前后 2 天（get_odds 区间 ≤5 天）
+        from datetime import datetime, timedelta
+        try:
+            dt = datetime.fromisoformat(kickoff.replace("Z", "+00:00"))
+            d_from = (dt - timedelta(days=2)).strftime("%Y-%m-%d")
+            d_to = (dt + timedelta(days=2)).strftime("%Y-%m-%d")
+        except (ValueError, TypeError):
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "match": f"{home} vs {away}",
+                 "league": league, "reason": f"bad_kickoff:{kickoff}"})
+            continue
+        params = urllib.parse.urlencode({
+            "action": "get_odds", "APIkey": key,
+            "league_id": lid, "from": d_from, "to": d_to,
+        })
+        odds_list = None
+        last_err = None
+        for attempt in range(4):  # apiv3 SSL 超时偶发，指数退避重试
+            try:
+                req = urllib.request.Request(f"https://apiv3.apifootball.com/?{params}",
+                                             headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"})
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    odds_list = json.loads(resp.read().decode("utf-8", "replace"))
+                break
+            except Exception as exc:
+                last_err = f"{type(exc).__name__}: {str(exc)[:80]}"
+                if attempt < 3:
+                    time.sleep(3 * (attempt + 1))
+        if odds_list is None:
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "match": f"{home} vs {away}",
+                 "league": league, "reason": f"retry_failed:{last_err}"})
+            continue
+        if isinstance(odds_list, dict) and odds_list.get("error") is not None:
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "match": f"{home} vs {away}",
+                 "league": league, "reason": f"api_error:{odds_list.get('message')}"})
+            continue
+        odds_list = odds_list if isinstance(odds_list, list) else []
+        report["requests"].append({"league_id": lid, "league": league,
+                                   "window": f"{d_from}~{d_to}", "odds_rows": len(odds_list)})
+        if not odds_list:
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "match": f"{home} vs {away}",
+                 "league": league, "reason": "no_apifootball_odds_in_window"})
+            continue
+        # 窗口内按队名过滤到具体场次（get_odds 返回整个联赛窗口的多场比赛）
+        # 体彩短名是中文、国际盘名是英文：team_aliases 配置中文->英文别名，
+        # 匹配时把别名英文名加入候选，与 events 返回的英文队名做归一化比对。
+        aliases_cfg = config.get("team_aliases") or {}
+        home_candidates = [home] + list(aliases_cfg.get(home, []))
+        away_candidates = [away] + list(aliases_cfg.get(away, []))
+        # get_events 拿窗口内场次的队名（同联赛、同日窗口），再按队名匹配
+        ev_params = urllib.parse.urlencode({
+            "action": "get_events", "APIkey": key,
+            "league_id": lid, "from": d_from, "to": d_to,
+        })
+        ev_by_id = {}
+        for attempt in range(4):  # apiv3 SSL 超时偶发，指数退避重试
+            try:
+                req = urllib.request.Request(f"https://apiv3.apifootball.com/?{ev_params}",
+                                             headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"})
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    ev_list = json.loads(resp.read().decode("utf-8", "replace"))
+                if isinstance(ev_list, list):
+                    for ev in ev_list:
+                        ev_by_id[ev.get("match_id")] = (
+                            ev.get("match_hometeam_name"), ev.get("match_awayteam_name"))
+                break
+            except Exception:
+                if attempt < 3:
+                    time.sleep(3 * (attempt + 1))
+        matched_odds = []
+        for o in odds_list:
+            mid_apifb = str(o.get("match_id"))
+            h_name, a_name = ev_by_id.get(mid_apifb, ("", ""))
+            if h_name and a_name:
+                # 有 events 数据：按队名匹配（候选含中文短名+英文别名）
+                if name_hits(h_name, home_candidates) and name_hits(a_name, away_candidates):
+                    matched_odds.append(o)
+            else:
+                # 无 events 数据：按窗口内唯一场次近似（仅当窗口内 match_id 唯一）
+                if len({str(x.get("match_id")) for x in odds_list}) == 1:
+                    matched_odds.append(o)
+        if not matched_odds:
+            report["unmatched"].append(
+                {"match_id": mid, "match_num": num, "match": f"{home} vs {away}",
+                 "league": league, "reason": "no_team_match_in_odds_window",
+                 "window_match_ids": len({str(x.get('match_id')) for x in odds_list})})
+            continue
+        entry = {
+            "match_id": mid, "match_num": num,
+            "match": f"{home} vs {away}", "league": league,
+            "apifootball_league_id": lid, "window": f"{d_from}~{d_to}",
+            "apifootball_match_id": str(matched_odds[0].get("match_id")),
+            "bookmakers": matched_odds,
+        }
+        report["matches"].append(entry)
+
+    # 3) 落盘：快照 JSON + 追加 JSONL（dry-run 不写）
+    if not a.dry_run and a.store:
+        store = Path(a.store)
+        store.mkdir(parents=True, exist_ok=True)
+        line = {"schema": report["schema"], "provider": report["provider"],
+                "ran_at": report["ran_at"], "matches": report["matches"]}
+        with open(store / "intl_production.jsonl", "a", encoding="utf-8") as f:
+            f.write(json.dumps(line, ensure_ascii=False) + "\n")
+        report["store_file"] = str((store / "intl_production.jsonl").resolve())
+    if a.out:
+        Path(a.out).write_text(
+            json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

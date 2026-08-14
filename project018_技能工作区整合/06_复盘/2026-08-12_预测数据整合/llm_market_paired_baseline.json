@@ -1,0 +1,610 @@
+{
+ "summary": {
+  "schema": "llm-market-paired-baseline-1.0",
+  "paired_n": 29,
+  "stats": {
+   "llm_double": {
+    "n": 29,
+    "hit": 14,
+    "hit_rate_pct": 48.28
+   },
+   "llm_single": {
+    "n": 17,
+    "hit": 6,
+    "hit_rate_pct": 35.29
+   },
+   "market_argmax": {
+    "n": 29,
+    "hit": 12,
+    "hit_rate_pct": 41.38
+   },
+   "market_argmax_not_draw": {
+    "n": 29,
+    "hit": 12,
+    "hit_rate_pct": 41.38
+   }
+  }
+ },
+ "rows": [
+  {
+   "match_id": "sporttery-2040699",
+   "actual": "H",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    1.76,
+    3.8,
+    3.35
+   ],
+   "market_prob": [
+    50.3,
+    23.3,
+    26.4
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040706",
+   "actual": "D",
+   "llm_pick": "双选 主胜/平局（H/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.85,
+    3.05,
+    3.85
+   ],
+   "market_prob": [
+    47.9,
+    29.1,
+    23.0
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040700",
+   "actual": "H",
+   "llm_pick": "双选 主胜/平局（H/D），偏好平局",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    2.22,
+    2.78,
+    3.15
+   ],
+   "market_prob": [
+    39.9,
+    31.9,
+    28.2
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040727",
+   "actual": "A",
+   "llm_pick": "双选 主胜/平局（H/D）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.95,
+    3.24,
+    3.25
+   ],
+   "market_prob": [
+    45.4,
+    27.3,
+    27.2
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040728",
+   "actual": "D",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.4,
+    4.22,
+    5.6
+   ],
+   "market_prob": [
+    63.2,
+    21.0,
+    15.8
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040720",
+   "actual": "D",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    2.25,
+    3.6,
+    2.46
+   ],
+   "market_prob": [
+    39.4,
+    24.6,
+    36.0
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040721",
+   "actual": "H",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": false,
+   "odds": [
+    3.45,
+    3.48,
+    1.81
+   ],
+   "market_prob": [
+    25.7,
+    25.4,
+    48.9
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040718",
+   "actual": "H",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    2.44,
+    3.1,
+    2.52
+   ],
+   "market_prob": [
+    36.3,
+    28.6,
+    35.1
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040729",
+   "actual": "D",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": false,
+   "odds": [
+    3.2,
+    3.16,
+    2.0
+   ],
+   "market_prob": [
+    27.7,
+    28.0,
+    44.3
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040724",
+   "actual": "H",
+   "llm_pick": "双选 主胜/平局（H/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": false,
+   "odds": [
+    2.88,
+    3.15,
+    2.15
+   ],
+   "market_prob": [
+    30.7,
+    28.1,
+    41.2
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040725",
+   "actual": "A",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.46,
+    3.85,
+    5.4
+   ],
+   "market_prob": [
+    60.6,
+    23.0,
+    16.4
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040763",
+   "actual": "A",
+   "llm_pick": "双选 客胜/主胜（A/H）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": true,
+   "odds": [
+    4.0,
+    3.55,
+    1.68
+   ],
+   "market_prob": [
+    22.2,
+    25.0,
+    52.8
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040764",
+   "actual": "H",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    1.44,
+    4.15,
+    5.15
+   ],
+   "market_prob": [
+    61.5,
+    21.3,
+    17.2
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040765",
+   "actual": "A",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.75,
+    3.35,
+    3.85
+   ],
+   "market_prob": [
+    50.6,
+    26.4,
+    23.0
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040767",
+   "actual": "A",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": true,
+   "odds": [
+    2.72,
+    3.05,
+    2.31
+   ],
+   "market_prob": [
+    32.6,
+    29.1,
+    38.4
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040768",
+   "actual": "D",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.69,
+    3.26,
+    4.35
+   ],
+   "market_prob": [
+    52.4,
+    27.2,
+    20.4
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040798",
+   "actual": "A",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.68,
+    3.32,
+    4.3
+   ],
+   "market_prob": [
+    52.7,
+    26.7,
+    20.6
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040769",
+   "actual": "H",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    1.28,
+    4.9,
+    6.95
+   ],
+   "market_prob": [
+    69.2,
+    18.1,
+    12.7
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040770",
+   "actual": "H",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    2.3,
+    2.75,
+    3.02
+   ],
+   "market_prob": [
+    38.5,
+    32.2,
+    29.3
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040772",
+   "actual": "H",
+   "llm_pick": "双选 主胜/客胜（H/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    2.35,
+    3.0,
+    2.7
+   ],
+   "market_prob": [
+    37.7,
+    29.5,
+    32.8
+   ],
+   "disagree": null
+  },
+  {
+   "match_id": "sporttery-2040787",
+   "actual": "A",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": true,
+   "odds": [
+    3.2,
+    3.45,
+    1.9
+   ],
+   "market_prob": [
+    27.7,
+    25.7,
+    46.6
+   ],
+   "disagree": true
+  },
+  {
+   "match_id": "sporttery-2040789",
+   "actual": "H",
+   "llm_pick": "单选 客胜（A）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": false,
+   "odds": [
+    4.0,
+    4.05,
+    1.58
+   ],
+   "market_prob": [
+    22.1,
+    21.9,
+    56.0
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040790",
+   "actual": "H",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    1.84,
+    3.15,
+    3.72
+   ],
+   "market_prob": [
+    48.1,
+    28.1,
+    23.8
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040791",
+   "actual": "D",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "A",
+   "market_hit": false,
+   "odds": [
+    5.05,
+    3.65,
+    1.52
+   ],
+   "market_prob": [
+    17.5,
+    24.2,
+    58.2
+   ],
+   "disagree": true
+  },
+  {
+   "match_id": "sporttery-2040792",
+   "actual": "A",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    2.05,
+    2.92,
+    3.35
+   ],
+   "market_prob": [
+    43.2,
+    30.3,
+    26.4
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040793",
+   "actual": "H",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "market_pick": "H",
+   "market_hit": true,
+   "odds": [
+    1.15,
+    5.8,
+    11.5
+   ],
+   "market_prob": [
+    77.0,
+    15.3,
+    7.7
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040794",
+   "actual": "D",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.25,
+    5.25,
+    7.25
+   ],
+   "market_prob": [
+    70.9,
+    16.9,
+    12.2
+   ],
+   "disagree": false
+  },
+  {
+   "match_id": "sporttery-2040795",
+   "actual": "H",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "market_pick": "A",
+   "market_hit": false,
+   "odds": [
+    3.85,
+    3.85,
+    1.64
+   ],
+   "market_prob": [
+    23.0,
+    23.0,
+    54.0
+   ],
+   "disagree": true
+  },
+  {
+   "match_id": "sporttery-2040796",
+   "actual": "D",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "market_pick": "H",
+   "market_hit": false,
+   "odds": [
+    1.73,
+    3.15,
+    4.3
+   ],
+   "market_prob": [
+    51.2,
+    28.1,
+    20.6
+   ],
+   "disagree": false
+  }
+ ]
+}

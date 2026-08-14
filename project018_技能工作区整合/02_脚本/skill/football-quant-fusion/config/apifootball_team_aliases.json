@@ -4,7 +4,9 @@
     "阿拉木图": "Kairat Almaty",
     "阿拉木图凯拉特": "Kairat Almaty",
     "索列夫": "Levski Sofia",
-    "索菲亚列夫斯基": "Levski Sofia"
+    "索菲亚列夫斯基": "Levski Sofia",
+    "巴黎圣日尔曼": "PSG",
+    "巴黎圣曼": "PSG"
   },
   "evidence": [
     {
@@ -16,6 +18,19 @@
       "away_full": "索菲亚列夫斯基",
       "provider_home": "Kairat Almaty",
       "provider_away": "Levski Sofia"
+    },
+    {
+      "verified_at": "2026-08-12",
+      "sporttery_match_id": 2040831,
+      "kickoff": "2026-08-13T03:00:00+08:00",
+      "competition": "UEFA Super Cup / 欧超杯",
+      "home_full": "巴黎圣日尔曼",
+      "home_abbr": "巴黎圣曼",
+      "away_full": "阿斯顿维拉",
+      "away_abbr": "维拉",
+      "provider_home": "PSG",
+      "provider_league": "ligue_1",
+      "note": "体彩全称与简称均指向同一场欧超杯对阵；本地 ligue_1 模型球队名为 PSG，别名表原有 slug parissg 归一化后不等于 psg，故显式登记"
     }
   ],
   "rule": "Only verified aliases may be added; fuzzy names never auto-settle."

@@ -1,0 +1,592 @@
+{
+  "weights": [
+    0.0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+  ],
+  "step_days": 30,
+  "half_life": 500.0,
+  "protocol": "walk_forward，每片拟合进球版与xG版各一次后按w混合",
+  "discipline": "w 在验证集上选，测试集只报结果",
+  "leagues": [
+    {
+      "league": {
+        "id": 152,
+        "slug": "premier_league",
+        "name": "Premier League"
+      },
+      "cutoffs": {
+        "validation_from": 739116,
+        "test_from": 739482
+      },
+      "xg_coverage": {
+        "loaded": 1795,
+        "xg_missing": 113,
+        "xg_input": "project021_五大联赛APIFootball训练\\04_素材\\标准化\\premier_league_xg.jsonl"
+      },
+      "validation_sweep": [
+        {
+          "w": 0.0,
+          "n": 382,
+          "skip": 1,
+          "brier": 0.597303,
+          "log_loss": 0.996255,
+          "accuracy_pct": 52.88,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "w": 0.2,
+          "n": 382,
+          "skip": 1,
+          "brier": 0.596127,
+          "log_loss": 0.994887,
+          "accuracy_pct": 53.14,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "w": 0.4,
+          "n": 382,
+          "skip": 1,
+          "brier": 0.595566,
+          "log_loss": 0.994519,
+          "accuracy_pct": 53.4,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "w": 0.6,
+          "n": 382,
+          "skip": 1,
+          "brier": 0.595597,
+          "log_loss": 0.995143,
+          "accuracy_pct": 53.14,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "w": 0.8,
+          "n": 382,
+          "skip": 1,
+          "brier": 0.596149,
+          "log_loss": 0.99675,
+          "accuracy_pct": 52.62,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "w": 1.0,
+          "n": 382,
+          "skip": 1,
+          "brier": 0.597351,
+          "log_loss": 0.999553,
+          "accuracy_pct": 52.09,
+          "market": 0.576167,
+          "frequency": 0.658233
+        }
+      ],
+      "validation_best": {
+        "w": 0.4,
+        "n": 382,
+        "skip": 1,
+        "brier": 0.595566,
+        "log_loss": 0.994519,
+        "accuracy_pct": 53.4,
+        "market": 0.576167,
+        "frequency": 0.658233
+      },
+      "test": {
+        "0.0": {
+          "n": 379,
+          "skip": 0,
+          "brier": 0.629658,
+          "log_loss": 1.061849,
+          "accuracy_pct": 46.17,
+          "market": 0.607958,
+          "frequency": 0.656125
+        },
+        "0.4": {
+          "n": 379,
+          "skip": 0,
+          "brier": 0.624149,
+          "log_loss": 1.045887,
+          "accuracy_pct": 48.02,
+          "market": 0.607958,
+          "frequency": 0.656125
+        }
+      },
+      "test_pure_goal_baseline": {
+        "n": 379,
+        "skip": 0,
+        "brier": 0.629658,
+        "log_loss": 1.061849,
+        "accuracy_pct": 46.17,
+        "market": 0.607958,
+        "frequency": 0.656125
+      }
+    },
+    {
+      "league": {
+        "id": 302,
+        "slug": "la_liga",
+        "name": "La Liga"
+      },
+      "cutoffs": {
+        "validation_from": 739118,
+        "test_from": 739483
+      },
+      "xg_coverage": {
+        "loaded": 1792,
+        "xg_missing": 120,
+        "xg_input": "project021_五大联赛APIFootball训练\\04_素材\\标准化\\la_liga_xg.jsonl"
+      },
+      "validation_sweep": [
+        {
+          "w": 0.0,
+          "n": 380,
+          "skip": 1,
+          "brier": 0.575446,
+          "log_loss": 0.970034,
+          "accuracy_pct": 53.16,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "w": 0.2,
+          "n": 380,
+          "skip": 1,
+          "brier": 0.574331,
+          "log_loss": 0.968836,
+          "accuracy_pct": 52.63,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "w": 0.4,
+          "n": 380,
+          "skip": 1,
+          "brier": 0.574569,
+          "log_loss": 0.969518,
+          "accuracy_pct": 53.42,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "w": 0.6,
+          "n": 380,
+          "skip": 1,
+          "brier": 0.576253,
+          "log_loss": 0.972128,
+          "accuracy_pct": 54.21,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "w": 0.8,
+          "n": 380,
+          "skip": 1,
+          "brier": 0.579461,
+          "log_loss": 0.976724,
+          "accuracy_pct": 54.74,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "w": 1.0,
+          "n": 380,
+          "skip": 1,
+          "brier": 0.584257,
+          "log_loss": 0.983381,
+          "accuracy_pct": 54.47,
+          "market": 0.555245,
+          "frequency": 0.64585
+        }
+      ],
+      "validation_best": {
+        "w": 0.2,
+        "n": 380,
+        "skip": 1,
+        "brier": 0.574331,
+        "log_loss": 0.968836,
+        "accuracy_pct": 52.63,
+        "market": 0.555245,
+        "frequency": 0.64585
+      },
+      "test": {
+        "0.0": {
+          "n": 383,
+          "skip": 0,
+          "brier": 0.58246,
+          "log_loss": 1.005776,
+          "accuracy_pct": 53.0,
+          "market": 0.567652,
+          "frequency": 0.631867
+        },
+        "0.2": {
+          "n": 383,
+          "skip": 0,
+          "brier": 0.581865,
+          "log_loss": 0.999729,
+          "accuracy_pct": 53.0,
+          "market": 0.567652,
+          "frequency": 0.631867
+        }
+      },
+      "test_pure_goal_baseline": {
+        "n": 383,
+        "skip": 0,
+        "brier": 0.58246,
+        "log_loss": 1.005776,
+        "accuracy_pct": 53.0,
+        "market": 0.567652,
+        "frequency": 0.631867
+      }
+    },
+    {
+      "league": {
+        "id": 207,
+        "slug": "serie_a",
+        "name": "Serie A"
+      },
+      "cutoffs": {
+        "validation_from": 739040,
+        "test_from": 739487
+      },
+      "xg_coverage": {
+        "loaded": 1790,
+        "xg_missing": 111,
+        "xg_input": "project021_五大联赛APIFootball训练\\04_素材\\标准化\\serie_a_xg.jsonl"
+      },
+      "validation_sweep": [
+        {
+          "w": 0.0,
+          "n": 377,
+          "skip": 4,
+          "brier": 0.590294,
+          "log_loss": 0.988246,
+          "accuracy_pct": 52.25,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "w": 0.2,
+          "n": 377,
+          "skip": 4,
+          "brier": 0.589459,
+          "log_loss": 0.987448,
+          "accuracy_pct": 53.05,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "w": 0.4,
+          "n": 377,
+          "skip": 4,
+          "brier": 0.590178,
+          "log_loss": 0.988978,
+          "accuracy_pct": 52.25,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "w": 0.6,
+          "n": 377,
+          "skip": 4,
+          "brier": 0.59256,
+          "log_loss": 0.992866,
+          "accuracy_pct": 52.79,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "w": 0.8,
+          "n": 377,
+          "skip": 4,
+          "brier": 0.596697,
+          "log_loss": 0.999172,
+          "accuracy_pct": 52.25,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "w": 1.0,
+          "n": 377,
+          "skip": 4,
+          "brier": 0.602668,
+          "log_loss": 1.00799,
+          "accuracy_pct": 50.93,
+          "market": 0.566564,
+          "frequency": 0.660376
+        }
+      ],
+      "validation_best": {
+        "w": 0.2,
+        "n": 377,
+        "skip": 4,
+        "brier": 0.589459,
+        "log_loss": 0.987448,
+        "accuracy_pct": 53.05,
+        "market": 0.566564,
+        "frequency": 0.660376
+      },
+      "test": {
+        "0.0": {
+          "n": 377,
+          "skip": 3,
+          "brier": 0.592714,
+          "log_loss": 0.992779,
+          "accuracy_pct": 51.72,
+          "market": 0.583598,
+          "frequency": 0.658857
+        },
+        "0.2": {
+          "n": 377,
+          "skip": 3,
+          "brier": 0.59362,
+          "log_loss": 0.99433,
+          "accuracy_pct": 51.46,
+          "market": 0.583598,
+          "frequency": 0.658857
+        }
+      },
+      "test_pure_goal_baseline": {
+        "n": 377,
+        "skip": 3,
+        "brier": 0.592714,
+        "log_loss": 0.992779,
+        "accuracy_pct": 51.72,
+        "market": 0.583598,
+        "frequency": 0.658857
+      }
+    },
+    {
+      "league": {
+        "id": 175,
+        "slug": "bundesliga",
+        "name": "Bundesliga"
+      },
+      "cutoffs": {
+        "validation_from": 739129,
+        "test_from": 739493
+      },
+      "xg_coverage": {
+        "loaded": 1432,
+        "xg_missing": 121,
+        "xg_input": "project021_五大联赛APIFootball训练\\04_素材\\标准化\\bundesliga_xg.jsonl"
+      },
+      "validation_sweep": [
+        {
+          "w": 0.0,
+          "n": 308,
+          "skip": 2,
+          "brier": 0.630071,
+          "log_loss": 1.065117,
+          "accuracy_pct": 46.75,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "w": 0.2,
+          "n": 308,
+          "skip": 2,
+          "brier": 0.625346,
+          "log_loss": 1.051664,
+          "accuracy_pct": 48.7,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "w": 0.4,
+          "n": 308,
+          "skip": 2,
+          "brier": 0.621268,
+          "log_loss": 1.041152,
+          "accuracy_pct": 48.05,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "w": 0.6,
+          "n": 308,
+          "skip": 2,
+          "brier": 0.618107,
+          "log_loss": 1.033459,
+          "accuracy_pct": 47.4,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "w": 0.8,
+          "n": 308,
+          "skip": 2,
+          "brier": 0.616081,
+          "log_loss": 1.028873,
+          "accuracy_pct": 46.75,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "w": 1.0,
+          "n": 308,
+          "skip": 2,
+          "brier": 0.615929,
+          "log_loss": 1.028647,
+          "accuracy_pct": 46.75,
+          "market": 0.605527,
+          "frequency": 0.668732
+        }
+      ],
+      "validation_best": {
+        "w": 1.0,
+        "n": 308,
+        "skip": 2,
+        "brier": 0.615929,
+        "log_loss": 1.028647,
+        "accuracy_pct": 46.75,
+        "market": 0.605527,
+        "frequency": 0.668732
+      },
+      "test": {
+        "0.0": {
+          "n": 310,
+          "skip": 1,
+          "brier": 0.577339,
+          "log_loss": 0.976359,
+          "accuracy_pct": 54.84,
+          "market": 0.554001,
+          "frequency": 0.646725
+        },
+        "1.0": {
+          "n": 310,
+          "skip": 1,
+          "brier": 0.586698,
+          "log_loss": 0.989111,
+          "accuracy_pct": 53.23,
+          "market": 0.554001,
+          "frequency": 0.646725
+        }
+      },
+      "test_pure_goal_baseline": {
+        "n": 310,
+        "skip": 1,
+        "brier": 0.577339,
+        "log_loss": 0.976359,
+        "accuracy_pct": 54.84,
+        "market": 0.554001,
+        "frequency": 0.646725
+      }
+    },
+    {
+      "league": {
+        "id": 168,
+        "slug": "ligue_1",
+        "name": "Ligue 1"
+      },
+      "cutoffs": {
+        "validation_from": 738984,
+        "test_from": 739369
+      },
+      "xg_coverage": {
+        "loaded": 1591,
+        "xg_missing": 91,
+        "xg_input": "project021_五大联赛APIFootball训练\\04_素材\\标准化\\ligue_1_xg.jsonl"
+      },
+      "validation_sweep": [
+        {
+          "w": 0.0,
+          "n": 333,
+          "skip": 0,
+          "brier": 0.578152,
+          "log_loss": 0.973928,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "w": 0.2,
+          "n": 333,
+          "skip": 0,
+          "brier": 0.578909,
+          "log_loss": 0.97481,
+          "accuracy_pct": 55.86,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "w": 0.4,
+          "n": 333,
+          "skip": 0,
+          "brier": 0.580664,
+          "log_loss": 0.977263,
+          "accuracy_pct": 55.26,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "w": 0.6,
+          "n": 333,
+          "skip": 0,
+          "brier": 0.583488,
+          "log_loss": 0.981281,
+          "accuracy_pct": 53.45,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "w": 0.8,
+          "n": 333,
+          "skip": 0,
+          "brier": 0.587438,
+          "log_loss": 0.986863,
+          "accuracy_pct": 51.95,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "w": 1.0,
+          "n": 333,
+          "skip": 0,
+          "brier": 0.592554,
+          "log_loss": 0.994013,
+          "accuracy_pct": 51.35,
+          "market": 0.568722,
+          "frequency": 0.641648
+        }
+      ],
+      "validation_best": {
+        "w": 0.0,
+        "n": 333,
+        "skip": 0,
+        "brier": 0.578152,
+        "log_loss": 0.973928,
+        "accuracy_pct": 56.16,
+        "market": 0.568722,
+        "frequency": 0.641648
+      },
+      "test": {
+        "0.0": {
+          "n": 334,
+          "skip": 3,
+          "brier": 0.59301,
+          "log_loss": 0.993461,
+          "accuracy_pct": 52.99,
+          "market": 0.587142,
+          "frequency": 0.640701
+        }
+      },
+      "test_pure_goal_baseline": {
+        "n": 334,
+        "skip": 3,
+        "brier": 0.59301,
+        "log_loss": 0.993461,
+        "accuracy_pct": 52.99,
+        "market": 0.587142,
+        "frequency": 0.640701
+      }
+    }
+  ]
+}

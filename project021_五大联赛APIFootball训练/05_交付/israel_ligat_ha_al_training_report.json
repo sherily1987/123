@@ -1,0 +1,129 @@
+{
+  "league": {
+    "id": 202,
+    "slug": "israel_ligat_ha_al",
+    "name": "Ligat Ha'al",
+    "country": "Israel",
+    "kind": "domestic_league"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1199,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 18,
+    "train_n": 719,
+    "validation_n": 240,
+    "test_n": 240
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\israel_ligat_ha_al_candidate.json",
+  "validation": {
+    "n": 207,
+    "skip": 33,
+    "model": {
+      "n": 207,
+      "brier_mean": 0.586934,
+      "log_loss": 0.987151,
+      "accuracy_pct": 54.59
+    },
+    "model_on_baseline_subset": {
+      "n": 202,
+      "brier_mean": 0.582558,
+      "log_loss": 0.981037,
+      "accuracy_pct": 54.95
+    },
+    "provider_market": {
+      "n": 202,
+      "brier_mean": 0.5675,
+      "log_loss": 0.958549,
+      "accuracy_pct": 51.98
+    },
+    "frequency_baseline": {
+      "n": 207,
+      "brier_mean": 0.654407,
+      "log_loss": 1.079197,
+      "probs": [
+        0.4,
+        0.2625,
+        0.3375
+      ]
+    },
+    "by_league": {
+      "202": {
+        "n": 207,
+        "model": {
+          "n": 207,
+          "brier_mean": 0.586934,
+          "log_loss": 0.987151,
+          "accuracy_pct": 54.59
+        },
+        "provider_market": {
+          "n": 202,
+          "brier_mean": 0.5675,
+          "log_loss": 0.958549,
+          "accuracy_pct": 51.98
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 239,
+    "skip": 0,
+    "model": {
+      "n": 239,
+      "brier_mean": 0.642805,
+      "log_loss": 1.062449,
+      "accuracy_pct": 43.93
+    },
+    "model_on_baseline_subset": {
+      "n": 234,
+      "brier_mean": 0.637232,
+      "log_loss": 1.055121,
+      "accuracy_pct": 44.44
+    },
+    "provider_market": {
+      "n": 234,
+      "brier_mean": 0.575542,
+      "log_loss": 0.966669,
+      "accuracy_pct": 55.13
+    },
+    "frequency_baseline": {
+      "n": 239,
+      "brier_mean": 0.65533,
+      "log_loss": 1.081311,
+      "probs": [
+        0.4,
+        0.2594,
+        0.3406
+      ]
+    },
+    "by_league": {
+      "202": {
+        "n": 239,
+        "model": {
+          "n": 239,
+          "brier_mean": 0.642805,
+          "log_loss": 1.062449,
+          "accuracy_pct": 43.93
+        },
+        "provider_market": {
+          "n": 234,
+          "brier_mean": 0.575542,
+          "log_loss": 0.966669,
+          "accuracy_pct": 55.13
+        }
+      }
+    }
+  },
+  "provider_market_coverage": {
+    "event_count": 1199,
+    "matched_events": 843,
+    "unmatched_events": 356,
+    "rejected_after_kickoff": 116,
+    "rejected_invalid_odds": 7,
+    "rejected_unparseable_time": 0
+  }
+}

@@ -8,7 +8,7 @@ from backtest_lib import *
 def parse_dt(s): return datetime.fromisoformat(s.replace('Z','+00:00'))
 # [中文功能] 把核心预测登记进回测库
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('--input',required=True);ap.add_argument('--output',required=True);ap.add_argument('--store',default='H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest');ap.add_argument('--snapshot',default='unspecified');ap.add_argument('--allow-past',action='store_true');ap.add_argument('--predict',action='store_true',help='先跑predict.py生成--output再登记');ap.add_argument('--replace-snapshot',action='store_true',help='允许同一(match_id,snapshot)重复登记；重复条目在回测中只算一个样本');a=ap.parse_args()
+ ap=argparse.ArgumentParser();ap.add_argument('--input',required=True);ap.add_argument('--output',required=True);ap.add_argument('--store',default='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest');ap.add_argument('--snapshot',default='unspecified');ap.add_argument('--allow-past',action='store_true');ap.add_argument('--predict',action='store_true',help='先跑predict.py生成--output再登记');ap.add_argument('--replace-snapshot',action='store_true',help='允许同一(match_id,snapshot)重复登记；重复条目在回测中只算一个样本');a=ap.parse_args()
  inp=json.load(open(a.input,encoding='utf-8'))
  if a.predict:
   from predict import predict as run

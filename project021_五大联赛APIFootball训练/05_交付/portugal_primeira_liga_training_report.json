@@ -1,0 +1,116 @@
+{
+  "league": {
+    "id": 266,
+    "slug": "portugal_primeira_liga",
+    "name": "Primeira Liga",
+    "country": "Portugal"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1539,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 27,
+    "train_n": 923,
+    "validation_n": 308,
+    "test_n": 308
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\portugal_primeira_liga_candidate.json",
+  "validation": {
+    "n": 274,
+    "skip": 34,
+    "model": {
+      "n": 274,
+      "brier_mean": 0.582468,
+      "log_loss": 0.981214,
+      "accuracy_pct": 50.36
+    },
+    "provider_market": {
+      "n": 246,
+      "brier_mean": 0.555649,
+      "log_loss": 0.935666,
+      "accuracy_pct": 54.88
+    },
+    "frequency_baseline": {
+      "n": 274,
+      "brier_mean": 0.655911,
+      "log_loss": 1.083183,
+      "probs": [
+        0.442,
+        0.2351,
+        0.3229
+      ]
+    },
+    "by_league": {
+      "266": {
+        "n": 274,
+        "model": {
+          "n": 274,
+          "brier_mean": 0.582468,
+          "log_loss": 0.981214,
+          "accuracy_pct": 50.36
+        },
+        "provider_market": {
+          "n": 246,
+          "brier_mean": 0.555649,
+          "log_loss": 0.935666,
+          "accuracy_pct": 54.88
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 272,
+    "skip": 36,
+    "model": {
+      "n": 272,
+      "brier_mean": 0.54923,
+      "log_loss": 0.930494,
+      "accuracy_pct": 54.78
+    },
+    "provider_market": {
+      "n": 247,
+      "brier_mean": 0.536039,
+      "log_loss": 0.908371,
+      "accuracy_pct": 55.47
+    },
+    "frequency_baseline": {
+      "n": 272,
+      "brier_mean": 0.660844,
+      "log_loss": 1.089891,
+      "probs": [
+        0.4395,
+        0.2413,
+        0.3193
+      ]
+    },
+    "by_league": {
+      "266": {
+        "n": 272,
+        "model": {
+          "n": 272,
+          "brier_mean": 0.54923,
+          "log_loss": 0.930494,
+          "accuracy_pct": 54.78
+        },
+        "provider_market": {
+          "n": 247,
+          "brier_mean": 0.536039,
+          "log_loss": 0.908371,
+          "accuracy_pct": 55.47
+        }
+      }
+    }
+  },
+  "provider_market_coverage": {
+    "event_count": 1539,
+    "matched_events": 999,
+    "unmatched_events": 540,
+    "rejected_after_kickoff": 66,
+    "rejected_invalid_odds": 1,
+    "rejected_unparseable_time": 0
+  }
+}

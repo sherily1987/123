@@ -19,7 +19,17 @@ project018_技能工作区整合/04_素材/迁移清单/
 # APIFootball 五大联赛原始响应与标准化赛果留在项目工作区；体量大，按目录清单和下载器可复现。
 project021_五大联赛APIFootball训练/04_素材/apifootball_com_raw/
 project021_五大联赛APIFootball训练/04_素材/apifootball_com_odds_raw/
+# 同类供应商原始缓存，2026-08-11 定规则后新建，补上：
+#   apifootball_com_raw_stats/  2710 个 JSON / 约 3.2GB（apifootball.com 单场统计）
+#   api_football_raw/           6374 个 JSON / 约 31MB（api-sports.io 原始响应）
+project021_五大联赛APIFootball训练/04_素材/apifootball_com_raw_stats/
+project021_五大联赛APIFootball训练/04_素材/api_football_raw/
 project021_五大联赛APIFootball训练/04_素材/标准化/
 project021_五大联赛APIFootball训练/05_交付/*.log
 # Junction is a local Codex discovery bridge, recreated by switch_runtime.ps1.
 project018_技能工作区整合/05_交付/plugin/football-quant-fusion/skills/
+
+# 仓库根目录纪律（见 AGENTS.md §5）：临时抓取/调试文件不该直接落在根目录，
+# 应放进对应项目的 04_素材/。这条只锚定根层级（开头的 /），不影响项目内部同名文件。
+/*.html
+/*.json

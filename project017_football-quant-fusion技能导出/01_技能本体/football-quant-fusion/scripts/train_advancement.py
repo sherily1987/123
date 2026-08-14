@@ -21,7 +21,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts")
+sys.path.insert(0, r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts")
 import build_advancement_library as B
 
 D = B.D

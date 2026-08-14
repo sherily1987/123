@@ -1,0 +1,129 @@
+{
+  "league": {
+    "id": 253,
+    "slug": "norway_eliteserien",
+    "name": "Eliteserien",
+    "country": "Norway",
+    "kind": "domestic_league"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1226,
+    "season_count": 6,
+    "team_id_coverage": 1.0,
+    "team_count": 25,
+    "train_n": 735,
+    "validation_n": 245,
+    "test_n": 246
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\norway_eliteserien_candidate.json",
+  "validation": {
+    "n": 234,
+    "skip": 12,
+    "model": {
+      "n": 234,
+      "brier_mean": 0.633715,
+      "log_loss": 1.054713,
+      "accuracy_pct": 49.15
+    },
+    "model_on_baseline_subset": {
+      "n": 226,
+      "brier_mean": 0.639964,
+      "log_loss": 1.064054,
+      "accuracy_pct": 48.67
+    },
+    "provider_market": {
+      "n": 226,
+      "brier_mean": 0.596257,
+      "log_loss": 0.99844,
+      "accuracy_pct": 52.21
+    },
+    "frequency_baseline": {
+      "n": 234,
+      "brier_mean": 0.646198,
+      "log_loss": 1.067689,
+      "probs": [
+        0.4612,
+        0.2272,
+        0.3116
+      ]
+    },
+    "by_league": {
+      "253": {
+        "n": 234,
+        "model": {
+          "n": 234,
+          "brier_mean": 0.633715,
+          "log_loss": 1.054713,
+          "accuracy_pct": 49.15
+        },
+        "provider_market": {
+          "n": 226,
+          "brier_mean": 0.596257,
+          "log_loss": 0.99844,
+          "accuracy_pct": 52.21
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 233,
+    "skip": 12,
+    "model": {
+      "n": 233,
+      "brier_mean": 0.574885,
+      "log_loss": 0.969054,
+      "accuracy_pct": 55.36
+    },
+    "model_on_baseline_subset": {
+      "n": 220,
+      "brier_mean": 0.575706,
+      "log_loss": 0.969633,
+      "accuracy_pct": 55.45
+    },
+    "provider_market": {
+      "n": 220,
+      "brier_mean": 0.531631,
+      "log_loss": 0.908954,
+      "accuracy_pct": 58.18
+    },
+    "frequency_baseline": {
+      "n": 233,
+      "brier_mean": 0.618527,
+      "log_loss": 1.027471,
+      "probs": [
+        0.4577,
+        0.2283,
+        0.314
+      ]
+    },
+    "by_league": {
+      "253": {
+        "n": 233,
+        "model": {
+          "n": 233,
+          "brier_mean": 0.574885,
+          "log_loss": 0.969054,
+          "accuracy_pct": 55.36
+        },
+        "provider_market": {
+          "n": 220,
+          "brier_mean": 0.531631,
+          "log_loss": 0.908954,
+          "accuracy_pct": 58.18
+        }
+      }
+    }
+  },
+  "provider_market_coverage": {
+    "event_count": 1226,
+    "matched_events": 795,
+    "unmatched_events": 431,
+    "rejected_after_kickoff": 0,
+    "rejected_invalid_odds": 1,
+    "rejected_unparseable_time": 0
+  }
+}

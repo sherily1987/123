@@ -1,0 +1,37 @@
+📁 证据文件: 5 个
+   - evidence_001_psg_villa.md
+   - evidence_002_platense_coquimbo.md
+   - evidence_003_palmeiras_cerro.md
+   - evidence_009_mirassol_ldu.md
+   - evidence_010_rosario_corinthians.md
+🎯 共 1 场比赛待预测, 每场 3 个模型定性判断
+
+================================================================
+⚽ 第1/1场 [周三003] 帕梅拉斯 VS 波特诺 | 解放者杯 | 2026-08-13 06:00
+   证据: evidence_003_palmeiras_cerro.md
+================================================================
+     ✓ [deepseek-chat     ] -> 主胜 / 平局 比分偏好:1-0
+     ✓ [glm-4-flash       ] -> 主胜 / 客胜 比分偏好:1-0
+     ✓ [kimi-k2.6         ] -> 主胜 / 平局 比分偏好:1-0
+
+  📊 综合方向: 主胜  (1.2/1.8票, 强度67%)
+  🚨 谨慎(证据存在缺口): 建议双选 主胜/平局
+  🎯 比分偏好: 1-0
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平胜
+  ⚠️ 坍缩标记: OU_COLLAPSE:小2.5x3
+
+  💰 下注推荐:
+     🚫 不下注 — 证据存在缺口，风险过高
+     
+     EV 分析:
+       主胜: 预测 66.7% × 赔率 1.22 = EV -18.7% ❌
+       平局: 预测 26.2% × 赔率 4.70 = EV +23.1% ✅
+       客胜: 预测 7.1% × 赔率 10.50 = EV -25.0% ❌
+  🗳️ 投票分布: 主胜:1.2 | 平局:0.5 | 客胜:0.1
+  🤖 各模型判断:
+     [deepseek-chat       ] 主胜 (备选:平局) 比分:1-0 — 【近况: 洲际赛事双方无同尺度对比数据，状态成疑】【战意: 解放者杯正赛，双方均全力争胜】【主客: 帕梅拉斯主场作战，洲
+     [glm-4-flash         ] 主胜 (备选:客胜) 比分:1-0 — 【战意: 双方均为正赛，解放者杯淘汰赛性质】【主客: 帕梅拉斯为主队，洲际赛事存在旅行因素】【赔率: 主胜赔率远低于客胜
+     [kimi-k2.6           ] 主胜 (备选:平局) 比分:1-0 — 【战意: 解放者杯单场淘汰性质双方均为正赛】【伤停: 未取得双方官方首发/伤停可核验来源】【主客: 帕梅拉斯为主队但旅行
+{"direction": "主胜", "votes": 1.19, "total_votes": 1.785, "strength": 0.6666666666666666, "all_votes": {"主胜": 1.19, "平局": 0.4675, "客胜": 0.1275}, "top_score_pref": "1-0", "score_prefs": {"1-0": 1.19}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 1.19}, "top_hafu": "平胜", "all_hafu": {"平胜": 1.19}, "alt_direction": "平局", "caution": true, "valid_model_count": 3, "minimum_valid_models": 3, "collapse_flags": ["OU_COLLAPSE:小2.5x3"], "individual": {"zhipu/glm-4-flash": {"model_id": "zhipu/glm-4-flash", "provider": "zhipu", "direction": "主胜", "alt_direction": "客胜", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意: 双方均为正赛，解放者杯淘汰赛性质】【主客: 帕梅拉斯为主队，洲际赛事存在旅行因素】【赔率: 主胜赔率远低于客胜】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "主客", "旅行"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【近况: 洲际赛事双方无同尺度对比数据，状态成疑】【战意: 解放者杯正赛，双方均全力争胜】【主客: 帕梅拉斯主场作战，洲际旅行因素对客队不利】【身份: 巴西俱乐部整体实力强于巴拉圭俱乐部，赔率1.22显示市场高度看好主队】但伤停/首发信息缺失，且杯赛首回合冷门频发，主队大热需防平局。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况", "状态", "主客", "旅行", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k2.6": {"model_id": "moonshot/kimi-k2.6", "provider": "moonshot", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意: 解放者杯单场淘汰性质双方均为正赛】【伤停: 未取得双方官方首发/伤停可核验来源】【主客: 帕梅拉斯为主队但旅行及场地信息待补】。主队大热但证据缺口显著，杯赛单场易爆冷，保守看主胜防平，倾向低比分。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "主客", "旅行"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "llm_model_pool_sha256": "4b61f8e50c398acb711f79465a1c1e63d77bc29640fe9a062a2176c69e8a39f9", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "d0827049d3cc2821a224d6fa7881f939728da9fc27f59ebe4cba722ed69c8c7c", "evidence_file_sha256": "747038ba7b2dd418cd0cfe8b371483487f75ca8e132d5f999ea9c0957f3cd654", "evidence_collected_at_min": "2026-08-12T21:07:48+0800", "evidence_collected_at_max": "2026-08-12T21:07:48+0800", "ev_recommendation": {"action": "skip", "reason": "证据存在缺口，风险过高", "recommended_bets": [], "ev_analysis": {"主胜": {"predicted_prob": 0.6666666666666666, "odds": 1.22, "ev": -0.18666666666666676}, "平局": {"predicted_prob": 0.2619047619047619, "odds": 4.7, "ev": 0.23095238095238102}, "客胜": {"predicted_prob": 0.07142857142857144, "odds": 10.5, "ev": -0.2499999999999999}}}}
+

@@ -1,0 +1,33 @@
+{
+  "league": {
+    "id": 28,
+    "slug": "world_cup",
+    "name": "World Cup",
+    "country": "Worldcup"
+  },
+  "eligibility": {
+    "tier": "pooled",
+    "reasons": [
+      "completed_n_lt_900",
+      "season_count_lt_3",
+      "test_n_lt_150"
+    ],
+    "completed_n": 163,
+    "season_count": 2,
+    "team_id_coverage": 1.0,
+    "team_count": 54,
+    "train_n": 97,
+    "validation_n": 33,
+    "test_n": 33
+  },
+  "lifecycle": "candidate",
+  "status": "not_trained",
+  "provider_market_coverage": {
+    "event_count": 163,
+    "matched_events": 149,
+    "unmatched_events": 14,
+    "rejected_after_kickoff": 125,
+    "rejected_invalid_odds": 0,
+    "rejected_unparseable_time": 0
+  }
+}

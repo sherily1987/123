@@ -1,0 +1,68 @@
+{
+  "home": "Bayer Leverkusen",
+  "away": "Hamburg",
+  "neutral": false,
+  "home_league": "bundesliga",
+  "away_league": "bundesliga",
+  "cross_league": false,
+  "verdict": "降级",
+  "reasons": [
+    "联赛档位取较差者：bundesliga=C, bundesliga=C -> C",
+    "档位 C：只看方向，不要采用具体数值"
+  ],
+  "league_tiers": {
+    "bundesliga": {
+      "tier": "C",
+      "gap": 0.0214,
+      "n": 276
+    }
+  },
+  "weighted_n": {
+    "Bayer Leverkusen": 67.32,
+    "Hamburg": 31.31
+  },
+  "basis": {
+    "mode": "same_league",
+    "league": "bundesliga",
+    "xg": true,
+    "xg_weight": 0.4,
+    "home_adv": 0.11283797939245703,
+    "note": "复刻回测协议：half_life=500，启用 xG 时按 w=0.4 混合，不加收缩"
+  },
+  "market_dependency": "UNAVAILABLE",
+  "prediction": {
+    "lambda": [
+      2.1403,
+      0.9717
+    ],
+    "probs_1x2": [
+      0.6485,
+      0.1831,
+      0.1684
+    ],
+    "over25": 0.6014,
+    "btts": 0.5411,
+    "top_scores": [
+      {
+        "score": "1-0",
+        "p": 0.1027
+      },
+      {
+        "score": "2-0",
+        "p": 0.1019
+      },
+      {
+        "score": "2-1",
+        "p": 0.0991
+      },
+      {
+        "score": "1-1",
+        "p": 0.0852
+      },
+      {
+        "score": "3-0",
+        "p": 0.0727
+      }
+    ]
+  }
+}

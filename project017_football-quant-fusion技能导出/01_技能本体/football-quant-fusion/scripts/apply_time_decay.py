@@ -9,8 +9,9 @@ import sys
 from pathlib import Path
 
 from runtime import resolve_python
+from runtime_paths import core_scripts_dir
 
-_ZU = Path(r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3\scripts\apply_time_decay.py")
+_ZU = core_scripts_dir() / "apply_time_decay.py"
 
 
 def main():

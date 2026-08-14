@@ -1,0 +1,37 @@
+📁 证据文件: 5 个
+   - evidence_001_psg_villa.md
+   - evidence_002_platense_coquimbo.md
+   - evidence_003_palmeiras_cerro.md
+   - evidence_009_mirassol_ldu.md
+   - evidence_010_rosario_corinthians.md
+🎯 共 1 场比赛待预测, 每场 3 个模型定性判断
+
+================================================================
+⚽ 第1/1场 [周三001] 巴黎圣曼 VS 维拉 | 欧超杯 | 2026-08-13 03:00
+   证据: evidence_001_psg_villa.md
+================================================================
+     ✓ [deepseek-chat     ] -> 主胜 / 平局 比分偏好:1-0
+     ✓ [glm-4-flash       ] -> 主胜 / 客胜 比分偏好:2-0
+     ✓ [kimi-k2.6         ] -> 主胜 / 平局 比分偏好:1-0
+
+  📊 综合方向: 主胜  (1.2/1.8票, 强度67%)
+  🚨 谨慎(证据存在缺口): 建议双选 主胜/平局
+  🎯 比分偏好: 1-0
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平胜
+  ⚠️ 坍缩标记: OU_COLLAPSE:小2.5x3
+
+  💰 下注推荐:
+     🚫 不下注 — 证据存在缺口，风险过高
+     
+     EV 分析:
+       主胜: 预测 66.7% × 赔率 1.58 = EV +5.3% ✅
+       平局: 预测 26.2% × 赔率 3.55 = EV -7.0% ❌
+       客胜: 预测 7.1% × 赔率 4.65 = EV -66.8% ❌
+  🗳️ 投票分布: 主胜:1.2 | 平局:0.5 | 客胜:0.1
+  🤖 各模型判断:
+     [deepseek-chat       ] 主胜 (备选:平局) 比分:1-0 — 【身份: 欧超杯为欧冠冠军对阵欧联冠军，巴黎圣曼作为欧冠冠军实力定位高于维拉】【战意: 单场决赛双方均全力争胜，但巴黎整
+     [glm-4-flash         ] 主胜 (备选:客胜) 比分:2-0 — 【战意: 欧超杯决赛，双方均为正赛】【主客: 巴黎圣曼为主队】【身份: 欧冠冠军 vs 欧联冠军】
+     [kimi-k2.6           ] 主胜 (备选:平局) 比分:1-0 — 【伤停:未取得双方官方首发/伤停公告可核验来源】【近况:涉及不同联赛无可靠同尺度状态对比】欧超杯单场决赛双方战意充足，巴
+{"direction": "主胜", "votes": 1.19, "total_votes": 1.785, "strength": 0.6666666666666666, "all_votes": {"主胜": 1.19, "平局": 0.4675, "客胜": 0.1275}, "top_score_pref": "1-0", "score_prefs": {"1-0": 0.935, "2-0": 0.255}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 1.19}, "top_hafu": "平胜", "all_hafu": {"平胜": 0.935, "胜胜": 0.255}, "alt_direction": "平局", "caution": true, "valid_model_count": 3, "minimum_valid_models": 3, "collapse_flags": ["OU_COLLAPSE:小2.5x3"], "individual": {"zhipu/glm-4-flash": {"model_id": "zhipu/glm-4-flash", "provider": "zhipu", "direction": "主胜", "alt_direction": "客胜", "score_pref": "2-0", "ou25": "小2.5", "hafu": "胜胜", "evidence_gap": true, "reasoning": "【战意: 欧超杯决赛，双方均为正赛】【主客: 巴黎圣曼为主队】【身份: 欧冠冠军 vs 欧联冠军】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "主客", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【身份: 欧超杯为欧冠冠军对阵欧联冠军，巴黎圣曼作为欧冠冠军实力定位高于维拉】【战意: 单场决赛双方均全力争胜，但巴黎整体阵容深度占优】【近况: 无同尺度对比数据，仅能依据市场基线判断】【伤停: 双方首发及伤停信息未公布，存在不确定性】。官方赔率主胜1.58明显低赔，但中立场决赛冷门频发，且证据缺口较大，故双选平局。比分倾向1-0，总进球小，半全场平胜。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "阵容", "首发", "战意", "近况", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k2.6": {"model_id": "moonshot/kimi-k2.6", "provider": "moonshot", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【伤停:未取得双方官方首发/伤停公告可核验来源】【近况:涉及不同联赛无可靠同尺度状态对比】欧超杯单场决赛双方战意充足，巴黎圣曼名义主队但中立场作战；证据缺口显著且杯赛决赛易保守，大热方需防平，倾向低比分小球。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况", "状态"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "llm_model_pool_sha256": "4b61f8e50c398acb711f79465a1c1e63d77bc29640fe9a062a2176c69e8a39f9", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "0264df372a29ab0da7914ee77fe77fd2595784e640aaf0c2b97c9466e1cb211d", "evidence_file_sha256": "3024d555bc3e3c203b6c3fdc46dd6d193ba3f661d81587b11117c011d243db6a", "evidence_collected_at_min": "2026-08-12T21:07:48+0800", "evidence_collected_at_max": "2026-08-12T21:07:48+0800", "ev_recommendation": {"action": "skip", "reason": "证据存在缺口，风险过高", "recommended_bets": [], "ev_analysis": {"主胜": {"predicted_prob": 0.6666666666666666, "odds": 1.58, "ev": 0.05333333333333323}, "平局": {"predicted_prob": 0.2619047619047619, "odds": 3.55, "ev": -0.07023809523809521}, "客胜": {"predicted_prob": 0.07142857142857144, "odds": 4.65, "ev": -0.6678571428571427}}}}
+

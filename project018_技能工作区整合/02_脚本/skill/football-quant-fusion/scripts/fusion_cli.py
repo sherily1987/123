@@ -113,6 +113,10 @@ def record_fusion(rest):
     core["recommendation_gate"] = wrapped.get("recommendation_gate") or (wrapped.get("core_output") or {}).get("recommendation_gate")
     core["data_usage_audit"] = wrapped.get("data_usage_audit") or (wrapped.get("core_output") or {}).get("data_usage_audit")
     core["fusion_full_output"] = wrapped
+    # 2026-08-12 修复：保留 build_identity，否则 fusion_record 登记时
+    # engine_bundle/prediction_code/config 三个哈希全部落 'unknown'，
+    # 导致同版本样本永远无法归入 current cohort（P1-1 根因）。
+    core["build_identity"] = wrapped.get("build_identity")
     if odds_report is not None:
         core["odds_movement_capture"] = odds_report
     core_path = fusion_output.with_suffix(fusion_output.suffix + ".registry-core.json")

@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
 from predict import matrix as dc_matrix, one as dc_one
 
 RHO = -0.08

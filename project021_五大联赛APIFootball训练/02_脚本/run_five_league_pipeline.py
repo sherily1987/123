@@ -29,19 +29,21 @@ download_odds_for_dates = odds_history.download_odds_for_dates
 attach_provider_market = odds_history.attach_provider_market
 
 
-def catalog() -> dict:
-    return json.loads((HERE / "five_league_catalog.json").read_text(encoding="utf-8"))
+def catalog(path: Path | None = None) -> dict:
+    return json.loads((path or HERE / "five_league_catalog.json").read_text(encoding="utf-8"))
 
 
-def run_pipeline(project: Path, refresh: bool = False) -> dict:
-    config = catalog()
+def run_pipeline(project: Path, refresh: bool = False, catalog_path: Path | None = None,
+                 with_player_stats: bool = False) -> dict:
+    config = catalog(catalog_path)
     start, end = date.fromisoformat(config["window"]["from"]), date.fromisoformat(config["window"]["to"])
     project = project.resolve()
     delivery = project / "05_交付"
     delivery.mkdir(parents=True, exist_ok=True)
     result, failures, downloaded = {"leagues": {}}, [], {}
     for league in config["leagues"]:
-        report = download_history(league["id"], start, end, project, league["slug"], refresh)
+        report = download_history(league["id"], start, end, project, league["slug"], refresh,
+                                  with_player_stats=with_player_stats)
         entry = {
             "download": {
                 "rows": len(report["rows"]), "months_reused": report.get("months_reused", []),
@@ -49,6 +51,8 @@ def run_pipeline(project: Path, refresh: bool = False) -> dict:
                 "output": report.get("output"),
             }
         }
+        if "statistics" in report:
+            entry["statistics"] = report["statistics"]
         downloaded[league["slug"]] = (league, report)
         if report["failures"]:
             entry.update({"status": "download_failed", "training": {"status": "skipped", "reason": "download_failures"}})
@@ -76,7 +80,8 @@ def run_pipeline(project: Path, refresh: bool = False) -> dict:
     result["status"] = "partial" if failures else "ok"
     result["download_failures"] = failures
     (delivery / "download_failures.json").write_text(json.dumps(failures, ensure_ascii=False, indent=2), encoding="utf-8")
-    (delivery / "five_league_pipeline_report.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    report_name = config.get("report_name", "five_league_pipeline_report.json")
+    (delivery / report_name).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     return result
 
 
@@ -84,8 +89,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project", type=Path, required=True)
     parser.add_argument("--refresh", action="store_true")
+    parser.add_argument("--catalog", type=Path, help="联赛清单 JSON，默认 five_league_catalog.json")
+    parser.add_argument("--with-player-stats", action="store_true", help="同时抓取球队级赛后统计")
     args = parser.parse_args()
-    result = run_pipeline(args.project, args.refresh)
+    result = run_pipeline(args.project, args.refresh, args.catalog, args.with_player_stats)
     print(json.dumps(result, ensure_ascii=False))
     if result["status"] == "partial":
         raise SystemExit(1)

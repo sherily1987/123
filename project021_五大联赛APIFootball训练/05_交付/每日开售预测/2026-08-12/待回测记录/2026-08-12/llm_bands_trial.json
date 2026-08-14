@@ -1,0 +1,313 @@
+{
+  "schema": "llm-band-trial-1.0",
+  "recorded_at": "2026-08-12",
+  "protocol": "赔率发布前登记，避免被市场锚定；开售后由 watch_sporttery_sale.py 抓取赔率对照，赛后结算算 Brier",
+  "records": [
+    {
+      "match_num": "周四002",
+      "matchup": "克拉约瓦(罗马尼亚) vs 库奥皮奥(芬兰)",
+      "direction": {
+        "probability_bands": {
+          "H": "中高",
+          "D": "中低",
+          "A": "偏低"
+        }
+      },
+      "rationale": "主队本国联赛中上游且主场，客队芬超冠军但客场作战",
+      "prior_exposure_to_quant_model": false,
+      "derived": {
+        "bands": {
+          "H": "中高",
+          "D": "中低",
+          "A": "偏低"
+        },
+        "midpoints_pct": {
+          "H": 45.0,
+          "D": 35.0,
+          "A": 25.0
+        },
+        "raw_sum_pct": 105.0,
+        "coherent": true,
+        "probs_1x2": [
+          0.428572,
+          0.333333,
+          0.238095
+        ],
+        "basis": "band_midpoint_normalized"
+      },
+      "match_id": 2040821
+    },
+    {
+      "match_num": "周四003",
+      "matchup": "帕福斯(塞浦路斯) vs 萨尔茨堡(奥地利)",
+      "direction": {
+        "probability_bands": {
+          "H": "偏低",
+          "D": "中低",
+          "A": "中高"
+        }
+      },
+      "rationale": "萨尔茨堡是欧冠常客，实力明显占优；帕福斯主场略补",
+      "prior_exposure_to_quant_model": false,
+      "derived": {
+        "bands": {
+          "H": "偏低",
+          "D": "中低",
+          "A": "中高"
+        },
+        "midpoints_pct": {
+          "H": 25.0,
+          "D": 35.0,
+          "A": 45.0
+        },
+        "raw_sum_pct": 105.0,
+        "coherent": true,
+        "probs_1x2": [
+          0.238095,
+          0.333333,
+          0.428572
+        ],
+        "basis": "band_midpoint_normalized"
+      },
+      "match_id": 2040822
+    },
+    {
+      "match_num": "周四004",
+      "matchup": "雷克维京(冰岛) vs 图恩(瑞士)",
+      "direction": {
+        "probability_bands": {
+          "H": "中低",
+          "D": "中低",
+          "A": "中高"
+        }
+      },
+      "rationale": "瑞士球队更强，但冰岛夏季主场状态在线，差距不如纸面大",
+      "prior_exposure_to_quant_model": false,
+      "derived": {
+        "bands": {
+          "H": "中低",
+          "D": "中低",
+          "A": "中高"
+        },
+        "midpoints_pct": {
+          "H": 35.0,
+          "D": 35.0,
+          "A": 45.0
+        },
+        "raw_sum_pct": 115.0,
+        "coherent": true,
+        "probs_1x2": [
+          0.304348,
+          0.304348,
+          0.391304
+        ],
+        "basis": "band_midpoint_normalized"
+      },
+      "match_id": 2040833
+    },
+    {
+      "match_num": "周四006",
+      "matchup": "流浪者(苏格兰) vs 比亚韦斯托克(波兰)",
+      "direction": {
+        "probability_bands": {
+          "H": "偏高",
+          "D": "中低",
+          "A": "很低"
+        }
+      },
+      "rationale": "流浪者主场 Ibrox 压迫力强，对手波兰中游",
+      "prior_exposure_to_quant_model": false,
+      "derived": {
+        "bands": {
+          "H": "偏高",
+          "D": "中低",
+          "A": "很低"
+        },
+        "midpoints_pct": {
+          "H": 57.5,
+          "D": 35.0,
+          "A": 15.0
+        },
+        "raw_sum_pct": 107.5,
+        "coherent": true,
+        "probs_1x2": [
+          0.534884,
+          0.325581,
+          0.139535
+        ],
+        "basis": "band_midpoint_normalized"
+      },
+      "match_id": 2040824
+    },
+    {
+      "match_num": "周四007",
+      "matchup": "安德莱赫特(比利时) vs PAOK(希腊)",
+      "direction": {
+        "probability_bands": {
+          "H": "中高",
+          "D": "中低",
+          "A": "中低"
+        }
+      },
+      "rationale": "双方水平接近，主场优势是主要区分",
+      "prior_exposure_to_quant_model": false,
+      "derived": {
+        "bands": {
+          "H": "中高",
+          "D": "中低",
+          "A": "中低"
+        },
+        "midpoints_pct": {
+          "H": 45.0,
+          "D": 35.0,
+          "A": 35.0
+        },
+        "raw_sum_pct": 115.0,
+        "coherent": true,
+        "probs_1x2": [
+          0.391304,
+          0.304348,
+          0.304348
+        ],
+        "basis": "band_midpoint_normalized"
+      },
+      "match_id": 2040825
+    },
+    {
+      "match_num": "周四008",
+      "matchup": "哈茨(苏格兰) vs 本菲卡(葡萄牙)",
+      "direction": {
+        "probability_bands": {
+          "H": "很低",
+          "D": "偏低",
+          "A": "很高"
+        }
+      },
+      "rationale": "本菲卡实力显著占优",
+      "prior_exposure_to_quant_model": true,
+      "derived": {
+        "bands": {
+          "H": "很低",
+          "D": "偏低",
+          "A": "很高"
+        },
+        "midpoints_pct": {
+          "H": 15.0,
+          "D": 25.0,
+          "A": 72.5
+        },
+        "raw_sum_pct": 112.5,
+        "coherent": true,
+        "probs_1x2": [
+          0.133333,
+          0.222222,
+          0.644445
+        ],
+        "basis": "band_midpoint_normalized"
+      },
+      "match_id": 2040826
+    },
+    {
+      "match_num": "周三001",
+      "matchup": "巴黎圣日尔曼 vs 阿斯顿维拉（欧超杯，中立场）",
+      "direction": {
+        "probability_bands": {
+          "H": "很高",
+          "D": "偏低",
+          "A": "很低"
+        }
+      },
+      "rationale": "PSG为卫冕欧冠+法甲冠军，阵容深度与近期状态明显强于维拉；欧超杯为中立场单场决赛，不计主场优势，纯按双方实力判断。此档位在看到本场融合引擎盘口复述结果(57.3/25.9/16.8)之后登记，不是干净样本。",
+      "prior_exposure_to_quant_model": true,
+      "match_id": "sporttery-2040831",
+      "derived": {
+        "bands": {
+          "H": "很高",
+          "D": "偏低",
+          "A": "很低"
+        },
+        "midpoints_pct": {
+          "H": 72.5,
+          "D": 25.0,
+          "A": 15.0
+        },
+        "raw_sum_pct": 112.5,
+        "coherent": true,
+        "probs_1x2": [
+          0.644445,
+          0.222222,
+          0.133333
+        ],
+        "basis": "band_midpoint_normalized"
+      }
+    },
+    {
+      "match_num": "周三002",
+      "matchup": "普拉滕斯(阿根廷) vs 科金博联(智利)",
+      "direction": {
+        "probability_bands": {
+          "H": "偏高",
+          "D": "中高",
+          "A": "偏低"
+        }
+      },
+      "rationale": "阿根廷顶级联赛球队对智利球队历史交锋整体占优，叠加主场，但南美解放者杯淘汰赛波动性大，不给极端档位。此档位在看到融合引擎盘口复述结果(50.5/32.1/17.5)之后登记，不是干净样本。",
+      "prior_exposure_to_quant_model": true,
+      "match_id": "sporttery-2040819",
+      "derived": {
+        "bands": {
+          "H": "偏高",
+          "D": "中高",
+          "A": "偏低"
+        },
+        "midpoints_pct": {
+          "H": 57.5,
+          "D": 45.0,
+          "A": 25.0
+        },
+        "raw_sum_pct": 127.5,
+        "coherent": true,
+        "probs_1x2": [
+          0.450981,
+          0.352941,
+          0.196078
+        ],
+        "basis": "band_midpoint_normalized"
+      }
+    },
+    {
+      "match_num": "周三003",
+      "matchup": "帕尔梅拉斯(巴西) vs 波特诺山丘(巴拉圭)",
+      "direction": {
+        "probability_bands": {
+          "H": "很高",
+          "D": "偏低",
+          "A": "很低"
+        }
+      },
+      "rationale": "帕尔梅拉斯是南美最强俱乐部之一且主场作战，波特诺山丘整体实力明显下风。此档位在看到融合引擎盘口复述结果(77.2/16.9/5.8，且核心层已标注EXTREME_CLEAN_SHEET_HOME/λ回退警告)之后登记，不是干净样本。",
+      "prior_exposure_to_quant_model": true,
+      "match_id": "sporttery-2040820",
+      "derived": {
+        "bands": {
+          "H": "很高",
+          "D": "偏低",
+          "A": "很低"
+        },
+        "midpoints_pct": {
+          "H": 72.5,
+          "D": 25.0,
+          "A": 15.0
+        },
+        "raw_sum_pct": 112.5,
+        "coherent": true,
+        "probs_1x2": [
+          0.644445,
+          0.222222,
+          0.133333
+        ],
+        "basis": "band_midpoint_normalized"
+      }
+    }
+  ]
+}

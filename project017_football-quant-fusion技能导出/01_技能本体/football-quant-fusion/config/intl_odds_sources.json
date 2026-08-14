@@ -3,9 +3,13 @@
   "provider": "the-odds-api",
   "base_url": "https://api.the-odds-api.com/v4",
   "env_key_var": "ODDS_API_KEY",
-  "regions": ["eu"],
+  "regions": [
+    "eu"
+  ],
   "odds_format": "decimal",
-  "default_markets": ["h2h"],
+  "default_markets": [
+    "h2h"
+  ],
   "default_sport_keys": [
     "soccer_epl",
     "soccer_spain_la_liga",
@@ -35,14 +39,121 @@
     "中超": "soccer_china_superleague"
   },
   "team_aliases": {
-    "塞萨洛尼基": ["PAOK", "PAOK Thessaloniki", "PAOK Salonika"],
-    "安德莱赫特": ["Anderlecht"],
-    "格拉斯哥流浪者": ["Rangers", "Glasgow Rangers"],
-    "克拉约瓦大学": ["Universitatea Craiova", "U Craiova", "CS U Craiova"],
+    "塞萨洛尼基": [
+      "PAOK",
+      "PAOK Thessaloniki",
+      "PAOK Salonika"
+    ],
+    "安德莱赫特": [
+      "Anderlecht"
+    ],
+    "格拉斯哥流浪者": [
+      "Rangers",
+      "Glasgow Rangers"
+    ],
+    "克拉约瓦大学": [
+      "Universitatea Craiova",
+      "U Craiova",
+      "CS U Craiova"
+    ],
+    "库奥皮奥": [
+      "KuPS",
+      "Kuopio"
+    ],
+    "巴拉纳竞技": [
+      "Athletico Paranaense",
+      "Athletico-PR",
+      "Athletico Paranaense PR"
+    ],
+    "维多利亚": [
+      "Vitoria",
+      "Vitoria BA",
+      "EC Vitoria"
+    ],
+    "比亚韦斯托克": [
+      "Jagiellonia Bialystok",
+      "Jagiellonia"
+    ],
+    "巴竞技": [
+      "Athletico Paranaense",
+      "Athletico-PR"
+    ],
+    "克拉约瓦": [
+      "Univ. Craiova",
+      "Universitatea Craiova",
+      "U Craiova",
+      "CS U Craiova"
+    ],
+    "比亚韦": [
+      "Jagiellonia",
+      "Jagiellonia Bialystok"
+    ],
+    "流浪者": [
+      "Rangers",
+      "Glasgow Rangers"
+    ],
+    "塞萨洛": [
+      "PAOK",
+      "PAOK Thessaloniki",
+      "PAOK Salonika"
+    ],
+    "安德莱": [
+      "Anderlecht"
+    ],
+    "本菲卡": [
+      "Benfica",
+      "SL Benfica"
+    ],
+    "哈茨": [
+      "Hearts",
+      "Heart of Midlothian"
+    ],
+    "阿尔克马": ["AZ", "AZ Alkmaar"],
+    "海牙": ["ADO Den Haag", "Den Haag"],
+    "鹿斯巴达": ["Sparta Rotterdam", "Sparta"],
+    "费耶诺德": ["Feyenoord"],
+    "兹沃勒": ["PEC Zwolle", "Zwolle"],
+    "阿贾克斯": ["Ajax", "Ajax Amsterdam"],
+    "格罗宁根": ["Groningen", "FC Groningen"],
+    "乌德勒支": ["Utrecht", "FC Utrecht"],
+    "海伦芬": ["Heerenveen", "SC Heerenveen"],
+    "特温特": ["Twente", "FC Twente"],
+    "哈马比": ["Hammarby", "Hammarby IF"],
+    "赫根": ["Hacken", "BK Hacken"],
+    "哈尔姆斯": ["Halmstad", "Halmstads BK"],
+    "盖斯": ["GAIS"],
+    "哥德堡": ["IFK Goteborg", "Goteborg"],
+    "卡尔马": ["Kalmar", "Kalmar FF"],
     "库奥皮奥": ["KuPS", "Kuopio"],
-    "巴拉纳竞技": ["Athletico Paranaense", "Athletico-PR", "Athletico Paranaense PR"],
-    "维多利亚": ["Vitoria", "Vitoria BA", "EC Vitoria"],
-    "比亚韦斯托克": ["Jagiellonia Bialystok", "Jagiellonia"]
+    "TPS图尔": ["TPS", "TPS Turku"],
+    "利勒斯特": ["Lillestrom", "Lillestrøm"],
+    "罗森博格": ["Rosenborg", "Rosenborg BK"],
+    "汉坎": ["HamKam", "Ham-Kam"],
+    "奥勒松": ["Aalesund", "Aalesunds FK"]
   },
-  "notes": "赔率一律以体彩官方为准；The Odds API 仅作移动赔率/CLV 参考，不参与概率建模、不替换体彩盘口、不进推荐门控。免费档 500 次/月，默认每联赛 1 请求（h2h）。sport key 已按 2026-08-06 官方 sports 列表校准（--check-sports 实测）；The Odds API 当前无欧罗巴/巴西杯/欧冠小组赛 key，相关场次会如实标记 no_sport_key。默认 12 联赛约 360 次/月，可传 --sport-keys 精简。"
+  "notes": "赔率一律以体彩官方为准；The Odds API 仅作移动赔率/CLV 参考，不参与概率建模、不替换体彩盘口、不进推荐门控。免费档 500 次/月，默认每联赛 1 请求（h2h）。sport key 已按 2026-08-06 官方 sports 列表校准（--check-sports 实测）；The Odds API 当前无欧罗巴/巴西杯/欧冠小组赛 key，相关场次会如实标记 no_sport_key。默认 12 联赛约 360 次/月，可传 --sport-keys 精简。",
+  "league_map_apifootball": {
+    "英超": "152",
+    "西甲": "302",
+    "意甲": "207",
+    "德甲": "175",
+    "法甲": "168",
+    "欧冠": "3",
+    "欧罗巴": "4",
+    "欧协联": "683",
+    "挪超": "253",
+    "芬超": "352",
+    "瑞超": "307",
+    "苏超": "279",
+    "荷甲": "244",
+    "葡超": "266",
+    "土超": "322",
+    "比甲": "63",
+    "奥超": "56",
+    "波甲": "259",
+    "丹超": "135",
+    "希超": "178",
+    "瑞甲": "14",
+    "挪甲": "498"
+  }
 }

@@ -3,7 +3,7 @@
 import argparse,csv,json,hashlib,statistics
 from datetime import datetime,timezone
 from pathlib import Path
-DEFAULT='H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/xg/xg_records.jsonl'
+DEFAULT='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/xg/xg_records.jsonl'
 # [中文功能] 标准化队名（去空格非字母数字）
 def norm(s):return ''.join(c.lower() for c in str(s).strip() if c.isalnum())
 # [中文功能] 生成比赛去重键

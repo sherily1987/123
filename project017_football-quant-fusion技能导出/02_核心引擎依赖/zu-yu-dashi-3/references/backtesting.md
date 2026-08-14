@@ -1,7 +1,7 @@
 ﻿# 足预大师3.4.1回测规范
 
 ## 存储
-默认：`H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest/`。技能目录只放代码。预测和赛果分开；已有记录禁止静默覆盖。
+默认：`F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest/`。技能目录只放代码。预测和赛果分开；已有记录禁止静默覆盖。
 
 ## 正式预测登记
 
@@ -32,7 +32,7 @@ python3 scripts/settle_result.py --match-id ID --score-90 1-1 --score-et 0-0 --p
 
 登记库：
 ```sh
-python3 scripts/backtest.py --store H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest --snapshot closing
+python3 scripts/backtest.py --store F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest --snapshot closing
 ```
 离线JSON：
 ```sh

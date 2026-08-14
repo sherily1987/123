@@ -19,7 +19,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-CORE = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/fetch_sporttery_full.py')
+CORE = Path('F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/fetch_sporttery_full.py')
 
 UA = {'User-Agent': 'Mozilla/5.0 (Linux; Android 14)',
       'Referer': 'https://m.sporttery.cn/mjc/zqsj/?tab=concern'}
@@ -52,6 +52,28 @@ def run_core(query_date, method, output, delay, match_id=None, match_num=None):
     if proc.returncode != 0:
         raise RuntimeError(proc.stderr or proc.stdout)
     return json.loads(output.read_text(encoding='utf-8'))
+
+
+def build_field_meta(match, collected_at):
+    """为各盘口生成分离的抓取时间、源更新时间和预测截止时间。"""
+    result = {}
+    for field, updated_key in (("odds", "had_updated_at"),
+                               ("hhad", "hhad_updated_at"),
+                               ("ttg", "ttg_updated_at"),
+                               ("hafu", "hafu_updated_at"),
+                               ("crs", "crs_updated_at")):
+        source_updated_at = match.get(updated_key)
+        result[field] = {
+            "reliability": 100,
+            "freshness": 100,
+            "source": "中国体彩网移动端官方固定奖金接口",
+            "collected_at": collected_at,
+            "source_updated_at": source_updated_at,
+            "prediction_as_of": collected_at,
+            # 兼容旧消费者；新鲜度逻辑不再使用observed_at。
+            "observed_at": source_updated_at or collected_at,
+        }
+    return result
 
 
 # [中文功能] 按开球日期分组：双查 all+concern，仅保留开球日期==目标日的场次
@@ -211,23 +233,9 @@ def main():
                 d = {'home': m['home'], 'away': m['away'], 'competition': m['league'],
                      'stage': m['league'], 'kickoff': m['kickoff_iso'], 'mode': 'market_only',
                      'odds': m['model_odds'], 'context_confirmed': True,
-                     'field_meta': {
-                         'odds': {'reliability': 100, 'freshness': 100,
-                                  'source': '中国体彩网移动端官方固定奖金接口',
-                                  'observed_at': m.get('had_updated_at') or fetched_at},
-                         'hhad': {'reliability': 100, 'freshness': 100,
-                                  'source': '中国体彩网移动端官方固定奖金接口',
-                                  'observed_at': m.get('hhad_updated_at') or fetched_at},
-                         'ttg': {'reliability': 100, 'freshness': 100,
-                                 'source': '中国体彩网移动端官方固定奖金接口',
-                                 'observed_at': m.get('ttg_updated_at') or fetched_at},
-                         'hafu': {'reliability': 100, 'freshness': 100,
-                                  'source': '中国体彩网移动端官方固定奖金接口',
-                                  'observed_at': m.get('hafu_updated_at') or fetched_at},
-                         'crs': {'reliability': 100, 'freshness': 100,
-                                 'source': '中国体彩网移动端官方固定奖金接口',
-                                 'observed_at': m.get('crs_updated_at') or fetched_at},
-                     },
+                     'prediction_as_of': fetched_at,
+                     'collected_at': fetched_at,
+                     'field_meta': build_field_meta(m, fetched_at),
                      'assumptions': [],
                      'sporttery_meta': {'match_id': m['match_id'], 'match_num': m['match_num']}}
                 if m.get('model_hhad'):

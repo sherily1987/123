@@ -87,18 +87,50 @@ def select_primary_rows(rows, policy="latest_before_kickoff"):
     return selected
 
 
-def version_cohort(row, current_identity):
-    """精确哈希匹配才属于current；可识别旧版为legacy，其余为unknown。"""
-    version = str(row.get("version") or "").strip().lower()
+def _is_sha256(value):
+    v = str(value or "")
+    return len(v) == 64 and all(c in "0123456789abcdef" for c in v.lower())
+
+
+def engine_build_key(row):
+    """样本的引擎构建指纹，用于区分「同版本样本」（评测规则要求按引擎完整哈希分组）。
+
+    冻结哈希（engine_bundle_sha256）是首选口径。2026-08-03 版本戳修复之前登记的样本
+    没有冻结哈希，但 model.engine_sha256（predict.py 源码哈希）+ core_engine_version
+    足以把它们分成互不混淆的构建组——这些样本可归因，只是归因粒度较粗，
+    不应与真正无法归因的样本混在同一个桶里。返回 "" 表示确实无法归因。
+    """
     model = row.get("model") or {}
-    if not version or version in {"unknown", "offline", "none"} or "unknown" in version:
-        return "unknown"
+    bundle = model.get("engine_bundle_sha256")
+    if _is_sha256(bundle):
+        return f"bundle-{str(bundle)[:12]}"
+    engine = model.get("engine_sha256")
+    if _is_sha256(engine):
+        core = str(row.get("core_engine_version") or model.get("core_version") or "?")
+        return f"engine-{str(engine)[:12]}+core-{core}"
+    return ""
+
+
+def version_cohort(row, current_identity):
+    """精确哈希匹配才属于current；可识别旧版为legacy，其余为unknown。
+
+    2026-08-14 修正：原实现只看 version 字符串，凡是 version=="unknown" 一律判 unknown，
+    导致 1445 条有完整 engine_sha256 的历史样本被误判为不可归因（生产回测里占 81%）。
+    现改为先做精确哈希匹配，再回退到引擎构建指纹，只有连指纹都拿不到才是 unknown。
+    """
+    model = row.get("model") or {}
     required = ("fusion_version", "core_version", "engine_bundle_sha256",
                 "prediction_code_sha256", "config_sha256")
-    if all(str(model.get(key) or "") == str(current_identity.get(key) or "")
-           for key in required):
+    if all(_is_sha256(current_identity.get(key)) or current_identity.get(key)
+           for key in required) and all(
+            str(model.get(key) or "") == str(current_identity.get(key) or "")
+            for key in required):
         return "current"
-    return "legacy"
+    version = str(row.get("version") or "").strip().lower()
+    identifiable = version and version not in {"unknown", "offline", "none"} and "unknown" not in version
+    if identifiable or engine_build_key(row):
+        return "legacy"
+    return "unknown"
 
 
 # [中文功能] 旧容器路径 /var/minis/... 自动映射到本机 shared 目录
@@ -371,6 +403,7 @@ def score_record(rec, root):
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
         "model": _m if isinstance(_m, dict) else {},
+        "core_engine_version": (rec.get("output") or {}).get("core_engine_version"),
         "league": ((rec.get("match") or {}).get("competition")) or ((rec.get("match") or {}).get("stage")) or "?",
         "probs": probs,
         "market_probs": market_probs,
@@ -485,10 +518,12 @@ def main():
     by_league = {}
     by_snapshot = {}
     by_cohort = {"current": [], "legacy": [], "unknown": []}
+    by_engine_build = {}
     for r in rows:
         by_version.setdefault(r["version"], []).append(r)
         by_league.setdefault(r["league"], []).append(r)
         by_cohort[r["version_cohort"]].append(r)
+        by_engine_build.setdefault(engine_build_key(r) or "unattributable", []).append(r)
     for r in snapshot_rows:
         by_snapshot.setdefault(r["snapshot_type"], []).append(r)
     current_n = len(by_cohort["current"])
@@ -506,6 +541,7 @@ def main():
         "overall": overall,
         "by_version": {k: summarize(v) for k, v in sorted(by_version.items())},
         "by_version_cohort": {k: summarize(v) for k, v in by_cohort.items()},
+        "by_engine_build": {k: summarize(v) for k, v in sorted(by_engine_build.items())},
         "by_league": {k: summarize(v) for k, v in sorted(by_league.items())},
         "snapshot_research": {
             "record_sample_size": len(snapshot_rows),

@@ -1,0 +1,547 @@
+{
+  "cutoff": "2024-12-12",
+  "leagues": [
+    "_pooled_small",
+    "austria_bundesliga",
+    "belarus_premier_league",
+    "belgium_first_division_a",
+    "bulgaria_first_league",
+    "bundesliga",
+    "croatia_hnl",
+    "cyprus_1_division",
+    "czech_liga",
+    "denmark_superliga",
+    "eredivisie",
+    "finland_veikkausliiga",
+    "greece_super_league_1",
+    "hungary_nb_i",
+    "israel_ligat_ha_al",
+    "la_liga",
+    "ligue_1",
+    "moldova_super_liga",
+    "norway_eliteserien",
+    "poland_ekstraklasa",
+    "portugal_primeira_liga",
+    "premier_league",
+    "republic_of_ireland_premier_division",
+    "romania_liga_i",
+    "scotland_premiership",
+    "serbia_super_liga",
+    "serie_a",
+    "slovakia_1_liga",
+    "slovenia_1_snl",
+    "sweden_allsvenskan",
+    "switzerland_super_league",
+    "turkey_super_lig",
+    "ukraine_premier_league"
+  ],
+  "uefa_match_counts": {
+    "serie_a": 265,
+    "premier_league": 251,
+    "bundesliga": 244,
+    "la_liga": 238,
+    "ligue_1": 196,
+    "eredivisie": 185,
+    "belgium_first_division_a": 177,
+    "portugal_primeira_liga": 168,
+    "turkey_super_lig": 153,
+    "czech_liga": 141,
+    "austria_bundesliga": 129,
+    "scotland_premiership": 123,
+    "denmark_superliga": 120,
+    "greece_super_league_1": 114,
+    "switzerland_super_league": 110,
+    "norway_eliteserien": 104,
+    "ukraine_premier_league": 101,
+    "serbia_super_liga": 100,
+    "israel_ligat_ha_al": 97,
+    "cyprus_1_division": 96,
+    "sweden_allsvenskan": 95,
+    "poland_ekstraklasa": 91,
+    "bulgaria_first_league": 85,
+    "slovenia_1_snl": 74,
+    "slovakia_1_liga": 72,
+    "romania_liga_i": 69,
+    "croatia_hnl": 68,
+    "hungary_nb_i": 66,
+    "moldova_super_liga": 63,
+    "finland_veikkausliiga": 60,
+    "republic_of_ireland_premier_division": 46,
+    "belarus_premier_league": 40,
+    "estonia_meistriliiga": 32,
+    "luxembourg_national_division": 25,
+    "russia_premier_league": 25,
+    "montenegro_first_league": 13,
+    "lithuania_1_lyga": 4,
+    "bosnia_and_herzegovina_1st_league": 2,
+    "latvia_1_liga": 2
+  },
+  "pooled_small_leagues": [
+    "bosnia_and_herzegovina_1st_league",
+    "estonia_meistriliiga",
+    "latvia_1_liga",
+    "lithuania_1_lyga",
+    "luxembourg_national_division",
+    "montenegro_first_league",
+    "russia_premier_league"
+  ],
+  "min_uefa_matches": 40,
+  "shrinkage_k": 40.0,
+  "shrinkage_selection": [
+    {
+      "k": 0.0,
+      "n": 608,
+      "brier": 0.576222
+    },
+    {
+      "k": 5.0,
+      "n": 608,
+      "brier": 0.573641
+    },
+    {
+      "k": 10.0,
+      "n": 608,
+      "brier": 0.572465
+    },
+    {
+      "k": 20.0,
+      "n": 608,
+      "brier": 0.57141
+    },
+    {
+      "k": 40.0,
+      "n": 608,
+      "brier": 0.571299
+    },
+    {
+      "k": 80.0,
+      "n": 608,
+      "brier": 0.572661
+    }
+  ],
+  "domestic_fit": {
+    "austria_bundesliga": {
+      "n_matches": 679,
+      "teams": 15,
+      "home_adv": 0.2558878315540769
+    },
+    "belarus_premier_league": {
+      "n_matches": 811,
+      "teams": 23,
+      "home_adv": 0.08729479083920576
+    },
+    "belgium_first_division_a": {
+      "n_matches": 1109,
+      "teams": 22,
+      "home_adv": 0.28267070022444835
+    },
+    "bosnia_and_herzegovina_1st_league": {
+      "n_matches": 1832,
+      "teams": 48,
+      "home_adv": 0.528404515710745
+    },
+    "bulgaria_first_league": {
+      "n_matches": 941,
+      "teams": 20,
+      "home_adv": 0.15249226132951185
+    },
+    "bundesliga": {
+      "n_matches": 1040,
+      "teams": 26,
+      "home_adv": 0.2587062235668434
+    },
+    "croatia_hnl": {
+      "n_matches": 620,
+      "teams": 12,
+      "home_adv": 0.2666819238205165
+    },
+    "cyprus_1_division": {
+      "n_matches": 817,
+      "teams": 20,
+      "home_adv": 0.17427068261233902
+    },
+    "czech_liga": {
+      "n_matches": 985,
+      "teams": 23,
+      "home_adv": 0.05616828435760837
+    },
+    "denmark_superliga": {
+      "n_matches": 680,
+      "teams": 15,
+      "home_adv": 0.24884615655392955
+    },
+    "eredivisie": {
+      "n_matches": 1097,
+      "teams": 30,
+      "home_adv": 0.3359807801942285
+    },
+    "estonia_meistriliiga": {
+      "n_matches": 629,
+      "teams": 15,
+      "home_adv": 0.1740011649521509
+    },
+    "finland_veikkausliiga": {
+      "n_matches": 606,
+      "teams": 17,
+      "home_adv": 0.21878593292967075
+    },
+    "greece_super_league_1": {
+      "n_matches": 820,
+      "teams": 19,
+      "home_adv": 0.20695191718552616
+    },
+    "hungary_nb_i": {
+      "n_matches": 689,
+      "teams": 17,
+      "home_adv": 0.31722788445124744
+    },
+    "iceland_1_deild": {
+      "n_matches": 489,
+      "teams": 23,
+      "home_adv": 0.42021480319890214
+    },
+    "israel_liga_leumit": {
+      "n_matches": 1002,
+      "teams": 25,
+      "home_adv": 0.21318513219435753
+    },
+    "israel_ligat_ha_al": {
+      "n_matches": 811,
+      "teams": 18,
+      "home_adv": 0.12830768974683537
+    },
+    "la_liga": {
+      "n_matches": 1299,
+      "teams": 25,
+      "home_adv": 0.31136218313991293
+    },
+    "latvia_1_liga": {
+      "n_matches": 611,
+      "teams": 23,
+      "home_adv": 0.32044961506181235
+    },
+    "ligue_1": {
+      "n_matches": 1194,
+      "teams": 24,
+      "home_adv": 0.2599402767652779
+    },
+    "lithuania_1_lyga": {
+      "n_matches": 812,
+      "teams": 25,
+      "home_adv": 0.14383793525993888
+    },
+    "luxembourg_national_division": {
+      "n_matches": 838,
+      "teams": 21,
+      "home_adv": 0.14161153861084597
+    },
+    "moldova_super_liga": {
+      "n_matches": 406,
+      "teams": 22,
+      "home_adv": 0.13845782246101257
+    },
+    "montenegro_first_league": {
+      "n_matches": 643,
+      "teams": 17,
+      "home_adv": 0.05290706959507244
+    },
+    "norway_eliteserien": {
+      "n_matches": 896,
+      "teams": 23,
+      "home_adv": 0.17096455841310282
+    },
+    "poland_ekstraklasa": {
+      "n_matches": 1079,
+      "teams": 26,
+      "home_adv": 0.32071232409464934
+    },
+    "portugal_primeira_liga": {
+      "n_matches": 1039,
+      "teams": 25,
+      "home_adv": 0.25110724356789166
+    },
+    "premier_league": {
+      "n_matches": 1289,
+      "teams": 26,
+      "home_adv": 0.3228632673013409
+    },
+    "republic_of_ireland_premier_division": {
+      "n_matches": 633,
+      "teams": 15,
+      "home_adv": 0.28954546680541443
+    },
+    "romania_liga_i": {
+      "n_matches": 1107,
+      "teams": 24,
+      "home_adv": 0.0913048158040359
+    },
+    "russia_premier_league": {
+      "n_matches": 876,
+      "teams": 25,
+      "home_adv": 0.17067018449401455
+    },
+    "scotland_premiership": {
+      "n_matches": 793,
+      "teams": 20,
+      "home_adv": 0.05100782354748212
+    },
+    "serbia_super_liga": {
+      "n_matches": 1041,
+      "teams": 25,
+      "home_adv": 0.19856968371339026
+    },
+    "serie_a": {
+      "n_matches": 1289,
+      "teams": 26,
+      "home_adv": 0.2302927144782964
+    },
+    "slovakia_1_liga": {
+      "n_matches": 688,
+      "teams": 19,
+      "home_adv": 0.2280515766723119
+    },
+    "slovenia_1_snl": {
+      "n_matches": 632,
+      "teams": 15,
+      "home_adv": 0.22750546543189143
+    },
+    "sweden_allsvenskan": {
+      "n_matches": 903,
+      "teams": 25,
+      "home_adv": 0.20111728863085596
+    },
+    "switzerland_super_league": {
+      "n_matches": 696,
+      "teams": 15,
+      "home_adv": 0.35463954913951545
+    },
+    "turkey_super_lig": {
+      "n_matches": 1208,
+      "teams": 27,
+      "home_adv": 0.32293470686455666
+    },
+    "ukraine_premier_league": {
+      "n_matches": 758,
+      "teams": 25,
+      "home_adv": 0.17069981123617461
+    }
+  },
+  "n_fit": 2022,
+  "n_test": 871,
+  "naive": {
+    "home_adv": 0.38283979308268495,
+    "offsets": {
+      "finland_veikkausliiga": 0.0,
+      "montenegro_first_league": 0.0,
+      "norway_eliteserien": 0.0,
+      "poland_ekstraklasa": 0.0,
+      "slovakia_1_liga": 0.0,
+      "republic_of_ireland_premier_division": 0.0,
+      "bulgaria_first_league": 0.0,
+      "belarus_premier_league": 0.0,
+      "hungary_nb_i": 0.0,
+      "slovenia_1_snl": 0.0,
+      "luxembourg_national_division": 0.0,
+      "estonia_meistriliiga": 0.0,
+      "croatia_hnl": 0.0,
+      "cyprus_1_division": 0.0,
+      "austria_bundesliga": 0.0,
+      "czech_liga": 0.0,
+      "scotland_premiership": 0.0,
+      "denmark_superliga": 0.0,
+      "sweden_allsvenskan": 0.0,
+      "switzerland_super_league": 0.0,
+      "eredivisie": 0.0,
+      "turkey_super_lig": 0.0,
+      "ukraine_premier_league": 0.0,
+      "moldova_super_liga": 0.0,
+      "romania_liga_i": 0.0,
+      "israel_ligat_ha_al": 0.0,
+      "belgium_first_division_a": 0.0,
+      "serbia_super_liga": 0.0,
+      "ligue_1": 0.0,
+      "greece_super_league_1": 0.0,
+      "russia_premier_league": 0.0,
+      "portugal_primeira_liga": 0.0,
+      "bundesliga": 0.0,
+      "serie_a": 0.0,
+      "premier_league": 0.0,
+      "la_liga": 0.0,
+      "bosnia_and_herzegovina_1st_league": 0.0,
+      "latvia_1_liga": 0.0,
+      "lithuania_1_lyga": 0.0,
+      "_pooled_small": 0.0
+    },
+    "group_offsets": {
+      "_pooled_small": 0.0,
+      "austria_bundesliga": 0.0,
+      "belarus_premier_league": 0.0,
+      "belgium_first_division_a": 0.0,
+      "bulgaria_first_league": 0.0,
+      "bundesliga": 0.0,
+      "croatia_hnl": 0.0,
+      "cyprus_1_division": 0.0,
+      "czech_liga": 0.0,
+      "denmark_superliga": 0.0,
+      "eredivisie": 0.0,
+      "finland_veikkausliiga": 0.0,
+      "greece_super_league_1": 0.0,
+      "hungary_nb_i": 0.0,
+      "israel_ligat_ha_al": 0.0,
+      "la_liga": 0.0,
+      "ligue_1": 0.0,
+      "moldova_super_liga": 0.0,
+      "norway_eliteserien": 0.0,
+      "poland_ekstraklasa": 0.0,
+      "portugal_primeira_liga": 0.0,
+      "premier_league": 0.0,
+      "republic_of_ireland_premier_division": 0.0,
+      "romania_liga_i": 0.0,
+      "scotland_premiership": 0.0,
+      "serbia_super_liga": 0.0,
+      "serie_a": 0.0,
+      "slovakia_1_liga": 0.0,
+      "slovenia_1_snl": 0.0,
+      "sweden_allsvenskan": 0.0,
+      "switzerland_super_league": 0.0,
+      "turkey_super_lig": 0.0,
+      "ukraine_premier_league": 0.0
+    },
+    "converged": true,
+    "n_fit": 2022
+  },
+  "calibrated": {
+    "home_adv": 0.34490804352513843,
+    "offsets": {
+      "finland_veikkausliiga": -0.3404297388932644,
+      "montenegro_first_league": -0.4238585772872035,
+      "norway_eliteserien": 0.11087686142131208,
+      "poland_ekstraklasa": 0.12781965111335905,
+      "slovakia_1_liga": -0.2639748506200632,
+      "republic_of_ireland_premier_division": -0.3876851986530962,
+      "bulgaria_first_league": -0.33774891400549134,
+      "belarus_premier_league": -0.6608991992538925,
+      "hungary_nb_i": 0.12291230918571788,
+      "slovenia_1_snl": -0.12634673451407527,
+      "luxembourg_national_division": -0.4238585772872035,
+      "estonia_meistriliiga": -0.4238585772872035,
+      "croatia_hnl": -0.061845585709351926,
+      "cyprus_1_division": -0.14888697490168967,
+      "austria_bundesliga": 0.12638240320445,
+      "czech_liga": -0.20451664149980509,
+      "scotland_premiership": -0.29279325029940334,
+      "denmark_superliga": 0.25491295222136345,
+      "sweden_allsvenskan": -0.02093736975811949,
+      "switzerland_super_league": 0.08385108899864001,
+      "eredivisie": 0.36573557375485066,
+      "turkey_super_lig": 0.17330055283956752,
+      "ukraine_premier_league": -0.1401720526239223,
+      "moldova_super_liga": -0.911798279645503,
+      "romania_liga_i": -0.24042439241976546,
+      "israel_ligat_ha_al": 0.034285976249716583,
+      "belgium_first_division_a": 0.1822972062440863,
+      "serbia_super_liga": -0.2846825773179482,
+      "ligue_1": 0.476462380054945,
+      "greece_super_league_1": 0.05646537776847447,
+      "russia_premier_league": -0.4238585772872035,
+      "portugal_primeira_liga": 0.32672030538053515,
+      "bundesliga": 0.5722944394220917,
+      "serie_a": 0.5514309252290757,
+      "premier_league": 0.7533630489143357,
+      "la_liga": 0.5278892854000735,
+      "bosnia_and_herzegovina_1st_league": -0.4238585772872035,
+      "latvia_1_liga": -0.4238585772872035,
+      "lithuania_1_lyga": -0.4238585772872035,
+      "_pooled_small": -0.4238585772872035
+    },
+    "group_offsets": {
+      "_pooled_small": -0.4238585772872035,
+      "austria_bundesliga": 0.12638240320445,
+      "belarus_premier_league": -0.6608991992538925,
+      "belgium_first_division_a": 0.1822972062440863,
+      "bulgaria_first_league": -0.33774891400549134,
+      "bundesliga": 0.5722944394220917,
+      "croatia_hnl": -0.061845585709351926,
+      "cyprus_1_division": -0.14888697490168967,
+      "czech_liga": -0.20451664149980509,
+      "denmark_superliga": 0.25491295222136345,
+      "eredivisie": 0.36573557375485066,
+      "finland_veikkausliiga": -0.3404297388932644,
+      "greece_super_league_1": 0.05646537776847447,
+      "hungary_nb_i": 0.12291230918571788,
+      "israel_ligat_ha_al": 0.034285976249716583,
+      "la_liga": 0.5278892854000735,
+      "ligue_1": 0.476462380054945,
+      "moldova_super_liga": -0.911798279645503,
+      "norway_eliteserien": 0.11087686142131208,
+      "poland_ekstraklasa": 0.12781965111335905,
+      "portugal_primeira_liga": 0.32672030538053515,
+      "premier_league": 0.7533630489143357,
+      "republic_of_ireland_premier_division": -0.3876851986530962,
+      "romania_liga_i": -0.24042439241976546,
+      "scotland_premiership": -0.29279325029940334,
+      "serbia_super_liga": -0.2846825773179482,
+      "serie_a": 0.5514309252290757,
+      "slovakia_1_liga": -0.2639748506200632,
+      "slovenia_1_snl": -0.12634673451407527,
+      "sweden_allsvenskan": -0.02093736975811949,
+      "switzerland_super_league": 0.08385108899864001,
+      "turkey_super_lig": 0.17330055283956752,
+      "ukraine_premier_league": -0.1401720526239223
+    },
+    "converged": true,
+    "n_fit": 2022
+  },
+  "test": {
+    "naive": {
+      "n": 871,
+      "model": {
+        "n": 871,
+        "brier_mean": 0.668108,
+        "log_loss": 1.102293,
+        "accuracy_pct": 44.78
+      },
+      "provider_market": {
+        "n": 549,
+        "brier_mean": 0.535342,
+        "log_loss": 0.913536,
+        "accuracy_pct": 60.84
+      },
+      "frequency_baseline": {
+        "n": 871,
+        "brier_mean": 0.622974,
+        "log_loss": 1.032918,
+        "probs": [
+          0.4782,
+          0.2146,
+          0.3071
+        ]
+      }
+    },
+    "calibrated": {
+      "n": 871,
+      "model": {
+        "n": 871,
+        "brier_mean": 0.568399,
+        "log_loss": 0.960143,
+        "accuracy_pct": 55.57
+      },
+      "provider_market": {
+        "n": 549,
+        "brier_mean": 0.535342,
+        "log_loss": 0.913536,
+        "accuracy_pct": 60.84
+      },
+      "frequency_baseline": {
+        "n": 871,
+        "brier_mean": 0.622974,
+        "log_loss": 1.032918,
+        "probs": [
+          0.4782,
+          0.2146,
+          0.3071
+        ]
+      }
+    }
+  }
+}

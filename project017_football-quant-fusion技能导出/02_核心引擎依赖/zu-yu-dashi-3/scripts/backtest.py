@@ -58,7 +58,7 @@ def load_offline(path):
  return rows
 # [中文功能] 回测主入口（在线登记库或离线文件）
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('input',nargs='?',help='离线历史JSON');ap.add_argument('--store',default='H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest');ap.add_argument('--snapshot');ap.add_argument('--output');a=ap.parse_args()
+ ap=argparse.ArgumentParser();ap.add_argument('input',nargs='?',help='离线历史JSON');ap.add_argument('--store',default='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest');ap.add_argument('--snapshot');ap.add_argument('--output');a=ap.parse_args()
  if a.input:rows,dropped=load_offline(a.input),[]
  else:rows,dropped=load_store(a.store,a.snapshot)
  # [中文功能] 取某字段所有有效值的均值

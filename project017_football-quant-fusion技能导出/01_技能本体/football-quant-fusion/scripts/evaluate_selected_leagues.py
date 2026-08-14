@@ -4,7 +4,7 @@ import argparse,json,math
 from pathlib import Path
 from statistics import mean
 import sys
-sys.path.insert(0,'H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts')
+sys.path.insert(0,'F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts')
 from odds_methods import devig
 METHODS=('proportional','additive','power','shin'); SNAPS=('opening','t_minus_24h','t_minus_6h','closing')
 # [中文功能] 把比分转成胜平负索引（主胜0/平1/客胜2）

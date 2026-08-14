@@ -1,0 +1,746 @@
+{
+  "threshold": 0.7,
+  "train_until": "2025-04-28",
+  "coefficients": {
+    "inside_outside": {
+      "path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\模型\\proxy_xg_coeffs_inside_outside_all.json",
+      "a": 0.155772,
+      "b": 0.033864,
+      "n_matches": 23149,
+      "leagues": 26,
+      "self_check": {
+        "total_predicted": 64796.0,
+        "total_actual": 64827.0,
+        "total_deviation_pct": -0.048,
+        "total_conserved": true,
+        "primary_gt_secondary": true,
+        "primary_secondary_ratio": 4.6
+      }
+    },
+    "shots_on_target": {
+      "path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\模型\\proxy_xg_coeffs_shots_on_target_all.json",
+      "a": 0.304959,
+      "b": 0.00486,
+      "n_matches": 7920,
+      "leagues": 9,
+      "self_check": {
+        "total_predicted": 20088.0,
+        "total_actual": 20108.0,
+        "total_deviation_pct": -0.099,
+        "total_conserved": true,
+        "primary_gt_secondary": true,
+        "primary_secondary_ratio": 62.75
+      }
+    }
+  },
+  "leagues": {
+    "apisports_bulgaria_first_league": {
+      "coverage": {
+        "n": 562,
+        "box": 0.42170818505338076,
+        "sot": 0.8932384341637011,
+        "box_n": 237,
+        "sot_n": 502,
+        "finished": 861
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.583,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 58.3%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
+      "xg_rows": 502
+    },
+    "apisports_cyprus_1_division": {
+      "coverage": {
+        "n": 467,
+        "box": 0.17558886509635974,
+        "sot": 0.9464668094218416,
+        "box_n": 82,
+        "sot_n": 442,
+        "finished": 775
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.5703,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 57.0%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
+      "xg_rows": 442
+    },
+    "apisports_japan_j1_league": {
+      "coverage": {
+        "n": 992,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 992,
+        "sot_n": 992,
+        "finished": 992
+      },
+      "basis": "inside_outside",
+      "match_share": 1.0,
+      "xg_rows": 992
+    },
+    "apisports_korea_k_league_1": {
+      "coverage": {
+        "n": 534,
+        "box": 0.7397003745318352,
+        "sot": 1.0,
+        "box_n": 395,
+        "sot_n": 534,
+        "finished": 693
+      },
+      "basis": "inside_outside",
+      "match_share": 0.57,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 57.0%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
+      "xg_rows": 395
+    },
+    "apisports_serbia_super_liga": {
+      "coverage": {
+        "n": 770,
+        "box": 0.7597402597402597,
+        "sot": 0.874025974025974,
+        "box_n": 585,
+        "sot_n": 673,
+        "finished": 900
+      },
+      "basis": "inside_outside",
+      "match_share": 0.65,
+      "xg_rows": 585
+    },
+    "apisports_ukraine_premier_league": {
+      "coverage": {
+        "n": 465,
+        "box": 0.3741935483870968,
+        "sot": 0.9204301075268817,
+        "box_n": 174,
+        "sot_n": 428,
+        "finished": 732
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.5847,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 58.5%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
+      "xg_rows": 428
+    },
+    "austria_bundesliga": {
+      "coverage": {
+        "n": 924,
+        "box": 0.9924242424242424,
+        "sot": 1.0,
+        "box_n": 917,
+        "sot_n": 924,
+        "finished": 974
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9415,
+      "xg_rows": 917
+    },
+    "belarus_premier_league": {
+      "coverage": {
+        "n": 711,
+        "box": 0.0,
+        "sot": 0.0014064697609001407,
+        "box_n": 0,
+        "sot_n": 1,
+        "finished": 1169
+      },
+      "basis": null,
+      "match_share": 0.0
+    },
+    "belgium_first_division_a": {
+      "coverage": {
+        "n": 1509,
+        "box": 0.9946984758117959,
+        "sot": 1.0,
+        "box_n": 1501,
+        "sot_n": 1509,
+        "finished": 1607
+      },
+      "basis": "inside_outside",
+      "match_share": 0.934,
+      "xg_rows": 1501
+    },
+    "bosnia_and_herzegovina_1st_league": {
+      "coverage": {
+        "n": 11,
+        "box": 0.2727272727272727,
+        "sot": 1.0,
+        "box_n": 3,
+        "sot_n": 11,
+        "finished": 2467
+      },
+      "basis": null,
+      "match_share": 0.0045,
+      "skipped_reason": "xG 可用场次仅占完赛 0.4%，低于 60%"
+    },
+    "bulgaria_first_league": {
+      "coverage": {
+        "n": 581,
+        "box": 0.0051635111876075735,
+        "sot": 0.8881239242685026,
+        "box_n": 3,
+        "sot_n": 516,
+        "finished": 1378
+      },
+      "basis": null,
+      "match_share": 0.3745,
+      "skipped_reason": "xG 可用场次仅占完赛 37.4%，低于 60%"
+    },
+    "bundesliga": {
+      "coverage": {
+        "n": 1445,
+        "box": 0.9916955017301038,
+        "sot": 1.0,
+        "box_n": 1433,
+        "sot_n": 1445,
+        "finished": 1553
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9227,
+      "xg_rows": 1432
+    },
+    "croatia_hnl": {
+      "coverage": {
+        "n": 841,
+        "box": 0.990487514863258,
+        "sot": 0.9988109393579072,
+        "box_n": 833,
+        "sot_n": 840,
+        "finished": 900
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9256,
+      "xg_rows": 833
+    },
+    "cyprus_1_division": {
+      "coverage": {
+        "n": 537,
+        "box": 0.0,
+        "sot": 0.659217877094972,
+        "box_n": 0,
+        "sot_n": 354,
+        "finished": 1210
+      },
+      "basis": null,
+      "match_share": 0.0
+    },
+    "czech_liga": {
+      "coverage": {
+        "n": 1262,
+        "box": 0.5340729001584786,
+        "sot": 0.9801901743264659,
+        "box_n": 674,
+        "sot_n": 1237,
+        "finished": 1397
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.8855,
+      "xg_rows": 1237
+    },
+    "denmark_superliga": {
+      "coverage": {
+        "n": 911,
+        "box": 0.9934138309549945,
+        "sot": 1.0,
+        "box_n": 905,
+        "sot_n": 911,
+        "finished": 963
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9398,
+      "xg_rows": 905
+    },
+    "eredivisie": {
+      "coverage": {
+        "n": 1502,
+        "box": 0.988681757656458,
+        "sot": 1.0,
+        "box_n": 1485,
+        "sot_n": 1502,
+        "finished": 1589
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9346,
+      "xg_rows": 1485
+    },
+    "estonia_meistriliiga": {
+      "coverage": {
+        "n": 3,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 3,
+        "sot_n": 3,
+        "finished": 897
+      },
+      "basis": null,
+      "match_share": 0.0033,
+      "skipped_reason": "xG 可用场次仅占完赛 0.3%，低于 60%"
+    },
+    "europe_uefa_conference_league": {
+      "coverage": {
+        "n": 1200,
+        "box": 0.695,
+        "sot": 0.795,
+        "box_n": 834,
+        "sot_n": 954,
+        "finished": 1929
+      },
+      "basis": null,
+      "match_share": 0.4946,
+      "skipped_reason": "xG 可用场次仅占完赛 49.5%，低于 60%"
+    },
+    "fd_e1": {
+      "coverage": {
+        "n": 2760,
+        "box": 0.0,
+        "sot": 1.0,
+        "box_n": 0,
+        "sot_n": 2760,
+        "finished": 2760
+      },
+      "basis": "shots_on_target",
+      "match_share": 1.0,
+      "xg_rows": 2760
+    },
+    "fd_f2": {
+      "coverage": {
+        "n": 1748,
+        "box": 0.0,
+        "sot": 1.0,
+        "box_n": 0,
+        "sot_n": 1748,
+        "finished": 1750
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.9989,
+      "xg_rows": 1748
+    },
+    "finland_veikkausliiga": {
+      "coverage": {
+        "n": 316,
+        "box": 0.0,
+        "sot": 1.0,
+        "box_n": 0,
+        "sot_n": 316,
+        "finished": 867
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.3645,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 36.4%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
+      "xg_rows": 316
+    },
+    "greece_super_league_1": {
+      "coverage": {
+        "n": 1101,
+        "box": 0.7783832879200726,
+        "sot": 1.0,
+        "box_n": 857,
+        "sot_n": 1101,
+        "finished": 1194
+      },
+      "basis": "inside_outside",
+      "match_share": 0.7178,
+      "xg_rows": 856
+    },
+    "hungary_nb_i": {
+      "coverage": {
+        "n": 617,
+        "box": 0.6969205834683955,
+        "sot": 0.7082658022690438,
+        "box_n": 430,
+        "sot_n": 437,
+        "finished": 1001
+      },
+      "basis": null,
+      "match_share": 0.4366,
+      "skipped_reason": "xG 可用场次仅占完赛 43.7%，低于 60%"
+    },
+    "iceland_1_deild": {
+      "coverage": {
+        "n": 4,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 4,
+        "sot_n": 4,
+        "finished": 692
+      },
+      "basis": null,
+      "match_share": 0.0058,
+      "skipped_reason": "xG 可用场次仅占完赛 0.6%，低于 60%"
+    },
+    "israel_liga_leumit": {
+      "coverage": {
+        "n": 0,
+        "box": 0.0,
+        "sot": 0.0,
+        "box_n": 0,
+        "sot_n": 0,
+        "finished": 1483
+      },
+      "basis": null,
+      "match_share": 0.0
+    },
+    "israel_ligat_ha_al": {
+      "coverage": {
+        "n": 491,
+        "box": 0.7433808553971487,
+        "sot": 0.7617107942973523,
+        "box_n": 365,
+        "sot_n": 374,
+        "finished": 1199
+      },
+      "basis": null,
+      "match_share": 0.3044,
+      "skipped_reason": "xG 可用场次仅占完赛 30.4%，低于 60%"
+    },
+    "la_liga": {
+      "coverage": {
+        "n": 1803,
+        "box": 0.9938990571270105,
+        "sot": 1.0,
+        "box_n": 1792,
+        "sot_n": 1803,
+        "finished": 1912
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9372,
+      "xg_rows": 1792
+    },
+    "latvia_1_liga": {
+      "coverage": {
+        "n": 44,
+        "box": 0.045454545454545456,
+        "sot": 0.9090909090909091,
+        "box_n": 2,
+        "sot_n": 40,
+        "finished": 869
+      },
+      "basis": null,
+      "match_share": 0.046,
+      "skipped_reason": "xG 可用场次仅占完赛 4.6%，低于 60%"
+    },
+    "ligue_1": {
+      "coverage": {
+        "n": 1601,
+        "box": 0.9943785134291068,
+        "sot": 1.0,
+        "box_n": 1592,
+        "sot_n": 1601,
+        "finished": 1682
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9465,
+      "xg_rows": 1591
+    },
+    "lithuania_1_lyga": {
+      "coverage": {
+        "n": 50,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 50,
+        "sot_n": 50,
+        "finished": 1170
+      },
+      "basis": null,
+      "match_share": 0.0427,
+      "skipped_reason": "xG 可用场次仅占完赛 4.3%，低于 60%"
+    },
+    "luxembourg_national_division": {
+      "coverage": {
+        "n": 176,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 176,
+        "sot_n": 176,
+        "finished": 1202
+      },
+      "basis": null,
+      "match_share": 0.1464,
+      "skipped_reason": "xG 可用场次仅占完赛 14.6%，低于 60%"
+    },
+    "moldova_super_liga": {
+      "coverage": {
+        "n": 0,
+        "box": 0.0,
+        "sot": 0.0,
+        "box_n": 0,
+        "sot_n": 0,
+        "finished": 628
+      },
+      "basis": null,
+      "match_share": 0.0
+    },
+    "montenegro_first_league": {
+      "coverage": {
+        "n": 49,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 49,
+        "sot_n": 49,
+        "finished": 916
+      },
+      "basis": null,
+      "match_share": 0.0535,
+      "skipped_reason": "xG 可用场次仅占完赛 5.3%，低于 60%"
+    },
+    "norway_eliteserien": {
+      "coverage": {
+        "n": 1164,
+        "box": 0.9982817869415808,
+        "sot": 1.0,
+        "box_n": 1162,
+        "sot_n": 1164,
+        "finished": 1226
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9478,
+      "xg_rows": 1162
+    },
+    "poland_ekstraklasa": {
+      "coverage": {
+        "n": 1430,
+        "box": 0.9545454545454546,
+        "sot": 1.0,
+        "box_n": 1365,
+        "sot_n": 1430,
+        "finished": 1530
+      },
+      "basis": "inside_outside",
+      "match_share": 0.8922,
+      "xg_rows": 1364
+    },
+    "portugal_primeira_liga": {
+      "coverage": {
+        "n": 1471,
+        "box": 0.9918422841604351,
+        "sot": 1.0,
+        "box_n": 1459,
+        "sot_n": 1471,
+        "finished": 1539
+      },
+      "basis": "inside_outside",
+      "match_share": 0.948,
+      "xg_rows": 1455
+    },
+    "premier_league": {
+      "coverage": {
+        "n": 1807,
+        "box": 0.9944659656889873,
+        "sot": 1.0,
+        "box_n": 1797,
+        "sot_n": 1807,
+        "finished": 1908
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9418,
+      "xg_rows": 1795
+    },
+    "republic_of_ireland_premier_division": {
+      "coverage": {
+        "n": 516,
+        "box": 0.9903100775193798,
+        "sot": 1.0,
+        "box_n": 511,
+        "sot_n": 516,
+        "finished": 927
+      },
+      "basis": null,
+      "match_share": 0.5512,
+      "skipped_reason": "xG 可用场次仅占完赛 55.1%，低于 60%"
+    },
+    "romania_liga_i": {
+      "coverage": {
+        "n": 1491,
+        "box": 0.6472166331321261,
+        "sot": 0.9919517102615694,
+        "box_n": 965,
+        "sot_n": 1479,
+        "finished": 1591
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.9296,
+      "xg_rows": 1479
+    },
+    "russia_premier_league": {
+      "coverage": {
+        "n": 1146,
+        "box": 0.9904013961605584,
+        "sot": 1.0,
+        "box_n": 1135,
+        "sot_n": 1146,
+        "finished": 1222
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9288,
+      "xg_rows": 1135
+    },
+    "saudi_pro_league": {
+      "coverage": {
+        "n": 1393,
+        "box": 0.9985642498205313,
+        "sot": 1.0,
+        "box_n": 1391,
+        "sot_n": 1393,
+        "finished": 1398
+      },
+      "basis": "inside_outside",
+      "match_share": 0.995,
+      "xg_rows": 1391
+    },
+    "scotland_premiership": {
+      "coverage": {
+        "n": 1141,
+        "box": 0.9439088518843121,
+        "sot": 0.9938650306748467,
+        "box_n": 1077,
+        "sot_n": 1134,
+        "finished": 1167
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9229,
+      "xg_rows": 1077
+    },
+    "serbia_super_liga": {
+      "coverage": {
+        "n": 1136,
+        "box": 0.7940140845070423,
+        "sot": 0.914612676056338,
+        "box_n": 902,
+        "sot_n": 1039,
+        "finished": 1593
+      },
+      "basis": null,
+      "match_share": 0.5662,
+      "skipped_reason": "xG 可用场次仅占完赛 56.6%，低于 60%"
+    },
+    "serie_a": {
+      "coverage": {
+        "n": 1799,
+        "box": 0.9949972206781545,
+        "sot": 1.0,
+        "box_n": 1790,
+        "sot_n": 1799,
+        "finished": 1901
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9416,
+      "xg_rows": 1790
+    },
+    "slovakia_1_liga": {
+      "coverage": {
+        "n": 618,
+        "box": 0.38673139158576053,
+        "sot": 0.9805825242718447,
+        "box_n": 239,
+        "sot_n": 606,
+        "finished": 974
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.6222,
+      "xg_rows": 606
+    },
+    "slovenia_1_snl": {
+      "coverage": {
+        "n": 296,
+        "box": 0.0,
+        "sot": 0.9662162162162162,
+        "box_n": 0,
+        "sot_n": 286,
+        "finished": 887
+      },
+      "basis": null,
+      "match_share": 0.3224,
+      "skipped_reason": "xG 可用场次仅占完赛 32.2%，低于 60%"
+    },
+    "sweden_allsvenskan": {
+      "coverage": {
+        "n": 1161,
+        "box": 0.9939707149009475,
+        "sot": 1.0,
+        "box_n": 1154,
+        "sot_n": 1161,
+        "finished": 1226
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9413,
+      "xg_rows": 1154
+    },
+    "switzerland_super_league": {
+      "coverage": {
+        "n": 987,
+        "box": 0.9949341438703141,
+        "sot": 0.9989868287740629,
+        "box_n": 982,
+        "sot_n": 986,
+        "finished": 1053
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9326,
+      "xg_rows": 982
+    },
+    "turkey_super_lig": {
+      "coverage": {
+        "n": 1644,
+        "box": 0.9896593673965937,
+        "sot": 1.0,
+        "box_n": 1627,
+        "sot_n": 1644,
+        "finished": 1721
+      },
+      "basis": "inside_outside",
+      "match_share": 0.9454,
+      "xg_rows": 1626
+    },
+    "uefa_champions_league": {
+      "coverage": {
+        "n": 938,
+        "box": 0.8773987206823027,
+        "sot": 0.908315565031983,
+        "box_n": 823,
+        "sot_n": 852,
+        "finished": 1175
+      },
+      "basis": "inside_outside",
+      "match_share": 0.7004,
+      "xg_rows": 821
+    },
+    "uefa_europa_league": {
+      "coverage": {
+        "n": 926,
+        "box": 0.7786177105831533,
+        "sot": 0.8650107991360692,
+        "box_n": 721,
+        "sot_n": 801,
+        "finished": 1041
+      },
+      "basis": "inside_outside",
+      "match_share": 0.6926,
+      "xg_rows": 721
+    },
+    "ukraine_premier_league": {
+      "coverage": {
+        "n": 433,
+        "box": 0.004618937644341801,
+        "sot": 0.9191685912240185,
+        "box_n": 2,
+        "sot_n": 398,
+        "finished": 1117
+      },
+      "basis": null,
+      "match_share": 0.3563,
+      "skipped_reason": "xG 可用场次仅占完赛 35.6%，低于 60%"
+    },
+    "world_cup": {
+      "coverage": {
+        "n": 163,
+        "box": 1.0,
+        "sot": 1.0,
+        "box_n": 163,
+        "sot_n": 163,
+        "finished": 163
+      },
+      "basis": "inside_outside",
+      "match_share": 1.0,
+      "xg_rows": 162
+    }
+  }
+}

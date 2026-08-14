@@ -11,7 +11,7 @@
 
 用法:
   python download_league_history.py --league-id 103 --league-name Eliteserien \
-      --slug eliteserien --project "H:\\claude AI自媒体\\project015_挪超2022"
+      --slug eliteserien --project <目标项目路径>
   python download_league_history.py --league-id 103 --league-name Eliteserien \
       --slug eliteserien --project <项目路径> --delay 0   # 已拉过时快速重合并
 """

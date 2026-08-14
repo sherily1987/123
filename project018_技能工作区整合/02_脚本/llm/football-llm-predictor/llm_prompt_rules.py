@@ -36,20 +36,71 @@ EVIDENCE_TAGS = ("伤停", "阵容", "首发", "缺阵", "战意", "动机", "�
 ODDS_ONLY_TAGS = ("赔率", "盘口", "让球", "市场")
 
 # ---------- 检索关键词（证据收集用） ----------
+# 分层结构：required = 每类至少搜一次的核心词；optional = 按赛事/语言扩展。
+# 2026-08-12 修订：
+#   - 清理伪关键词（get_lineups / team_ids / wttr / 勿混淆——搜了只命中文档）；
+#   - 补两回合制战意词（second leg / aggregate / qualifying round 等，8月资格赛主战场）；
+#   - 补南美语言词（escalação / once titular / formación 等，解放者杯常客）；
+#   - 近况补主客分拆（home/away form）与连胜连败（streak）。
 SEARCH_KEYWORDS = {
-    "伤停": [
-        "injury", "injured", "doubtful", "suspended", "team news", "predicted lineup", "get_lineups", "starting XI", "missing players",
-        "大名单", "伤停", "缺阵", "停赛", "赛前发布会", "伤病名单",
-        "blessure", "opstelling", "desfalques", "lesão", "infortunio", "ausfälle",
-    ],
-    "近况": ["last 5", "form", "recent results", "xG", "clean sheet", "近5场", "状态", "走势"],
-    "战意": [
-        "opening day", "promoted", "relegation", "title race", "rotation", "midweek",
-        "揭幕", "升级", "保级", "争冠", "轮换", "首回合", "次回合",
-    ],
-    "主客天气": ["home advantage", "travel", "artificial turf", "wttr", "主场", "客场", "草皮", "天气"],
-    "赔率": ["opening odds", "closing", "steam", "drift", "初盘", "即盘", "降水", "升水", "让球线"],
-    "身份": ["official name", "full name", "team_ids", "官方全名", "勿混淆"],
+    "伤停": {
+        "required": [
+            "injury", "injured", "doubtful", "suspended", "team news",
+            "大名单", "伤停", "缺阵", "停赛",
+        ],
+        "optional": [
+            "predicted lineup", "confirmed lineup", "official lineup", "team announcement",
+            "starting XI", "missing players", "伤病名单", "赛前发布会",
+            "blessure", "opstelling", "desfalques", "lesão", "infortunio", "ausfälle",
+            "escalação", "once titular", "formación",
+        ],
+    },
+    "近况": {
+        "required": [
+            "last 5", "form", "recent results", "近5场", "状态",
+        ],
+        "optional": [
+            "home form", "away form", "winning streak", "losing streak", "undefeated",
+            "xG", "xG for", "xG against", "clean sheet", "走势",
+        ],
+    },
+    "战意": {
+        "required": [
+            "首回合", "次回合", "first leg", "second leg", "aggregate", "qualifying round",
+        ],
+        "optional": [
+            "opening day", "promoted", "relegation", "title race", "rotation", "midweek",
+            "extra time", "penalties", "away goals rule", "trophy", "final", "showpiece",
+            "揭幕", "升级", "保级", "争冠", "轮换",
+        ],
+    },
+    "主客天气": {
+        "required": [
+            "home advantage", "travel", "weather", "主场", "客场", "天气",
+        ],
+        "optional": [
+            "artificial turf", "pitch condition", "altitude", "heat", "temperature",
+            "long journey", "草皮", "远征",
+        ],
+    },
+    "赔率": {
+        "required": [
+            "opening odds", "closing odds", "初盘", "即盘",
+        ],
+        "optional": [
+            "odds movement", "odds drift", "market move", "steam", "drift",
+            "让球线", "冷热", "升水", "降水",
+        ],
+    },
+    "身份": {
+        "required": [
+            "official name", "full name", "官方全名",
+        ],
+        "optional": [
+            "official site", "official page", "match page", "UEFA official",
+            "球队官方", "官网",
+        ],
+    },
 }
 
 

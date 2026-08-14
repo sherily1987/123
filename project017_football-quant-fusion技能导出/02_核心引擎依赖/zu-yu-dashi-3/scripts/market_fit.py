@@ -36,23 +36,54 @@ def _parse_time(value):
     return dt
 
 
-# [中文功能] 计算各盘口相对开球时间的新鲜度
+# [中文功能] 计算各盘口相对预测截止时间的新鲜度
 def market_freshness(data):
-    """Compute auditable pool age relative to kickoff; no timestamp means unknown."""
-    kickoff = _parse_time(data.get('kickoff'))
+    """计算可审计的盘口新鲜度。
+
+    采集器提供的 ``field_meta.<pool>.freshness`` 表示本次快照已实时取到该盘口，
+    否则只允许用 ``prediction_as_of - collected_at`` 计算。source_updated_at/
+    observed_at 是数据源最后更新时间，不代表本次抓取时间，不能用于判定采集新鲜度。
+    """
+    prediction_as_of = _parse_time(data.get('prediction_as_of'))
     meta = data.get('field_meta') or {}
     result = {}
     for pool, field in [('had', 'odds'), ('hhad', 'hhad'), ('ou', 'ou'),
                         ('ttg', 'ttg'), ('hafu', 'hafu'), ('crs', 'crs')]:
         item = meta.get(field) or {}
-        observed = _parse_time(item.get('observed_at'))
-        if not observed or not kickoff:
+        explicit_freshness = item.get('freshness')
+        if isinstance(explicit_freshness, (int, float)):
+            score = max(0.0, min(100.0, float(explicit_freshness)))
+            if score >= 75.0:
+                status, factor = 'FRESH', 1.0
+            elif score >= 50.0:
+                status, factor = 'AGING', 0.5
+            elif score > 0.0:
+                status, factor = 'STALE', 0.15
+            else:
+                status, factor = 'OUTDATED', 0.0
+            result[pool] = {
+                'status': status,
+                'factor': factor,
+                'age_hours': None,
+                'observed_at': item.get('observed_at'),
+                'collected_at': item.get('collected_at'),
+                'source_updated_at': item.get('source_updated_at'),
+                'basis': 'explicit_snapshot_freshness',
+                'freshness_score': score,
+            }
+            continue
+        collected = _parse_time(item.get('collected_at'))
+        as_of = _parse_time(item.get('prediction_as_of')) or prediction_as_of
+        if not collected or not as_of:
             # Unknown age is not fresh. Keep the observation auditable but do
             # not let an untimestamped pool receive full production weight.
             result[pool] = {'status': 'UNKNOWN', 'factor': 0.0, 'age_hours': None,
-                            'observed_at': item.get('observed_at')}
+                            'observed_at': item.get('observed_at'),
+                            'collected_at': item.get('collected_at'),
+                            'source_updated_at': item.get('source_updated_at'),
+                            'basis': 'missing_collection_anchor'}
             continue
-        age = max(0.0, (kickoff - observed).total_seconds() / 3600.0)
+        age = max(0.0, (as_of - collected).total_seconds() / 3600.0)
         if age <= FRESH_HOURS:
             status, factor = 'FRESH', 1.0
         elif age <= HALF_FRESH_HOURS:
@@ -63,7 +94,10 @@ def market_freshness(data):
             status, factor = 'OUTDATED', 0.0
         result[pool] = {'status': status, 'factor': factor,
                         'age_hours': round(age, 3),
-                        'observed_at': item.get('observed_at')}
+                        'observed_at': item.get('observed_at'),
+                        'collected_at': item.get('collected_at'),
+                        'source_updated_at': item.get('source_updated_at'),
+                        'basis': 'collection_age'}
     return result
 
 

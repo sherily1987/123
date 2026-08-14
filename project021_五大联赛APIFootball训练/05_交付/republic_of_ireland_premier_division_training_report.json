@@ -1,0 +1,129 @@
+{
+  "league": {
+    "id": 200,
+    "slug": "republic_of_ireland_premier_division",
+    "name": "Premier Division",
+    "country": "Republic of Ireland",
+    "kind": "domestic_league"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 927,
+    "season_count": 6,
+    "team_id_coverage": 1.0,
+    "team_count": 15,
+    "train_n": 556,
+    "validation_n": 185,
+    "test_n": 186
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\republic_of_ireland_premier_division_candidate.json",
+  "validation": {
+    "n": 183,
+    "skip": 1,
+    "model": {
+      "n": 183,
+      "brier_mean": 0.650068,
+      "log_loss": 1.06948,
+      "accuracy_pct": 40.98
+    },
+    "model_on_baseline_subset": {
+      "n": 159,
+      "brier_mean": 0.662854,
+      "log_loss": 1.088598,
+      "accuracy_pct": 38.36
+    },
+    "provider_market": {
+      "n": 159,
+      "brier_mean": 0.62736,
+      "log_loss": 1.040825,
+      "accuracy_pct": 46.54
+    },
+    "frequency_baseline": {
+      "n": 183,
+      "brier_mean": 0.656929,
+      "log_loss": 1.084484,
+      "probs": [
+        0.4534,
+        0.2581,
+        0.2885
+      ]
+    },
+    "by_league": {
+      "200": {
+        "n": 183,
+        "model": {
+          "n": 183,
+          "brier_mean": 0.650068,
+          "log_loss": 1.06948,
+          "accuracy_pct": 40.98
+        },
+        "provider_market": {
+          "n": 159,
+          "brier_mean": 0.62736,
+          "log_loss": 1.040825,
+          "accuracy_pct": 46.54
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 185,
+    "skip": 0,
+    "model": {
+      "n": 185,
+      "brier_mean": 0.624866,
+      "log_loss": 1.040938,
+      "accuracy_pct": 46.49
+    },
+    "model_on_baseline_subset": {
+      "n": 149,
+      "brier_mean": 0.617996,
+      "log_loss": 1.030994,
+      "accuracy_pct": 47.65
+    },
+    "provider_market": {
+      "n": 149,
+      "brier_mean": 0.617568,
+      "log_loss": 1.021966,
+      "accuracy_pct": 45.64
+    },
+    "frequency_baseline": {
+      "n": 185,
+      "brier_mean": 0.661064,
+      "log_loss": 1.090951,
+      "probs": [
+        0.4447,
+        0.2642,
+        0.2911
+      ]
+    },
+    "by_league": {
+      "200": {
+        "n": 185,
+        "model": {
+          "n": 185,
+          "brier_mean": 0.624866,
+          "log_loss": 1.040938,
+          "accuracy_pct": 46.49
+        },
+        "provider_market": {
+          "n": 149,
+          "brier_mean": 0.617568,
+          "log_loss": 1.021966,
+          "accuracy_pct": 45.64
+        }
+      }
+    }
+  },
+  "provider_market_coverage": {
+    "event_count": 927,
+    "matched_events": 551,
+    "unmatched_events": 376,
+    "rejected_after_kickoff": 56,
+    "rejected_invalid_odds": 2,
+    "rejected_unparseable_time": 0
+  }
+}

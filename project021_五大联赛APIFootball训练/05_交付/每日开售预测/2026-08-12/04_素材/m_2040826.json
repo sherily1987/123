@@ -1,0 +1,51 @@
+{
+  "schema_version": "3.0",
+  "collector_version": "mobile-3.5.0",
+  "source": "中国体彩网移动端官方链路",
+  "source_url": null,
+  "fetched_at": "2026-08-12T04:10:34.089511+00:00",
+  "count": 1,
+  "matches": [
+    {
+      "match_id": 2040826,
+      "match_num": null,
+      "business_date": null,
+      "kickoff_local": " 00:00",
+      "kickoff_iso": null,
+      "timezone": "Asia/Shanghai",
+      "league": null,
+      "home": null,
+      "away": null,
+      "status": "",
+      "status_name": null,
+      "model_odds": null,
+      "model_hhad": null,
+      "crs": null,
+      "ttg": null,
+      "hafu": null,
+      "team_ids": {
+        "home_team_id": null,
+        "away_team_id": null,
+        "league_id": null,
+        "home_full": null,
+        "away_full": null
+      },
+      "single_pools": {},
+      "had_updated_at": null,
+      "hhad_updated_at": null,
+      "crs_updated_at": null,
+      "ttg_updated_at": null,
+      "hafu_updated_at": null,
+      "odds_eligible": false,
+      "fixed_bonus_url": "https://webapi.sporttery.cn/gateway/uniform/football/getFixedBonusV1.qry?clientCode=3001&matchId=2040826",
+      "odds_history": {},
+      "match_result_list": [],
+      "sections_no999": ""
+    }
+  ],
+  "notes": [
+    "唯一链路：移动端 getConditionsV1 + getMatchDataPageListV1 + 逐场 getFixedBonusV1。",
+    "CRS只作相对排序，不直接归一化。",
+    "禁止调用任何已废弃PC/计算器接口。"
+  ]
+}

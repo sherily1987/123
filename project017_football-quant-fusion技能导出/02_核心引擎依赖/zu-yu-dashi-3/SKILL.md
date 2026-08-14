@@ -79,11 +79,11 @@ version: 3.4.4
 
 离线历史JSON：
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/backtest.py <历史比赛JSON>
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/backtest.py <历史比赛JSON>
 ```
 登记库：
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/backtest.py --store H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest --snapshot closing
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/backtest.py --store F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest --snapshot closing
 ```
 
 离线输入为正常predict字段加每场`actual:[主队90分钟进球,客队90分钟进球]`。输出Brier、log loss、Top比分、分档校准、ECE、基础频率基线和市场基线。
@@ -197,13 +197,13 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 
 - 正式赛前预测默认使用：
   ```sh
-  python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/record_prediction.py --input input.json --output output.json --predict --snapshot T-24h
+  python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/record_prediction.py --input input.json --output output.json --predict --snapshot T-24h
   ```
 - 预测必须在开赛前登记；已登记记录禁止覆盖，更新预测创建新snapshot。测试和敏感性分析可不登记。
 - 每条记录保存模型版本、输入/输出/引擎哈希，并追加到链式registry。
 - 赛后回填优先用官方赛果自动化，一条命令扫描登记库缺口并写入：
   ```sh
-  python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/settle_from_sporttery.py [--date YYYY-MM-DD] [--dry-run]
+  python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/settle_from_sporttery.py [--date YYYY-MM-DD] [--dry-run]
   ```
   数据源为移动端 `getMatchDataPageListV1.qry?method=result` 的 `sectionsNo999`（全场）与 `sectionsNo1`（半场）；只回填 `matchStatusName=已完成` 且比分非空的场次，未完成一律 `no_result_yet` 跳过，不臆补。先跑 `--dry-run` 核对匹配是否指向正确球队。
   ⚠️ 该接口**不带 `matchDate` 时只返回约10场滚动窗口**，`pageSize`/`pageNo` 参数无效（见 pitfalls 1.1b）。脚本已改为按待回填场次的开球日期逐日查询（并各自附带前一日以覆盖 businessDate 与 matchDate 跨零点的差异）后合并去重。**不得改回裸调一次**，否则窗口外的已完赛场次会被永久误判为未出赛果。
@@ -215,7 +215,7 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 - 快速历史样本：运行`build_historical_dataset.py`下载football-data公开CSV并转成离线回测集；历史回测与前瞻登记库必须分开报告。
 - **每日样本流水线（推荐入口）**：`daily_pipeline.py` 一条命令完成 回填赛果→采集全盘口→登记快照→追加赔率移动库：
   ```sh
-  python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/daily_pipeline.py [--date YYYY-MM-DD] [--dry-run]
+  python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/daily_pipeline.py [--date YYYY-MM-DD] [--dry-run]
   ```
   体彩**每天 11:00 开售时刷新全部盘口赔率**，故定时任务设在 11:05，快照标 `T-7h`（离最早开球约7小时）。已配置 minis-scheduled 每日任务，不要重复创建。网络失败自动重试2次。
 - 单步排查时才用 `daily_snapshot.py`；只登记Selling且HAD完整、尚未开赛的比赛。同一比赛多快照不能当成多个独立样本。
@@ -236,7 +236,7 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 
 **关键约定**（不随会话变化）：
 - 用户主要需求：中国体彩官方赔率采集 + 胜平负/比分/总进球/BTTS/让球分析 + 可选PPT产出
-- 技能目录固定 `H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/`；不得修改 `zu-yu-dashi-2`、`ucl-predictor`
+- 技能目录固定 `F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/`；不得修改 `zu-yu-dashi-2`、`ucl-predictor`
 - 交互语言：中文；PPT若有用户提供的模板，优先保留版式，数字直接读取 `model_output.json`
 
 新发现的坑或方法，**追加进 `pitfalls.md`**，不要散落在对话历史里。

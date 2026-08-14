@@ -1,0 +1,639 @@
+{
+ "summary": {
+  "schema": "scattered-llm-backtest-1.0",
+  "generated_at": "2026-08-12T09:17:27.872282+00:00",
+  "stats": {
+   "llm_double": {
+    "n": 46,
+    "hit": 26,
+    "hit_rate_pct": 56.52
+   },
+   "llm_single": {
+    "n": 45,
+    "hit": 20,
+    "hit_rate_pct": 44.44
+   },
+   "score_top1": {
+    "n": 46,
+    "hit": 6,
+    "hit_rate_pct": 13.04
+   },
+   "score_top3": {
+    "n": 46,
+    "hit": 10,
+    "hit_rate_pct": 21.74
+   }
+  },
+  "by_source": {
+   "project012_20260803": {
+    "n": 3,
+    "scored": 3
+   },
+   "project014": {
+    "n": 21,
+    "scored": 21
+   },
+   "今日推荐_20260808": {
+    "n": 13,
+    "scored": 13
+   },
+   "双轨四玩法_20260809": {
+    "n": 6,
+    "scored": 6
+   },
+   "双轨四玩法_20260810": {
+    "n": 3,
+    "scored": 3
+   }
+  },
+  "total_scored": 46
+ },
+ "detail": [
+  {
+   "source": "project012_20260803",
+   "match_id": "sporttery-2040699",
+   "match_num": "周日012",
+   "actual": "3-2",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-2",
+    "1-3",
+    "2-2"
+   ]
+  },
+  {
+   "source": "project012_20260803",
+   "match_id": "sporttery-2040706",
+   "match_num": "周日013",
+   "actual": "1-1",
+   "llm_pick": "双选 主胜/平局（H/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0",
+    "2-1",
+    "1-1"
+   ]
+  },
+  {
+   "source": "project012_20260803",
+   "match_id": "sporttery-2040700",
+   "match_num": "周日014",
+   "actual": "2-0",
+   "llm_pick": "双选 主胜/平局（H/D），偏好平局",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0",
+    "1-1",
+    "0-0"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040727",
+   "match_num": "周二002",
+   "actual": "1-2",
+   "llm_pick": "双选 主胜/平局（H/D）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0",
+    "1-1",
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040728",
+   "match_num": "周二003",
+   "actual": "0-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-0",
+    "1-0",
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040720",
+   "match_num": "周二004",
+   "actual": "3-3",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-1",
+    "0-1",
+    "1-2"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040721",
+   "match_num": "周二005",
+   "actual": "2-1",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-1",
+    "0-1",
+    "1-2"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040718",
+   "match_num": "周四001",
+   "actual": "4-0",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "0-1",
+    "1-1",
+    "0-2"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040729",
+   "match_num": "周四002",
+   "actual": "0-0",
+   "llm_pick": "双选 平局/客胜（D/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "score_picks": [
+    "0-1",
+    "1-1",
+    "1-2"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040724",
+   "match_num": "周四003",
+   "actual": "2-1",
+   "llm_pick": "双选 主胜/平局（H/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-0",
+    "1-1",
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040725",
+   "match_num": "周四004",
+   "actual": "0-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1",
+    "1-0",
+    "2-0"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040750",
+   "match_num": "周六001",
+   "actual": "2-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040797",
+   "match_num": "周六002",
+   "actual": "1-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040763",
+   "match_num": "周六015",
+   "actual": "1-3",
+   "llm_pick": "双选 客胜/主胜（A/H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040764",
+   "match_num": "周六016",
+   "actual": "4-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040765",
+   "match_num": "周六017",
+   "actual": "0-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040766",
+   "match_num": "周六018",
+   "actual": "2-2",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1",
+    "2-0"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040767",
+   "match_num": "周六019",
+   "actual": "0-1",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040768",
+   "match_num": "周六020",
+   "actual": "1-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040798",
+   "match_num": "周六021",
+   "actual": "0-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040769",
+   "match_num": "周六022",
+   "actual": "2-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1",
+    "2-0"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040770",
+   "match_num": "周六023",
+   "actual": "2-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040771",
+   "match_num": "周六024",
+   "actual": "2-2",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "project014",
+   "match_id": "sporttery-2040772",
+   "match_num": "周六025",
+   "actual": "1-0",
+   "llm_pick": "双选 主胜/客胜（H/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040750",
+   "match_num": "周六001",
+   "actual": "2-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040797",
+   "match_num": "周六002",
+   "actual": "1-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040763",
+   "match_num": "周六015",
+   "actual": "1-3",
+   "llm_pick": "双选 客胜/主胜（A/H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040764",
+   "match_num": "周六016",
+   "actual": "4-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040765",
+   "match_num": "周六017",
+   "actual": "0-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040766",
+   "match_num": "周六018",
+   "actual": "2-2",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1",
+    "2-0"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040767",
+   "match_num": "周六019",
+   "actual": "0-1",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040768",
+   "match_num": "周六020",
+   "actual": "1-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040798",
+   "match_num": "周六021",
+   "actual": "0-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040769",
+   "match_num": "周六022",
+   "actual": "2-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1",
+    "2-0"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040770",
+   "match_num": "周六023",
+   "actual": "2-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040771",
+   "match_num": "周六024",
+   "actual": "2-2",
+   "llm_pick": "双选 客胜/平局（A/D）",
+   "llm_double_hit": true,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "今日推荐_20260808",
+   "match_id": "sporttery-2040772",
+   "match_num": "周六025",
+   "actual": "1-0",
+   "llm_pick": "双选 主胜/客胜（H/A）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-2",
+    "2-1"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260809",
+   "match_id": "sporttery-2040787",
+   "match_num": "周日017",
+   "actual": "0-1",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260809",
+   "match_id": "sporttery-2040789",
+   "match_num": "周日019",
+   "actual": "2-1",
+   "llm_pick": "单选 客胜（A）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "0-1"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260809",
+   "match_id": "sporttery-2040790",
+   "match_num": "周日021",
+   "actual": "1-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260809",
+   "match_id": "sporttery-2040791",
+   "match_num": "周日022",
+   "actual": "2-2",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260809",
+   "match_id": "sporttery-2040792",
+   "match_num": "周日023",
+   "actual": "0-2",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260809",
+   "match_id": "sporttery-2040793",
+   "match_num": "周日024",
+   "actual": "2-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260810",
+   "match_id": "sporttery-2040794",
+   "match_num": "周一001",
+   "actual": "2-2",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260810",
+   "match_id": "sporttery-2040795",
+   "match_num": "周一002",
+   "actual": "1-0",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": true,
+   "llm_single_hit": true,
+   "score_picks": [
+    "1-0"
+   ]
+  },
+  {
+   "source": "双轨四玩法_20260810",
+   "match_id": "sporttery-2040796",
+   "match_num": "周一003",
+   "actual": "2-2",
+   "llm_pick": "单选 主胜（H）",
+   "llm_double_hit": false,
+   "llm_single_hit": false,
+   "score_picks": [
+    "1-0"
+   ]
+  }
+ ]
+}

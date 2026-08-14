@@ -11,13 +11,14 @@ import sys
 from pathlib import Path
 
 from runtime import resolve_python
+from runtime_paths import core_scripts_dir, data_root
 
 # 统一解释器：当前为 3.14 等非 3.12 时，所有子进程改用内置 Python 3.12
 PY = resolve_python()
 
 HERE = Path(__file__).resolve().parent
 FUSION_VERSION = "1.4.0"
-STORE = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/backtest')
+STORE = data_root() / "backtest"
 
 # 子命令 → 负责脚本（相对本目录；缺失时给出恢复提示）
 MAP = {
@@ -27,6 +28,14 @@ MAP = {
     "record": "fusion_record.py",
     "daily-pipeline": "fusion_daily_pipeline.py",
 }
+
+HELP = """\
+Supported commands:
+  collect | sales-day-collect | kickoff-date-collect
+  record | daily-pipeline | preview | merge-preview | settle | backtest
+  odds-add | odds-drift | odds-intl | tournament
+  football-data-enrich | market-ablation | collect-date
+"""
 
 
 # [中文功能] 从命令行参数中提取指定flag的值
@@ -104,6 +113,10 @@ def record_fusion(rest):
     core["recommendation_gate"] = wrapped.get("recommendation_gate") or (wrapped.get("core_output") or {}).get("recommendation_gate")
     core["data_usage_audit"] = wrapped.get("data_usage_audit") or (wrapped.get("core_output") or {}).get("data_usage_audit")
     core["fusion_full_output"] = wrapped
+    # 2026-08-12 修复：保留 build_identity，否则 fusion_record 登记时
+    # engine_bundle/prediction_code/config 三个哈希全部落 'unknown'，
+    # 导致同版本样本永远无法归入 current cohort（P1-1 根因）。
+    core["build_identity"] = wrapped.get("build_identity")
     if odds_report is not None:
         core["odds_movement_capture"] = odds_report
     core_path = fusion_output.with_suffix(fusion_output.suffix + ".registry-core.json")
@@ -131,6 +144,10 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__)
         raise SystemExit(1)
+    if sys.argv[1] in ("-h", "--help", "help"):
+        print(__doc__)
+        print(HELP)
+        return
     cmd, rest = sys.argv[1], sys.argv[2:]
     if cmd in ("collect", "sales-day-collect", "kickoff-date-collect"):
         script = MAP[cmd]
@@ -163,21 +180,21 @@ def main():
         return
     if cmd in ("preview",):
         # 委托 zu-yu-dashi-3 官方前瞻采集
-        p = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/fetch_match_preview.py')
+        p = core_scripts_dir() / "fetch_match_preview.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
         proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
         sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
         raise SystemExit(proc.returncode)
     if cmd in ("merge-preview",):
-        p = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/merge_preview.py')
+        p = core_scripts_dir() / "merge_preview.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
         proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
         sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
         raise SystemExit(proc.returncode)
     if cmd == "settle":
-        p = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/settle_from_sporttery.py')
+        p = HERE / "fusion_settle.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
         proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
@@ -190,13 +207,13 @@ def main():
             proc = subprocess.run([PY, str(fb), *rest], text=True, capture_output=True)
             sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
             raise SystemExit(proc.returncode)
-        p = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/backtest.py')
+        p = core_scripts_dir() / "backtest.py"
         print('提示：fusion_backtest.py 缺失（事故损坏），回退核心引擎回测', file=sys.stderr)
         proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
         sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
         raise SystemExit(proc.returncode)
     if cmd in ("odds-add", "odds-drift"):
-        p = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/odds_movement.py')
+        p = core_scripts_dir() / "odds_movement.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
         sub_cmd = 'add' if cmd == 'odds-add' else 'drift'

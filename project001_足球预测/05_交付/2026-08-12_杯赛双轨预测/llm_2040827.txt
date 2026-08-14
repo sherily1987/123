@@ -1,0 +1,39 @@
+📁 证据文件: 7 个
+   - evidence_001_psg_villa.md
+   - evidence_002_platense_coquimbo.md
+   - evidence_003_palmeiras_cerro.md
+   - evidence_009_mirassol_ldu.md
+   - evidence_010_rosario_corinthians.md
+   - evidence_012_mirassol_ldu.md
+   - evidence_013_rosario_corinthians.md
+🎯 共 1 场比赛待预测, 每场 3 个模型定性判断
+
+================================================================
+⚽ 第1/1场 [周四009] 米拉索尔 VS 基多体大 | 解放者杯 | 2026-08-14 06:00
+   证据: evidence_012_mirassol_ldu.md
+================================================================
+     ✓ [deepseek-chat     ] -> 主胜 / 平局 比分偏好:1-0
+     ✓ [glm-4-flash       ] -> 主胜 / 客胜 比分偏好:1-0
+     ✓ [kimi-k2.6         ] -> 主胜 比分偏好:1-0
+
+  📊 综合方向: 主胜  (1.2/1.6票, 强度76%)
+  🚨 谨慎(证据存在缺口): 建议双选 主胜/平局
+  🎯 比分偏好: 1-0
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平胜
+  ⚠️ 坍缩标记: OU_COLLAPSE:小2.5x3
+
+  💰 下注推荐:
+     🚫 不下注 — 证据存在缺口，风险过高
+     
+     EV 分析:
+       主胜: 预测 75.7% × 赔率 1.49 = EV +12.8% ✅
+       平局: 预测 16.2% × 赔率 3.60 = EV -41.6% ❌
+       客胜: 预测 8.1% × 赔率 5.60 = EV -54.6% ❌
+  🗳️ 投票分布: 主胜:1.2 | 平局:0.3 | 客胜:0.1
+  🤖 各模型判断:
+     [deepseek-chat       ] 主胜 (备选:平局) 比分:1-0 — 【战意: 解放者杯正赛，双方均全力争胜】【主客: 米拉索尔主场作战，洲际赛事主场优势明显】【近况: 无可靠同尺度对比数据
+     [glm-4-flash         ] 主胜 (备选:客胜) 比分:1-0 — 【战意: 解放者杯淘汰赛性质，双方均为正赛】【主客: 米拉索尔为主队，洲际赛事存在旅行因素】【身份: 体彩官方HAD赔率
+     [kimi-k2.6           ] 主胜 比分:1-0 — 【战意:解放者杯单场淘汰，双方均为正赛】【主客:米拉索尔为主队，基多体大跨洲客战存在旅行消耗】【伤停:截至采集时未取得双
+{"direction": "主胜", "votes": 1.19, "total_votes": 1.5724999999999998, "strength": 0.7567567567567568, "all_votes": {"主胜": 1.19, "平局": 0.255, "客胜": 0.1275}, "top_score_pref": "1-0", "score_prefs": {"1-0": 1.19}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 1.19}, "top_hafu": "平胜", "all_hafu": {"平胜": 1.19}, "alt_direction": "平局", "caution": true, "valid_model_count": 3, "minimum_valid_models": 3, "collapse_flags": ["OU_COLLAPSE:小2.5x3"], "individual": {"zhipu/glm-4-flash": {"model_id": "zhipu/glm-4-flash", "provider": "zhipu", "direction": "主胜", "alt_direction": "客胜", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意: 解放者杯淘汰赛性质，双方均为正赛】【主客: 米拉索尔为主队，洲际赛事存在旅行因素】【身份: 体彩官方HAD赔率主胜1.49，客胜5.6】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "主客", "旅行", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意: 解放者杯正赛，双方均全力争胜】【主客: 米拉索尔主场作战，洲际赛事主场优势明显】【近况: 无可靠同尺度对比数据，但主队赔率1.49显著低开】【伤停: 双方首发及伤停信息未披露，存在不确定性】主胜概率较高，但杯赛冷门风险大，需防平局。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况", "主客"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k2.6": {"model_id": "moonshot/kimi-k2.6", "provider": "moonshot", "direction": "主胜", "alt_direction": null, "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意:解放者杯单场淘汰，双方均为正赛】【主客:米拉索尔为主队，基多体大跨洲客战存在旅行消耗】【伤停:截至采集时未取得双方官方首发及伤停可核验来源】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "主客", "旅行"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "llm_model_pool_sha256": "4b61f8e50c398acb711f79465a1c1e63d77bc29640fe9a062a2176c69e8a39f9", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "cff46c32a27d9080317561823d7747b3cc46f77470469845894c639fc875b77a", "evidence_file_sha256": "6bad635c9c51135228e643af5e4a55ffc3dfb232df595afe2fa8d84568a86b54", "evidence_collected_at_min": "2026-08-12T21:07:48+0800", "evidence_collected_at_max": "2026-08-12T21:07:48+0800", "ev_recommendation": {"action": "skip", "reason": "证据存在缺口，风险过高", "recommended_bets": [], "ev_analysis": {"主胜": {"predicted_prob": 0.7567567567567568, "odds": 1.49, "ev": 0.1275675675675676}, "平局": {"predicted_prob": 0.1621621621621622, "odds": 3.6, "ev": -0.4162162162162161}, "客胜": {"predicted_prob": 0.0810810810810811, "odds": 5.6, "ev": -0.5459459459459459}}}}
+

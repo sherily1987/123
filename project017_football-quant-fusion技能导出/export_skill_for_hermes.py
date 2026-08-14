@@ -24,7 +24,7 @@ import sys
 import zipfile
 from pathlib import Path
 
-PROJECT_ROOT = Path(r"H:\claude AI自媒体\project017_football-quant-fusion技能导出")
+PROJECT_ROOT = Path(r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出")
 
 SRC_SKILL = Path(r"C:\Users\Administrator\.codex\skills\football-quant-fusion")
 SRC_CORE = Path(
@@ -34,7 +34,9 @@ SRC_SHARED = Path(
     r"C:\Users\Administrator\.codex\skills\football-quant-fusion-suite\shared\football-quant-fusion"
 )
 SRC_TODAY_INPUT = Path(
-    r"H:\claude AI自媒体\project014_football-quant-fusion\04_素材\2026-08-06_今日竞彩预测\input_20260806.json"
+    # project014 已于 2026-08-12 归档到 90_归档/，样例输入随之搬迁；仅用于导出包里的
+    # demo 样例，不是生产数据依赖，路径失效只会让导出脚本报错，不影响实际预测链路。
+    r"F:\HM足球比赛预测\90_归档\project014_football-quant-fusion\04_素材\2026-08-06_今日竞彩预测\input_20260806.json"
 )
 
 SKILL_DIR = PROJECT_ROOT / "01_技能本体" / "football-quant-fusion"

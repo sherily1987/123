@@ -1,4 +1,4 @@
-﻿---
+---
 name: football-quant-fusion
 description: 全赛事足球量化研究与竞彩决策支持融合技能。融合足彩批量流水线、战意/赔率走势/状态研究与欧冠严格数据治理、阵容伤停、双回合晋级能力；输出胜平负、比分、大小球、BTTS、体彩让球、亚洲盘、晋级概率、数据质量、敏感性、赔率异动和可回测登记。用户提到今日推荐、足彩分析、竞彩足球、足球预测、欧冠预测、双回合晋级、夺冠模拟、让球、大小球、比分、赔率截图、盘口波动、串关、回测、回测已经预测的比赛或跨模型分析时触发。不用于纯实时比分查询。
 version: 1.4.0
@@ -79,7 +79,7 @@ version: 1.4.0
   - `evidence[]`：每条事实含 `{fact, source(URL), collected_at, mapped, basis}`。
 - 关键词库：按证据类型搜索（伤停/阵容、战意/动机、近况、主客/旅行/天气、赔率异动、
   身份核验），中英双语、官方来源优先、每类至少两个来源交叉验证；模板见
-  `H:\claude AI自媒体\project013_LLM对比轨道试点\01_规划\关键词库.md`。
+  `F:\HM足球比赛预测\90_归档\project013_LLM对比轨道试点\01_规划\关键词库.md`（项目已归档，模板文件仍在原相对结构内）。
 
 ### 纪律（硬性）
 
@@ -111,6 +111,10 @@ version: 1.4.0
 - 赛事/赛果：赛事官网、官方联赛、体彩官方列表。
 - 补充足球数据：`football-data.org`，只读取环境变量 `FOOTBALL_DATA_API_KEY`；用于其覆盖赛事的赛程、积分、近期结果和交锋交叉核验。该源无赛事覆盖时必须标 `UNAVAILABLE`，不得用其他联赛数据替代。
 - 补充足球数据：`API-Football v3`（`scripts/api_football_adapter.py`，Key 只从环境变量 `API_FOOTBALL_KEY` 读取）：赛程/赛果、积分榜、伤停、H2H。**Free 套餐限制**：仅开放 2022–2024 赛季（2025/2026 当前赛季会报错）、每日 100 次请求；`/odds` 赔率接口未适配且免费套餐覆盖不稳定——赔率仍以体彩官方采集为准。该源仅用于历史样本补齐与前瞻证据，不参与生产赔率。
+- 补充足球数据：`apifootball.com`（`scripts/apifootball_com_adapter.py`，Key 只从环境变量 `APIFOOTBALL_COM_KEY` 读取）：这是独立供应商，使用 `apiv3.apifootball.com` 与查询参数 `APIkey`，不能与上面的 API-Sports v3 适配器混用。首期支持账户可用国家/联赛清单、赛程赛果、积分榜、球队、首发和统计原始结果；先落盘 provider 信封并标准化预览，字段核验后才允许接入特征。`get_odds` 可在显式 `apifootball_primary` 路径中作为 `provider_only` 市场输入，但不能伪装成体彩赔率或生成体彩玩法标签。
+- `apifootball.com` 文档口径补充：`get_events` 支持 `timezone/from/to/country_id/league_id/match_id/team_id/match_live/withPlayerStats`；`get_standings` 使用 `overall_league_*` 字段；`get_lineups`/`get_statistics` 按 match id 包裹对象；`get_predictions` 始终为 `PROVIDER_BENCHMARK`，不能直接当作独立模型 edge。详见 `project007_APIFootball数据接入/05_交付/接入说明.md`。
+- `apifootball.com` 联赛训练：用 `scripts/download_apifootball_com_history.py` 下载按联赛的历史赛果，随后运行 `scripts/league_training_audit.py` 自动分为 `independent` / `calibration` / `pooled`；仅被 scope 精确标为国内联赛且满足样本、赛季、测试集和球队 ID 覆盖门槛者可独立训练。赛后 statistics、lineup、player_statistics 被标记 `POST_MATCH`，不得进入赛前输入。`scripts/provider_market_input.py` 仅支持显式 `apifootball_primary`，输出 `provider_only`，不生成体彩玩法标签。
+- 五大联赛候选训练：从 `project021_五大联赛APIFootball训练/02_脚本/run_five_league_pipeline.py` 运行 2021/22–2025/26 的英超、西甲、意甲、德甲、法甲下载、审计与时间切分训练。赛果按联赛月度续跑，`get_odds` 按全部比赛日全局缓存一次并按 `match_id` 联接；仅采纳开球前的 1X2 供应商赔率，经去水与跨 bookmaker 中位数汇总为 `provider_market`。`odd_date` 暂按 Europe/Berlin 解释且必须标记时间假设。独立模型只写为 `candidate`，`provider_market` 不得伪装为体彩赔率、生成体彩玩法或接入生产推荐。
 - 体彩赔率：移动端官方 HAD/HHAD/CRS/TTG/HAFU；保留更新时间和原始 URL。**赔率一律以体彩官方为准。**
 - 国际盘赔率（The Odds API，可选）：**仅作移动赔率/CLV 参考**；不参与概率建模、不替换体彩盘口、不进推荐门控。默认不启用（未设置 `ODDS_API_KEY` 自动跳过）。
 - 阵容/伤停：俱乐部/赛事官方优先，至少一个可信备源交叉验证。
@@ -133,7 +137,7 @@ version: 1.4.0
 写入 JSON 后运行：
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_predict.py input.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_predict.py input.json
 ```
 
 有体彩全盘口时：HAD + HHAD + TTG + HAFU 联合拟合 λ；CRS 只做相对比分排序对照，不直接归一化。输出至少包括：
@@ -163,6 +167,7 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 - edge 小于敏感性宽度时，结论为"无显著决策价值"；
 - `UNFITTED_FUSION` 且市场依赖度高或没有显著 edge 时，只输出市场基线，不生成独立单选推荐；
 - 1X2、比分、大小球、BTTS、让球分别计算不确定性，不能把1X2等级继承给衍生市场；
+- **让球推荐**（`recommendation_policy.evaluate()` 返回的 `hhad_recommendation` 字段，2026-08-13 加入）：基于体彩让球胜平负（HHAD）三项概率的独立出胆判断，跟1X2用同一 `banker_prob_threshold`（默认50%）阈值但分别判定——1X2不出胆不代表让球轨也不出胆，反之亦然。**这是体彩HHAD固定让球线三项盘，不是真正的亚洲盘**（win/push/half结算），字段里已标注 `market_type: sporttery_hhad_3way`，不得混用两者的结算规则。`calibration_status` 未独立验证，读结果时仍要看整体 `calibration_status` 字段；
 - 数据冲突、阵容未定、盘口陈旧或依赖过高时降级；
 - 可输出"单选/双选/回避"，但理由必须来自脚本与证据；
 - 串关须提示腿间相关性，不把各场"信心"机械相乘；默认优先少腿、低相关，不追求最高组合赔率。
@@ -175,38 +180,38 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 
 ```sh
 # 默认入口：完整竞彩销售日（自动合并跨午夜周六001…周六016）；输出必须明确"销售日口径"，不得简称为自然日全部比赛
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py collect --sales-day YYYY-MM-DD --output raw.json --emit-input input.json
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py sales-day-collect --sales-day YYYY-MM-DD --output raw.json --emit-input input.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py collect --sales-day YYYY-MM-DD --output raw.json --emit-input input.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py sales-day-collect --sales-day YYYY-MM-DD --output raw.json --emit-input input.json
 # 兼容别名：等价于 collect（同 sales_day_collect.py）；参数同为 --sales-day / --output
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py collect-date --sales-day YYYY-MM-DD --output raw_date.json --emit-input input_date.json
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_predict.py input.json > output.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py collect-date --sales-day YYYY-MM-DD --output raw_date.json --emit-input input_date.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_predict.py input.json > output.json
 ```
 
 需要官方前瞻、伤停与近况时：
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py preview --from-collect raw.json --output preview.json
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py merge-preview --input input.json --preview preview.json --output hybrid.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py preview --from-collect raw.json --output preview.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py merge-preview --input input.json --preview preview.json --output hybrid.json
 ```
 
 补充调用 football-data.org（Key 只从环境变量读取，不写入输出）：
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/football_data_adapter.py --competition CODE --output football_data.json
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/football_data_adapter.py --team "Team name" --output team_search.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/football_data_adapter.py --competition CODE --output football_data.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/football_data_adapter.py --team "Team name" --output team_search.json
 # 将唯一匹配的足球数据来源元信息安全合并到模型输入，不覆盖体彩赔率
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py football-data-enrich --input input.json --home-query "Home FC" --away-query "Away FC" --output enriched.json  # ⚠️ 暂不可用：脚本事故损坏待恢复
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py football-data-enrich --input input.json --home-query "Home FC" --away-query "Away FC" --output enriched.json  # ⚠️ 暂不可用：脚本事故损坏待恢复
 # 多市场消融实验；当前配置标记UNFITTED，只用于比较，不代表已校准最优
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py market-ablation --input input.json --output ablation.json  # ⚠️ 暂不可用：脚本事故损坏待恢复
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py market-ablation --input input.json --output ablation.json  # ⚠️ 暂不可用：脚本事故损坏待恢复
 ```
 
 历史赛果批量下载（API-Football 免费版，2022–2024 赛季；复用 `api_football_adapter.py`）：
 
 ```sh
 # 目标项目必须已存在（按全局工作台 SOP 建 projectXXX_项目名称）；输出写入其 04_素材/
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/download_league_history.py \
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/download_league_history.py \
   --league-id 103 --league-name Eliteserien --slug eliteserien \
-  --project "H:\claude AI自媒体\projectXXX_项目名称"
+  --project "F:\HM足球比赛预测\projectXXX_项目名称"
 # 已拉过时快速重合并（不请求）：加 --delay 0
 ```
 
@@ -217,17 +222,17 @@ API-Football 联赛 id 可查 `/leagues?season=2024`；免费版限 100 次/天�
 > ⚠️ **输入格式要求**：`record` 只接受**单场裸 dict**（home/away/odds/field_meta/...）。`collect --emit-input` 产出的是 `{matches:[...]}` 批量文件，**不能直接喂给 record**；批量场景请用 `daily-pipeline`（内部自动拆分），或自行拆成单场后逐个 record。
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py record --input input.json --output model_output.json --snapshot prematch
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py record --input input.json --output model_output.json --snapshot prematch
 # 若同时有原始采集 raw.json，可附带赔率移动入库
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py record --input input.json --output model_output.json --snapshot prematch --odds-source raw.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py record --input input.json --output model_output.json --snapshot prematch --odds-source raw.json
 ```
 
 一体化每日流水线（回填赛果→采集销售日→登记快照→赔率移动库）：
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py daily-pipeline --sales-day YYYY-MM-DD
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py daily-pipeline --sales-day YYYY-MM-DD
 # 或直接
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_daily_pipeline.py --sales-day YYYY-MM-DD [--dry-run]
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_daily_pipeline.py --sales-day YYYY-MM-DD [--dry-run]
 ```
 
 单场登记仍可用上面的 `record` 分步命令；批量场景优先用 `daily-pipeline`，避免手动串4-5步遗漏赔率移动库或去重。
@@ -244,19 +249,21 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 
 样本分母审计：
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/sample_audit.py --snapshot SNAPSHOT --output sample_audit.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/sample_audit.py --snapshot SNAPSHOT --output sample_audit.json
 ```
 组合腿校验：
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_combo.py --legs combos.json --output combo_validation.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_combo.py --legs combos.json --output combo_validation.json
 ```
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py settle --date YYYY-MM-DD --dry-run
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py backtest --snapshot closing
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py settle --date YYYY-MM-DD --dry-run
+# 体彩官方结果缺失时，显式启用 APIFootball 欧冠 fallback；默认关闭
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py settle --date YYYY-MM-DD --apifootball-fallback --dry-run
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py backtest --snapshot closing
 # 该命令评估 football-quant-fusion 实际输出，不是仅评估底层 3.4.4 核心引擎
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py odds-add --source raw.json
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py odds-drift --date YYYY-MM-DD
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py odds-add --source raw.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py odds-drift --date YYYY-MM-DD
 ```
 
 ### 国际盘对照（可选，The Odds API）
@@ -265,7 +272,7 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 
 ```sh
 # 手动抓取一次（--match-file 传体彩 raw/input JSON，做联赛+开球时间+队名 best-effort 匹配）
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py odds-intl --match-file raw.json --out intl_snapshot.json
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py odds-intl --match-file raw.json --out intl_snapshot.json
 python3 .../fusion_cli.py odds-intl --match-file raw.json --dry-run      # 只看计划，不发请求
 python3 .../fusion_cli.py odds-intl --check-sports                       # 校验配置里的 sport key
 ```
@@ -280,7 +287,7 @@ python3 .../fusion_cli.py odds-intl --check-sports                       # 校�
 
 ```sh
 # 在项目根目录运行（默认读 04_素材/待回测记录/<date>/，官方赛果由 settle 回填）
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/backtest_dual_track.py --date 20260803
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/backtest_dual_track.py --date 20260803
 # 或显式指定记录目录与输出
 python3 .../backtest_dual_track.py --records-dir <待回测记录目录> --output out.json --report out.md
 ```
@@ -291,8 +298,11 @@ python3 .../backtest_dual_track.py --records-dir <待回测记录目录> --outpu
 一键回测所有已预测比赛（手动关键词「回测已经预测的比赛」/ 自动计划任务 `FootballQuantAutoBacktest`）：
 
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/auto_backtest.py \
-  --workspace "H:\claude AI自媒体" --output-dir <项目>/05_交付/auto_backtest
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/auto_backtest.py \
+  --workspace "F:\HM足球比赛预测" --output-dir <项目>/05_交付/auto_backtest
+# 允许回填并显式启用 APIFootball 欧冠 fallback
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/auto_backtest.py \
+  --settle --apifootball-fallback --workspace "F:\HM足球比赛预测" --output-dir <项目>/05_交付/auto_backtest
 ```
 
 流程：① settle 回填共享库官方赛果（幂等）→ ② fusion_backtest 统计共享库量化记录 →
@@ -301,11 +311,13 @@ python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_�
 
 同 `(match_id, snapshot_type)` 只算一个样本。至少分版本、联赛、市场、快照报告；样本 <200 不宣称优于市场。命中率只作辅指标，主指标为 Brier、Log Loss、ECE；有固定赛前策略与赔率才评 ROI。
 
+APIFootball fallback 仅补全普通完赛欧冠赛果。供应商存在加时/点球字段但无法确认90分钟比分时标记 `needs_review`，不得进入正式回测分母；体彩官方结果与供应商结果冲突时标记 `source_conflict`，不得静默覆盖。
+
 ## 赛事模拟
 
 全赛事模拟前必须确认当前赛制、赛程、抽签约束、主客顺序和已赛结果。运行次数默认 100,000，固定并报告 seed。不得用已取消的客场进球规则。动态抽签或新版欧冠联赛阶段须显式输入规则；脚本不支持的赛制不得用"平均随机抽签"冒充官方规则。**1.4.0 已收编赛事级 Monte Carlo（`scripts/ucl_tournament_mc.py`，经 `fusion_cli.py tournament` 路由）**：默认内置 2025/26 官方 36 队名单与 2025-08-28 官方分档，生产运行必须带真实实力参数（`--teams teams.json --strength strength.json`）并 `--iterations 100000`；使用示例：
 ```sh
-python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py tournament --selftest
+python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts/fusion_cli.py tournament --selftest
 python3 .../fusion_cli.py tournament --iterations 100000 --seed YYYYMMDD --teams teams.json --strength strength.json --output out.json
 ```
 赛制单元自检（抽签约束/附加赛配对/16强映射/继承制/加时点球/并列规则）必须 PASS 才允许正式输出；若请求的赛制/参赛队不是脚本内置 36 队名单，须先按规则确认清单核实并显式传入 `--teams`。实力参数状态（2026-08-05）：**生产默认 strength schema 1.2**（2024/25 联赛快照 + UEFA 官方 5 年国家系数标定）；**v2.1 备选**（融合引擎 Dixon-Coles 实时 λ 五大联赛 22 队 + v1.2 混合 + 幂压缩 p=0.7）——个体强队修正到位（PSG 第 5）、四强命中与 v1.2 持平（2/4），但前八命中 4/8 未达 ≥6/8 验收线；v2.0 无压缩版为实验版。所有版本均存在时点滞后与覆盖局限，不构成"优于市场"或"命中冠军"声明；演进与验收见 project005/01_规划/2026-08-04_MonteCarlo生产化路线图.md。
@@ -329,7 +341,7 @@ python3 .../fusion_cli.py tournament --iterations 100000 --seed YYYYMMDD --teams
 - `references/output_contract.md`：统一报告模板。
 - `references/motive_evidence_reference.md`：战意/赔率走势事实→证据账本映射参考（UNFITTED，来自soccer-lottery经验降级）。
 - `references/pitfalls.md`：融合层自身的踩坑记录（核心引擎崩溃兜底、字段透传缺口、流水线格式假设等）。
-- 详细底层建模/回测坑位按需读取 `H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/references/`；融合 Skill 的脚本对其版本做兼容检查，不静默吞错。
+- 详细底层建模/回测坑位按需读取 `F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/references/`；融合 Skill 的脚本对其版本做兼容检查，不静默吞错。
 
 
 

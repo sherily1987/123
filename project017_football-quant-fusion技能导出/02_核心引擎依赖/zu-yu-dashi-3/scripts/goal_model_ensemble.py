@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy as np
 from scipy.special import gammaln
 
-sys.path.insert(0, r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
 import predict as P
 
 N = 13  # 0..12

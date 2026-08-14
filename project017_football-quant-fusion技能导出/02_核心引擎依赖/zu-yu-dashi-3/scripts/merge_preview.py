@@ -17,7 +17,7 @@
 import argparse, json
 from pathlib import Path
 
-STORE = 'H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest'
+STORE = 'F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest'
 
 
 # [中文功能] 读取本地已结算比赛用于去重比对

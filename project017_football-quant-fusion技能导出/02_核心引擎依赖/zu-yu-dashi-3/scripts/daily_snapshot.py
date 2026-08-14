@@ -4,7 +4,7 @@ import argparse,json,subprocess,sys,tempfile
 from pathlib import Path
 # [中文功能] 生成某日全部场次的快照数据集
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('--date',required=True);ap.add_argument('--snapshot',default='T-6h');ap.add_argument('--store',default='H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest');ap.add_argument('--work',default='H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/forward');a=ap.parse_args();here=Path(__file__).parent;day=Path(a.work)/a.date;day.mkdir(parents=True,exist_ok=True);raw=day/f'sporttery_{a.snapshot}.json';batch=day/f'inputs_{a.snapshot}.json'
+ ap=argparse.ArgumentParser();ap.add_argument('--date',required=True);ap.add_argument('--snapshot',default='T-6h');ap.add_argument('--store',default='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest');ap.add_argument('--work',default='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/forward');a=ap.parse_args();here=Path(__file__).parent;day=Path(a.work)/a.date;day.mkdir(parents=True,exist_ok=True);raw=day/f'sporttery_{a.snapshot}.json';batch=day/f'inputs_{a.snapshot}.json'
  subprocess.run([sys.executable,str(here/'fetch_sporttery_full.py'),'--date',a.date,'--output',str(raw),'--emit-input',str(batch)],check=True,stdout=subprocess.DEVNULL);data=json.load(open(batch,encoding='utf-8'));records=[]
  for i,m in enumerate(data['matches']):
   inp=day/f"{m['sporttery_meta']['match_num']}_{a.snapshot}_input.json";out=day/f"{m['sporttery_meta']['match_num']}_{a.snapshot}_output.json";inp.write_text(json.dumps(m,ensure_ascii=False,indent=2),encoding='utf-8')

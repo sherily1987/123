@@ -1,0 +1,207 @@
+{
+  "cutoff": "2025-01-30",
+  "leagues": [
+    "austria_bundesliga",
+    "belgium_first_division_a",
+    "bundesliga",
+    "czech_liga",
+    "eredivisie",
+    "la_liga",
+    "ligue_1",
+    "portugal_primeira_liga",
+    "premier_league",
+    "scotland_premiership",
+    "serie_a",
+    "turkey_super_lig",
+    "ukraine_premier_league"
+  ],
+  "shrinkage_k": 0.0,
+  "shrinkage_selection": [
+    {
+      "k": 0.0,
+      "n": 225,
+      "brier": 0.583706
+    },
+    {
+      "k": 2.0,
+      "n": 225,
+      "brier": 0.585378
+    },
+    {
+      "k": 5.0,
+      "n": 225,
+      "brier": 0.586709
+    },
+    {
+      "k": 10.0,
+      "n": 225,
+      "brier": 0.587869
+    },
+    {
+      "k": 20.0,
+      "n": 225,
+      "brier": 0.589666
+    }
+  ],
+  "domestic_fit": {
+    "premier_league": {
+      "n_matches": 1369,
+      "teams": 26,
+      "home_adv": 0.28049186754214883
+    },
+    "la_liga": {
+      "n_matches": 1350,
+      "teams": 25,
+      "home_adv": 0.30311500732874885
+    },
+    "serie_a": {
+      "n_matches": 1359,
+      "teams": 26,
+      "home_adv": 0.22354767789832677
+    },
+    "bundesliga": {
+      "n_matches": 1094,
+      "teams": 26,
+      "home_adv": 0.25142215122105976
+    },
+    "ligue_1": {
+      "n_matches": 1239,
+      "teams": 24,
+      "home_adv": 0.263178584337332
+    },
+    "belgium_first_division_a": {
+      "n_matches": 1157,
+      "teams": 22,
+      "home_adv": 0.2605007783038709
+    },
+    "portugal_primeira_liga": {
+      "n_matches": 1094,
+      "teams": 25,
+      "home_adv": 0.25398077844823896
+    },
+    "eredivisie": {
+      "n_matches": 1139,
+      "teams": 30,
+      "home_adv": 0.3352103792247823
+    },
+    "scotland_premiership": {
+      "n_matches": 842,
+      "teams": 20,
+      "home_adv": 0.1215280965748941
+    },
+    "austria_bundesliga": {
+      "n_matches": 680,
+      "teams": 15,
+      "home_adv": 0.2569948983940303
+    },
+    "czech_liga": {
+      "n_matches": 993,
+      "teams": 23,
+      "home_adv": 0.03262992518974478
+    },
+    "turkey_super_lig": {
+      "n_matches": 1262,
+      "teams": 27,
+      "home_adv": 0.33184771139750224
+    },
+    "ukraine_premier_league": {
+      "n_matches": 766,
+      "teams": 25,
+      "home_adv": 0.16414593910078054
+    }
+  },
+  "n_fit": 738,
+  "n_test": 325,
+  "naive": {
+    "home_adv": 0.18718154069537135,
+    "offsets": {
+      "austria_bundesliga": 0.0,
+      "belgium_first_division_a": 0.0,
+      "bundesliga": 0.0,
+      "czech_liga": 0.0,
+      "eredivisie": 0.0,
+      "la_liga": 0.0,
+      "ligue_1": 0.0,
+      "portugal_primeira_liga": 0.0,
+      "premier_league": 0.0,
+      "scotland_premiership": 0.0,
+      "serie_a": 0.0,
+      "turkey_super_lig": 0.0,
+      "ukraine_premier_league": 0.0
+    },
+    "converged": true,
+    "n_fit": 738
+  },
+  "calibrated": {
+    "home_adv": 0.21307451430708102,
+    "offsets": {
+      "austria_bundesliga": -0.1302067476985794,
+      "belgium_first_division_a": -0.17197352234614072,
+      "bundesliga": 0.46042687783537917,
+      "czech_liga": -0.86460627838568,
+      "eredivisie": 0.022644259160798524,
+      "la_liga": 0.4005738429625356,
+      "ligue_1": 0.31403313416849127,
+      "portugal_primeira_liga": 0.06989676839852836,
+      "premier_league": 0.6221525599573668,
+      "scotland_premiership": -0.767289909830241,
+      "serie_a": 0.45218940755936304,
+      "turkey_super_lig": -0.056737744140349565,
+      "ukraine_premier_league": -0.35110264764147214
+    },
+    "converged": true,
+    "n_fit": 738
+  },
+  "test": {
+    "naive": {
+      "n": 325,
+      "model": {
+        "n": 325,
+        "brier_mean": 0.718023,
+        "log_loss": 1.214336,
+        "accuracy_pct": 43.38
+      },
+      "provider_market": {
+        "n": 217,
+        "brier_mean": 0.553023,
+        "log_loss": 0.938595,
+        "accuracy_pct": 60.37
+      },
+      "frequency_baseline": {
+        "n": 325,
+        "brier_mean": 0.61884,
+        "log_loss": 1.026912,
+        "probs": [
+          0.4756,
+          0.2317,
+          0.2927
+        ]
+      }
+    },
+    "calibrated": {
+      "n": 325,
+      "model": {
+        "n": 325,
+        "brier_mean": 0.561922,
+        "log_loss": 0.949552,
+        "accuracy_pct": 57.23
+      },
+      "provider_market": {
+        "n": 217,
+        "brier_mean": 0.553023,
+        "log_loss": 0.938595,
+        "accuracy_pct": 60.37
+      },
+      "frequency_baseline": {
+        "n": 325,
+        "brier_mean": 0.61884,
+        "log_loss": 1.026912,
+        "probs": [
+          0.4756,
+          0.2317,
+          0.2927
+        ]
+      }
+    }
+  }
+}

@@ -14,7 +14,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
 import understat_xg as UX
 
 CN2US = {"英超": "EPL", "西甲": "La_liga", "德甲": "Bundesliga", "意甲": "Serie_A", "法甲": "Ligue_1"}
@@ -64,7 +64,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--output", required=True)
-    ap.add_argument("--store", default=r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/datasets/understat_store.jsonl")
+    ap.add_argument("--store", default=r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/datasets/understat_store.jsonl")
     ap.add_argument("--mode", default="model_first", choices=("model_first", "hybrid_prior"))
     ap.add_argument("--prior-weight", type=float, default=0.05)
     a = ap.parse_args()

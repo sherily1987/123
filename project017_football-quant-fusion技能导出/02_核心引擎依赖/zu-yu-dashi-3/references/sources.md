@@ -26,11 +26,11 @@
 - 单场历史交锋和近期比分走 `getResultHistoryV1` 与 `getMatchResultV1`；它们是体彩页面展示的第三方统计，用于低权重状态特征，不得与竞彩官方赛果或市场赔率等权。
 - HAD/HHAD基础采集脚本：
   ```sh
-  python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/fetch_sporttery_full.py --date YYYY-MM-DD --output /path/raw_sporttery.json --emit-input /path/model_input.json
+  python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/fetch_sporttery_full.py --date YYYY-MM-DD --output /path/raw_sporttery.json --emit-input /path/model_input.json
   ```
 - 完整全盘口采集脚本（CRS、TTG、HAFU及HAD/HHAD）：
   ```sh
-  python3 H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/fetch_sporttery_full.py --date YYYY-MM-DD --output /path/raw_sporttery_full.json --emit-input /path/model_input.json
+  python3 F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/zu-yu-dashi-3/scripts/fetch_sporttery_full.py --date YYYY-MM-DD --output /path/raw_sporttery_full.json --emit-input /path/model_input.json
   ```
   支持`--date`、`--match-num 周四001`、`--match-id 1234567`筛选；逐场请求默认间隔1.5秒。赛果快速采集用`--results --date YYYY-MM-DD`，不会逐场拉赔率。
 - 字段：`HAD`=非让球胜平负；`HHAD`=让球胜平负；`h/d/a`=主胜/平/客胜；`goalLine`=体彩让球数。

@@ -1,0 +1,103 @@
+{
+  "schema_version": "engine-full-test-1.0",
+  "generated_at": "2026-08-08T00:32:30+08:00",
+  "engine": "3.4.4",
+  "fusion": "fusion_predict_core",
+  "summary": {
+    "total": 15,
+    "pass": 15,
+    "fail": 0
+  },
+  "tests": [
+    {
+      "name": "去水方法",
+      "status": "PASS",
+      "details": "4方法×4组赔率，概率和=1",
+      "error": null
+    },
+    {
+      "name": "矩阵归一化",
+      "status": "PASS",
+      "details": "DC/BP矩阵、温度缩放均归一化",
+      "error": null
+    },
+    {
+      "name": "1X2校准",
+      "status": "PASS",
+      "details": "校准层概率和=1",
+      "error": null
+    },
+    {
+      "name": "λ反解复现市场",
+      "status": "PASS",
+      "details": "λ反解还原市场1X2（≤0.5pp）",
+      "error": null
+    },
+    {
+      "name": "market_only新鲜盘口",
+      "status": "PASS",
+      "details": "1X2=校准市场、MARKET_BASELINE",
+      "error": null
+    },
+    {
+      "name": "market_only远期新鲜快照",
+      "status": "PASS",
+      "details": "显式新鲜快照不因距离开球超过24小时而降级",
+      "error": null
+    },
+    {
+      "name": "model_first显式λ",
+      "status": "PASS",
+      "details": "λ=显式值、kind=model_goal_rate",
+      "error": null
+    },
+    {
+      "name": "market_only陈旧HAD明确阻断",
+      "status": "PASS",
+      "details": "陈旧HAD→market_only明确阻断，不静默切换model_first",
+      "error": null
+    },
+    {
+      "name": "两回合晋级",
+      "status": "PASS",
+      "details": "晋级概率和=100、点球主队0.38、ET=29.8%",
+      "error": null
+    },
+    {
+      "name": "极端赔率",
+      "status": "PASS",
+      "details": "极端赔率不崩溃、1X2和=100",
+      "error": null
+    },
+    {
+      "name": "4场生产批量不变量",
+      "status": "PASS",
+      "details": "hybrid.json 不存在，跳过",
+      "error": null
+    },
+    {
+      "name": "模型常数",
+      "status": "PASS",
+      "details": "常数校验 通过",
+      "error": null
+    },
+    {
+      "name": "DC团队强度",
+      "status": "PASS",
+      "details": "Arsenal vs Liverpool λ=1.575/1.2838；覆盖外→UNFITTED_TEAM",
+      "error": null
+    },
+    {
+      "name": "Understat查询",
+      "status": "PASS",
+      "details": "Man Utd vs Fulham xG=1.84362/1.71998",
+      "error": null
+    },
+    {
+      "name": "注册库健康",
+      "status": "PASS",
+      "details": "sample_audit 正常",
+      "error": null
+    }
+  ]
+}

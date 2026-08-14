@@ -6,20 +6,62 @@ match_id 优先用 sporttery_meta.match_id（如 sporttery-2040688），
 回退为 comp/season/kickoff/队名拼接。同一 (match_id, snapshot_type) 幂等。
 """
 import argparse
+import hashlib
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, 'H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts')
+from runtime_paths import core_scripts_dir, data_root
+
+sys.path.insert(0, str(core_scripts_dir()))
 from backtest_lib import slug, sha, atomic_json, load_jsonl, append_jsonl
 
-DEFAULT_STORE = 'H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/backtest'
+DEFAULT_STORE = str(data_root() / "backtest")
 
 
 # [中文功能] 解析ISO时间字符串（兼容Z后缀）
 def parse_dt(s):
     return datetime.fromisoformat(s.replace('Z', '+00:00'))
+
+
+def raw_sha256(payload):
+    """Hash the exact JSON file bytes, rather than its parsed representation."""
+    return hashlib.sha256(payload).hexdigest()
+
+
+def is_complete_sha256(value):
+    return isinstance(value, str) and len(value) == 64 and all(c in '0123456789abcdef' for c in value.lower())
+
+
+def formal_prediction_as_of(inp, kickoff):
+    """Return a timezone-aware, strictly pre-kickoff formal as-of timestamp."""
+    value = inp.get('prediction_as_of')
+    if not value:
+        sys.exit('prediction_as_of required for formal snapshot=prematch registration')
+    try:
+        as_of = parse_dt(value)
+    except (TypeError, ValueError):
+        sys.exit('prediction_as_of must be an ISO-8601 timestamp with timezone')
+    if as_of.tzinfo is None:
+        sys.exit('prediction_as_of timezone required for formal snapshot=prematch registration')
+    if as_of.astimezone(timezone.utc) >= kickoff.astimezone(timezone.utc):
+        sys.exit('prediction_as_of must be strictly before kickoff for formal snapshot=prematch registration')
+    return value
+
+
+def cohort_key(frozen_hashes, route, mode, llm_model_pool_sha256=None):
+    """Stable cohort identity; old records deliberately remain without this field."""
+    parts = [
+        frozen_hashes['prediction_code_sha256'],
+        frozen_hashes['config_sha256'],
+        frozen_hashes['engine_bundle_sha256'],
+        str(route),
+        str(mode),
+    ]
+    if llm_model_pool_sha256:
+        parts.append(llm_model_pool_sha256)
+    return hashlib.sha256('|'.join(parts).encode('utf-8')).hexdigest()
 
 
 # [中文功能] 把融合预测输出登记进回测注册库
@@ -34,8 +76,10 @@ def main():
     ap.add_argument('--replace-snapshot', action='store_true')
     a = ap.parse_args()
 
-    inp = json.load(open(a.input, encoding='utf-8'))
-    out = json.load(open(a.output, encoding='utf-8'))
+    input_raw = Path(a.input).read_bytes()
+    output_raw = Path(a.output).read_bytes()
+    inp = json.loads(input_raw.decode('utf-8-sig'))
+    out = json.loads(output_raw.decode('utf-8-sig'))
     if isinstance(inp, dict) and 'matches' in inp:
         sys.exit('record one match per invocation; input must be a bare match dict')
     if out.get('fusion_status') != 'ok':
@@ -62,13 +106,40 @@ def main():
     # 版本戳修复（2026-08-03）：输出顶层没有 engine_version 字段（历史 bug 导致预测ID全落
     # vunknown，1445 条 8/2 回填样本无法版本归因）。改为取 core_output.engine_version
     # + 融合层版本（与 config/version_manifest.json 的 fusion_version 保持同步）。
-    core_ver = str((out.get('core_output') or {}).get('engine_version')
+    build = out.get('build_identity') or {}
+    core_ver = str(build.get('core_version')
+                   or (out.get('core_output') or {}).get('engine_version')
                    or out.get('core_engine_version') or 'unknown')
-    version = f"fusion-1.4.0-core-{core_ver}"
-    vslug = slug(version)
+    fusion_ver = str(build.get('fusion_version') or '1.4.0')
+    frozen_hashes = {
+        key: build.get(key, 'unknown')
+        for key in ('engine_bundle_sha256', 'prediction_code_sha256', 'config_sha256')
+    }
+    if a.snapshot == 'prematch' and not all(is_complete_sha256(value) for value in frozen_hashes.values()):
+        sys.exit('complete build hashes required for formal snapshot=prematch registration')
     created = datetime.now(timezone.utc)
+    if a.snapshot == 'prematch':
+        prediction_as_of = formal_prediction_as_of(inp, kd)
+    else:
+        prediction_as_of = inp.get('prediction_as_of') or created.isoformat()
+
+    route = inp.get('route') or out.get('route') or 'unknown'
+    mode = inp.get('mode') or out.get('mode') or 'unknown'
+    llm_audit_keys = ('llm_model_pool_sha256', 'evidence_file_sha256')
+    has_llm_audit = any(key in inp for key in llm_audit_keys)
+    is_llm_registration = has_llm_audit or 'llm' in f'{route} {mode}'.lower()
+    llm_audit = {key: inp.get(key) for key in llm_audit_keys}
+    has_complete_llm_audit = all(is_complete_sha256(value) for value in llm_audit.values())
+    if has_llm_audit and not has_complete_llm_audit:
+        sys.exit('LLM audit hashes required: llm_model_pool_sha256 and evidence_file_sha256 must both be complete SHA-256 values')
+    if a.snapshot == 'prematch' and is_llm_registration and not has_complete_llm_audit:
+        sys.exit('LLM audit hashes required for formal production LLM prematch registration')
+    version = f"fusion-{fusion_ver}-core-{core_ver}"
+    vslug = slug(version)
     pid = f"{mid}__v{vslug}__{created.strftime('%Y%m%dT%H%M%SZ')}__{slug(a.snapshot)}"
 
+    if a.snapshot == 'prematch' and a.replace_snapshot:
+        sys.exit('prematch snapshots are immutable; use an explicit distinct experiment snapshot')
     if not a.replace_snapshot:
         for e in load_jsonl(Path(a.store) / 'registry.jsonl'):
             if e.get('match_id') != mid:
@@ -84,23 +155,46 @@ def main():
                     ensure_ascii=False))
                 sys.exit(0)
 
-    engine = Path('H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/predict.py').read_bytes()
+    engine = (core_scripts_dir() / "predict.py").read_bytes()
     rec = {
-        'schema_version': 'fusion-1.0',
+        'schema_version': 'fusion-1.1',
         'prediction_id': pid,
         'match_id': mid,
         'created_at': created.isoformat(),
+        'prediction_as_of': prediction_as_of,
         'snapshot_type': a.snapshot,
-        'model': {'name': 'football-quant-fusion', 'version': version,
-                  'engine_sha256': sha(engine)},
+        'route': route,
+        'mode': mode,
+        'cohort_key': cohort_key(frozen_hashes, route, mode, llm_audit['llm_model_pool_sha256']),
+        'model': {
+            'name': 'football-quant-fusion',
+            'version': version,
+            'fusion_version': fusion_ver,
+            'core_version': core_ver,
+            'fusion_schema_version': str(build.get('fusion_schema_version') or
+                                         out.get('fusion_schema_version') or 'unknown'),
+            'engine_sha256': sha(engine),
+            'engine_bundle_sha256': frozen_hashes['engine_bundle_sha256'],
+            'prediction_code_sha256': frozen_hashes['prediction_code_sha256'],
+            'config_sha256': frozen_hashes['config_sha256'],
+        },
         'match': {'competition': inp.get('competition'), 'season': inp.get('season'),
                   'stage': inp.get('stage'), 'kickoff': ko,
                   'home': inp['home'], 'away': inp['away'],
                   'sporttery_meta': sm},
         'input': inp,
         'output': out,
-        'hashes': {'input_sha256': sha(inp), 'output_sha256': sha(out)},
+        'hashes': {
+            'input_sha256': sha(inp), 'output_sha256': sha(out),
+            'input_raw_sha256': raw_sha256(input_raw), 'output_raw_sha256': raw_sha256(output_raw),
+        },
     }
+    if has_llm_audit:
+        rec.update(llm_audit)
+    if is_llm_registration and not has_complete_llm_audit:
+        rec['llm_registration_class'] = 'experimental_unverified'
+    elif is_llm_registration:
+        rec['llm_registration_class'] = 'audited'
     p = Path(a.store) / 'predictions' / created.strftime('%Y/%m') / (pid + '.json')
     if p.exists():
         sys.exit('prediction exists; no overwrite')

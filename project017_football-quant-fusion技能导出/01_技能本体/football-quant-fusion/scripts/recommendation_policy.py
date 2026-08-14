@@ -110,20 +110,52 @@ def evaluate(output, market_freshness=None):
             if isinstance(meta, dict) and meta.get('status') in ('OUTDATED', 'STALE'):
                 stale_pools.append(pool)
 
+    # 用户裁定 2026-08-12：概率 >= 50% 即允许出胆（market_only 跟随市场，
+    # 接受足球不确定性；AVOID_DATA_RISK/让球险/陈旧盘保留为标注不阻断）。
+    probs = core.get('final_1x2_pct') or []
+    primary = max(range(3), key=lambda j: probs[j]) if len(probs) == 3 else None
+    max_prob = probs[primary] / 100.0 if primary is not None else 0.0
+    prob_threshold = float(policy.get('banker_prob_threshold', 0.50))
     banker_allowed = bool(
-        not unfit and cal_prob is not None and not stale_pools
-        and (one_goal_risk is None or one_goal_risk < float(policy.get('one_goal_draw_risk_pct', 18.0)))
+        max_prob >= prob_threshold
+        and status not in ('UNFITTED_NO_VALUE', 'UNAVAILABLE')  # 占位/无输出仍阻断
+        and not stale_pools
     )
-    confidence = round(cal_prob, 3) if banker_allowed and cal_prob is not None else None
+    confidence = round(max_prob, 3) if banker_allowed else None
     reasons = []
-    if unfit:
+    if status in ('UNFITTED_NO_VALUE', 'UNAVAILABLE'):
         reasons.append('UNFITTED_OR_NO_SIGNIFICANT_EDGE')
-    if cal_prob is None:
-        reasons.append('CALIBRATED_PROBABILITY_UNAVAILABLE')
+    if max_prob < prob_threshold:
+        reasons.append(f'PROB_BELOW_BANKER_THRESHOLD:{round(max_prob * 100, 1)}%')
     if stale_pools:
         reasons.append('STALE_MARKET:' + ','.join(sorted(stale_pools)))
     if one_goal_risk is not None and one_goal_risk >= float(policy.get('one_goal_draw_risk_pct', 18.0)):
         reasons.append('ONE_GOAL_OR_PUSH_RISK')
+
+    # 让球推荐（体彩让球胜平负 HHAD，三项：让胜/让平/让负）——跟1X2用同一套阈值逻辑，
+    # 不是另起一套标准。之前 hhad 只作为1X2出胆的风险标注（ONE_GOAL_OR_PUSH_RISK），
+    # 没有自己的推荐结论；用户 2026-08-13 要求补上。
+    # 注意：这是体彩 HHAD（固定让球线的三项盘），不是真正的亚洲盘（win/push/half
+    # 结算）；两者结算规则不同，见 asian_handicap_home 字段的单独说明，不能混用。
+    hhad_primary = max(range(3), key=lambda j: hhad_probs[j]) if len(hhad_probs) == 3 else None
+    hhad_max_prob = hhad_probs[hhad_primary] / 100.0 if hhad_primary is not None else 0.0
+    hhad_labels = ['让胜', '让平', '让负']
+    hhad_banker_allowed = bool(
+        hhad_primary is not None
+        and hhad_max_prob >= prob_threshold
+        and status not in ('UNFITTED_NO_VALUE', 'UNAVAILABLE')
+        and not stale_pools
+    )
+    hhad_recommendation = {
+        'available': hhad_primary is not None,
+        'line': line,
+        'primary_pick': hhad_labels[hhad_primary] if hhad_primary is not None else None,
+        'confidence_pct': round(hhad_max_prob, 3) if hhad_banker_allowed else None,
+        'banker_allowed': hhad_banker_allowed,
+        'market_type': 'sporttery_hhad_3way',
+        'note': '体彩让球胜平负三项盘推荐，跟1X2共用同一置信阈值；不是亚洲盘（win/push/half），'
+                '结算规则不同。calibration_status 未独立验证，参照整体calibration_status字段。',
+    }
 
     return {
         'banker_allowed': banker_allowed,
@@ -136,6 +168,7 @@ def evaluate(output, market_freshness=None):
                  'let_win_pct': hhad_probs[0] if len(hhad_probs) == 3 else None,
                  'let_draw_or_one_goal_pct': hhad_probs[1] if len(hhad_probs) == 3 else None,
                  'let_loss_pct': hhad_probs[2] if len(hhad_probs) == 3 else None},
+        'hhad_recommendation': hhad_recommendation,
         'one_goal_risk_pct': one_goal_risk,
         'stale_pools': sorted(stale_pools),
         'reasons': reasons,
@@ -144,7 +177,7 @@ def evaluate(output, market_freshness=None):
             'min_samples_for_recalibration': int(policy.get('min_samples_for_recalibration', 100)),
             'target_samples_for_threshold_review': int(policy.get('target_samples_for_threshold_review', 200)),
         },
-        'note': '未达到批准的时间序列校准条件前，不生成数值confidence，不允许出胆。',
+        'note': '用户裁定 2026-08-12：主方向概率>=50%即允许出胆（market_only 跟随市场，接受不确定性）；UNFITTED_NO_VALUE/无输出/陈旧盘仍阻断。',
     }
 
 

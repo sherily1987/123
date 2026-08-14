@@ -13,7 +13,7 @@
 import argparse, json
 from pathlib import Path
 
-DEFAULT = 'H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/odds/movement.jsonl'
+DEFAULT = 'F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/odds/movement.jsonl'
 POOLS = [('hadList', 'HAD'), ('hhadList', 'HHAD'), ('ttgList', 'TTG'),
          ('crsList', 'CRS'), ('hafuList', 'HAFU')]
 

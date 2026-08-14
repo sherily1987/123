@@ -26,7 +26,7 @@ def test_pipeline_writes_all_league_statuses_when_one_download_fails(monkeypatch
 
 
 def test_pipeline_downloads_provider_odds_once_for_all_event_dates(monkeypatch, tmp_path):
-    def fake_complete_history(league_id, start, end, project, slug, *args):
+    def fake_complete_history(league_id, start, end, project, slug, *args, **kwargs):
         output = project / "04_素材" / "标准化" / f"{slug}_events.jsonl"
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps({"match_id": league_id, "league_id": league_id, "kickoff": "2024-08-17T20:00:00", "actual": [1, 0]}) + "\n", encoding="utf-8")

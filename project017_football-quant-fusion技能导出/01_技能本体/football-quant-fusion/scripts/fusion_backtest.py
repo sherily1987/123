@@ -13,12 +13,13 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
 
-DEFAULT_STORE = Path("H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/backtest")
+DEFAULT_STORE = Path("F:\HM足球比赛预测\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/backtest")
 
 
 # [中文功能] 按行读取 jsonl
@@ -27,6 +28,77 @@ def load_jsonl(path):
     if not p.exists():
         return []
     return [json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip()]
+
+
+def dedupe_snapshot_rows(rows):
+    """同一比赛同一快照只保留created_at最新的一条。"""
+    selected = {}
+    dropped = []
+    for row in rows:
+        key = (row.get("match_id"), str(row.get("snapshot_type") or "unspecified").lower())
+        current = selected.get(key)
+        if current is None or str(row.get("created_at") or "") > str(current.get("created_at") or ""):
+            if current is not None:
+                dropped.append({"match_id": key[0], "snapshot_type": key[1],
+                                "superseded": current.get("prediction_id")})
+            selected[key] = row
+        else:
+            dropped.append({"match_id": key[0], "snapshot_type": key[1],
+                            "superseded": row.get("prediction_id")})
+    return list(selected.values()), dropped
+
+
+def _snapshot_rank(snapshot_type):
+    value = str(snapshot_type or "").lower().replace("_", "-").replace(" ", "")
+    if value in {"closing", "close"}:
+        return 60
+    if value in {"prematch", "pre-match"}:
+        return 50
+    if value in {"t-4h", "tminus4h", "tminus-4h"}:
+        return 40
+    if value in {"t-6h", "tminus6h", "tminus-6h"}:
+        return 35
+    if value in {"t-24h", "tminus24h", "tminus-24h"}:
+        return 25
+    if value in {"opening", "open"}:
+        return 10
+    return 0
+
+
+def select_primary_rows(rows, policy="latest_before_kickoff"):
+    """按比赛选择一个主评估快照；其他快照仅用于时点研究。"""
+    by_match = {}
+    for row in rows:
+        by_match.setdefault(row.get("match_id"), []).append(row)
+    selected = []
+    for candidates in by_match.values():
+        if policy in {"prematch", "closing"}:
+            exact = [r for r in candidates
+                     if str(r.get("snapshot_type") or "").lower() == policy]
+            if not exact:
+                continue
+            chosen = max(exact, key=lambda r: str(r.get("created_at") or ""))
+        elif policy == "latest_before_kickoff":
+            chosen = max(candidates, key=lambda r: (_snapshot_rank(r.get("snapshot_type")),
+                                                     str(r.get("created_at") or "")))
+        else:
+            raise ValueError(f"unknown snapshot policy: {policy}")
+        selected.append(chosen)
+    return selected
+
+
+def version_cohort(row, current_identity):
+    """精确哈希匹配才属于current；可识别旧版为legacy，其余为unknown。"""
+    version = str(row.get("version") or "").strip().lower()
+    model = row.get("model") or {}
+    if not version or version in {"unknown", "offline", "none"} or "unknown" in version:
+        return "unknown"
+    required = ("fusion_version", "core_version", "engine_bundle_sha256",
+                "prediction_code_sha256", "config_sha256")
+    if all(str(model.get(key) or "") == str(current_identity.get(key) or "")
+           for key in required):
+        return "current"
+    return "legacy"
 
 
 # [中文功能] 旧容器路径 /var/minis/... 自动映射到本机 shared 目录
@@ -62,6 +134,52 @@ def brier(probs, idx):
 # [中文功能] 对数损失
 def logloss(probs, idx):
     return -math.log(max(1e-12, min(1 - 1e-12, probs[idx])))
+
+
+def _percentile(values, q):
+    ordered = sorted(values)
+    if not ordered:
+        return None
+    pos = (len(ordered) - 1) * q
+    lo, hi = int(math.floor(pos)), int(math.ceil(pos))
+    if lo == hi:
+        return ordered[lo]
+    return ordered[lo] * (hi - pos) + ordered[hi] * (pos - lo)
+
+
+def paired_market_comparison(rows, iterations=2000, seed=20260808):
+    """同场比较模型与市场，按比赛差值做确定性paired bootstrap。"""
+    pairs = []
+    for row in rows:
+        market = row.get("market_probs")
+        if not isinstance(market, list) or len(market) != 3:
+            continue
+        idx = row["actual_idx"]
+        pairs.append((brier(row["probs"], idx) - brier(market, idx),
+                      logloss(row["probs"], idx) - logloss(market, idx)))
+    if not pairs:
+        return {"n": 0, "status": "no_paired_market_probability"}
+    n = len(pairs)
+    b_mean = sum(x[0] for x in pairs) / n
+    l_mean = sum(x[1] for x in pairs) / n
+    rng = random.Random(seed)
+    boot_b, boot_l = [], []
+    for _ in range(max(1, int(iterations))):
+        sample = [pairs[rng.randrange(n)] for _ in range(n)]
+        boot_b.append(sum(x[0] for x in sample) / n)
+        boot_l.append(sum(x[1] for x in sample) / n)
+    return {
+        "n": n,
+        "bootstrap_iterations": max(1, int(iterations)),
+        "seed": seed,
+        "brier_delta_model_minus_market": round(b_mean, 8),
+        "brier_delta_95ci": [round(_percentile(boot_b, 0.025), 8),
+                             round(_percentile(boot_b, 0.975), 8)],
+        "log_loss_delta_model_minus_market": round(l_mean, 8),
+        "log_loss_delta_95ci": [round(_percentile(boot_l, 0.025), 8),
+                                round(_percentile(boot_l, 0.975), 8)],
+        "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。",
+    }
 
 
 # [中文功能] 比例去水（默认）
@@ -144,6 +262,53 @@ def summarize(rows):
     return out
 
 
+def walk_forward_report(rows, folds=5, bootstrap_iterations=2000):
+    """按开球日期做扩展窗口评估；同一天比赛绝不跨训练/测试边界。"""
+    dated = [r for r in rows if str(r.get("kickoff") or "")[:10]]
+    dates = sorted({str(r.get("kickoff"))[:10] for r in dated})
+    folds = max(1, int(folds))
+    if len(dates) < folds + 1:
+        return {"status": "insufficient_time_groups", "date_groups": len(dates),
+                "requested_folds": folds, "folds": []}
+    initial = max(1, len(dates) // (folds + 1))
+    remaining = len(dates) - initial
+    reports = []
+    all_test = []
+    for i in range(folds):
+        start = initial + round(i * remaining / folds)
+        end = initial + round((i + 1) * remaining / folds)
+        test_dates = set(dates[start:end])
+        if not test_dates:
+            continue
+        train = [r for r in dated if str(r.get("kickoff"))[:10] < dates[start]]
+        test = [r for r in dated if str(r.get("kickoff"))[:10] in test_dates]
+        all_test.extend(test)
+        reports.append({
+            "fold": i + 1,
+            "train_start": min(str(r.get("kickoff")) for r in train),
+            "train_end": max(str(r.get("kickoff")) for r in train),
+            "test_start": min(str(r.get("kickoff")) for r in test),
+            "test_end": max(str(r.get("kickoff")) for r in test),
+            "train_n": len(train),
+            "test_n": len(test),
+            "train_match_ids": sorted({r.get("match_id") for r in train}),
+            "test_match_ids": sorted({r.get("match_id") for r in test}),
+            "test_metrics": summarize(test),
+            "paired_market": paired_market_comparison(
+                test, iterations=bootstrap_iterations, seed=20260808 + i),
+        })
+    return {
+        "status": "ok",
+        "method": "expanding_window_grouped_by_kickoff_date",
+        "fold_count": len(reports),
+        "folds": reports,
+        "combined_test_n": len(all_test),
+        "combined_test_metrics": summarize(all_test),
+        "combined_paired_market": paired_market_comparison(
+            all_test, iterations=bootstrap_iterations, seed=20260808),
+    }
+
+
 # [中文功能] 从一条融合记录解析可回测字段；结果缺失返回 None
 def score_record(rec, root):
     mid = rec.get("match_id")
@@ -165,6 +330,16 @@ def score_record(rec, root):
         return None, "missing_1x2"
     h, a = int(s90["home"]), int(s90["away"])
     probs = [x / 100.0 for x in probs_pct]
+    market_pct = find(out, "market_prob_pct") or find(core, "market_prob_pct")
+    if isinstance(market_pct, list) and len(market_pct) == 3:
+        market_probs = [float(x) / 100.0 for x in market_pct]
+    else:
+        try:
+            market_probs = devig([float(x) for x in ((rec.get("input") or {}).get("odds") or [])])
+            if len(market_probs) != 3:
+                market_probs = None
+        except Exception:
+            market_probs = None
     idx = actual_1x2(h, a)
     top_list = fc.get("top_scores") or core.get("top_scores") or []
     score_view = None
@@ -192,10 +367,13 @@ def score_record(rec, root):
     return {
         "prediction_id": rec.get("prediction_id"),
         "match_id": mid,
+        "created_at": rec.get("created_at") or "",
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
+        "model": _m if isinstance(_m, dict) else {},
         "league": ((rec.get("match") or {}).get("competition")) or ((rec.get("match") or {}).get("stage")) or "?",
         "probs": probs,
+        "market_probs": market_probs,
         "actual_idx": idx,
         "actual_score": actual_score,
         "top_scores": score_view,
@@ -240,6 +418,11 @@ def main():
     ap.add_argument("input", nargs="?", help="可选：离线历史 JSON（含 output+actual 的融合记录）")
     ap.add_argument("--store", default=str(DEFAULT_STORE))
     ap.add_argument("--snapshot")
+    ap.add_argument("--evaluation-unit", choices=("match", "snapshot"), default="match")
+    ap.add_argument("--snapshot-policy", choices=("latest_before_kickoff", "prematch", "closing"),
+                    default="latest_before_kickoff")
+    ap.add_argument("--walk-forward-folds", type=int, default=5)
+    ap.add_argument("--bootstrap-iterations", type=int, default=2000)
     ap.add_argument("--output")
     a = ap.parse_args()
     root = Path(a.store)
@@ -247,28 +430,32 @@ def main():
     if a.input:
         raw = json.loads(Path(a.input).read_text(encoding="utf-8-sig"))
         items = raw.get("matches", raw) if isinstance(raw, dict) else raw
-        rows = []
+        raw_rows = []
         for it in items:
             out = it.get("output") or it
             probs_pct = find(out, "final_1x2_pct", "final_1x2")
+            market_pct = find(out, "market_prob_pct")
             s90 = it.get("actual")
             if not probs_pct or not s90:
                 continue
-            rows.append({
+            raw_rows.append({
                 "match_id": it.get("match_id", "offline"),
                 "snapshot_type": it.get("snapshot_type", "offline"),
                 "version": str(it.get("engine_version") or "offline"),
+                "model": it.get("model") or {},
                 "league": str(it.get("competition") or it.get("stage") or "?"),
                 "probs": [x / 100.0 for x in probs_pct],
+                "market_probs": ([x / 100.0 for x in market_pct]
+                                   if isinstance(market_pct, list) and len(market_pct) == 3 else None),
                 "actual_idx": actual_1x2(int(s90[0]), int(s90[1])),
                 "actual_score": f"{int(s90[0])}-{int(s90[1])}",
                 "top_scores": None, "ou25": None, "btts": None, "clv_pp": None,
                 "snapshot_odds": None, "created_at": it.get("created_at") or "",
+                "kickoff": it.get("kickoff") or "",
             })
+        snapshot_rows, dropped = dedupe_snapshot_rows(raw_rows)
     else:
-        seen = {}
-        dropped = []
-        rows = []
+        raw_rows = []
         for e in load_jsonl(root / "registry.jsonl"):
             p = resolve_path(e.get("path", ""), root)
             if not p.exists():
@@ -282,44 +469,61 @@ def main():
             row, exc = score_record(rec, root)
             if row is None:
                 continue
-            key = (row["match_id"], row["snapshot_type"])
-            cur = seen.get(key)
-            if cur is None or (rec.get("created_at") or "") > (cur[1] or ""):
-                if cur is not None:
-                    dropped.append({"match_id": key[0], "snapshot_type": key[1], "superseded": cur[0]})
-                seen[key] = (row["prediction_id"], rec.get("created_at"))
-                row["created_at"] = rec.get("created_at") or ""
-                rows.append(row)
-            else:
-                dropped.append({"match_id": key[0], "snapshot_type": key[1], "superseded": row["prediction_id"]})
-        rows = attach_clv(rows)
+            raw_rows.append(row)
+        snapshot_rows, dropped = dedupe_snapshot_rows(raw_rows)
+        snapshot_rows = attach_clv(snapshot_rows)
+
+    from fusion_predict_core import build_identity
+    current_identity = build_identity()
+    for row in snapshot_rows:
+        row["version_cohort"] = version_cohort(row, current_identity)
+    rows = (select_primary_rows(snapshot_rows, a.snapshot_policy)
+            if a.evaluation_unit == "match" else list(snapshot_rows))
 
     overall = summarize(rows)
     by_version = {}
     by_league = {}
     by_snapshot = {}
+    by_cohort = {"current": [], "legacy": [], "unknown": []}
     for r in rows:
         by_version.setdefault(r["version"], []).append(r)
         by_league.setdefault(r["league"], []).append(r)
+        by_cohort[r["version_cohort"]].append(r)
+    for r in snapshot_rows:
         by_snapshot.setdefault(r["snapshot_type"], []).append(r)
+    current_n = len(by_cohort["current"])
     report = {
-        "schema_version": "fusion-backtest-1.0",
+        "schema_version": "fusion-backtest-2.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "store": str(root),
+        "evaluation_unit": a.evaluation_unit,
+        "snapshot_policy": a.snapshot_policy,
+        "record_sample_size": len(snapshot_rows),
         "sample_size": len(rows),
+        "unique_match_n": len({r.get("match_id") for r in rows}),
         "deduped_duplicates": len(dropped),
         "deduped_detail": dropped,
         "overall": overall,
         "by_version": {k: summarize(v) for k, v in sorted(by_version.items())},
+        "by_version_cohort": {k: summarize(v) for k, v in by_cohort.items()},
         "by_league": {k: summarize(v) for k, v in sorted(by_league.items())},
-        "by_snapshot": {k: summarize(v) for k, v in sorted(by_snapshot.items())},
+        "snapshot_research": {
+            "record_sample_size": len(snapshot_rows),
+            "by_snapshot": {k: summarize(v) for k, v in sorted(by_snapshot.items())},
+        },
+        "paired_market": paired_market_comparison(
+            rows, iterations=a.bootstrap_iterations, seed=20260808),
+        "walk_forward": walk_forward_report(
+            rows, folds=a.walk_forward_folds, bootstrap_iterations=a.bootstrap_iterations),
+        "current_identity": current_identity,
         "calibration_gate": {
             "min_recalibration": 100,
             "threshold_review": 200,
-            "ready_for_recalibration": len(rows) >= 100,
-            "ready_for_threshold_review": len(rows) >= 200,
+            "current_version_n": current_n,
+            "ready_for_recalibration": current_n >= 100,
+            "ready_for_threshold_review": current_n >= 200,
         },
-        "warning": None if len(rows) >= 200 else "样本<200时结论不可靠。",
+        "warning": None if current_n >= 200 else "当前精确代码/配置版本独立比赛<200，不得据此宣称优于市场。",
         "disclaimer": "概率模型输出，非投注建议。",
     }
     if a.output:
@@ -327,7 +531,9 @@ def main():
         Path(a.output).write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({
         "status": "ok",
+        "record_sample_size": len(snapshot_rows),
         "sample_size": len(rows),
+        "unique_match_n": len({r.get("match_id") for r in rows}),
         "deduped_duplicates": len(dropped),
         "overall": {k: v for k, v in overall.items() if k != "calibration_bins"},
         "by_version": {k: {x: y for x, y in summarize(v).items() if x != "calibration_bins"} for k, v in by_version.items()},

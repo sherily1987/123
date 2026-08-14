@@ -79,7 +79,7 @@ version: 1.4.0
   - `evidence[]`：每条事实含 `{fact, source(URL), collected_at, mapped, basis}`。
 - 关键词库：按证据类型搜索（伤停/阵容、战意/动机、近况、主客/旅行/天气、赔率异动、
   身份核验），中英双语、官方来源优先、每类至少两个来源交叉验证；模板见
-  `H:\claude AI自媒体\project013_LLM对比轨道试点\01_规划\关键词库.md`。
+  `F:\HM足球比赛预测\90_归档\project013_LLM对比轨道试点\01_规划\关键词库.md`（项目已归档，模板文件仍在原相对结构内）。
 
 ### 纪律（硬性）
 
@@ -167,6 +167,7 @@ python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/
 - edge 小于敏感性宽度时，结论为"无显著决策价值"；
 - `UNFITTED_FUSION` 且市场依赖度高或没有显著 edge 时，只输出市场基线，不生成独立单选推荐；
 - 1X2、比分、大小球、BTTS、让球分别计算不确定性，不能把1X2等级继承给衍生市场；
+- **让球推荐**（`recommendation_policy.evaluate()` 返回的 `hhad_recommendation` 字段，2026-08-13 加入）：基于体彩让球胜平负（HHAD）三项概率的独立出胆判断，跟1X2用同一 `banker_prob_threshold`（默认50%）阈值但分别判定——1X2不出胆不代表让球轨也不出胆，反之亦然。**这是体彩HHAD固定让球线三项盘，不是真正的亚洲盘**（win/push/half结算），字段里已标注 `market_type: sporttery_hhad_3way`，不得混用两者的结算规则。`calibration_status` 未独立验证，读结果时仍要看整体 `calibration_status` 字段；
 - 数据冲突、阵容未定、盘口陈旧或依赖过高时降级；
 - 可输出"单选/双选/回避"，但理由必须来自脚本与证据；
 - 串关须提示腿间相关性，不把各场"信心"机械相乘；默认优先少腿、低相关，不追求最高组合赔率。
@@ -210,7 +211,7 @@ python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/
 # 目标项目必须已存在（按全局工作台 SOP 建 projectXXX_项目名称）；输出写入其 04_素材/
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/download_league_history.py \
   --league-id 103 --league-name Eliteserien --slug eliteserien \
-  --project "H:\claude AI自媒体\projectXXX_项目名称"
+  --project "F:\HM足球比赛预测\projectXXX_项目名称"
 # 已拉过时快速重合并（不请求）：加 --delay 0
 ```
 
@@ -298,7 +299,7 @@ python3 .../backtest_dual_track.py --records-dir <待回测记录目录> --outpu
 
 ```sh
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/auto_backtest.py \
-  --workspace "H:\claude AI自媒体" --output-dir <项目>/05_交付/auto_backtest
+  --workspace "F:\HM足球比赛预测" --output-dir <项目>/05_交付/auto_backtest
 # 允许回填并显式启用 APIFootball 欧冠 fallback
 python3 C:\Users\Administrator\.codex\skills\football-quant-fusion-suite/skills/football-quant-fusion/scripts/auto_backtest.py \
   --settle --apifootball-fallback --workspace "F:\HM足球比赛预测" --output-dir <项目>/05_交付/auto_backtest

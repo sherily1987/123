@@ -1,39 +1,84 @@
 {
-  "calibration_status": "VALID",
-  "min_samples_for_recalibration": 100,
-  "target_samples_for_threshold_review": 200,
-  "one_goal_draw_risk_pct": 18.0,
-  "stale_market_factor": {
-    "fresh_hours": 6,
-    "half_hours": 12,
-    "max_hours": 24
-  },
-  "calibration_params": {
-    "primary_probability": {
-      "method": "band_table_plus_edge",
-      "bands": [
-        {"lo": 0.0, "hi": 0.4, "n_train": 909, "prob": 0.4257},
-        {"lo": 0.4, "hi": 0.45, "n_train": 94, "prob": 0.4043},
-        {"lo": 0.45, "hi": 0.5, "n_train": 117, "prob": 0.5385},
-        {"lo": 0.5, "hi": 0.55, "n_train": 71, "prob": 0.6901},
-        {"lo": 0.55, "hi": 0.6, "n_train": 71, "prob": 0.5211},
-        {"lo": 0.6, "hi": 0.65, "n_train": 71, "prob": 0.4507},
-        {"lo": 0.65, "hi": 0.7, "n_train": 45, "prob": 0.4},
-        {"lo": 0.7, "hi": 1.01, "n_train": 100, "prob": 0.72}
-      ],
-      "edge_min_pp": 5,
-      "fitted_on": "全快照池(1478) 2026-08-06 重校准，主方向概率分箱实测命中率；细分开赛前高概率段（原0.6+合并band掩盖0.60-0.70段高估21-28pp）",
-      "pool_notes": "band ECE test: all raw 0.0602->cal 0.0438; 实测0.60-0.70段高估17.5/27.7pp、0.70-0.80段校准良好(73.6%)、0.50-0.55段低估16.3pp(69.0%实际)。模型Brier不优于市场(0.627vs0.586)，confidence仅校准值、非edge声明。edge实测范围[-6.3,+1.6]pp(675样本)，无一达到2pp，故edge_min_pp=5实质要求独立信息，market_only几乎必然不出胆",
-      "validated": {
-        "all_test_n": 1478,
-        "edge_n": 675,
-        "edge_range_pp": [-6.3, 1.6],
-        "note": "2026-08-06 重校准验证：全部样本实测分箱命中率作为band概率；edge门槛5pp后当前market_only池无样本可达，出胆需hybrid独立信息"
-      }
+ "calibration_status": "VALID",
+ "min_samples_for_recalibration": 100,
+ "target_samples_for_threshold_review": 200,
+ "one_goal_draw_risk_pct": 18.0,
+ "stale_market_factor": {
+  "fresh_hours": 6,
+  "half_hours": 12,
+  "max_hours": 24
+ },
+ "calibration_params": {
+  "primary_probability": {
+   "method": "band_table_plus_edge",
+   "bands": [
+    {
+     "lo": 0.0,
+     "hi": 0.4,
+     "n_train": 909,
+     "prob": 0.4257
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.45,
+     "n_train": 94,
+     "prob": 0.4043
+    },
+    {
+     "lo": 0.45,
+     "hi": 0.5,
+     "n_train": 117,
+     "prob": 0.5385
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.55,
+     "n_train": 71,
+     "prob": 0.6901
+    },
+    {
+     "lo": 0.55,
+     "hi": 0.6,
+     "n_train": 71,
+     "prob": 0.5211
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.65,
+     "n_train": 71,
+     "prob": 0.4507
+    },
+    {
+     "lo": 0.65,
+     "hi": 0.7,
+     "n_train": 45,
+     "prob": 0.4
+    },
+    {
+     "lo": 0.7,
+     "hi": 1.01,
+     "n_train": 100,
+     "prob": 0.72
     }
-  },
-  "review": {
-    "next_review": "prematch 已结算样本达到 200 后复审（当前 prematch 9 场，预计 2026-27 新赛季中期）",
-    "rollback": "restore config/recommendation_policy.json.bak_2026-08-06_P0"
+   ],
+   "edge_min_pp": 5,
+   "fitted_on": "全快照池(1478) 2026-08-06 重校准，主方向概率分箱实测命中率；细分开赛前高概率段（原0.6+合并band掩盖0.60-0.70段高估21-28pp）",
+   "pool_notes": "band ECE test: all raw 0.0602->cal 0.0438; 实测0.60-0.70段高估17.5/27.7pp、0.70-0.80段校准良好(73.6%)、0.50-0.55段低估16.3pp(69.0%实际)。模型Brier不优于市场(0.627vs0.586)，confidence仅校准值、非edge声明。edge实测范围[-6.3,+1.6]pp(675样本)，无一达到2pp，故edge_min_pp=5实质要求独立信息，market_only几乎必然不出胆",
+   "validated": {
+    "all_test_n": 1478,
+    "edge_n": 675,
+    "edge_range_pp": [
+     -6.3,
+     1.6
+    ],
+    "note": "2026-08-06 重校准验证：全部样本实测分箱命中率作为band概率；edge门槛5pp后当前market_only池无样本可达，出胆需hybrid独立信息"
+   }
   }
+ },
+ "review": {
+  "next_review": "prematch 已结算样本达到 200 后复审（当前 prematch 9 场，预计 2026-27 新赛季中期）",
+  "rollback": "restore config/recommendation_policy.json.bak_2026-08-06_P0"
+ },
+ "banker_prob_threshold": 0.5,
+ "banker_policy_note": "用户裁定 2026-08-12：主方向概率>=50%即出胆；接受足球不确定性"
 }

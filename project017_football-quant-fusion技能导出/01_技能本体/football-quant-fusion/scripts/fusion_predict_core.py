@@ -9,14 +9,19 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import os
 import sys
 from pathlib import Path
 
+from production_router import route_matches
 
-CORE_DIR = Path(r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3\scripts")
+
+from runtime_paths import core_scripts_dir, data_root
+
+CORE_DIR = core_scripts_dir()
 CORE_FILE = CORE_DIR / "predict.py"
 HERE = Path(__file__).resolve().parent
 WEIGHTS_FILE = HERE.parent / "config" / "market_weights.json"
@@ -37,6 +42,39 @@ SEVERE_PREFIXES = ("DOUBLE_HOME_ADV", "EXTREME_LAMBDA_ASYMMETRY", "EXTREME_CLEAN
 DERIVATIVE_PREFIXES = ("TTG_SCORE_CONFLICT", "HHAD_CONFLICT")
 # 字节码缺陷修复：market_freshness 分支曾引用未赋值的模块级变量
 market_freshness_meta = {}
+
+
+def _hash_files(paths):
+    """按文件名+内容生成稳定的组合SHA256；缺失文件也进入哈希。"""
+    digest = hashlib.sha256()
+    for path in sorted((Path(p) for p in paths), key=lambda p: str(p).lower()):
+        digest.update(str(path.name).encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes() if path.exists() else b"<missing>")
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def build_identity():
+    """返回本次预测可复现所需的版本、代码包和配置哈希。"""
+    policy_file = HERE.parent / "config" / "recommendation_policy.json"
+    manifest = {}
+    if VERSION_FILE.exists():
+        manifest = json.loads(VERSION_FILE.read_text(encoding="utf-8-sig"))
+    prediction_code = [HERE / "fusion_predict.py", HERE / "fusion_predict_core.py",
+                       HERE / "recommendation_policy.py", HERE / "apifootball_model_features.py",
+                       HERE / "production_router.py"]
+    core_code = [CORE_FILE, CORE_DIR / "market_fit.py", CORE_DIR / "odds_methods.py"]
+    config_files = [VERSION_FILE, WEIGHTS_FILE, policy_file]
+    return {
+        "skill_version": str(manifest.get("skill_version") or "unknown"),
+        "fusion_version": str(manifest.get("fusion_version") or "unknown"),
+        "core_version": str(manifest.get("core_version") or "unknown"),
+        "fusion_schema_version": str(manifest.get("fusion_schema_version") or "1.3.0"),
+        "prediction_code_sha256": _hash_files(prediction_code),
+        "config_sha256": _hash_files(config_files),
+        "engine_bundle_sha256": _hash_files(prediction_code + core_code + config_files),
+    }
 
 # 兼容旧入口：允许环境变量覆盖核心引擎目录
 _override = os.environ.get("FUSION_CORE_DIR")
@@ -414,6 +452,7 @@ def apply_multi_market_adjustments(core, data, out):
 
 def predict_one(core, version, data):
     """单场融合预测入口：市场权重注入 → 核心预测 → 审计 → 门控。"""
+    build = build_identity()
     data, weights_loaded = ensure_market_weights(dict(data))
     try:
         out = core.predict(data)
@@ -441,6 +480,7 @@ def predict_one(core, version, data):
             "fusion_schema_version": "1.3.0",
             "fusion_status": "blocked",
             "core_engine_version": version,
+            "build_identity": build,
             "core_output": core_output,
         }
     if out.get("status") == "ok":
@@ -457,6 +497,7 @@ def predict_one(core, version, data):
             "fusion_schema_version": "1.3.0",
             "fusion_status": "blocked",
             "core_engine_version": version,
+            "build_identity": build,
             "core_output": out,
         }
     ledger = ledger_audit(data)
@@ -541,6 +582,30 @@ def predict_one(core, version, data):
         "market_anchor": "HAD" if out.get("market_prob_pct") is not None else "NONE_OR_STALE",
         "note": "market_anchor为NONE_OR_STALE时，不把陈旧/未知HAD当作新鲜市场锚。",
     }
+    api = data.get("api_football") or {}
+    api_features = data.get("api_features") or {}
+    api_usage = {
+        "provider": api.get("provider", "apifootball.com") if api else None,
+        "match_id": api.get("match_id") if api else None,
+        "statistics_status": api.get("statistics_status") if api else "NOT_ATTACHED",
+        "lineups_status": api.get("lineups_status") if api else "NOT_ATTACHED",
+        "standings_status": api.get("standings_status") if api else "NOT_ATTACHED",
+        "predictions_status": api.get("predictions_status") if api else "NOT_ATTACHED",
+        "external_market_status": api.get("external_market_status") if api else "NOT_ATTACHED",
+        "pre_kickoff_usable": (api.get("as_of") or {}).get("usable") if api else False,
+        "odds_policy": "separate_market_layer_only",
+        "model_feature_policy": "raw_attached; no unbacktested coefficient injection",
+        "note": "赛后statistics只能在历史快照聚合后用于后续比赛；get_predictions保留为p_apifootball外部对照，不是xG。",
+    }
+    data_usage_audit["apifootball"] = api_usage
+    data_usage_audit["api_features"] = {
+        "status": (data.get("field_meta") or {}).get("api_features", {}).get("status", "NOT_ATTACHED"),
+        "history_matches": api_features.get("history_matches"),
+        "no_future_leakage": api_features.get("no_future_leakage"),
+        "lambda_prior_source": ((api_features.get("team_strength") or {}).get("source")
+                                 or (data.get("lambda_prior") or {}).get("source")),
+        "note": "只有显式注入lambda_prior且通过当前引擎校验时，球队动态强度才影响模型；原始统计/阵容/积分榜仅作分层审计。",
+    }
 
     policy_path = HERE.parent / "config" / "recommendation_policy.json"
     policy_mod = HERE / "recommendation_policy.py"
@@ -574,6 +639,7 @@ def predict_one(core, version, data):
     result = {
         "fusion_schema_version": "1.3.0",
         "version_manifest": version_manifest,
+        "build_identity": build,
         "fusion_status": "ok",
         "core_engine_version": version,
         "match": out.get("match"),
@@ -582,6 +648,14 @@ def predict_one(core, version, data):
         "data_quality": quality,
         "source_evidence": data.get("source_evidence"),
         "field_meta": data.get("field_meta"),
+        "api_football": {
+            "provider": api.get("provider"),
+            "match_id": api.get("match_id"),
+            "field_status": api_usage,
+            "prediction": api.get("prediction"),
+            "external_market": api.get("external_market_raw"),
+        } if api else None,
+        "api_features": api_features or None,
         "market_freshness": (out.get("multi_market_fit") or {}).get("freshness") or market_freshness_meta,
         "data_usage_audit": data_usage_audit,
         "recommendation_gate": recommendation_gate,
@@ -616,6 +690,10 @@ def predict_one(core, version, data):
             ),
         },
         "market_dependency_pct": out.get("market_dependency_pct"),
+        "external_models": {
+            "p_apifootball": api.get("prediction") if api else None,
+            "note": "apifootball get_predictions仅作为外部模型对照，不进入独立球队强度训练。",
+        },
         "sensitivity": out.get("sensitivity"),
         "reliability_flags": out.get("reliability_flags"),
         "assumptions": out.get("assumptions") or data.get("assumptions"),
@@ -631,10 +709,37 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="input JSON path")
     parser.add_argument("--output", help="optional output JSON path")
+    parser.add_argument("--production-route", action="store_true",
+                        help="按联赛启用Understat/APIfootball生产路由；缺失时回退MARKET_BASELINE")
+    parser.add_argument("--understat-store",
+                        default=str(data_root() / "datasets" / "understat_store.jsonl"))
+    parser.add_argument("--apifootball-events",
+                        help="APIfootball get_events历史JSON或JSONL；未提供时该轨道自动回退市场基线")
+    parser.add_argument("--router-min-history", type=int, default=5)
     args = parser.parse_args()
     core, version = load_core()
     with open(args.input, "r", encoding="utf-8-sig") as handle:
         raw = json.load(handle)
+    if args.production_route:
+        def load_rows(path):
+            if not path or not Path(path).exists():
+                return []
+            text = Path(path).read_text(encoding="utf-8-sig")
+            try:
+                value = json.loads(text)
+                if isinstance(value, list):
+                    return value
+                if isinstance(value, dict):
+                    return value.get("events") or value.get("matches") or []
+            except json.JSONDecodeError:
+                return [json.loads(line) for line in text.splitlines() if line.strip()]
+            return []
+        raw = route_matches(
+            raw,
+            load_rows(args.understat_store),
+            load_rows(args.apifootball_events),
+            min_history=args.router_min_history,
+        )
     if isinstance(raw, dict) and isinstance(raw.get("matches"), list):
         result = {
             "fusion_schema_version": "1.3.0",

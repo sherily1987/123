@@ -1,0 +1,29 @@
+{
+  "model": "poisson_identity_link",
+  "basis": "inside_outside_no_pen",
+  "formula": "xg = a*shots_inside_box_excl_penalty + b*shots_outside_box",
+  "a_inside_box": 0.145211,
+  "b_outside_box": 0.028662,
+  "converged": true,
+  "n_rows": 12954,
+  "n_matches": 6477,
+  "train_until": "2025-04-28",
+  "sources": [
+    "premier_league_match_stats.jsonl",
+    "la_liga_match_stats.jsonl",
+    "serie_a_match_stats.jsonl",
+    "bundesliga_match_stats.jsonl",
+    "ligue_1_match_stats.jsonl"
+  ],
+  "self_check": {
+    "total_predicted": 16660.0,
+    "total_actual": 16671.0,
+    "total_deviation_pct": -0.066,
+    "total_conserved": true,
+    "primary_gt_secondary": true,
+    "primary_secondary_ratio": 5.07
+  },
+  "penalty_conversion": 0.794652,
+  "penalties_excluded": true,
+  "note": "系数由本仓库样本回归得到；已剔除点球，apply 时按实测转化率补回点球期望进球"
+}

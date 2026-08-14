@@ -50,7 +50,12 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_
     raw_rows = [json.loads(line) for line in input_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     for row in raw_rows:
         audit.validate_prematch_record(row)
-    eligibility = audit.classify(raw_rows, "domestic_league")
+    # kind 由 catalog 提供：洲际赛事（UCL/UEL）不是国内联赛，审计会判 excluded。
+    # 硬编码 "domestic_league" 会把洲际赛事误当联赛训练，绕过该规则。
+    eligibility = audit.classify(raw_rows, league.get("kind", "domestic_league"))
+    # lifecycle 反映"是否实际训练出了模型"，不代表单场质量判断——弱联赛（未跑赢频率
+    # 基线等）仍标 production，因为质量分级是 predict_no_odds.py 的分档裁决（tier
+    # A/B/C/D + 可用/降级/拒绝）的职责，两套机制不重叠，不在这里重复编码。
     result = {"league": league, "eligibility": eligibility, "lifecycle": "candidate"}
     if eligibility["tier"] != "independent":
         result["status"] = "not_trained"
@@ -62,7 +67,7 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_
     final_model.update({
         "schema_version": "team-strength-apifootball-1.0",
         "source": "apifootball.com_event_results",
-        "lifecycle": "candidate",
+        "lifecycle": "production",
         "league_id": league["id"],
         "league_name": league["name"],
         "split": {"validation_from_day": first, "test_from_day": second},

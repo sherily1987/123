@@ -1,0 +1,129 @@
+{
+  "league": {
+    "id": 308,
+    "slug": "switzerland_super_league",
+    "name": "Super League",
+    "country": "Switzerland",
+    "kind": "domestic_league"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1053,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 16,
+    "train_n": 631,
+    "validation_n": 211,
+    "test_n": 211
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\switzerland_super_league_candidate.json",
+  "validation": {
+    "n": 206,
+    "skip": 2,
+    "model": {
+      "n": 206,
+      "brier_mean": 0.641866,
+      "log_loss": 1.064274,
+      "accuracy_pct": 47.09
+    },
+    "model_on_baseline_subset": {
+      "n": 198,
+      "brier_mean": 0.634066,
+      "log_loss": 1.053504,
+      "accuracy_pct": 48.48
+    },
+    "provider_market": {
+      "n": 198,
+      "brier_mean": 0.628996,
+      "log_loss": 1.044531,
+      "accuracy_pct": 50.51
+    },
+    "frequency_baseline": {
+      "n": 206,
+      "brier_mean": 0.635825,
+      "log_loss": 1.05468,
+      "probs": [
+        0.4362,
+        0.2772,
+        0.2866
+      ]
+    },
+    "by_league": {
+      "308": {
+        "n": 206,
+        "model": {
+          "n": 206,
+          "brier_mean": 0.641866,
+          "log_loss": 1.064274,
+          "accuracy_pct": 47.09
+        },
+        "provider_market": {
+          "n": 198,
+          "brier_mean": 0.628996,
+          "log_loss": 1.044531,
+          "accuracy_pct": 50.51
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 210,
+    "skip": 0,
+    "model": {
+      "n": 210,
+      "brier_mean": 0.656619,
+      "log_loss": 1.082146,
+      "accuracy_pct": 41.43
+    },
+    "model_on_baseline_subset": {
+      "n": 199,
+      "brier_mean": 0.658147,
+      "log_loss": 1.084386,
+      "accuracy_pct": 41.21
+    },
+    "provider_market": {
+      "n": 199,
+      "brier_mean": 0.610968,
+      "log_loss": 1.021319,
+      "accuracy_pct": 49.25
+    },
+    "frequency_baseline": {
+      "n": 210,
+      "brier_mean": 0.665114,
+      "log_loss": 1.095822,
+      "probs": [
+        0.4496,
+        0.274,
+        0.2764
+      ]
+    },
+    "by_league": {
+      "308": {
+        "n": 210,
+        "model": {
+          "n": 210,
+          "brier_mean": 0.656619,
+          "log_loss": 1.082146,
+          "accuracy_pct": 41.43
+        },
+        "provider_market": {
+          "n": 199,
+          "brier_mean": 0.610968,
+          "log_loss": 1.021319,
+          "accuracy_pct": 49.25
+        }
+      }
+    }
+  },
+  "provider_market_coverage": {
+    "event_count": 1053,
+    "matched_events": 793,
+    "unmatched_events": 260,
+    "rejected_after_kickoff": 48,
+    "rejected_invalid_odds": 39,
+    "rejected_unparseable_time": 0
+  }
+}

@@ -18,26 +18,26 @@
   },
   "lifecycle": "candidate",
   "status": "trained",
-  "model_path": "F:\\HM足球比赛预测\\.worktrees\\codex-five-league-training\\project021_五大联赛APIFootball训练\\03_模型\\serie_a_candidate.json",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\serie_a_candidate.json",
   "validation": {
-    "n": 306,
-    "skip": 75,
+    "n": 307,
+    "skip": 74,
     "model": {
-      "n": 306,
-      "brier_mean": 0.570436,
-      "log_loss": 0.957938,
-      "accuracy_pct": 54.25
+      "n": 307,
+      "brier_mean": 0.569884,
+      "log_loss": 0.957187,
+      "accuracy_pct": 54.4
     },
     "provider_market": {
-      "n": 292,
-      "brier_mean": 0.554537,
-      "log_loss": 0.934227,
-      "accuracy_pct": 55.14
+      "n": 293,
+      "brier_mean": 0.554286,
+      "log_loss": 0.933889,
+      "accuracy_pct": 55.29
     },
     "frequency_baseline": {
-      "n": 306,
-      "brier_mean": 0.659732,
-      "log_loss": 1.088153,
+      "n": 307,
+      "brier_mean": 0.65989,
+      "log_loss": 1.088346,
       "probs": [
         0.4105,
         0.2719,
@@ -46,41 +46,41 @@
     },
     "by_league": {
       "207": {
-        "n": 306,
+        "n": 307,
         "model": {
-          "n": 306,
-          "brier_mean": 0.570436,
-          "log_loss": 0.957938,
-          "accuracy_pct": 54.25
+          "n": 307,
+          "brier_mean": 0.569884,
+          "log_loss": 0.957187,
+          "accuracy_pct": 54.4
         },
         "provider_market": {
-          "n": 292,
-          "brier_mean": 0.554537,
-          "log_loss": 0.934227,
-          "accuracy_pct": 55.14
+          "n": 293,
+          "brier_mean": 0.554286,
+          "log_loss": 0.933889,
+          "accuracy_pct": 55.29
         }
       }
     }
   },
   "test": {
-    "n": 340,
-    "skip": 40,
+    "n": 342,
+    "skip": 38,
     "model": {
-      "n": 340,
-      "brier_mean": 0.656274,
-      "log_loss": 1.345652,
-      "accuracy_pct": 50.88
+      "n": 342,
+      "brier_mean": 0.605979,
+      "log_loss": 1.012838,
+      "accuracy_pct": 51.17
     },
     "provider_market": {
-      "n": 325,
-      "brier_mean": 0.591369,
-      "log_loss": 0.990912,
-      "accuracy_pct": 52.62
+      "n": 327,
+      "brier_mean": 0.592363,
+      "log_loss": 0.993001,
+      "accuracy_pct": 52.6
     },
     "frequency_baseline": {
-      "n": 340,
-      "brier_mean": 0.65823,
-      "log_loss": 1.085591,
+      "n": 342,
+      "brier_mean": 0.65799,
+      "log_loss": 1.085219,
       "probs": [
         0.407,
         0.2748,
@@ -89,18 +89,18 @@
     },
     "by_league": {
       "207": {
-        "n": 340,
+        "n": 342,
         "model": {
-          "n": 340,
-          "brier_mean": 0.656274,
-          "log_loss": 1.345652,
-          "accuracy_pct": 50.88
+          "n": 342,
+          "brier_mean": 0.605979,
+          "log_loss": 1.012838,
+          "accuracy_pct": 51.17
         },
         "provider_market": {
-          "n": 325,
-          "brier_mean": 0.591369,
-          "log_loss": 0.990912,
-          "accuracy_pct": 52.62
+          "n": 327,
+          "brier_mean": 0.592363,
+          "log_loss": 0.993001,
+          "accuracy_pct": 52.6
         }
       }
     }
@@ -112,5 +112,10 @@
     "rejected_after_kickoff": 50,
     "rejected_invalid_odds": 1,
     "rejected_unparseable_time": 0
+  },
+  "team_identity_fix": {
+    "applied": true,
+    "basis": "team_key() 以供应商 team_id 为主键，队名仅作显示",
+    "note": "修复前用队名当主键，供应商跨赛季改名导致同队被拆成多个身份"
   }
 }

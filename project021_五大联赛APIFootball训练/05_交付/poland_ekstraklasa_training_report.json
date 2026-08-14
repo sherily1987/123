@@ -1,0 +1,129 @@
+{
+  "league": {
+    "id": 259,
+    "slug": "poland_ekstraklasa",
+    "name": "Ekstraklasa",
+    "country": "Poland",
+    "kind": "domestic_league"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1530,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 27,
+    "train_n": 918,
+    "validation_n": 306,
+    "test_n": 306
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\poland_ekstraklasa_candidate.json",
+  "validation": {
+    "n": 240,
+    "skip": 66,
+    "model": {
+      "n": 240,
+      "brier_mean": 0.609617,
+      "log_loss": 1.019532,
+      "accuracy_pct": 47.92
+    },
+    "model_on_baseline_subset": {
+      "n": 231,
+      "brier_mean": 0.613802,
+      "log_loss": 1.025401,
+      "accuracy_pct": 47.19
+    },
+    "provider_market": {
+      "n": 231,
+      "brier_mean": 0.615953,
+      "log_loss": 1.024757,
+      "accuracy_pct": 46.32
+    },
+    "frequency_baseline": {
+      "n": 240,
+      "brier_mean": 0.647881,
+      "log_loss": 1.071609,
+      "probs": [
+        0.4314,
+        0.281,
+        0.2876
+      ]
+    },
+    "by_league": {
+      "259": {
+        "n": 240,
+        "model": {
+          "n": 240,
+          "brier_mean": 0.609617,
+          "log_loss": 1.019532,
+          "accuracy_pct": 47.92
+        },
+        "provider_market": {
+          "n": 231,
+          "brier_mean": 0.615953,
+          "log_loss": 1.024757,
+          "accuracy_pct": 46.32
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 272,
+    "skip": 34,
+    "model": {
+      "n": 272,
+      "brier_mean": 0.65159,
+      "log_loss": 1.082636,
+      "accuracy_pct": 46.32
+    },
+    "model_on_baseline_subset": {
+      "n": 263,
+      "brier_mean": 0.64838,
+      "log_loss": 1.077419,
+      "accuracy_pct": 46.39
+    },
+    "provider_market": {
+      "n": 263,
+      "brier_mean": 0.64282,
+      "log_loss": 1.067382,
+      "accuracy_pct": 41.83
+    },
+    "frequency_baseline": {
+      "n": 272,
+      "brier_mean": 0.652608,
+      "log_loss": 1.078334,
+      "probs": [
+        0.4355,
+        0.2737,
+        0.2908
+      ]
+    },
+    "by_league": {
+      "259": {
+        "n": 272,
+        "model": {
+          "n": 272,
+          "brier_mean": 0.65159,
+          "log_loss": 1.082636,
+          "accuracy_pct": 46.32
+        },
+        "provider_market": {
+          "n": 263,
+          "brier_mean": 0.64282,
+          "log_loss": 1.067382,
+          "accuracy_pct": 41.83
+        }
+      }
+    }
+  },
+  "provider_market_coverage": {
+    "event_count": 1530,
+    "matched_events": 1036,
+    "unmatched_events": 494,
+    "rejected_after_kickoff": 65,
+    "rejected_invalid_odds": 13,
+    "rejected_unparseable_time": 0
+  }
+}

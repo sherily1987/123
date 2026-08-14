@@ -1,0 +1,14 @@
+{
+  "schema_version": "3.0",
+  "collector_version": "mobile-3.5.0",
+  "source": "中国体彩网移动端官方链路",
+  "source_url": "https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry?method=concern&matchDate=2026-08-12",
+  "fetched_at": "2026-08-12T01:31:36.601832+00:00",
+  "count": 0,
+  "matches": [],
+  "notes": [
+    "唯一链路：移动端 getConditionsV1 + getMatchDataPageListV1 + 逐场 getFixedBonusV1。",
+    "CRS只作相对排序，不直接归一化。",
+    "禁止调用任何已废弃PC/计算器接口。"
+  ]
+}

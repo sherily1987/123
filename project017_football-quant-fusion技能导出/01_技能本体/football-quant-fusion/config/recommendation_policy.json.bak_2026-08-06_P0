@@ -1,0 +1,35 @@
+{
+  "calibration_status": "VALID",
+  "min_samples_for_recalibration": 100,
+  "target_samples_for_threshold_review": 200,
+  "one_goal_draw_risk_pct": 18.0,
+  "stale_market_factor": {
+    "fresh_hours": 6,
+    "half_hours": 12,
+    "max_hours": 24
+  },
+  "calibration_params": {
+    "primary_probability": {
+      "method": "band_table_plus_edge",
+      "bands": [
+        {"lo": 0.0, "hi": 0.4, "n_train": 539, "prob": 0.4174},
+        {"lo": 0.4, "hi": 0.5, "n_train": 103, "prob": 0.4757},
+        {"lo": 0.5, "hi": 0.6, "n_train": 98, "prob": 0.6122},
+        {"lo": 0.6, "hi": 1.01, "n_train": 123, "prob": 0.561}
+      ],
+      "edge_min_pp": 0,
+      "fitted_on": "全快照池(1439) attributed 2026-08-03 audit pool, 60/20/20 chronological",
+      "pool_notes": "band ECE test: closing raw 0.0804->cal 0.0715, all raw 0.0602->cal 0.0438; 模型Brier不优于市场(全池0.627vs0.586)，confidence仅校准值、非edge声明",
+      "validated": {
+        "all_test_n": 288,
+        "closing_test_n": 74,
+        "edge_strategy_all": {"n": 118, "hit_pct": 40.68, "market_implied_pct": 39.5},
+        "edge_strategy_closing": {"n": 35, "hit_pct": 54.29, "market_implied_pct": 48.12}
+      }
+    }
+  },
+  "review": {
+    "next_review": "real-time prematch 已结算样本 test 达到 200 后复审（预计 2026-27 新赛季中期）",
+    "rollback": "restore config/recommendation_policy.json.bak_2026-08-03"
+  }
+}

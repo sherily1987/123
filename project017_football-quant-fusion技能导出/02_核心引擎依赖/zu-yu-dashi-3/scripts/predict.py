@@ -132,16 +132,25 @@ def league_calibration(d):
             return dict(_LEAGUE_KT[_LEAGUE_KT_ALIASES[cand]])
     return dict(DEFAULT_CALIBRATION)
 
-# 星级 ⇄ 最大概率区间。[FITTED 2026-08-02] 同上数据集。
-# 测试集实测命中率单调递增，已校验：
-#   ★★★★★ 70%+   n=32  实测 87.5%
-#   ★★★★☆ 60-70% n=79  实测 69.6%
-#   ★★★☆☆ 50-60% n=106 实测 56.6%
-#   ★★☆☆☆ 40-50% n=114 实测 47.4%
-#   ★☆☆☆☆ <40%   n=74  实测 36.5%
+# 星级 ⇄ 最大概率区间。[FITTED 2026-08-02 初版 → 2026-08-12 对齐 band 校准]
+# ⚠️ 2026-08-12 修订：原实测命中率（87.5/69.6/56.6/47.4/36.5）来自 2026-08-02 的
+#    405 场测试集，与 2026-08-06 全快照池 1478 场 band 校准严重脱节——60-69% 段
+#    星级暗示 69.6% 命中，实际 band 校准仅 40-45%（高估 25-30pp，会误导"4星=高置信"）。
+#    现改为 band 表同源命中率（recommendation_policy.json band_table_plus_edge，
+#    主方向概率分箱实测命中率，细分开赛前高概率段）。
 STAR_BANDS = [(0.70, 5), (0.60, 4), (0.50, 3), (0.40, 2), (0.0, 1)]
-STAR_OBSERVED_HIT = {5: 87.5, 4: 69.6, 3: 56.6, 2: 47.4, 1: 36.5}
-STAR_SAMPLE_N = {5: 32, 4: 79, 3: 106, 2: 114, 1: 74}
+# band 同源命中率（2026-08-06 校准，n=1478 池）：
+#   <0.40→42.57%(n909) / 0.40-0.45→40.43%(n94) / 0.45-0.50→53.85%(n117) /
+#   0.50-0.55→69.01%(n71) / 0.55-0.60→52.11%(n71) / 0.60-0.65→45.07%(n71) /
+#   0.65-0.70→40.00%(n45) / 0.70+→72.00%(n100)
+#   星级聚合口径（按原星级边界取 band 加权平均）：
+#   ★5 (≥0.70) = 72.00 (n100)
+#   ★4 (0.60-0.70) = (71*45.07+45*40.00)/116 = 43.10 (n116)
+#   ★3 (0.50-0.60) = (71*69.01+71*52.11)/142 = 60.56 (n142)
+#   ★2 (0.40-0.50) = (94*40.43+117*53.85)/211 = 47.87 (n211)
+#   ★1 (<0.40) = 42.57 (n909)
+STAR_OBSERVED_HIT = {5: 72.0, 4: 43.1, 3: 60.6, 2: 47.9, 1: 42.6}
+STAR_SAMPLE_N = {5: 100, 4: 116, 3: 142, 2: 211, 1: 909}
 
 
 # [中文功能] 对胜平负概率施加平局修正+温度缩放
@@ -920,9 +929,10 @@ def predict(d):
 
     explicit = d.get('lambda_home') is not None and d.get('lambda_away') is not None
     elo = d.get('elo_home') is not None and d.get('elo_away') is not None
-    mode = d.get('mode') or ('model_first' if explicit
-                             else ('hybrid' if market and elo
-                                   else ('market_only' if market else 'model_first')))
+    requested_mode = d.get('mode')
+    mode = requested_mode or ('model_first' if explicit
+                              else ('hybrid' if market and elo
+                                    else ('market_only' if market else 'model_first')))
 
     total, total_src = resolve_goal_total(d)
     rho = float(d.get('rho', RHO_DEFAULT))
@@ -938,11 +948,23 @@ def predict(d):
     had_freshness = (market_freshness_meta or {}).get('had') or {}
     had_usable = bool(d.get('odds')) and had_freshness.get('status') not in ('STALE', 'OUTDATED', 'UNKNOWN')
     if market and not had_usable:
-        flags_pre = d.setdefault('assumptions', [])
+        flags_pre = list(d.get('assumptions') or [])
         flags_pre.append('HAD_MARKET_ANCHOR_STALE_OR_UNKNOWN: 最终1X2不将陈旧/未知时间HAD作为新鲜市场锚。')
-        market = None
         if mode == 'market_only':
-            mode = 'model_first' if (explicit or elo) else 'model_first'
+            return {
+                'status': 'market_anchor_unusable',
+                'schema_version': '3.3',
+                'engine_version': ENGINE_VERSION,
+                'match': f"{d['home']} vs {d['away']}",
+                'mode': 'market_only',
+                'requested_mode': requested_mode,
+                'market_freshness': market_freshness_meta,
+                'market_prob_pct': [round(x * 100, 1) for x in market],
+                'bookmaker_margin_pct': round(margin * 100, 1),
+                'errors': ['market_only requires a fresh or aging HAD market anchor; refusing silent model_first fallback'],
+                'assumptions': flags_pre,
+            }
+        market = None
     if fit_multi_market and (market or d.get('hhad') or d.get('ou') or d.get('ttg')
                               or d.get('hafu') or d.get('lambda_prior')):
         # If HAD is stale, it has been removed from `market`; other timestamped
@@ -989,6 +1011,31 @@ def predict(d):
     m = matrix(lh, la, rho)
     pure = one(m)
 
+    # market_only 的多盘口拟合只负责衍生市场结构，不能把异常λ传播到比分/O-U/BTTS。
+    # 一旦联合拟合触发极端λ/零封审计，退回到HAD三项直接反解的λ；1X2仍固定为市场。
+    lambda_guard = None
+    fitted_lambda_audit = audit_lambda_and_clean_sheet(lh, la, m)
+    fitted_severe = [
+        flag for flag in fitted_lambda_audit['flags']
+        if flag.startswith(('EXTREME_LAMBDA_ASYMMETRY', 'EXTREME_CLEAN_SHEET'))
+    ]
+    if mode == 'market_only' and market and multi_fit and fitted_severe:
+        had_lambda = solve_lam_from_probs(market)
+        if had_lambda is not None:
+            rejected_lambda = [round(lh, 3), round(la, 3)]
+            lh, la = had_lambda
+            m = matrix(lh, la, rho)
+            pure = one(m)
+            tags.append('EXTREME_LAMBDA_FALLBACK_TO_HAD')
+            lambda_guard = {
+                'triggered': True,
+                'action': 'fallback_to_had_inverse',
+                'rejected_lambda': rejected_lambda,
+                'rejected_flags': fitted_severe,
+                'fallback_lambda': [round(lh, 3), round(la, 3)],
+                'note': 'market_only联合拟合异常；衍生市场改用HAD直接反解λ，禁止传播极端拟合。',
+            }
+
     market_solver_used = bool(market and (not multi_fit) and 'PROXY_XG' in tags and solve_lam_from_probs(market) is not None)
     # goal_total 只在启发式回退路径真正参与 λ 求解：
     # multi_market_fit 直接由 HAD/HHAD/O-U/TTG 赔率拟合，inverse_1x2 由 HAD 三项反解，两者都不吃 goal_total。
@@ -996,6 +1043,11 @@ def predict(d):
 
     flags = []
     lambda_audit = audit_lambda_and_clean_sheet(lh, la, m)
+    if lambda_guard:
+        flags.append(
+            'EXTREME_LAMBDA_FALLBACK_TO_HAD: multi-market λ='
+            f"{lambda_guard['rejected_lambda']}触发极端审计，已回退HAD反解λ="
+            f"{lambda_guard['fallback_lambda']}；比分及衍生市场按回退结果计算。")
     flags.extend(lambda_audit['flags'])
     # 依赖度：按真实λ来源估计，不再因为误标 PROXY_XG 被抬高。
     # multi_fit 本身已是盘口拟合，基础依赖高；若叠加独立伤停/战意修正，则略降。
@@ -1080,7 +1132,9 @@ def predict(d):
             flags.append('DOUBLE_HOME_ADV: Elo主场加成与home_adv同时启用且缺少额外环境确认，可能重复计权。')
     if mode == 'market_only' and not multi_fit:
         flags.append('DERIVED_FROM_1X2_ONLY: 比分、O/U、BTTS与AH由HAD的1X2反解λ推导，未受O/U、TTG或真实xG约束，必须降级解读。')
-    if multi_fit:
+    if multi_fit and lambda_guard:
+        flags.append('MULTI_MARKET_FIT_REJECTED: 联合拟合结果仅保留诊断，不用于最终λ和衍生市场。')
+    elif multi_fit:
         flags.append('MULTI_MARKET_FIT: λ已由'+','.join(multi_fit['sources'])+'联合拟合；仍需用独立历史样本验证比分与衍生市场校准。')
     if d.get('hhad') is None and d.get('hhad_note'):
         flags.append('HHAD_NOT_MODELED: 仅有文字化HHAD信息，未输入结构化hhad，未进入脚本审计。')
@@ -1188,8 +1242,9 @@ def predict(d):
                                      if not goal_total_used else
                                      'goal_total 参与了 λ 求解，其取值会影响比分与总进球类输出。'},
         'implied_goal_total': round(implied_total,3),
-        'lambda_solver': ('multi_market_fit' if multi_fit else ('inverse_1x2' if market_solver_used else ('explicit_or_elo' if not market else 'heuristic_fallback'))),
+        'lambda_solver': ('had_inverse_extreme_guard' if lambda_guard else ('multi_market_fit' if multi_fit else ('inverse_1x2' if market_solver_used else ('explicit_or_elo' if not market else 'heuristic_fallback')))),
         'multi_market_fit': multi_fit,
+        'lambda_guard': lambda_guard,
         'market_dependency_pct': dep,
         'market_prob_pct': None if market is None else [round(x * 100, 1) for x in market],
         'bookmaker_margin_pct': None if margin is None else round(margin * 100, 1),

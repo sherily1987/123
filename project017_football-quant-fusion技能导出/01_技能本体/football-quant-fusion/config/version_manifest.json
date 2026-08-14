@@ -3,18 +3,24 @@
     "skill_version":  "1.4.0",
     "fusion_version":  "1.4.0",
     "core_version":  "3.4.4",
+    "fusion_schema_version":  "1.3.0",
+    "record_schema_version":  "fusion-1.1",
+    "backtest_schema_version":  "fusion-backtest-2.0",
+    "sample_audit_schema_version":  "sample-audit-2.0",
+    "walk_forward_schema_version":  "fusion-walk-forward-1.0",
     "market_fit_version":  "timestamp-aware-v1+fbl-band-20260803",
     "policy_version":  "recommendation-policy-1.0+band-edge-20260803",
     "calibration_status":  "PARTIAL — core single-market pools fitted (see core_calibration); fusion-level band/edge calibration VALID (2026-08-03 band table, see recommendation_policy.json); fusion combo superiority claim still blocked",
-    "production_entrypoint":  "H:\claude AI自媒体\project017_football-quant-fusion技能导出\01_技能本体\football-quant-fusion/scripts/fusion_cli.py",
+    "production_entrypoint":  "F:\HM足球比赛预测\project017_football-quant-fusion技能导出\01_技能本体\football-quant-fusion/scripts/fusion_cli.py",
     "legacy_entries":  [
-                           "H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/soccer-lottery/scripts/analyzer.py",
-                           "H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/predict.py"
+                           "F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/soccer-lottery/scripts/analyzer.py",
+                           "F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts/predict.py"
                        ],
     "notes":  [
                   "Core fitted 1X2/O-U2.5/O-U3.5 calibration exists and is now surfaced via fusion output\u0027s `core_calibration` field (1.4.0); it is NOT the same artifact as fusion-level recommendation confidence, which remains blocked until an approved fusion-level calibration exists.",
                   "1.4.0 wraps two confirmed core-engine crash scenarios (ZeroDivisionError / TypeError on stale-anchor inputs) into structured `fusion_status=blocked` responses instead of raw tracebacks; see references/pitfalls.md 1.1. Root cause not yet fixed in core predict.py.",
                   "All registered snapshots must preserve fusion/core versions and engine bundle hash.",
+                  "2026-08-08 P0: 主评估改为一场一快照；current仅接受版本+代码/配置哈希精确匹配；新增按开球日期分组walk-forward和同场模型-市场paired bootstrap；collected_at/source_updated_at/prediction_as_of语义分离。",
                   "2026-08-03: fusion-layer calibration_status flipped UNFITTED->VALID via band_table_plus_edge artifact (all-snapshot attributed pool n=1439, 60/20/20; band ECE test all 0.0602->0.0438, closing 0.0804->0.0715). Model Brier NOT better than market (all 0.627 vs 0.586) — artifact only calibrates confidence values, no superiority claim. Rollback: restore config/recommendation_policy.json.bak_2026-08-03.",
                   "2026-08-04: added scripts/download_league_history.py (generic API-Football league results downloader), scripts/backtest_dual_track.py (dual-track quant+LLM backtest) and scripts/auto_backtest.py (one-click backtest of all predicted matches: settle -> store quant backtest -> per-date dual-track backtest -> merged report; wired to scheduled task FootballQuantAutoBacktest and SKILL trigger '回测已经预测的比赛'). SKILL.md synced to plugin cache (no-BOM).",
                   "2026-08-04 (late): tournament Monte Carlo productionized. scripts/ucl_tournament_mc.py adopted into skill (from project005); fusion_cli.py adds `tournament` subcommand (runs selftest by default; production: --iterations 100000 --seed <date> --teams teams.json --strength strength.json --output out.json). Production run on 2025/26 official 36-team list + official pots (2025-08-28 draw) + API-Football 2024/25 domestic league strength with UEFA country-coefficient-approx league adjustment; 100k valid seasons, seed=20260803; results in project005/05_交付/2026-08-04_欧冠MC生产模拟/. Validation vs actual 2025/26: champion PSG ranked 4th (4.73%), 3/4 real semifinalists in simulated top5; Arsenal/Tottenham/Man City underestimated due to 2024/25 strength snapshot lag. Known limits: strength snapshot lag, league-strength approximation, coeff approximation, no injuries/rotation/motivation; next step: wire fusion-engine live lambda.",

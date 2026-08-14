@@ -1,0 +1,1424 @@
+{
+  "shrinkage": [
+    0,
+    2,
+    5,
+    10,
+    20,
+    40
+  ],
+  "fallbacks": [
+    "off",
+    "league_mean",
+    "newcomer"
+  ],
+  "step_days": 30,
+  "half_life": 500.0,
+  "protocol": "walk_forward，仅改冷启动开关",
+  "leagues": [
+    {
+      "league": {
+        "id": 152,
+        "slug": "premier_league",
+        "name": "Premier League"
+      },
+      "cutoffs": {
+        "validation_from": 739116,
+        "test_from": 739482
+      },
+      "newcomer_prior": {
+        "alpha_offset": -0.30359583737923,
+        "beta_offset": 0.462241076548993,
+        "n_matches": 115,
+        "n_teams": 4,
+        "window_days": 365
+      },
+      "validation_sweep": [
+        {
+          "fallback": "off",
+          "k": 0,
+          "n": 382,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.597303,
+          "log_loss": 0.996255,
+          "accuracy_pct": 52.88,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "fallback": "off",
+          "k": 2,
+          "n": 382,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.597193,
+          "log_loss": 0.996622,
+          "accuracy_pct": 52.62,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "fallback": "off",
+          "k": 5,
+          "n": 382,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.597783,
+          "log_loss": 0.998233,
+          "accuracy_pct": 52.36,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "fallback": "off",
+          "k": 10,
+          "n": 382,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.599333,
+          "log_loss": 1.001133,
+          "accuracy_pct": 51.83,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "fallback": "off",
+          "k": 20,
+          "n": 382,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.602806,
+          "log_loss": 1.006838,
+          "accuracy_pct": 51.05,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "fallback": "off",
+          "k": 40,
+          "n": 382,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.609474,
+          "log_loss": 1.017014,
+          "accuracy_pct": 49.48,
+          "market": 0.576167,
+          "frequency": 0.658233
+        },
+        {
+          "fallback": "league_mean",
+          "k": 0,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.596819,
+          "log_loss": 0.995586,
+          "accuracy_pct": 53.0,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "league_mean",
+          "k": 2,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.596685,
+          "log_loss": 0.995919,
+          "accuracy_pct": 52.74,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "league_mean",
+          "k": 5,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.597251,
+          "log_loss": 0.997498,
+          "accuracy_pct": 52.48,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "league_mean",
+          "k": 10,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.59878,
+          "log_loss": 1.000368,
+          "accuracy_pct": 51.96,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "league_mean",
+          "k": 20,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.602233,
+          "log_loss": 1.006045,
+          "accuracy_pct": 51.17,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "league_mean",
+          "k": 40,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.608889,
+          "log_loss": 1.016201,
+          "accuracy_pct": 49.61,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "newcomer",
+          "k": 0,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.598157,
+          "log_loss": 0.997379,
+          "accuracy_pct": 52.74,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "newcomer",
+          "k": 2,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.598009,
+          "log_loss": 0.997689,
+          "accuracy_pct": 52.48,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "newcomer",
+          "k": 5,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.598564,
+          "log_loss": 0.999248,
+          "accuracy_pct": 52.22,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "newcomer",
+          "k": 10,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.600084,
+          "log_loss": 1.002102,
+          "accuracy_pct": 51.7,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "newcomer",
+          "k": 20,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.60353,
+          "log_loss": 1.007768,
+          "accuracy_pct": 50.91,
+          "market": 0.576709,
+          "frequency": 0.657675
+        },
+        {
+          "fallback": "newcomer",
+          "k": 40,
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.610185,
+          "log_loss": 1.017925,
+          "accuracy_pct": 49.35,
+          "market": 0.576709,
+          "frequency": 0.657675
+        }
+      ],
+      "validation_current": {
+        "fallback": "off",
+        "k": 0,
+        "n": 382,
+        "skip": 1,
+        "fallback_rows": null,
+        "brier": 0.597303,
+        "log_loss": 0.996255,
+        "accuracy_pct": 52.88,
+        "market": 0.576167,
+        "frequency": 0.658233
+      },
+      "validation_best": {
+        "fallback": "league_mean",
+        "k": 2,
+        "n": 383,
+        "skip": 0,
+        "fallback_rows": 1,
+        "brier": 0.596685,
+        "log_loss": 0.995919,
+        "accuracy_pct": 52.74,
+        "market": 0.576709,
+        "frequency": 0.657675
+      },
+      "test": {
+        "current": {
+          "n": 379,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.629658,
+          "log_loss": 1.061849,
+          "accuracy_pct": 46.17,
+          "market": 0.607958,
+          "frequency": 0.656125
+        },
+        "selected": {
+          "n": 379,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.627063,
+          "log_loss": 1.045347,
+          "accuracy_pct": 46.44,
+          "market": 0.607958,
+          "frequency": 0.656125
+        }
+      }
+    },
+    {
+      "league": {
+        "id": 302,
+        "slug": "la_liga",
+        "name": "La Liga"
+      },
+      "cutoffs": {
+        "validation_from": 739118,
+        "test_from": 739483
+      },
+      "newcomer_prior": {
+        "alpha_offset": -0.10185536080708564,
+        "beta_offset": 0.1345334172571447,
+        "n_matches": 155,
+        "n_teams": 5,
+        "window_days": 365
+      },
+      "validation_sweep": [
+        {
+          "fallback": "off",
+          "k": 0,
+          "n": 380,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.575446,
+          "log_loss": 0.970034,
+          "accuracy_pct": 53.16,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "fallback": "off",
+          "k": 2,
+          "n": 380,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.576087,
+          "log_loss": 0.971242,
+          "accuracy_pct": 53.16,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "fallback": "off",
+          "k": 5,
+          "n": 380,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.577241,
+          "log_loss": 0.973219,
+          "accuracy_pct": 53.16,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "fallback": "off",
+          "k": 10,
+          "n": 380,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.57938,
+          "log_loss": 0.976652,
+          "accuracy_pct": 52.37,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "fallback": "off",
+          "k": 20,
+          "n": 380,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.58387,
+          "log_loss": 0.983434,
+          "accuracy_pct": 52.37,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "fallback": "off",
+          "k": 40,
+          "n": 380,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.592105,
+          "log_loss": 0.995223,
+          "accuracy_pct": 51.05,
+          "market": 0.555245,
+          "frequency": 0.64585
+        },
+        {
+          "fallback": "league_mean",
+          "k": 0,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.574524,
+          "log_loss": 0.968771,
+          "accuracy_pct": 53.28,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "league_mean",
+          "k": 2,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.575182,
+          "log_loss": 0.970001,
+          "accuracy_pct": 53.28,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "league_mean",
+          "k": 5,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.576358,
+          "log_loss": 0.972009,
+          "accuracy_pct": 53.28,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "league_mean",
+          "k": 10,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.578528,
+          "log_loss": 0.975483,
+          "accuracy_pct": 52.49,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "league_mean",
+          "k": 20,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.583065,
+          "log_loss": 0.982326,
+          "accuracy_pct": 52.49,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "league_mean",
+          "k": 40,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.59136,
+          "log_loss": 0.994194,
+          "accuracy_pct": 51.18,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "newcomer",
+          "k": 0,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.574312,
+          "log_loss": 0.968458,
+          "accuracy_pct": 53.28,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "newcomer",
+          "k": 2,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.574965,
+          "log_loss": 0.969684,
+          "accuracy_pct": 53.28,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "newcomer",
+          "k": 5,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.576136,
+          "log_loss": 0.971687,
+          "accuracy_pct": 53.28,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "newcomer",
+          "k": 10,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.578298,
+          "log_loss": 0.975155,
+          "accuracy_pct": 52.49,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "newcomer",
+          "k": 20,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.582823,
+          "log_loss": 0.981988,
+          "accuracy_pct": 52.49,
+          "market": 0.555245,
+          "frequency": 0.645352
+        },
+        {
+          "fallback": "newcomer",
+          "k": 40,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 1,
+          "brier": 0.591104,
+          "log_loss": 0.993844,
+          "accuracy_pct": 51.18,
+          "market": 0.555245,
+          "frequency": 0.645352
+        }
+      ],
+      "validation_current": {
+        "fallback": "off",
+        "k": 0,
+        "n": 380,
+        "skip": 1,
+        "fallback_rows": null,
+        "brier": 0.575446,
+        "log_loss": 0.970034,
+        "accuracy_pct": 53.16,
+        "market": 0.555245,
+        "frequency": 0.64585
+      },
+      "validation_best": {
+        "fallback": "newcomer",
+        "k": 0,
+        "n": 381,
+        "skip": 0,
+        "fallback_rows": 1,
+        "brier": 0.574312,
+        "log_loss": 0.968458,
+        "accuracy_pct": 53.28,
+        "market": 0.555245,
+        "frequency": 0.645352
+      },
+      "test": {
+        "current": {
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.58246,
+          "log_loss": 1.005776,
+          "accuracy_pct": 53.0,
+          "market": 0.567652,
+          "frequency": 0.631867
+        },
+        "selected": {
+          "n": 383,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.58246,
+          "log_loss": 1.005776,
+          "accuracy_pct": 53.0,
+          "market": 0.567652,
+          "frequency": 0.631867
+        }
+      }
+    },
+    {
+      "league": {
+        "id": 207,
+        "slug": "serie_a",
+        "name": "Serie A"
+      },
+      "cutoffs": {
+        "validation_from": 739040,
+        "test_from": 739487
+      },
+      "newcomer_prior": {
+        "alpha_offset": -0.09796485949833698,
+        "beta_offset": 0.16944002051429302,
+        "n_matches": 114,
+        "n_teams": 3,
+        "window_days": 365
+      },
+      "validation_sweep": [
+        {
+          "fallback": "off",
+          "k": 0,
+          "n": 377,
+          "skip": 4,
+          "fallback_rows": null,
+          "brier": 0.590294,
+          "log_loss": 0.988246,
+          "accuracy_pct": 52.25,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "fallback": "off",
+          "k": 2,
+          "n": 377,
+          "skip": 4,
+          "fallback_rows": null,
+          "brier": 0.58746,
+          "log_loss": 0.98346,
+          "accuracy_pct": 52.25,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "fallback": "off",
+          "k": 5,
+          "n": 377,
+          "skip": 4,
+          "fallback_rows": null,
+          "brier": 0.587107,
+          "log_loss": 0.983343,
+          "accuracy_pct": 53.05,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "fallback": "off",
+          "k": 10,
+          "n": 377,
+          "skip": 4,
+          "fallback_rows": null,
+          "brier": 0.588456,
+          "log_loss": 0.986022,
+          "accuracy_pct": 52.52,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "fallback": "off",
+          "k": 20,
+          "n": 377,
+          "skip": 4,
+          "fallback_rows": null,
+          "brier": 0.592649,
+          "log_loss": 0.993094,
+          "accuracy_pct": 52.25,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "fallback": "off",
+          "k": 40,
+          "n": 377,
+          "skip": 4,
+          "fallback_rows": null,
+          "brier": 0.601281,
+          "log_loss": 1.006436,
+          "accuracy_pct": 51.99,
+          "market": 0.566564,
+          "frequency": 0.660376
+        },
+        {
+          "fallback": "league_mean",
+          "k": 0,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.59135,
+          "log_loss": 0.989913,
+          "accuracy_pct": 51.97,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "league_mean",
+          "k": 2,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.588513,
+          "log_loss": 0.985132,
+          "accuracy_pct": 51.97,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "league_mean",
+          "k": 5,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.58812,
+          "log_loss": 0.984959,
+          "accuracy_pct": 52.76,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "league_mean",
+          "k": 10,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.589399,
+          "log_loss": 0.987537,
+          "accuracy_pct": 52.23,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "league_mean",
+          "k": 20,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.593475,
+          "log_loss": 0.994436,
+          "accuracy_pct": 51.97,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "league_mean",
+          "k": 40,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.601942,
+          "log_loss": 1.007534,
+          "accuracy_pct": 51.71,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "newcomer",
+          "k": 0,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.59135,
+          "log_loss": 0.989913,
+          "accuracy_pct": 51.97,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "newcomer",
+          "k": 2,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.588513,
+          "log_loss": 0.985132,
+          "accuracy_pct": 51.97,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "newcomer",
+          "k": 5,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.58812,
+          "log_loss": 0.984959,
+          "accuracy_pct": 52.76,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "newcomer",
+          "k": 10,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.589399,
+          "log_loss": 0.987537,
+          "accuracy_pct": 52.23,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "newcomer",
+          "k": 20,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.593475,
+          "log_loss": 0.994436,
+          "accuracy_pct": 51.97,
+          "market": 0.568245,
+          "frequency": 0.660381
+        },
+        {
+          "fallback": "newcomer",
+          "k": 40,
+          "n": 381,
+          "skip": 0,
+          "fallback_rows": 4,
+          "brier": 0.601942,
+          "log_loss": 1.007534,
+          "accuracy_pct": 51.71,
+          "market": 0.568245,
+          "frequency": 0.660381
+        }
+      ],
+      "validation_current": {
+        "fallback": "off",
+        "k": 0,
+        "n": 377,
+        "skip": 4,
+        "fallback_rows": null,
+        "brier": 0.590294,
+        "log_loss": 0.988246,
+        "accuracy_pct": 52.25,
+        "market": 0.566564,
+        "frequency": 0.660376
+      },
+      "validation_best": {
+        "fallback": "off",
+        "k": 5,
+        "n": 377,
+        "skip": 4,
+        "fallback_rows": null,
+        "brier": 0.587107,
+        "log_loss": 0.983343,
+        "accuracy_pct": 53.05,
+        "market": 0.566564,
+        "frequency": 0.660376
+      },
+      "test": {
+        "current": {
+          "n": 377,
+          "skip": 3,
+          "fallback_rows": null,
+          "brier": 0.592714,
+          "log_loss": 0.992779,
+          "accuracy_pct": 51.72,
+          "market": 0.583598,
+          "frequency": 0.658857
+        },
+        "selected": {
+          "n": 377,
+          "skip": 3,
+          "fallback_rows": null,
+          "brier": 0.59356,
+          "log_loss": 0.994868,
+          "accuracy_pct": 51.72,
+          "market": 0.583598,
+          "frequency": 0.658857
+        }
+      }
+    },
+    {
+      "league": {
+        "id": 175,
+        "slug": "bundesliga",
+        "name": "Bundesliga"
+      },
+      "cutoffs": {
+        "validation_from": 739129,
+        "test_from": 739493
+      },
+      "newcomer_prior": {
+        "alpha_offset": -0.28638619795568315,
+        "beta_offset": 0.19633739328961267,
+        "n_matches": 140,
+        "n_teams": 6,
+        "window_days": 365
+      },
+      "validation_sweep": [
+        {
+          "fallback": "off",
+          "k": 0,
+          "n": 308,
+          "skip": 2,
+          "fallback_rows": null,
+          "brier": 0.630071,
+          "log_loss": 1.065117,
+          "accuracy_pct": 46.75,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "fallback": "off",
+          "k": 2,
+          "n": 308,
+          "skip": 2,
+          "fallback_rows": null,
+          "brier": 0.622085,
+          "log_loss": 1.038701,
+          "accuracy_pct": 47.08,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "fallback": "off",
+          "k": 5,
+          "n": 308,
+          "skip": 2,
+          "fallback_rows": null,
+          "brier": 0.6208,
+          "log_loss": 1.035104,
+          "accuracy_pct": 46.75,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "fallback": "off",
+          "k": 10,
+          "n": 308,
+          "skip": 2,
+          "fallback_rows": null,
+          "brier": 0.621254,
+          "log_loss": 1.035456,
+          "accuracy_pct": 46.75,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "fallback": "off",
+          "k": 20,
+          "n": 308,
+          "skip": 2,
+          "fallback_rows": null,
+          "brier": 0.623677,
+          "log_loss": 1.038917,
+          "accuracy_pct": 46.43,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "fallback": "off",
+          "k": 40,
+          "n": 308,
+          "skip": 2,
+          "fallback_rows": null,
+          "brier": 0.628963,
+          "log_loss": 1.046299,
+          "accuracy_pct": 45.13,
+          "market": 0.605527,
+          "frequency": 0.668732
+        },
+        {
+          "fallback": "league_mean",
+          "k": 0,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.631753,
+          "log_loss": 1.067437,
+          "accuracy_pct": 46.45,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "league_mean",
+          "k": 2,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.623464,
+          "log_loss": 1.040684,
+          "accuracy_pct": 46.77,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "league_mean",
+          "k": 5,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.622153,
+          "log_loss": 1.03706,
+          "accuracy_pct": 46.45,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "league_mean",
+          "k": 10,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.622583,
+          "log_loss": 1.03738,
+          "accuracy_pct": 46.45,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "league_mean",
+          "k": 20,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.62495,
+          "log_loss": 1.04076,
+          "accuracy_pct": 46.13,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "league_mean",
+          "k": 40,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.630135,
+          "log_loss": 1.047995,
+          "accuracy_pct": 44.84,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "newcomer",
+          "k": 0,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.630803,
+          "log_loss": 1.066025,
+          "accuracy_pct": 46.45,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "newcomer",
+          "k": 2,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.622697,
+          "log_loss": 1.039491,
+          "accuracy_pct": 47.1,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "newcomer",
+          "k": 5,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.621403,
+          "log_loss": 1.035886,
+          "accuracy_pct": 46.77,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "newcomer",
+          "k": 10,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.621843,
+          "log_loss": 1.036218,
+          "accuracy_pct": 46.77,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "newcomer",
+          "k": 20,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.624234,
+          "log_loss": 1.039626,
+          "accuracy_pct": 46.45,
+          "market": 0.606886,
+          "frequency": 0.669681
+        },
+        {
+          "fallback": "newcomer",
+          "k": 40,
+          "n": 310,
+          "skip": 0,
+          "fallback_rows": 2,
+          "brier": 0.629461,
+          "log_loss": 1.046913,
+          "accuracy_pct": 45.16,
+          "market": 0.606886,
+          "frequency": 0.669681
+        }
+      ],
+      "validation_current": {
+        "fallback": "off",
+        "k": 0,
+        "n": 308,
+        "skip": 2,
+        "fallback_rows": null,
+        "brier": 0.630071,
+        "log_loss": 1.065117,
+        "accuracy_pct": 46.75,
+        "market": 0.605527,
+        "frequency": 0.668732
+      },
+      "validation_best": {
+        "fallback": "off",
+        "k": 5,
+        "n": 308,
+        "skip": 2,
+        "fallback_rows": null,
+        "brier": 0.6208,
+        "log_loss": 1.035104,
+        "accuracy_pct": 46.75,
+        "market": 0.605527,
+        "frequency": 0.668732
+      },
+      "test": {
+        "current": {
+          "n": 310,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.577339,
+          "log_loss": 0.976359,
+          "accuracy_pct": 54.84,
+          "market": 0.554001,
+          "frequency": 0.646725
+        },
+        "selected": {
+          "n": 310,
+          "skip": 1,
+          "fallback_rows": null,
+          "brier": 0.575685,
+          "log_loss": 0.972426,
+          "accuracy_pct": 54.84,
+          "market": 0.554001,
+          "frequency": 0.646725
+        }
+      }
+    },
+    {
+      "league": {
+        "id": 168,
+        "slug": "ligue_1",
+        "name": "Ligue 1"
+      },
+      "cutoffs": {
+        "validation_from": 738984,
+        "test_from": 739369
+      },
+      "newcomer_prior": null,
+      "validation_sweep": [
+        {
+          "fallback": "off",
+          "k": 0,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.578152,
+          "log_loss": 0.973928,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "off",
+          "k": 2,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.578038,
+          "log_loss": 0.973697,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "off",
+          "k": 5,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.578325,
+          "log_loss": 0.974053,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "off",
+          "k": 10,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.579512,
+          "log_loss": 0.975701,
+          "accuracy_pct": 55.56,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "off",
+          "k": 20,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.582974,
+          "log_loss": 0.98054,
+          "accuracy_pct": 54.95,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "off",
+          "k": 40,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": null,
+          "brier": 0.590318,
+          "log_loss": 0.990685,
+          "accuracy_pct": 51.35,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "league_mean",
+          "k": 0,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.578152,
+          "log_loss": 0.973928,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "league_mean",
+          "k": 2,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.578038,
+          "log_loss": 0.973697,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "league_mean",
+          "k": 5,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.578325,
+          "log_loss": 0.974053,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "league_mean",
+          "k": 10,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.579512,
+          "log_loss": 0.975701,
+          "accuracy_pct": 55.56,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "league_mean",
+          "k": 20,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.582974,
+          "log_loss": 0.98054,
+          "accuracy_pct": 54.95,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "league_mean",
+          "k": 40,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.590318,
+          "log_loss": 0.990685,
+          "accuracy_pct": 51.35,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "newcomer",
+          "k": 0,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.578152,
+          "log_loss": 0.973928,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "newcomer",
+          "k": 2,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.578038,
+          "log_loss": 0.973697,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "newcomer",
+          "k": 5,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.578325,
+          "log_loss": 0.974053,
+          "accuracy_pct": 56.16,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "newcomer",
+          "k": 10,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.579512,
+          "log_loss": 0.975701,
+          "accuracy_pct": 55.56,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "newcomer",
+          "k": 20,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.582974,
+          "log_loss": 0.98054,
+          "accuracy_pct": 54.95,
+          "market": 0.568722,
+          "frequency": 0.641648
+        },
+        {
+          "fallback": "newcomer",
+          "k": 40,
+          "n": 333,
+          "skip": 0,
+          "fallback_rows": 0,
+          "brier": 0.590318,
+          "log_loss": 0.990685,
+          "accuracy_pct": 51.35,
+          "market": 0.568722,
+          "frequency": 0.641648
+        }
+      ],
+      "validation_current": {
+        "fallback": "off",
+        "k": 0,
+        "n": 333,
+        "skip": 0,
+        "fallback_rows": null,
+        "brier": 0.578152,
+        "log_loss": 0.973928,
+        "accuracy_pct": 56.16,
+        "market": 0.568722,
+        "frequency": 0.641648
+      },
+      "validation_best": {
+        "fallback": "off",
+        "k": 2,
+        "n": 333,
+        "skip": 0,
+        "fallback_rows": null,
+        "brier": 0.578038,
+        "log_loss": 0.973697,
+        "accuracy_pct": 56.16,
+        "market": 0.568722,
+        "frequency": 0.641648
+      },
+      "test": {
+        "current": {
+          "n": 334,
+          "skip": 3,
+          "fallback_rows": null,
+          "brier": 0.59301,
+          "log_loss": 0.993461,
+          "accuracy_pct": 52.99,
+          "market": 0.587142,
+          "frequency": 0.640701
+        },
+        "selected": {
+          "n": 334,
+          "skip": 3,
+          "fallback_rows": null,
+          "brier": 0.591553,
+          "log_loss": 0.991036,
+          "accuracy_pct": 53.59,
+          "market": 0.587142,
+          "frequency": 0.640701
+        }
+      }
+    }
+  ]
+}

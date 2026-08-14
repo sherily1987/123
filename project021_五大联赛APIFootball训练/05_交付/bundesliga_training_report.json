@@ -18,26 +18,26 @@
   },
   "lifecycle": "candidate",
   "status": "trained",
-  "model_path": "F:\\HM足球比赛预测\\.worktrees\\codex-five-league-training\\project021_五大联赛APIFootball训练\\03_模型\\bundesliga_candidate.json",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\bundesliga_candidate.json",
   "validation": {
-    "n": 298,
-    "skip": 12,
+    "n": 308,
+    "skip": 2,
     "model": {
-      "n": 298,
-      "brier_mean": 0.648674,
-      "log_loss": 1.185914,
-      "accuracy_pct": 46.98
+      "n": 308,
+      "brier_mean": 0.659354,
+      "log_loss": 1.198388,
+      "accuracy_pct": 46.43
     },
     "provider_market": {
-      "n": 277,
-      "brier_mean": 0.602716,
-      "log_loss": 1.005652,
-      "accuracy_pct": 50.9
+      "n": 284,
+      "brier_mean": 0.605527,
+      "log_loss": 1.009584,
+      "accuracy_pct": 50.35
     },
     "frequency_baseline": {
-      "n": 298,
-      "brier_mean": 0.666615,
-      "log_loss": 1.096532,
+      "n": 308,
+      "brier_mean": 0.668732,
+      "log_loss": 1.099459,
       "probs": [
         0.4582,
         0.2479,
@@ -46,18 +46,18 @@
     },
     "by_league": {
       "175": {
-        "n": 298,
+        "n": 308,
         "model": {
-          "n": 298,
-          "brier_mean": 0.648674,
-          "log_loss": 1.185914,
-          "accuracy_pct": 46.98
+          "n": 308,
+          "brier_mean": 0.659354,
+          "log_loss": 1.198388,
+          "accuracy_pct": 46.43
         },
         "provider_market": {
-          "n": 277,
-          "brier_mean": 0.602716,
-          "log_loss": 1.005652,
-          "accuracy_pct": 50.9
+          "n": 284,
+          "brier_mean": 0.605527,
+          "log_loss": 1.009584,
+          "accuracy_pct": 50.35
         }
       }
     }
@@ -67,9 +67,9 @@
     "skip": 1,
     "model": {
       "n": 310,
-      "brier_mean": 0.73224,
-      "log_loss": 1.444103,
-      "accuracy_pct": 48.39
+      "brier_mean": 0.57969,
+      "log_loss": 0.987935,
+      "accuracy_pct": 55.16
     },
     "provider_market": {
       "n": 276,
@@ -92,9 +92,9 @@
         "n": 310,
         "model": {
           "n": 310,
-          "brier_mean": 0.73224,
-          "log_loss": 1.444103,
-          "accuracy_pct": 48.39
+          "brier_mean": 0.57969,
+          "log_loss": 0.987935,
+          "accuracy_pct": 55.16
         },
         "provider_market": {
           "n": 276,
@@ -112,5 +112,10 @@
     "rejected_after_kickoff": 230,
     "rejected_invalid_odds": 5,
     "rejected_unparseable_time": 0
+  },
+  "team_identity_fix": {
+    "applied": true,
+    "basis": "team_key() 以供应商 team_id 为主键，队名仅作显示",
+    "note": "修复前用队名当主键，供应商跨赛季改名导致同队被拆成多个身份"
   }
 }

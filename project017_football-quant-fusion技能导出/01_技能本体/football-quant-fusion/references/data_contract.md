@@ -69,3 +69,44 @@
 
 `VALID` / `MISSING` / `UNAVAILABLE` / `UNVERIFIED` / `OUTDATED` / `IMAGE_EXTRACTED` / `ASSUMED` / `PROXY_XG` / `EXPLICIT_XG`。
 数值 0 或 false 仍算已提供。`field_meta.<pool>.observed_at` 必须与 kickoff 同时区（Asia/Shanghai），按相对开球时间算新鲜度：FRESH(<6h)/AGING(<12h)/STALE(<24h)/OUTDATED(≥24h)。
+
+## 7. APIfootball赛前特征
+
+适配器原始数据统一放在`api_football`，经过
+`apifootball_model_features.py`后生成`api_features`：
+
+```json
+{
+  "api_features": {
+    "provider": "apifootball.com",
+    "as_of": {"kickoff": "...", "collected_at": "...", "usable": true},
+    "pre_kickoff_usable": true,
+    "history_matches": 114,
+    "team_strength": {
+      "status": "VALID",
+      "lambda_home": 1.85,
+      "lambda_away": 1.66,
+      "source": "dixon_coles_team_strength"
+    },
+    "rolling_statistics": {},
+    "standings": {},
+    "lineups": {},
+    "official_prediction": {
+      "prob_home": 42,
+      "prob_draw": 28,
+      "prob_away": 30,
+      "not_xg": true
+    },
+    "external_market": {"bookmaker_rows": 10},
+    "no_future_leakage": true
+  }
+}
+```
+
+时间规则：
+
+- `api_features.as_of.usable=false`时，statistics、standings、lineups、official_prediction、external_market只能保留原始审计，状态写为`POST_MATCH_NOT_USABLE`；
+- `get_statistics`中的射门、射正、禁区内射门只能进入后续比赛的滚动历史特征；
+- `get_predictions`只能输出`p_apifootball`，不得改名为xG；
+- `get_odds`只能进入外部市场层，不进入独立球队强度训练；
+- `lambda_prior`只有显式`--mode hybrid/model_first`才注入，且必须有`adjustment_ledger`；未完成联赛OOS校准时标记`UNFITTED`，引擎保持安全门控。

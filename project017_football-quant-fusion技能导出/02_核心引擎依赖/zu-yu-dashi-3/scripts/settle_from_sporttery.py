@@ -78,7 +78,7 @@ def fetch_fixed_by_id(mid):
 # [中文功能] 按官方赛果自动回填登记库
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--store', default='H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest')
+    ap.add_argument('--store', default='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\02_核心引擎依赖/shared/zu-yu-dashi-3/backtest')
     ap.add_argument('--date', help='只回填该 business_date')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()

@@ -1,0 +1,33 @@
+{
+  "model": "poisson_identity_link",
+  "basis": "shots_on_target",
+  "formula": "xg = a*shots_on_target + b*shots_off_target_or_blocked",
+  "a_inside_box": 0.304959,
+  "b_outside_box": 0.00486,
+  "converged": true,
+  "n_rows": 15840,
+  "n_matches": 7920,
+  "train_until": "2025-04-28",
+  "sources": [
+    "apisports_bulgaria_first_league_match_stats.jsonl",
+    "apisports_cyprus_1_division_match_stats.jsonl",
+    "apisports_ukraine_premier_league_match_stats.jsonl",
+    "czech_liga_match_stats.jsonl",
+    "fd_e1_match_stats.jsonl",
+    "fd_f2_match_stats.jsonl",
+    "finland_veikkausliiga_match_stats.jsonl",
+    "romania_liga_i_match_stats.jsonl",
+    "slovakia_1_liga_match_stats.jsonl"
+  ],
+  "self_check": {
+    "total_predicted": 20088.0,
+    "total_actual": 20108.0,
+    "total_deviation_pct": -0.099,
+    "total_conserved": true,
+    "primary_gt_secondary": true,
+    "primary_secondary_ratio": 62.75
+  },
+  "penalty_conversion": null,
+  "penalties_excluded": false,
+  "note": "系数由本仓库样本回归得到；未剔除点球，会系统性抬高 a"
+}

@@ -1,0 +1,37 @@
+📁 证据文件: 5 个
+   - evidence_001_psg_villa.md
+   - evidence_002_platense_coquimbo.md
+   - evidence_003_palmeiras_cerro.md
+   - evidence_009_mirassol_ldu.md
+   - evidence_010_rosario_corinthians.md
+🎯 共 1 场比赛待预测, 每场 3 个模型定性判断
+
+================================================================
+⚽ 第1/1场 [周三002] 普拉滕斯 VS 科金博联 | 解放者杯 | 2026-08-13 06:00
+   证据: evidence_002_platense_coquimbo.md
+================================================================
+     ✓ [deepseek-chat     ] -> 主胜 / 平局 比分偏好:1-0
+     ✓ [glm-4-flash       ] -> 主胜 / 客胜 比分偏好:1-0
+     ✓ [kimi-k2.6         ] -> 主胜 / 平局 比分偏好:1-0
+
+  📊 综合方向: 主胜  (1.2/1.8票, 强度67%)
+  🚨 谨慎(证据存在缺口): 建议双选 主胜/平局
+  🎯 比分偏好: 1-0
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平胜
+  ⚠️ 坍缩标记: OU_COLLAPSE:小2.5x3
+
+  💰 下注推荐:
+     🚫 不下注 — 证据存在缺口，风险过高
+     
+     EV 分析:
+       主胜: 预测 66.7% × 赔率 1.85 = EV +23.3% ✅
+       平局: 预测 26.2% × 赔率 2.73 = EV -28.5% ❌
+       客胜: 预测 7.1% × 赔率 4.50 = EV -67.9% ❌
+  🗳️ 投票分布: 主胜:1.2 | 平局:0.5 | 客胜:0.1
+  🤖 各模型判断:
+     [deepseek-chat       ] 主胜 (备选:平局) 比分:1-0 — 【伤停:双方官方首发/伤停公告未获取，存在信息缺口】【战意:解放者杯正赛，阿根廷vs智利俱乐部，双方均全力争胜】【主客:
+     [glm-4-flash         ] 主胜 (备选:客胜) 比分:1-0 — 【战意: 解放者杯淘汰赛性质，双方均为正赛】【主客: 普拉滕斯为主队，洲际赛事存在旅行因素】【身份: 体彩官方简名对应】
+     [kimi-k2.6           ] 主胜 (备选:平局) 比分:1-0 — 【伤停:未取得双方官方首发伤停公告】【战意:单场淘汰双方均为正赛】【主客:普拉滕斯为主队但洲际旅行因素待确认】证据缺口显
+{"direction": "主胜", "votes": 1.19, "total_votes": 1.785, "strength": 0.6666666666666666, "all_votes": {"主胜": 1.19, "平局": 0.4675, "客胜": 0.1275}, "top_score_pref": "1-0", "score_prefs": {"1-0": 1.19}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 1.19}, "top_hafu": "平胜", "all_hafu": {"平胜": 1.19}, "alt_direction": "平局", "caution": true, "valid_model_count": 3, "minimum_valid_models": 3, "collapse_flags": ["OU_COLLAPSE:小2.5x3"], "individual": {"zhipu/glm-4-flash": {"model_id": "zhipu/glm-4-flash", "provider": "zhipu", "direction": "主胜", "alt_direction": "客胜", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意: 解放者杯淘汰赛性质，双方均为正赛】【主客: 普拉滕斯为主队，洲际赛事存在旅行因素】【身份: 体彩官方简名对应】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "主客", "旅行", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【伤停:双方官方首发/伤停公告未获取，存在信息缺口】【战意:解放者杯正赛，阿根廷vs智利俱乐部，双方均全力争胜】【主客:普拉滕斯主场作战，洲际赛事旅行因素对客队不利】【近况:无同尺度对比数据，仅能参考赔率基线】主胜赔率1.85偏低但非极热，考虑杯赛冷门风险，双选主胜+平局，比分倾向1-0小胜。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况", "主客", "旅行"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k2.6": {"model_id": "moonshot/kimi-k2.6", "provider": "moonshot", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【伤停:未取得双方官方首发伤停公告】【战意:单场淘汰双方均为正赛】【主客:普拉滕斯为主队但洲际旅行因素待确认】证据缺口显著，低比分概率高，主胜受注但平局需防。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "主客", "旅行"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "llm_model_pool_sha256": "4b61f8e50c398acb711f79465a1c1e63d77bc29640fe9a062a2176c69e8a39f9", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "94c5f631435d7590adb1c739a3c2ae0f423ca0e5b1680ee6009f06856c2e5fbc", "evidence_file_sha256": "b30b5b750060808064a7325af777b63492ca30b3a927fce8d4f14a3381740802", "evidence_collected_at_min": "2026-08-12T21:07:48+0800", "evidence_collected_at_max": "2026-08-12T21:07:48+0800", "ev_recommendation": {"action": "skip", "reason": "证据存在缺口，风险过高", "recommended_bets": [], "ev_analysis": {"主胜": {"predicted_prob": 0.6666666666666666, "odds": 1.85, "ev": 0.2333333333333334}, "平局": {"predicted_prob": 0.2619047619047619, "odds": 2.73, "ev": -0.2849999999999999}, "客胜": {"predicted_prob": 0.07142857142857144, "odds": 4.5, "ev": -0.6785714285714286}}}}
+

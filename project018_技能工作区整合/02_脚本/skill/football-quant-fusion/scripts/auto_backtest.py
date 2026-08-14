@@ -12,7 +12,7 @@
 最后输出合并报告（汇总 settle / 共享库 / 各日期双轨命中率）。
 
 用法:
-  python auto_backtest.py --workspace "H:\\claude AI自媒体" --output-dir <项目>/05_交付/auto_backtest
+  python auto_backtest.py --workspace "F:\\HM足球比赛预测" --output-dir <项目>/05_交付/auto_backtest
 """
 from __future__ import annotations
 

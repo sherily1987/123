@@ -16,9 +16,14 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-os.environ.setdefault("FUSION_CORE_DIR", r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts")
-sys.path.insert(0, r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts")
-sys.path.insert(0, r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/football-quant-fusion/scripts")
+# 2026-08-12 修复：原硬编码指向 football-quant-fusion-suite 外部物理拷贝
+# （AGENTS.md 头号警告对象），模块级 setdefault FUSION_CORE_DIR + sys.path.insert
+# 会污染同一 pytest 进程内后续测试（test_p0_evaluation 拿到 suite 旧版
+# fusion_predict_core 的模块缓存与 build_identity，子进程却用仓库内新版，
+# 哈希不一致导致 cohort 归因失败）。统一走符号链接仓库内唯一事实源。
+os.environ.setdefault("FUSION_CORE_DIR", r"F:/HM足球比赛预测/project018_技能工作区整合/02_脚本/core/zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"F:/HM足球比赛预测/project018_技能工作区整合/02_脚本/core/zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"C:/Users/Administrator/.codex/skills/football-quant-fusion/scripts")
 
 import predict as P
 import fusion_predict_core as F
@@ -323,9 +328,9 @@ def t_registry(store):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", required=True)
-    ap.add_argument("--batch", default=r"H:\claude AI自媒体\project001_足球预测\05_交付\2026-08-04_4场\hybrid.json")
-    ap.add_argument("--ratings", default=r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/datasets/team_strength_ratings_2025.json")
-    ap.add_argument("--understat-store", default=r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/datasets/understat_store.jsonl")
+    ap.add_argument("--batch", default=r"F:\HM足球比赛预测\project001_足球预测\05_交付\2026-08-04_4场\hybrid.json")
+    ap.add_argument("--ratings", default=r"F:/HM足球比赛预测/project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/datasets/team_strength_ratings_2025.json")
+    ap.add_argument("--understat-store", default=r"F:/HM足球比赛预测/project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/datasets/understat_store.jsonl")
     a = ap.parse_args()
 
     check("去水方法", t_devig)

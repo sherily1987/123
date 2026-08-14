@@ -18,14 +18,14 @@
   },
   "lifecycle": "candidate",
   "status": "trained",
-  "model_path": "F:\\HM足球比赛预测\\.worktrees\\codex-five-league-training\\project021_五大联赛APIFootball训练\\03_模型\\ligue_1_candidate.json",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\ligue_1_candidate.json",
   "validation": {
     "n": 333,
     "skip": 0,
     "model": {
       "n": 333,
-      "brier_mean": 0.585517,
-      "log_loss": 0.985428,
+      "brier_mean": 0.58552,
+      "log_loss": 0.985432,
       "accuracy_pct": 54.95
     },
     "provider_market": {
@@ -49,8 +49,8 @@
         "n": 333,
         "model": {
           "n": 333,
-          "brier_mean": 0.585517,
-          "log_loss": 0.985428,
+          "brier_mean": 0.58552,
+          "log_loss": 0.985432,
           "accuracy_pct": 54.95
         },
         "provider_market": {
@@ -63,13 +63,13 @@
     }
   },
   "test": {
-    "n": 300,
-    "skip": 37,
+    "n": 302,
+    "skip": 35,
     "model": {
-      "n": 300,
-      "brier_mean": 0.581453,
-      "log_loss": 0.976193,
-      "accuracy_pct": 53.67
+      "n": 302,
+      "brier_mean": 0.581377,
+      "log_loss": 0.975947,
+      "accuracy_pct": 53.64
     },
     "provider_market": {
       "n": 279,
@@ -78,9 +78,9 @@
       "accuracy_pct": 53.41
     },
     "frequency_baseline": {
-      "n": 300,
-      "brier_mean": 0.636085,
-      "log_loss": 1.053521,
+      "n": 302,
+      "brier_mean": 0.636336,
+      "log_loss": 1.053973,
       "probs": [
         0.426,
         0.2491,
@@ -89,12 +89,12 @@
     },
     "by_league": {
       "168": {
-        "n": 300,
+        "n": 302,
         "model": {
-          "n": 300,
-          "brier_mean": 0.581453,
-          "log_loss": 0.976193,
-          "accuracy_pct": 53.67
+          "n": 302,
+          "brier_mean": 0.581377,
+          "log_loss": 0.975947,
+          "accuracy_pct": 53.64
         },
         "provider_market": {
           "n": 279,
@@ -112,5 +112,10 @@
     "rejected_after_kickoff": 253,
     "rejected_invalid_odds": 3,
     "rejected_unparseable_time": 0
+  },
+  "team_identity_fix": {
+    "applied": true,
+    "basis": "team_key() 以供应商 team_id 为主键，队名仅作显示",
+    "note": "修复前用队名当主键，供应商跨赛季改名导致同队被拆成多个身份"
   }
 }

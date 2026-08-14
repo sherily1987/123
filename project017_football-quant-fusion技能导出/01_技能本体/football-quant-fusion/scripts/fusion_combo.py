@@ -10,7 +10,7 @@ def load(p):
 
 # [中文功能] 校验组合腿ID的有效性并输出结果
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('--store',default='H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/backtest');ap.add_argument('--legs',required=True,help='JSON file: {combos:[{combo_id,legs:[]},...]}');ap.add_argument('--output',required=True);a=ap.parse_args();root=Path(a.store);data=json.loads(Path(a.legs).read_text(encoding='utf-8')); pred=[];covers=[]
+ ap=argparse.ArgumentParser();ap.add_argument('--store',default='F:\HM足球比赛预测\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/backtest');ap.add_argument('--legs',required=True,help='JSON file: {combos:[{combo_id,legs:[]},...]}');ap.add_argument('--output',required=True);a=ap.parse_args();root=Path(a.store);data=json.loads(Path(a.legs).read_text(encoding='utf-8')); pred=[];covers=[]
  for e in load(root/'registry.jsonl'):
   p=Path(e.get('path',''))
   if not p.exists():continue

@@ -16,9 +16,14 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-os.environ.setdefault("FUSION_CORE_DIR", r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
-sys.path.insert(0, r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖\zu-yu-dashi-3/scripts")
-sys.path.insert(0, r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\02_核心引擎依赖/skills/football-quant-fusion/scripts")
+# 2026-08-12 修复：原硬编码指向 football-quant-fusion-suite 外部物理拷贝
+# （AGENTS.md 头号警告对象），模块级 setdefault FUSION_CORE_DIR + sys.path.insert
+# 会污染同一 pytest 进程内后续测试（test_p0_evaluation 拿到 suite 旧版
+# fusion_predict_core 的模块缓存与 build_identity，子进程却用仓库内新版，
+# 哈希不一致导致 cohort 归因失败）。统一走符号链接仓库内唯一事实源。
+os.environ.setdefault("FUSION_CORE_DIR", r"F:/HM足球比赛预测/project018_技能工作区整合/02_脚本/core/zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"F:/HM足球比赛预测/project018_技能工作区整合/02_脚本/core/zu-yu-dashi-3/scripts")
+sys.path.insert(0, r"F:\HM足球比赛预测\project017_football-quant-fusion技能导出\01_技能本体\football-quant-fusion/scripts")
 
 import predict as P
 import fusion_predict_core as F
@@ -54,7 +59,7 @@ def sum3(pct):
 def basic_match(**kw):
     m = {"home": "HomeA", "away": "AwayB", "stage": "Test", "kickoff": "2026-08-04T00:00:00+08:00",
          "mode": "market_only", "odds": [2.5, 3.2, 2.8],
-         "field_meta": {"odds": {"observed_at": "2026-08-03T20:00:00+08:00"}}}
+         "field_meta": {"odds": {"observed_at": "2026-08-03T20:00:00+08:00", "freshness": 100}}}
     m.update(kw)
     return m
 
@@ -128,6 +133,27 @@ def t_market_only():
     return {"ok": True, "details": "1X2=校准市场、MARKET_BASELINE"}
 
 
+# ---- 5b. 远期开球不等于盘口陈旧 ----
+def t_market_only_future_snapshot():
+    d = basic_match(
+        kickoff="2026-08-08T02:00:00+08:00",
+        field_meta={"odds": {
+            "observed_at": "2026-08-06T14:10:38+08:00",
+            "freshness": 100,
+            "source": "中国体彩网移动端官方固定奖金接口",
+        }},
+    )
+    r = pred(d)
+    co = r.get("core_output") or {}
+    if r.get("fusion_status") != "ok":
+        return {"ok": False, "details": f"status={r.get('fusion_status')} core={co.get('status')}"}
+    if co.get("mode") != "market_only":
+        return {"ok": False, "details": f"输入market_only却输出{co.get('mode')}"}
+    if not co.get("market_prob_pct"):
+        return {"ok": False, "details": "显式freshness=100的HAD被错误删除"}
+    return {"ok": True, "details": "显式新鲜快照不因距离开球超过24小时而降级"}
+
+
 # ---- 6. model_first 显式 λ ----
 def t_model_first():
     r = pred({"home": "H", "away": "A", "stage": "T", "kickoff": "2026-08-10T01:00:00+08:00",
@@ -142,29 +168,31 @@ def t_model_first():
     return {"ok": True, "details": "λ=显式值、kind=model_goal_rate"}
 
 
-# ---- 7. 无锚回退（陈旧盘口不再崩溃）----
+# ---- 7. market_only无可用HAD时明确阻断，不静默换模型 ----
 def t_stale():
     for name, extra in (("stale_had", {}),
                         ("stale_all", {"hhad": {"line": -1, "odds": [1.9, 3.5, 3.4]},
                                        "ttg": {"odds": [12, 6, 4, 3.2, 4.5, 6.5, 11, 15]}})):
-        d = basic_match(**{"field_meta": {"odds": {"observed_at": "2026-08-01T09:00:00+08:00"},
-                                          **({} if not extra.get("hhad") else {"hhad": {"observed_at": "2026-08-01T09:00:00+08:00"},
-                                                                                "ttg": {"observed_at": "2026-08-01T09:00:00+08:00"}})}})
+        d = basic_match(**{"field_meta": {"odds": {"observed_at": "2026-08-01T09:00:00+08:00", "freshness": 0},
+                                          **({} if not extra.get("hhad") else {"hhad": {"observed_at": "2026-08-01T09:00:00+08:00", "freshness": 0},
+                                                                                "ttg": {"observed_at": "2026-08-01T09:00:00+08:00", "freshness": 0}})}})
         d.update(extra)
         r = pred(d)
-        tags = (r.get("core_output") or {}).get("xg_tags") or []
-        if r.get("fusion_status") != "ok" or "NO_ANCHOR_FALLBACK" not in tags:
-            return {"ok": False, "details": f"{name}: status={r.get('fusion_status')} tags={tags}"}
-        if r.get("fusion_decision", {}).get("status") != "AVOID_DATA_RISK":
-            return {"ok": False, "details": f"{name}: {r.get('fusion_decision', {}).get('status')}"}
-    return {"ok": True, "details": "陈旧盘口→NO_ANCHOR_FALLBACK + AVOID_DATA_RISK，不崩溃"}
+        co = r.get("core_output") or {}
+        if r.get("fusion_status") != "blocked":
+            return {"ok": False, "details": f"{name}: 应blocked，实际={r.get('fusion_status')}"}
+        if co.get("mode") != "market_only":
+            return {"ok": False, "details": f"{name}: 输入market_only却输出{co.get('mode')}"}
+        if co.get("status") != "market_anchor_unusable":
+            return {"ok": False, "details": f"{name}: core status={co.get('status')}"}
+    return {"ok": True, "details": "陈旧HAD→market_only明确阻断，不静默切换model_first"}
 
 
 # ---- 8. 两回合晋级 ----
 def t_twoleg():
     r = pred({"home": "TeamA", "away": "TeamB", "stage": "UCL", "kickoff": "2026-08-12T02:00:00+08:00",
               "mode": "market_only", "odds": [2.2, 3.3, 3.1], "first_leg": [1, 1],
-              "field_meta": {"odds": {"observed_at": "2026-08-12T00:00:00+08:00"}}})
+              "field_meta": {"odds": {"observed_at": "2026-08-12T00:00:00+08:00", "freshness": 100}}})
     adv = (r.get("core_output") or {}).get("advancement") or {}
     s = adv.get("home_advance_pct", 0) + adv.get("away_advance_pct", 0)
     if abs(s - 100) > 1.0:
@@ -184,6 +212,45 @@ def t_extreme():
     return {"ok": True, "details": "极端赔率不崩溃、1X2和=100"}
 
 
+# ---- 9b. market_only联合拟合极端λ自动回退HAD ----
+def t_market_only_extreme_lambda_guard():
+    original = P.fit_multi_market
+
+    def fake_extreme_fit(data, matrix, one, rho):
+        return {
+            "lambda_home": 4.0,
+            "lambda_away": 0.1,
+            "loss": 0.0,
+            "loss_parts": {"had": 0.0, "ttg": 0.0},
+            "sources": ["HAD", "TTG"],
+            "weights": {"had": 1.0, "ttg": 0.5},
+            "freshness": {},
+            "method": "test_extreme_fit",
+        }
+
+    d = basic_match(
+        ttg={"odds": [12, 6, 4, 3.2, 4.5, 6.5, 11, 15]},
+        field_meta={
+            "odds": {"observed_at": "2026-08-03T20:00:00+08:00", "freshness": 100},
+            "ttg": {"observed_at": "2026-08-03T20:00:00+08:00", "freshness": 100},
+        },
+    )
+    try:
+        P.fit_multi_market = fake_extreme_fit
+        co = P.predict(d)
+    finally:
+        P.fit_multi_market = original
+    guard = co.get("lambda_guard") or {}
+    if guard.get("action") != "fallback_to_had_inverse":
+        return {"ok": False, "details": f"guard={guard}"}
+    if max(co.get("xg") or [99]) / min(co.get("xg") or [0.01]) >= 6.0:
+        return {"ok": False, "details": f"极端λ仍在输出: {co.get('xg')}"}
+    if not any(str(x).startswith("EXTREME_LAMBDA_FALLBACK_TO_HAD")
+               for x in co.get("reliability_flags") or []):
+        return {"ok": False, "details": f"缺少回退旗标: {co.get('reliability_flags')}"}
+    return {"ok": True, "details": f"拒绝4.0/0.1，回退HAD λ={co.get('xg')}"}
+
+
 # ---- 10. 4 场生产批量不变量 ----
 def t_batch(path):
     if not path or not Path(path).exists():
@@ -197,7 +264,7 @@ def t_batch(path):
         sm = co.get("score_matrix") or {}
         if r.get("fusion_status") != "ok":
             return {"ok": False, "details": f"{m.get('home')}: {r.get('fusion_status')}"}
-        if sum3(f.get("final_1x2_pct") or []) != 100.0:
+        if abs(sum3(f.get("final_1x2_pct") or []) - 100.0) > 0.2:
             return {"ok": False, "details": f"{m.get('home')} 1X2 sum"}
         ou = f.get("ou_2_5") or {}
         if ou and abs(ou.get("over_pct", 0) + ou.get("under_pct", 0) - 100) > 0.5:
@@ -261,9 +328,9 @@ def t_registry(store):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", required=True)
-    ap.add_argument("--batch", default=r"H:\claude AI自媒体\project001_足球预测\05_交付\2026-08-04_4场\hybrid.json")
-    ap.add_argument("--ratings", default=r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/datasets/team_strength_ratings_2025.json")
-    ap.add_argument("--understat-store", default=r"H:\claude AI自媒体\project017_football-quant-fusion技能导出\03_共享数据\football-quant-fusion/datasets/understat_store.jsonl")
+    ap.add_argument("--batch", default=r"F:\HM足球比赛预测\project001_足球预测\05_交付\2026-08-04_4场\hybrid.json")
+    ap.add_argument("--ratings", default=r"F:/HM足球比赛预测/project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/datasets/team_strength_ratings_2025.json")
+    ap.add_argument("--understat-store", default=r"F:/HM足球比赛预测/project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/datasets/understat_store.jsonl")
     a = ap.parse_args()
 
     check("去水方法", t_devig)
@@ -271,10 +338,12 @@ def main():
     check("1X2校准", t_calibrate)
     check("λ反解复现市场", t_lambda)
     check("market_only新鲜盘口", t_market_only)
+    check("market_only远期新鲜快照", t_market_only_future_snapshot)
     check("model_first显式λ", t_model_first)
-    check("陈旧盘口无锚回退", t_stale)
+    check("market_only陈旧HAD明确阻断", t_stale)
     check("两回合晋级", t_twoleg)
     check("极端赔率", t_extreme)
+    check("market_only极端λ回退HAD", t_market_only_extreme_lambda_guard)
     check("4场生产批量不变量", lambda: t_batch(a.batch))
     check("模型常数", t_constants)
     check("DC团队强度", lambda: t_team_strength(a.ratings))

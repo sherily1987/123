@@ -1,0 +1,77 @@
+{
+  "home": "PSG",
+  "away": "Aston Villa",
+  "neutral": true,
+  "home_league": "ligue_1",
+  "away_league": "premier_league",
+  "cross_league": true,
+  "verdict": "降级",
+  "reasons": [
+    "联赛档位取较差者：ligue_1=B, premier_league=B -> B",
+    "跨联赛对阵，降一档（单标量偏移在两队非本联赛平均水平时失真）",
+    "档位 C：只看方向，不要采用具体数值"
+  ],
+  "league_tiers": {
+    "ligue_1": {
+      "tier": "B",
+      "gap": 0.0139,
+      "n": 307
+    },
+    "premier_league": {
+      "tier": "B",
+      "gap": 0.012,
+      "n": 356
+    }
+  },
+  "weighted_n": {
+    "PSG": 66.08,
+    "Aston Villa": 73.85
+  },
+  "basis": {
+    "mode": "cross_league",
+    "shrinkage_k": 40.0,
+    "offsets": {
+      "ligue_1": 0.476462380054945,
+      "premier_league": 0.7533630489143357
+    },
+    "home_adv": 0.0,
+    "xg": false,
+    "note": "复刻校准协议：纯进球模型+收缩+偏移，不混 xG"
+  },
+  "market_dependency": "UNAVAILABLE",
+  "prediction": {
+    "lambda": [
+      1.1549,
+      1.2841
+    ],
+    "probs_1x2": [
+      0.3426,
+      0.2526,
+      0.4048
+    ],
+    "over25": 0.4404,
+    "btts": 0.4849,
+    "top_scores": [
+      {
+        "score": "0-1",
+        "p": 0.1224
+      },
+      {
+        "score": "1-1",
+        "p": 0.119
+      },
+      {
+        "score": "1-0",
+        "p": 0.1111
+      },
+      {
+        "score": "1-2",
+        "p": 0.0831
+      },
+      {
+        "score": "0-0",
+        "p": 0.0769
+      }
+    ]
+  }
+}

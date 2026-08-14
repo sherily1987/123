@@ -1,0 +1,23 @@
+{
+  "model": "poisson_identity_link",
+  "basis": "shots_on_target",
+  "formula": "xg = a*shots_on_target + b*shots_off_target_or_blocked",
+  "a_inside_box": 0.314387,
+  "b_outside_box": 0.002086,
+  "converged": true,
+  "n_rows": 4416,
+  "n_matches": 2208,
+  "train_until": "2025-08-08",
+  "sources": [
+    "fd_e1_match_stats.jsonl"
+  ],
+  "self_check": {
+    "total_predicted": 5560.0,
+    "total_actual": 5560.0,
+    "total_deviation_pct": -0.0,
+    "total_conserved": true,
+    "primary_gt_secondary": true,
+    "primary_secondary_ratio": 150.71
+  },
+  "note": "系数由本仓库样本回归得到；未剔除点球，会系统性抬高 a"
+}

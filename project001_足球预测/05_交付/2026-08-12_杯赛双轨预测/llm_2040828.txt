@@ -1,0 +1,39 @@
+📁 证据文件: 7 个
+   - evidence_001_psg_villa.md
+   - evidence_002_platense_coquimbo.md
+   - evidence_003_palmeiras_cerro.md
+   - evidence_009_mirassol_ldu.md
+   - evidence_010_rosario_corinthians.md
+   - evidence_012_mirassol_ldu.md
+   - evidence_013_rosario_corinthians.md
+🎯 共 1 场比赛待预测, 每场 3 个模型定性判断
+
+================================================================
+⚽ 第1/1场 [周四010] 罗萨里奥 VS 科林蒂安 | 解放者杯 | 2026-08-14 08:30
+   证据: evidence_013_rosario_corinthians.md
+================================================================
+     ✓ [deepseek-chat     ] -> 主胜 / 平局 比分偏好:1-0
+     ✓ [glm-4-flash       ] -> 客胜 比分偏好:0-1
+     ✓ [kimi-k2.6         ] -> 主胜 / 平局 比分偏好:1-0
+
+  📊 综合方向: 主胜  (0.9/1.7票, 强度56%)
+  🚨 谨慎(强度<60%、证据存在缺口): 建议双选 主胜/平局
+  🎯 比分偏好: 1-0
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平胜
+  ⚠️ 坍缩标记: OU_COLLAPSE:小2.5x3
+
+  💰 下注推荐:
+     🚫 不下注 — 证据存在缺口，风险过高
+     
+     EV 分析:
+       主胜: 预测 56.4% × 赔率 2.02 = EV +13.9% ✅
+       平局: 预测 28.2% × 赔率 2.70 = EV -23.8% ❌
+       客胜: 预测 15.4% × 赔率 3.80 = EV -41.5% ❌
+  🗳️ 投票分布: 主胜:0.9 | 平局:0.5 | 客胜:0.3
+  🤖 各模型判断:
+     [deepseek-chat       ] 主胜 (备选:平局) 比分:1-0 — 【近况:无可靠同尺度对比数据】【战意:解放者杯正赛双方均全力争胜】【主客:罗萨里奥主场作战】【身份:阿根廷vs巴西俱乐部
+     [glm-4-flash         ] 客胜 比分:0-1 — 【战意: 解放者杯淘汰赛性质，双方均为正赛】【主客: 罗萨里奥主场，但洲际赛事存在旅行因素】【身份: 阿根廷 vs 巴西
+     [kimi-k2.6           ] 主胜 (备选:平局) 比分:1-0 — 【战意:解放者杯单场淘汰双方均为正赛】【伤停:未取得双方官方首发伤停公告】【近况:无可靠同尺度状态对比】证据缺口显著，杯
+{"direction": "主胜", "votes": 0.935, "total_votes": 1.6575000000000002, "strength": 0.5641025641025641, "all_votes": {"主胜": 0.935, "平局": 0.4675, "客胜": 0.255}, "top_score_pref": "1-0", "score_prefs": {"1-0": 0.935, "0-1": 0.255}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 1.19}, "top_hafu": "平胜", "all_hafu": {"平胜": 0.935, "负胜": 0.255}, "alt_direction": "平局", "caution": true, "valid_model_count": 3, "minimum_valid_models": 3, "collapse_flags": ["OU_COLLAPSE:小2.5x3"], "individual": {"zhipu/glm-4-flash": {"model_id": "zhipu/glm-4-flash", "provider": "zhipu", "direction": "客胜", "alt_direction": null, "score_pref": "0-1", "ou25": "小2.5", "hafu": "负胜", "evidence_gap": true, "reasoning": "【战意: 解放者杯淘汰赛性质，双方均为正赛】【主客: 罗萨里奥主场，但洲际赛事存在旅行因素】【身份: 阿根廷 vs 巴西俱乐部，身份差异可能影响战意】", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["战意", "主客", "旅行", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【近况:无可靠同尺度对比数据】【战意:解放者杯正赛双方均全力争胜】【主客:罗萨里奥主场作战】【身份:阿根廷vs巴西俱乐部】官方赔率主胜2.02略占优，但未取得双方首发/伤停公告，证据缺口明显。洲际赛事两回合冷门多，主队虽主场但优势有限，首选主胜，备选平局。比分倾向1-0，总进球看小。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况", "主客", "身份"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k2.6": {"model_id": "moonshot/kimi-k2.6", "provider": "moonshot", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "reasoning": "【战意:解放者杯单场淘汰双方均为正赛】【伤停:未取得双方官方首发伤停公告】【近况:无可靠同尺度状态对比】证据缺口显著，杯赛低比分常见，主队略被看好但预计难取大胜。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": true, "tags": ["伤停", "首发", "战意", "近况", "状态"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "llm_model_pool_sha256": "4b61f8e50c398acb711f79465a1c1e63d77bc29640fe9a062a2176c69e8a39f9", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "ec165c0f705bdbf84f2c4fa3382307a15da9e9a83c994f26ef1258fe72eeed3a", "evidence_file_sha256": "3e1357dd46ca084828f86980e43674f00f2ff248eebaae74609052157a552111", "evidence_collected_at_min": "2026-08-12T21:07:48+0800", "evidence_collected_at_max": "2026-08-12T21:07:48+0800", "ev_recommendation": {"action": "skip", "reason": "证据存在缺口，风险过高", "recommended_bets": [], "ev_analysis": {"主胜": {"predicted_prob": 0.5641025641025641, "odds": 2.02, "ev": 0.13948717948717948}, "平局": {"predicted_prob": 0.28205128205128205, "odds": 2.7, "ev": -0.2384615384615384}, "客胜": {"predicted_prob": 0.15384615384615383, "odds": 3.8, "ev": -0.41538461538461546}}}}
+
