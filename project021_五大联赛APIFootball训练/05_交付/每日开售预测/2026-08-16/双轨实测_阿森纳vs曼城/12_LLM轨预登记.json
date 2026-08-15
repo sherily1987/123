@@ -1,0 +1,55 @@
+{
+  "schema": "llm-track-1.0",
+  "track": "LLM直接判断（搜索证据驱动）",
+  "match_id": "sporttery-2040898",
+  "match_num": "周日011",
+  "match": "阿森纳 vs 曼城",
+  "competition": "英社区盾",
+  "kickoff": "2026-08-16T22:00:00+08:00",
+  "pre_registered_at": "2026-08-15T21:32:07+08:00",
+  "direction": {
+    "pick": "双选 平局/主胜（D/H）",
+    "single_preference": "平局（D）",
+    "note": "两个成功模型的加权投票为平局 1.02、主胜 0.51、客胜 0.255；强度 57.1%，且证据存在缺口。这是定性判断，不是概率输出。"
+  },
+  "score_picks": ["1-1", "0-1"],
+  "signals": [
+    "中立场单场决赛，不应赋予阿森纳常规主场优势",
+    "伤停接口 0 条不等于确认无伤停，首发与轮换未核实",
+    "最近五次交锋混合，只作低权重背景",
+    "官方赔率结构接近，量化轨也只有 2.7 个百分点的头名差"
+  ],
+  "evidence": [
+    {
+      "fact": "体彩与 API-Football 双源核验对阵、开球时间与赛事身份一致",
+      "source": "llm_evidence/evidence_025_阿森纳_曼城.md",
+      "collected_at": "2026-08-15T21:22:20+08:00",
+      "mapped": "identity_verified",
+      "basis": "Sporttery match 2040898 + API-Football fixture 1582365"
+    },
+    {
+      "fact": "API-Football 伤停返回 0 条，按不可用而非无伤停处理",
+      "source": "08_API_伤停.json",
+      "collected_at": "2026-08-15T21:22:20+08:00",
+      "mapped": "injury_unavailable",
+      "basis": "接口无记录，不作反向事实推断"
+    }
+  ],
+  "models": {
+    "requested": ["zhipu/glm-4-flash", "deepseek/deepseek-chat", "moonshot/kimi-k2.6"],
+    "successful": ["zhipu/glm-4-flash", "deepseek/deepseek-chat"],
+    "failed": [{"model": "moonshot/kimi-k2.6", "reason": "请求超过 120 秒仍未返回，人工中止；未计票"}],
+    "individual": {
+      "zhipu/glm-4-flash": {"direction": "客胜", "score": "0-1", "evidence_gap": true},
+      "deepseek/deepseek-chat": {"direction": "平局", "alt_direction": "主胜", "score": "1-1", "evidence_gap": true}
+    }
+  },
+  "risk_gate": {
+    "action": "skip",
+    "reason": "证据存在缺口，风险过高",
+    "strength": 0.5714285714,
+    "note": "投票强度不是校准概率；不展示或采用基于投票归一化的 EV 作为推荐。"
+  },
+  "comparison_note": "量化轨为 H 36.3% / D 30.1% / A 33.6%，市场基线头名 H；LLM 轨头名 D，存在方向分歧，但两轨都表明没有足够边际支持单向行动。",
+  "disclaimer": "LLM 轨道为定性判断（非概率模型输出），仅作对比研究；不构成投注建议。"
+}

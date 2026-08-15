@@ -1,0 +1,26 @@
+{
+  "schema": "llm-track-index-1.0",
+  "sales_day": "2026-08-16",
+  "snapshot": "prematch",
+  "track": "llm",
+  "models": ["zhipu/glm-4-flash", "deepseek/deepseek-chat", "moonshot/kimi-k2.6"],
+  "records": [
+    {
+      "match_num": "周日011",
+      "match_id": "sporttery-2040898",
+      "match": "阿森纳 vs 曼城",
+      "league": "英社区盾",
+      "kickoff": "2026-08-16T22:00:00+08:00",
+      "llm_pick_raw": "平局/主胜",
+      "llm_pick": "双选 平局/主胜（D/H）",
+      "llm_score_picks": ["1-1", "0-1"],
+      "strength_pct": 0.5714285714,
+      "caution": true,
+      "action": "skip",
+      "reason": "证据存在缺口，风险过高",
+      "llm_file": "12_LLM轨预登记.json",
+      "quant_file": "11_量化轨正式输出.json",
+      "result": null
+    }
+  ]
+}
