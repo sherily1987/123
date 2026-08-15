@@ -87,6 +87,20 @@ def test_mcp_generated_facts_have_machine_readable_provenance():
     assert all("source(https://" in line and "collected_at(" in line for line in fact_lines)
 
 
+def test_mcp_block_includes_sporttery_markets_and_api_sports_recent_form():
+    raw = {"home":"阿森纳","away":"曼城","league":"英社区盾","match_id":2040898,
+           "fixed_bonus_url":"https://webapi.sporttery.cn/match/2040898",
+           "crs":{"1-0":9.5},"ttg":{"2":3.5},"hafu":{"hh":4.2}}
+    api = {"status":"ok","fixture_id":1582365,
+           "recent":{"home":[{"date":"2026-08-13","league":"Friendly","home":"Arsenal",
+                                 "away":"Como","score_90":"1-1","status":"PEN"}],"away":[]},
+           "injuries_status":"UNAVAILABLE","lineups_status":"UNAVAILABLE"}
+    block = me.build_block(raw, {"home_team":"Arsenal","away_team":"Manchester City"},
+                           [], None, None, None, "715575", api_sports=api)
+    assert "CRS 比分赔率" in block and "TTG 总进球赔率" in block and "HAFU 半全场赔率" in block
+    assert "主队近况" in block and "Arsenal" in block
+
+
 def test_one_valid_model_returns_insufficient_model_responses():
     result = predict.aggregate_directions({"a": evidence_prediction("主胜"), "b": {"error": "down"}})
     assert result["error"] == "insufficient_model_responses"

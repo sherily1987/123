@@ -27,6 +27,7 @@ import os
 import re
 import sys
 import threading
+import time
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
@@ -37,6 +38,7 @@ for _p in (r"F:\HM足球比赛预测\project001_足球预测\02_脚本",):
         sys.path.insert(0, _p)
 
 import mcp_query  # noqa: E402  (call/parse 内核, 唯一实现)
+import llm_evidence_enrichment as lee
 
 # ---- REST lineups (MCP 无 get_lineups; 用 apiv3 直连) ----
 APIV3_BASE = "https://apiv3.apifootball.com/"
@@ -495,7 +497,7 @@ def fmt_h2h_block(h2h):
     return "\n".join(lines) if lines else None
 
 
-def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None):
+def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None, api_sports=None):
     home_en = cand.get("home_team", "") if cand else ""
     away_en = cand.get("away_team", "") if cand else ""
     collected_at = datetime.now(timezone.utc).isoformat()
@@ -505,7 +507,9 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None)
              f"> 第三方结构化数据: apifootball MCP | source({source_url}) collected_at({collected_at})",
              f"> match_identity(sporttery_match_id={raw_m.get('match_id', '')};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
              f"> 竞彩: {raw_m.get('match_num','')} | 体彩matchId {raw_m.get('match_id')} | apifootball match_id {mid}", ""]
-    blocks = []
+    blocks = [lee.render_sporttery_markets(raw_m, collected_at)]
+    if api_sports is not None:
+        blocks.append(lee.render_api_sports_evidence(api_sports, collected_at))
     b1 = fmt_odds_block(odds_list)
     if b1:
         blocks.append(b1)
@@ -561,6 +565,9 @@ def main():
     ap.add_argument("--seq", type=int, default=1, help="手动模式: 场次序号(证据文件序号)")
     ap.add_argument("--kickoff-iso", default="", help="手动模式: 带时区开球时间，例如 2026-08-10T17:00:00Z")
     ap.add_argument("--workers", type=int, default=4, help="并发数(服务器慢, 默认4)")
+    ap.add_argument("--watch-refresh", action="store_true", help="初次生成后监控至T-75并自动刷新")
+    ap.add_argument("--refresh-before-minutes", type=int, default=75)
+    ap.add_argument("--poll-seconds", type=int, default=60)
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -664,6 +671,8 @@ def main():
 
     # ---- 3. 生成文件 ----
     made = 0
+    contexts = []
+    api_client = lee.ApiSportsClient()
     for item in manual:
         ri = item["ri"] + 1
         raw_m = item["raw"]
@@ -675,14 +684,52 @@ def main():
         standings = results.get("standings", {}).get(str(item.get("league_id", "")), None) if item.get("league_id") else None
         h2h = results.get("h2h", {}).get(f"{home_en}|{away_en}", None)
         lineups = results.get("lineups", {}).get(mid)
-        block = build_block(raw_m, item.get("cand") or {}, odds_list, pred, standings, h2h, mid, lineups=lineups)
+        kickoff = raw_m.get("kickoff_iso") or (item.get("cand") or {}).get("kickoff_utc")
+        api_sports = (api_client.collect_match(home_en, away_en, kickoff)
+                      if home_en and away_en and kickoff else
+                      {"status": "UNAVAILABLE", "reason": "missing_identity_or_kickoff"})
+        block = build_block(raw_m, item.get("cand") or {}, odds_list, pred, standings, h2h, mid,
+                            lineups=lineups, api_sports=api_sports)
         fname = f"evidence_{ri:03d}_{re.sub(r'[^a-z0-9]+', '_', home_en.lower())}_{re.sub(r'[^a-z0-9]+', '_', away_en.lower())}_mcp.md"
         path = os.path.join(args.out_dir, fname)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(block)
+        written = lee.write_canonical_snapshot(path, block, datetime.now(timezone.utc).isoformat())
+        contexts.append({"item": item, "path": path, "kickoff": kickoff,
+                         "odds_list": odds_list, "pred": pred, "standings": standings,
+                         "h2h": h2h, "lineups": lineups})
         made += 1
-        print(f"📄 {path} ({len(block)}字)")
+        print(f"📄 {path} ({len(block)}字, archived={written['archived']})")
     print(f"\n✅ 完成, 生成 {made} 个 MCP 数据块 -> {args.out_dir}")
+
+    if args.watch_refresh and contexts:
+        pending = {str(ctx["item"]["mid"]): ctx for ctx in contexts if ctx.get("kickoff")}
+        print(f"👀 T-{args.refresh_before_minutes} watcher 启动, 待刷新 {len(pending)} 场", flush=True)
+        while pending:
+            now = datetime.now(timezone.utc)
+            for key, ctx in list(pending.items()):
+                kickoff_dt = datetime.fromisoformat(ctx["kickoff"].replace("Z", "+00:00"))
+                if now >= kickoff_dt.astimezone(timezone.utc):
+                    print(f"⛔ {key} 已开球, 禁止刷新", flush=True)
+                    pending.pop(key)
+                    continue
+                if not lee.refresh_due(kickoff_dt, now, args.refresh_before_minutes):
+                    continue
+                item = ctx["item"]
+                home_en, away_en = item.get("home_en", ""), item.get("away_en", "")
+                refreshed_api = api_client.collect_match(home_en, away_en, ctx["kickoff"])
+                try:
+                    refreshed_lineups = parse_lineups_payload(fetch_lineups_rest(item["mid"]), item["mid"])
+                except Exception:
+                    refreshed_lineups = None
+                refreshed_block = build_block(
+                    item["raw"], item.get("cand") or {}, ctx["odds_list"], ctx["pred"],
+                    ctx["standings"], ctx["h2h"], item["mid"],
+                    lineups=refreshed_lineups, api_sports=refreshed_api)
+                written = lee.write_canonical_snapshot(
+                    ctx["path"], refreshed_block, datetime.now(timezone.utc).isoformat())
+                print(f"🔄 {key} T-{args.refresh_before_minutes} 刷新完成, archived={written['archived']}", flush=True)
+                pending.pop(key)
+            if pending:
+                time.sleep(max(1, args.poll_seconds))
 
 
 if __name__ == "__main__":

@@ -58,6 +58,11 @@ python fetch_sporttery_full.py --date 2026-08-05 --method all \
 cd /c/Users/Administrator/football-llm-predictor
 python predict.py --input data/raw_2026-08-05.json --evidence-dir data/evidence_2026-08-05
 
+# 2a) 自动加入最近5场、CRS/TTG/HAFU，并在T−75刷新伤停/首发
+python mcp_evidence.py --input data/raw_2026-08-05.json \
+    --out-dir data/evidence_2026-08-05 \
+    --watch-refresh --refresh-before-minutes 75 --poll-seconds 60
+
 # 2b) 生成报告 (Markdown + Excel)
 python export_report.py data/predictions_2026-08-05.txt data/raw_2026-08-05.json
 
@@ -65,6 +70,8 @@ python export_report.py data/predictions_2026-08-05.txt data/raw_2026-08-05.json
 python fetch_sporttery_full.py --results --date 2026-08-06 --output data/results.json
 python backtest.py
 ```
+
+watcher 对每场只刷新一次；旧 canonical 证据归档至 `snapshots/`，开球后禁止生成新的赛前证据。
 
 `predict.py` 会把官方赔率（胜平负/让球/总进球/比分/半全场）+ 六类证据拼进每个模型的提示词，
 模型参考赔率但保留独立判断；输出综合预测 + 官方赔率隐含概率对照。
