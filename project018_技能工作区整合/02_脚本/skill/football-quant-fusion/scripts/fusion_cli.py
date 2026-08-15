@@ -85,8 +85,13 @@ def run_external_script(path, rest):
 
 
 def run_llm_evidence(rest):
-    """委托生产 LLM 工程采集近期战绩、CRS/TTG/HAFU 与临场阵容证据。"""
-    root = Path(os.environ.get("FOOTBALL_LLM_ROOT", r"C:\Users\Administrator\football-llm-predictor"))
+    """委托生产 LLM 工程采集近期战绩、CRS/TTG/HAFU 与临场阵容证据。
+
+    2026-08-16：LLM 工程已从 C:\\Users\\Administrator\\football-llm-predictor 迁入仓库，
+    默认值随之改为仓库内路径；`FOOTBALL_LLM_ROOT` 仍可覆盖（例如临时指回 C 盘对比）。
+    """
+    root = Path(os.environ.get("FOOTBALL_LLM_ROOT")
+                or (HERE.parents[2] / "llm" / "football-llm-predictor"))
     script = root / "mcp_evidence.py"
     if not script.is_file():
         raise SystemExit(

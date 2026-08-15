@@ -14,7 +14,10 @@ from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-LLM_DIR = Path(r"C:/Users/Administrator/football-llm-predictor")
+# 2026-08-16：LLM 工程已从 C:/Users/Administrator/football-llm-predictor 迁入仓库。
+# FOOTBALL_LLM_ROOT 可覆盖（例如临时指回 C 盘旧目录做对比）。
+LLM_DIR = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
+    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"))
 PARSE_SCRIPT = LLM_DIR / "parse_predictions.py"
 PREDICT_SCRIPT = LLM_DIR / "predict.py"
 MODELS = ["zhipu/glm-4-flash", "deepseek/deepseek-chat", "ark/doubao-seed-evolving"]

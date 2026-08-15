@@ -12,15 +12,41 @@
 6. **火山方舟/豆包** (https://console.volcengine.com/ark) — `ARK_API_KEY`，需控制台开通模型
 
 ### 2. 设置环境变量
+
+密钥只从环境变量读取，**不写进任何文件**（含本 README）。
+
 ```bash
 # bash / git-bash
-export ZHIPU_API_KEY=「redacted:…」
+export ZHIPU_API_KEY=<你的key>
 
 # Windows PowerShell
-$env:ZHIPU_API_KEY="「redacted:…」"
+$env:ZHIPU_API_KEY="<你的key>"
 
-# 或直接写入系统环境变量(长期有效)
+# 或直接写入 Windows 用户环境变量(长期有效)
+setx ZHIPU_API_KEY "<你的key>"
 ```
+
+> 2026-08-16 更正：此处原本写着 `「redacted:…」`——那是某次会话把工具层遮蔽后的输出
+> 写回了文件，不是真实密钥，但会让人照着复制出错。
+
+### 2.5 环境重建（2026-08-16 迁移后必读）
+
+本工程于 2026-08-16 从 `C:\Users\Administrator\football-llm-predictor`
+迁入仓库。**`.venv` 与 `node_modules` 没有跟着拷过来**——虚拟环境里烧死了创建时的
+绝对路径，直接拷贝到新位置是坏的。在新位置首次使用前重建：
+
+```bash
+cd "/f/HM足球比赛预测/project018_技能工作区整合/02_脚本/llm/football-llm-predictor"
+
+# Python 虚拟环境（crawl_evidence.py 依赖 Crawl4AI，装在这里）
+python -m venv .venv
+.venv/Scripts/python.exe -m pip install -U pip
+
+# Node 依赖（build_ppt_*.js 生成 PPT 用）
+npm install
+```
+
+日常 pytest 不依赖 `.venv`，用仓库通用解释器即可；只有实际跑 Crawl4AI 抓取才需要它。
 
 ### 3. 运行预测
 ```bash
@@ -49,13 +75,18 @@ python football_predictor.py "曼城" "利物浦" --dry-run
 配合足彩移动采集器（中国体彩官方移动端链路，零依赖零Key）使用：
 
 ```bash
+# 2026-08-16：本工程已从 C:\Users\Administrator\football-llm-predictor 迁入仓库，
+# 现位于 F:\HM足球比赛预测\project018_技能工作区整合\02_脚本\llm\football-llm-predictor。
+# 下面用 $LLM 代指该目录。（旧文档里的 /h/claude AI自媒体 是已废弃的 H 盘路径。）
+LLM="/f/HM足球比赛预测/project018_技能工作区整合/02_脚本/llm/football-llm-predictor"
+
 # 1) 采集某开球日的比赛与官方全盘口（胜平负/让球/比分/总进球/半全场）
-cd "/h/claude AI自媒体/project015_足彩移动采集接口导出/02_脚本"
+cd "/f/HM足球比赛预测/project015_足彩移动采集接口导出/02_脚本"
 python fetch_sporttery_full.py --date 2026-08-05 --method all \
-    --output "C:\Users\Administrator\football-llm-predictor\data\raw_2026-08-05.json" --delay 1.2
+    --output "$LLM/data/raw_2026-08-05.json" --delay 1.2
 
 # 2) 对采集到的每场比赛做多LLM预测（赔率作为参考输入, 证据驱动）
-cd /c/Users/Administrator/football-llm-predictor
+cd "$LLM"
 python predict.py --input data/raw_2026-08-05.json --evidence-dir data/evidence_2026-08-05
 
 # 2a) 自动加入最近5场、CRS/TTG/HAFU，并在T−75刷新伤停/首发

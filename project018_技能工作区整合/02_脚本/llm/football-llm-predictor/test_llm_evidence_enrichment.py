@@ -7,9 +7,13 @@ COLLECTED = "2026-08-15T13:22:20+00:00"
 
 
 def test_render_sporttery_markets_keeps_crs_ttg_and_hafu():
-    raw = {"fixed_bonus_url": "https://webapi.sporttery.cn/match/2040898",
-           "model_odds": [2.37, 3.17, 2.55], "crs": {"1-0": 9.5, "1-1": 5.7},
-           "ttg": {"2": 3.5, "3": 3.65}, "hafu": {"hh": 4.2, "dd": 5.35, "aa": 4.4}}
+    raw = {
+        "fixed_bonus_url": "https://webapi.sporttery.cn/match/2040898",
+        "model_odds": [2.37, 3.17, 2.55],
+        "crs": {"1-0": 9.5, "1-1": 5.7},
+        "ttg": {"2": 3.5, "3": 3.65},
+        "hafu": {"hh": 4.2, "dd": 5.35, "aa": 4.4},
+    }
     text = lee.render_sporttery_markets(raw, COLLECTED)
     assert "CRS" in text and "1-0=9.5" in text
     assert "TTG" in text and "2=3.5" in text
@@ -19,11 +23,12 @@ def test_render_sporttery_markets_keeps_crs_ttg_and_hafu():
 
 
 def test_render_recent_form_limits_each_team_to_five():
-    row = {"date": "2026-08-10T12:00:00+00:00", "league": "Friendly", "home": "Arsenal",
-           "away": "Como", "score_90": "1-1", "status": "FT"}
+    row = {"date": "2026-08-10T12:00:00+00:00", "league": "Friendly",
+           "home": "Arsenal", "away": "Como", "score_90": "1-1", "status": "FT"}
     text = lee.render_recent_form({"home": [dict(row, date=f"2026-08-{10-i:02d}T12:00:00+00:00") for i in range(6)],
                                    "away": [dict(row, home="Man City", away="Inter") for _ in range(6)]}, COLLECTED)
-    assert text.count("- 主队近况:") == 5 and text.count("- 客队近况:") == 5
+    assert text.count("- 主队近况:") == 5
+    assert text.count("- 客队近况:") == 5
 
 
 def test_refresh_due_has_closed_t75_open_kickoff_boundary():
@@ -39,14 +44,16 @@ def test_write_canonical_snapshot_archives_previous_content(tmp_path):
     path = tmp_path / "evidence_001_match_mcp.md"
     lee.write_canonical_snapshot(path, "first", COLLECTED)
     result = lee.write_canonical_snapshot(path, "second", "2026-08-15T14:00:00+00:00")
-    archived = list((tmp_path / "snapshots").glob("*.md"))
     assert path.read_text(encoding="utf-8") == "second"
+    archived = list((tmp_path / "snapshots").glob("*.md"))
     assert len(archived) == 1 and archived[0].read_text(encoding="utf-8") == "first"
     assert result["archived"] == str(archived[0])
 
 
 def test_api_sports_client_collects_recent_and_marks_empty_availability():
+    calls = []
     def transport(path, params):
+        calls.append((path, dict(params)))
         if path == "/fixtures" and "date" in params:
             return {"response": [{"fixture": {"id": 1582365, "date": "2026-08-16T14:00:00+00:00"},
                                    "teams": {"home": {"id": 42, "name": "Arsenal"},
@@ -56,12 +63,13 @@ def test_api_sports_client_collects_recent_and_marks_empty_availability():
             return {"response": [{"fixture": {"date": "2026-08-10T12:00:00+00:00", "status": {"short": "FT"}},
                                    "league": {"name": "Friendly"},
                                    "teams": {"home": {"name": name}, "away": {"name": "Opponent"}},
-                                   "score": {"fulltime": {"home": 2, "away": 1}}, "goals": {"home": 2, "away": 1}}]}
+                                   "score": {"fulltime": {"home": 2, "away": 1}},
+                                   "goals": {"home": 2, "away": 1}}]}
         if path in ("/injuries", "/fixtures/lineups"):
             return {"response": []}
         raise AssertionError((path, params))
-    result = lee.ApiSportsClient(transport=transport).collect_match(
-        "Arsenal", "Manchester City", "2026-08-16T14:00:00+00:00")
+    client = lee.ApiSportsClient(transport=transport)
+    result = client.collect_match("Arsenal", "Manchester City", "2026-08-16T14:00:00+00:00")
     assert result["status"] == "ok" and result["fixture_id"] == 1582365
     assert len(result["recent"]["home"]) == 1 and len(result["recent"]["away"]) == 1
     assert result["injuries_status"] == "UNAVAILABLE"

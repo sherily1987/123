@@ -53,14 +53,13 @@ MODEL_TEMPERATURE_OVERRIDES = {
     "doubao-seed-evolving": 1.0,
 }
 
-# 正式证据LLM模型池：国内直连四模型。海外/其他模型只能显式传参用于独立实验，
-# 不得因默认值混入生产投票或同一回测池。
+# 正式证据LLM模型池：国内直连三模型（2026-08-12 移除千问 qwen3.8-max：
+# 用户裁定删除，DASHSCOPE key 401 失效且不再续用）。
+# 海外/其他模型只能显式传参用于独立实验，不得因默认值混入生产投票或同一回测池。
 DEFAULT_MODELS = [
     "zhipu/glm-4-flash",                    # 智谱 (完全免费, 无限量)
     "deepseek/deepseek-chat",               # DeepSeek V3 (国内直连, 强推理, 极低价)
     "moonshot/kimi-k3",                     # Kimi K3 (推理模型, temperature=1)
-    # qwen/qwen3.8-max 已于 2026-08-12 移除（DASHSCOPE key 401 失效，不再续用）；
-    # 见 全局复利与踩坑日志.md 2026-08-12 条目与 00_收件箱/待处理.md。
 ]
 
 TIMEOUT = 90          # 单模型调用超时(秒)
@@ -191,7 +190,7 @@ def get_client(provider="zhipu"):
             os.environ[env_name] = key
     if not key:
         print(f"[!] 未检测到 {env_name} 环境变量")
-        print(f"    请先注册对应服务并设置环境变量, 例如:")
+        print("    请先注册对应服务并设置环境变量, 例如:")
         print(f"    setx {env_name} \"你的key\"   (Windows持久化)")
         sys.exit(1)
     _clients[provider] = OpenAI(base_url=cfg["base_url"], api_key=key,
@@ -529,7 +528,7 @@ def print_report(home, away, agg):
         hs, as_ = score.split("-", 1)
         stars = "★" * max(1, round(cnt))
         print(f"     {hs}-{as_}: {stars} ({cnt:g}票)")
-    print(f"  📊 赛果投票分布:  " +
+    print("  📊 赛果投票分布:  " +
           " | ".join(f"{k}: {v}票" for k, v in agg["all_results"].items()))
 
     print("\n  🤖 各模型独立预测:")
@@ -571,7 +570,6 @@ def main():
         import random
         random.seed(42)
         predictions = {}
-        results_pool = ["主胜", "平局", "客胜"]
         for m in args.models:
             hs = random.randint(0, 3)
             as_ = random.randint(0, 2)
@@ -583,7 +581,6 @@ def main():
             }
         print("\n[dry-run] 使用模拟响应演示聚合逻辑...")
     else:
-        client = get_client()
         predictions = {}
         lock = threading.Lock()
         print(f"\n⏳ 正在并行调用 {len(args.models)} 个模型...")

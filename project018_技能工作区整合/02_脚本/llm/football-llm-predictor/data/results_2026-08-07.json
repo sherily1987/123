@@ -1,17 +1,20 @@
 {
   "schema_version": "1.0",
+  "collector_version": "mobile-results-3.5.0",
   "source": "中国体彩网移动端官方赛果",
-  "fetched_at": "2026-08-08T16:08:06.339405+00:00",
+  "source_url": "https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry?method=result&matchDate=2026-08-07",
+  "fetched_at": "2026-08-12T03:35:58.331504+00:00",
   "count": 6,
   "finished_count": 6,
   "results": [
     {
       "match_id": 2040718,
       "match_num": "周四001",
+      "business_date": "2026-08-06",
+      "kickoff_local": "2026-08-07 07:00",
       "league": "巴西杯",
       "home": "维多利亚",
       "away": "巴竞技",
-      "kickoff_local": "2026-08-07 07:00",
       "status_name": "已完成",
       "finished": true,
       "score_ht": "2-0",
@@ -20,10 +23,11 @@
     {
       "match_id": 2040724,
       "match_num": "周四003",
+      "business_date": "2026-08-06",
+      "kickoff_local": "2026-08-07 00:00",
       "league": "欧罗巴",
       "home": "比亚韦",
       "away": "流浪者",
-      "kickoff_local": "2026-08-07 00:00",
       "status_name": "已完成",
       "finished": true,
       "score_ht": "2-1",
@@ -32,10 +36,11 @@
     {
       "match_id": 2040725,
       "match_num": "周四004",
+      "business_date": "2026-08-06",
+      "kickoff_local": "2026-08-07 01:45",
       "league": "欧罗巴",
       "home": "塞萨洛",
       "away": "安德莱",
-      "kickoff_local": "2026-08-07 01:45",
       "status_name": "已完成",
       "finished": true,
       "score_ht": "0-1",
@@ -44,10 +49,11 @@
     {
       "match_id": 2040726,
       "match_num": "周四005",
+      "business_date": "2026-08-06",
+      "kickoff_local": "2026-08-07 03:00",
       "league": "欧罗巴",
       "home": "本菲卡",
       "away": "哈茨",
-      "kickoff_local": "2026-08-07 03:00",
       "status_name": "已完成",
       "finished": true,
       "score_ht": "3-0",
@@ -56,10 +62,11 @@
     {
       "match_id": 2040737,
       "match_num": "周五001",
+      "business_date": "2026-08-07",
+      "kickoff_local": "2026-08-07 18:25",
       "league": "日职",
       "home": "横滨水手",
       "away": "鹿岛鹿角",
-      "kickoff_local": "2026-08-07 18:25",
       "status_name": "已完成",
       "finished": true,
       "score_ht": "2-1",
@@ -68,10 +75,11 @@
     {
       "match_id": 2040738,
       "match_num": "周五002",
+      "business_date": "2026-08-07",
+      "kickoff_local": "2026-08-07 18:30",
       "league": "日职",
       "home": "大阪钢巴",
       "away": "浦和红钻",
-      "kickoff_local": "2026-08-07 18:30",
       "status_name": "已完成",
       "finished": true,
       "score_ht": "2-1",
@@ -79,7 +87,7 @@
     }
   ],
   "notes": [
-    "score_90=sectionsNo999 90分钟",
-    "LLM eval auto"
+    "score_90取sectionsNo999(全场90分钟)。",
+    "未完成场次score_90为null，不得臆补。"
   ]
 }

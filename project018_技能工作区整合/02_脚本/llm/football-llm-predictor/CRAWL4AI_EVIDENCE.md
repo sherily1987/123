@@ -15,9 +15,12 @@
 Crawl4AI 装在项目虚拟环境：
 
 ```bash
-cd /c/Users/Administrator/football-llm-predictor
+cd "/f/HM足球比赛预测/project018_技能工作区整合/02_脚本/llm/football-llm-predictor"
 .venv/Scripts/python.exe crawl_evidence.py --help
 ```
+
+> 2026-08-16 迁移提示：`.venv` **没有**跟着从 C 盘拷过来（虚拟环境里烧死了绝对路径，
+> 拷贝过来是坏的）。在新位置首次使用 Crawl4AI 前必须重建，见 README「环境重建」。
 
 不要用 Hermes 的 `python` 运行实际抓取；普通 pytest 不依赖 Crawl4AI。
 

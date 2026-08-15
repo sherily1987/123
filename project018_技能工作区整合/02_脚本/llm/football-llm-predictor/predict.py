@@ -27,6 +27,9 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import football_predictor as fp
 import llm_prompt_rules as lpr
+import model_weights as mw
+import ev_calculator as evc
+import fusion_probability_source as fps
 
 def load_evidence(evidence_dir):
     """读取证据目录下所有 md 文件, 返回 {文件名: 内容}。"""
@@ -72,6 +75,10 @@ AGGREGATION_RULE_SPEC = {
 }
 MIN_VALID_EVIDENCE_MODELS = 2
 EVIDENCE_AUDITOR_MODEL = "deepseek/deepseek-chat"
+# 主胜比例熔断：批内主胜方向占比过高 = 赛季初/主队系统性高估（08-05 回测 4/5 主胜全错，
+# 08-13 官方赔率方向仅 30% 命中）。触发后把"强度最低"的主胜场次改判为次高方向。
+HOME_BIAS_THRESHOLD = 0.65   # 主胜方向占比 >= 65% 触发熔断
+HOME_BIAS_MIN_SAMPLE = 5     # 至少 5 场才统计（避免小样本误熔断）
 
 
 def _parse_evidence_datetime(value):
@@ -189,9 +196,14 @@ def assess_mcp_evidence(mcp_text, kickoff, match=None):
     return {"ok": True}
 
 
-def select_matches(matches, match_id=None, max_matches=0):
-    """Select matches while retaining their 1-based raw-file indices."""
+def select_matches(matches, match_id=None, max_matches=0, min_match=0):
+    """Select matches while retaining their 1-based raw-file indices.
+
+    min_match 用于分批预测：跳过前 min_match-1 场（序号仍按 raw 原始编号，
+    证据文件匹配不受影响）。"""
     selected = list(enumerate(matches, 1))
+    if min_match:
+        selected = selected[min_match - 1:]
     if max_matches:
         selected = selected[:max_matches]
     if match_id is not None:
@@ -220,14 +232,20 @@ def build_evidence_catalog(evidence_text):
         lowered = fact.lower()
         if any(marker in lowered for marker in ("来源冲突", "source_conflict", "说法冲突")):
             status = "SOURCE_CONFLICT"
-        elif any(marker in lowered for marker in ("无记录", "0条", "未获得", "未检索到", "未拿到", "证据缺口")):
+        elif any(marker in lowered for marker in (
+            "无记录", "0条", "未获得", "未检索到", "未拿到", "证据缺口",
+        )):
             status = "UNAVAILABLE"
         elif any(marker in lowered for marker in ("双源一致", "交叉验证", "verified_multi_source")):
             status = "VERIFIED_MULTI_SOURCE"
         else:
             status = "SINGLE_SOURCE"
-        catalog.append({"id": f"E{len(catalog) + 1}", "status": status,
-                        "fact": fact, "source": source_match.group(1)})
+        catalog.append({
+            "id": f"E{len(catalog) + 1}",
+            "status": status,
+            "fact": fact,
+            "source": source_match.group(1),
+        })
     return catalog
 
 
@@ -262,6 +280,19 @@ def build_evidence_prompt(match, evidence_text, match_idx):
             lines.append(f"官方让球({sign}{line:g})赔率: 主胜{hh['odds'][0]} / 平{hh['odds'][1]} / 客胜{hh['odds'][2]}")
     elif hh.get("odds"):
         lines.append("官方让球赔率: 数据缺口（字段不完整或非法，不生成市场倾向）")
+    # 次回合战意提示: 首回合领先方轮换/保守陷阱
+    fl = extract_first_leg_info(match.get("league", ""), evidence_text or "", home=match.get("home", ""), away=match.get("away", ""))
+    if fl.get("is_second_leg") and fl.get("first_leg_score"):
+        margin = fl.get("margin")
+        if margin is not None and margin >= 2:
+            margin_txt = f"首回合 {fl.get('first_leg_score')}（净胜 {margin} 球）"
+        else:
+            margin_txt = f"首回合 {fl.get('first_leg_score')}（分差不明显）"
+        lines.append(
+            f"\n⚠️ 次回合战意提示: {margin_txt}。"
+            f"两回合杯赛次回合的首回合领先方极易轮换主力或保守求平，'实力差'常被高估——"
+            f"即使某队明显更强，若它已手握晋级优势，也警惕其战意下降；反之落后方会全力进攻。"
+            f"判断时把'次回合战意'权重置于'静态实力差'之上。")
     catalog = build_evidence_catalog(evidence_text)
     lines.append(f"\n=== 结构化证据（{evidence_collection_label(evidence_text)}） ===")
     lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
@@ -280,13 +311,15 @@ def parse_evidence_audit(content, evidence_catalog):
         data = json.loads(match.group(0))
     except json.JSONDecodeError as exc:
         return {"error": f"audit_invalid_json:{exc}"}
-    if {"direction", "alt_direction", "score_pref", "ou25", "hafu"} & set(data):
+    forbidden = {"direction", "alt_direction", "score_pref", "ou25", "hafu"}
+    if forbidden & set(data):
         return {"error": "audit_contains_prediction_fields"}
     catalog = {str(item.get("id")): item for item in (evidence_catalog or [])}
     usable = [str(value) for value in (data.get("usable_evidence_ids") or [])]
     unusable = [str(value) for value in (data.get("unusable_evidence_ids") or [])]
     conflicts = [str(value) for value in (data.get("conflict_evidence_ids") or [])]
-    if any(value not in catalog for value in usable + unusable + conflicts):
+    all_ids = usable + unusable + conflicts
+    if any(value not in catalog for value in all_ids):
         return {"error": "audit_unknown_evidence_id"}
     if any(catalog[value].get("status") not in ("SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE") for value in usable):
         return {"error": "audit_marks_unusable_evidence_as_usable"}
@@ -295,17 +328,22 @@ def parse_evidence_audit(content, evidence_catalog):
     if any(catalog[value].get("status") != "SOURCE_CONFLICT" for value in conflicts):
         return {"error": "audit_conflict_status_mismatch"}
     readiness = data.get("market_readiness") or {}
-    required = ("one_x_two", "score", "ou25", "hafu")
-    if any(not isinstance(readiness.get(name), bool) for name in required):
+    required_markets = ("one_x_two", "score", "ou25", "hafu")
+    if any(not isinstance(readiness.get(name), bool) for name in required_markets):
         return {"error": "audit_invalid_market_readiness"}
-    return {"status":"ok","usable_evidence_ids":usable,"unusable_evidence_ids":unusable,
-            "conflict_evidence_ids":conflicts,"gaps":[str(v) for v in (data.get("gaps") or [])],
-            "market_readiness":{name:readiness[name] for name in required},
-            "summary":str(data.get("summary") or "").strip()[:220]}
+    return {
+        "status": "ok",
+        "usable_evidence_ids": usable,
+        "unusable_evidence_ids": unusable,
+        "conflict_evidence_ids": conflicts,
+        "gaps": [str(value) for value in (data.get("gaps") or [])],
+        "market_readiness": {name: readiness[name] for name in required_markets},
+        "summary": str(data.get("summary") or "").strip()[:220],
+    }
 
 
 def build_voter_prompt(base_prompt, evidence_audit):
-    audit = {key:value for key,value in evidence_audit.items() if key != "status"}
+    audit = {key: value for key, value in evidence_audit.items() if key != "status"}
     return (f"{base_prompt}\n\n=== DeepSeek 证据审计（无预测方向） ===\n"
             f"{json.dumps(audit, ensure_ascii=False, separators=(',', ':'))}\n"
             "请独立判断；审计结果只说明证据可用性，不是另一个模型的比赛结论。")
@@ -314,14 +352,18 @@ def build_voter_prompt(base_prompt, evidence_audit):
 def two_voter_consensus(predictions, voter_models):
     voter_models = list(voter_models)
     if len(voter_models) != 2:
-        return {"status":"skip","action":"skip","reason":"requires_exactly_two_voters","voter_models":voter_models}
+        return {"status": "skip", "action": "skip", "reason": "requires_exactly_two_voters",
+                "voter_models": voter_models}
     records = [predictions.get(model) for model in voter_models]
-    if any(not isinstance(item,dict) or "error" in item or item.get("decision") != "opinion" for item in records):
-        return {"status":"skip","action":"skip","reason":"voter_abstained_or_failed","voter_models":voter_models}
+    if any(not isinstance(item, dict) or "error" in item or item.get("decision") != "opinion" for item in records):
+        return {"status": "skip", "action": "skip", "reason": "voter_abstained_or_failed",
+                "voter_models": voter_models}
     directions = [item.get("direction") for item in records]
     if directions[0] != directions[1]:
-        return {"status":"skip","action":"skip","reason":"voter_disagreement","voter_models":voter_models,"directions":directions}
-    return {"status":"consensus","action":"research_opinion","direction":directions[0],"voter_models":voter_models}
+        return {"status": "skip", "action": "skip", "reason": "voter_disagreement",
+                "voter_models": voter_models, "directions": directions}
+    return {"status": "consensus", "action": "research_opinion", "direction": directions[0],
+            "voter_models": voter_models}
 
 
 def parse_evidence_prediction(content, evidence_catalog=None):
@@ -358,7 +400,9 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     unsupported = [str(value).strip() for value in (data.get("unsupported_assumptions") or []) if str(value).strip()]
     catalog_by_id = {str(item.get("id")): item for item in (evidence_catalog or [])}
     invalid_ids = [value for value in evidence_ids if evidence_catalog is not None and value not in catalog_by_id]
-    usable_ids = [value for value in evidence_ids if catalog_by_id.get(value, {}).get("status") in ("SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE")]
+    usable_ids = [value for value in evidence_ids if catalog_by_id.get(value, {}).get("status") in (
+        "SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE",
+    )]
     if decision == "opinion" and evidence_catalog is not None and (invalid_ids or not usable_ids or unsupported):
         decision = "abstain"
         direction = alt = sp = ou25 = hafu = None
@@ -368,6 +412,8 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     reasoning_ok = bool(reasoning) if is_new_contract else bool(rq.get("ok"))
     if not reasoning_ok:
         egap = True
+    # 动态坍缩标记：模型输出"低比分默认模板"(LOW_SCORE_SET)且 reasoning 差 = 坍缩。
+    # 不再硬编码 2-1/1-2；当前坍缩焦点 1-0 恰在 LOW_SCORE_SET 内。
     collapse_score = bool(sp in lpr.LOW_SCORE_SET and not reasoning_ok)
     return {
         "decision": decision,
@@ -394,14 +440,6 @@ def map_score_to_crs(home: int, away: int) -> str:
 
 def normalize_score_pref(raw):
     return lpr.normalize_score_pref(raw)
-
-    raw = str(raw).strip()
-    if raw in CRS_VALID:
-        return raw
-    m = re.match(r"^(\d+)-(\d+)$", raw)
-    if m:
-        return map_score_to_crs(int(m.group(1)), int(m.group(2)))
-    return None
 
 
 def sanitize_for_zhipu(text):
@@ -473,12 +511,16 @@ def call_evidence_auditor(client, prompt, evidence_catalog):
     try:
         response = client.chat.completions.create(
             model=fp.strip_provider(EVIDENCE_AUDITOR_MODEL),
-            messages=[{"role":"system","content":lpr.system_prompt_evidence_audit()},
-                      {"role":"user","content":prompt}],
-            temperature=0.0, max_tokens=768)
+            messages=[
+                {"role": "system", "content": lpr.system_prompt_evidence_audit()},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.0,
+            max_tokens=768,
+        )
         return parse_evidence_audit(response.choices[0].message.content, evidence_catalog)
     except Exception as exc:
-        return {"error":str(exc)[:160]}
+        return {"error": str(exc)[:160]}
 
 
 def is_two_legged(league, evidence_text):
@@ -515,6 +557,148 @@ def is_two_legged(league, evidence_text):
     return False
 
 
+def extract_first_leg_info(league, evidence_text, home=None, away=None):
+    """从证据文本提取两回合制赛事的关键信息, 用于次回合战意判断。
+
+    返回 dict:
+      is_second_leg: bool —— 本场是否次回合
+      first_leg_score: "1-1" 或 None —— 首回合比分(原始视角)
+      margin: int 或 None —— 首回合净胜球数(绝对值)。分差≥2 是"领先方轮换/保守"高发场景
+      agg_text: "总比分 X-Y" 原文片段或 None
+
+    home/away: 保留参数(未来可扩展队名级判断), 当前 leader 判断不可靠已移除,
+    改用"分差"作为战意修正的稳健信号——无论谁领先, 大分差次回合都倾向保守。
+    """
+    result = {"is_second_leg": False, "first_leg_score": None,
+              "margin": None, "agg_text": None}
+    text = evidence_text or ""
+    if not text:
+        return result
+    # 次回合检测: 证据明确写"次回合"且非历史交锋上下文
+    for m in re.finditer(r"次回合|第二回合|second leg|Second leg|2nd leg", text):
+        ctx = text[max(0, m.start()-80):m.end()+40]
+        if any(neg in ctx for neg in ["交锋", "H2H", "历史", "记录", "此前"]):
+            continue
+        result["is_second_leg"] = True
+        break
+    if not result["is_second_leg"]:
+        # 有些证据只写"首回合比分"但本场是次回合, 用"总比分/agg"兜底
+        if re.search(r"总比分|aggregate|Agg", text):
+            result["is_second_leg"] = True
+    # 首回合比分: 找"首回合"上下文里的比分。先剔除日期(2026-08-06)避免误匹配,
+    # 比分 = 1-2 位数字 - 1-2 位数字, 前后不能是数字或连字符(排除日期残留)
+    text_nodate = re.sub(r"\d{4}\s*[-/]\s*\d{1,2}\s*[-/]\s*\d{1,2}", " ", text)
+    fl_m = re.search(r"首回合[^0-9]{0,60}?(?<![\d-])(\d{1,2})\s*[-:：]\s*(\d{1,2})(?![\d-])", text_nodate)
+    if fl_m:
+        result["first_leg_score"] = f"{fl_m.group(1)}-{fl_m.group(2)}"
+        try:
+            result["margin"] = abs(int(fl_m.group(1)) - int(fl_m.group(2)))
+        except (ValueError, IndexError):
+            result["margin"] = None
+    # 总比分 / aggregate 片段(同样排除日期), 兜底 margin
+    agg_m = re.search(r"(?:总比分|aggregate|Agg)[^0-9]{0,15}(?<![\d-])(\d{1,2})\s*[-:：]\s*(\d{1,2})(?![\d-])", text_nodate, re.I)
+    if agg_m:
+        result["agg_text"] = f"{agg_m.group(1)}-{agg_m.group(2)}"
+        if result["margin"] is None:
+            try:
+                result["margin"] = abs(int(agg_m.group(1)) - int(agg_m.group(2)))
+            except (ValueError, IndexError):
+                pass
+    return result
+
+
+def decide_single_pick(agg, ev_results, first_leg, match=None):
+    """双选 → 单选主推方向(决策层)；平局概率高时保留双选建议。
+
+    场景: 强度<60% 或证据缺口时, 系统强制双选, 但"能赚钱的是单选"。
+    本函数默认在双选的两个方向里挑一个主推, 依据:
+      1. EV 差: 若一个方向正 EV 且另一个负 EV, 选正 EV 方向
+      2. 投票差: 若票数明显偏向一方, 选票多的一方
+      3. 次回合战意: 首回合大分差(≥2球)时, 平局概率上升——给平局小幅加权
+
+    例外(平局概率高): 平局是 1X2 里最难单选、最该双选的方向。
+    当平局是 top 方向, 或平局投票占比 ≥30% 且与主选方向差距 <10pp 时,
+    不强制单选, 输出"平局/另一方"双选建议。
+
+    返回 {"pick": 方向或"平局/X"双选, "confidence": 0-1, "reason": str, "skip": bool}
+    """
+    direction = agg.get("direction")
+    alt = agg.get("alt_direction")
+    votes = agg.get("all_votes") or {}
+    strength = agg.get("strength", 0)
+
+    # 无双选时, 主推即方向
+    if not alt or alt == direction:
+        return {"pick": direction, "confidence": strength, "reason": "模型共识明确(无备选)", "skip": False}
+
+    # ---- 平局概率高 → 双选建议(不强制单选) ----
+    total_votes = sum(votes.values())
+    draw_prob = votes.get("平局", 0) / total_votes if total_votes else 0
+    top_prob = votes.get(direction, 0) / total_votes if total_votes else 0
+    draw_high = (direction == "平局") or (draw_prob >= 0.30 and abs(draw_prob - top_prob) < 0.10)
+    if draw_high:
+        # 双选的另一方: 主胜/客胜里票数更高者
+        other = "主胜" if votes.get("主胜", 0) >= votes.get("客胜", 0) else "客胜"
+        return {
+            "pick": f"平局/{other}",
+            "confidence": 0.5,
+            "reason": f"平局概率高({draw_prob:.0%})，双选建议",
+            "skip": False,
+        }
+
+    candidates = [direction, alt]
+    # 1) EV 打分
+    ev_score = {d: 0.0 for d in candidates}
+    if ev_results:
+        for d in candidates:
+            data = ev_results.get(d, {})
+            ev = data.get("ev", -999)
+            ev_score[d] = ev
+    # 2) 投票打分(归一化票差)
+    vd, va = votes.get(direction, 0), votes.get(alt, 0)
+    total = vd + va
+    vote_score = {direction: (vd / total if total else 0.5),
+                  alt: (va / total if total else 0.5)}
+
+    # 3) 次回合战意修正: 首回合大分差(≥2球) → 平局概率上升
+    tactical_bias = {d: 0.0 for d in candidates}
+    if first_leg and first_leg.get("is_second_leg") and first_leg.get("margin", 0) >= 2:
+        # 领先方次回合易轮换/保守, 落后方虽猛攻但难净胜, 平局概率上升
+        tactical_bias["平局"] = tactical_bias.get("平局", 0) + 0.10
+
+    # 综合: EV 权重最高, 但 EV 全负时靠投票
+    score = {}
+    for d in candidates:
+        s = vote_score[d]  # 基础 = 投票占比(0-1)
+        ev = ev_score.get(d, -999)
+        if ev != -999:
+            # EV 映射到 [0,1] 分数: 正 EV 加分, 负 EV 减分
+            s += max(-0.5, min(0.5, ev * 1.5))  # ev 0.3 -> +0.45, ev -0.3 -> -0.45
+        s += tactical_bias.get(d, 0)
+        score[d] = s
+
+    pick = max(candidates, key=lambda d: score[d])
+    gap = abs(score[direction] - score[alt])
+    confidence = min(0.85, 0.5 + gap)  # 差距越大信心越高, 上限 0.85
+
+    # 理由
+    reasons = []
+    ev_d, ev_a = ev_score.get(direction, -999), ev_score.get(alt, -999)
+    if ev_d != -999 and ev_a != -999:
+        reasons.append(f"EV {direction}{ev_d:+.1%} vs {alt}{ev_a:+.1%}")
+    reasons.append(f"票数 {direction}{vd:.1f} vs {alt}{va:.1f}")
+    if first_leg and first_leg.get("is_second_leg"):
+        margin_txt = f"首回合{first_leg.get('first_leg_score') or '?'}(分差{first_leg.get('margin', '?')})"
+        reasons.append(f"次回合{margin_txt}")
+
+    return {
+        "pick": pick,
+        "confidence": confidence,
+        "reason": "; ".join(reasons),
+        "skip": False,
+    }
+
+
 def aggregate_directions(predictions):
     """单选1票/双选0.5; reasoning差与2-1坍缩降权; 强度<60%强制双选。"""
     valid = {md: p for md, p in predictions.items()
@@ -529,12 +713,15 @@ def aggregate_directions(predictions):
             "minimum_valid_models": MIN_VALID_EVIDENCE_MODELS,
             "errors": [p for p in predictions.values() if isinstance(p, dict) and "error" in p],
         }
+    # 独立性修正: 同一推理路径的模型权重打折, 防止虚假共识
+    model_pool = list(valid.keys())
+    model_w = mw.get_all_weights(model_pool)
     votes = Counter()
     score_prefs = Counter()
     ou_prefs = Counter()
     hafu_prefs = Counter()
     for md, p in valid.items():
-        w = 1.0
+        w = model_w.get(md, 0.8)
         if p.get("reasoning_ok") is False:
             w *= 0.5
         if p.get("evidence_gap"):
@@ -598,14 +785,54 @@ def enforce_evidence_gap(aggregation):
     return aggregation
 
 
+def enforce_home_bias_breaker(results):
+    """主胜比例熔断：批内主胜方向占比过高时，把强度最低的主胜场次改判为次高方向。
+
+    results: list of (match_idx, match, agg)，agg 为 aggregate_directions 输出。
+    返回 (corrections, report)：
+      corrections = {match_idx: 新方向}（被熔断改判的场次）
+      report = 描述行列表（供打印）
+    """
+    total = len(results)
+    if total < HOME_BIAS_MIN_SAMPLE:
+        return {}, []
+    home = [(idx, m, agg) for idx, m, agg in results if agg.get("direction") == "主胜"]
+    n_home = len(home)
+    if n_home / total < HOME_BIAS_THRESHOLD:
+        return {}, []
+    allowed = int(total * HOME_BIAS_THRESHOLD)
+    excess = n_home - allowed
+    if excess <= 0:
+        return {}, []
+    # 强度最低的主胜场次优先改判（最没把握的先改）
+    home_sorted = sorted(home, key=lambda r: r[2].get("strength", 0.0))
+    corrections = {}
+    report = [
+        f"主胜比例熔断触发: 本批 {total} 场中主胜 {n_home} 场 ({n_home/total:.0%}) ≥ {HOME_BIAS_THRESHOLD:.0%}",
+        f"熔断 {excess} 场（强度最低的主胜场次）改判为次高方向:",
+    ]
+    for idx, m, agg in home_sorted[:excess]:
+        new_dir = agg.get("alt_direction")
+        if not new_dir or new_dir == "主胜":
+            votes = agg.get("all_votes", {})
+            others = sorted(((d, v) for d, v in votes.items() if d != "主胜"), key=lambda x: -x[1])
+            new_dir = others[0][0] if others else "平局"
+        corrections[idx] = new_dir
+        report.append(
+            f"  {m.get('match_num','?')} {m.get('home','')}vs{m.get('away','')}: "
+            f"主胜(强度{agg.get('strength',0)*100:.0f}%) → {new_dir}"
+        )
+    return corrections, report
+
+
 def _stable_sha256(value):
     """Hash JSON data with a deterministic, Unicode-preserving encoding."""
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
-def build_audit_record(aggregation, models_used, prompt, evidence_status,
-                       evidence_audit=None, consensus_gate=None):
+def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_recommendation=None,
+                       single_pick=None, evidence_audit=None, consensus_gate=None):
     """Build the successful per-match JSON audit payload without calling an LLM."""
     if aggregation.get("error"):
         raise ValueError("cannot audit a failed aggregation")
@@ -623,6 +850,8 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status,
         "evidence_file_sha256": evidence_status["evidence_file_sha256"],
         "evidence_collected_at_min": evidence_status["evidence_collected_at_min"],
         "evidence_collected_at_max": evidence_status["evidence_collected_at_max"],
+        "ev_recommendation": ev_recommendation,
+        "single_pick": single_pick,
         "evidence_audit": evidence_audit,
         "consensus_gate": consensus_gate,
     })
@@ -657,11 +886,12 @@ def main():
     ap.add_argument("--models", nargs="+", default=fp.DEFAULT_MODELS)
     ap.add_argument("--match-id", type=int, default=None)
     ap.add_argument("--max-matches", type=int, default=0)
+    ap.add_argument("--min-match", type=int, default=0, help="分批预测：从第 N 场开始（序号按 raw 原始编号）")
     args = ap.parse_args()
 
     with open(args.input, encoding="utf-8") as f:
         data = json.load(f)
-    selected_matches = select_matches(data["matches"], args.match_id, args.max_matches)
+    selected_matches = select_matches(data["matches"], args.match_id, args.max_matches, args.min_match)
     if not selected_matches:
         print("没有符合条件的比赛")
         return
@@ -673,6 +903,11 @@ def main():
 
     voter_models = [model for model in args.models if model != EVIDENCE_AUDITOR_MODEL]
     print(f"🎯 共 {len(selected_matches)} 场比赛待预测, DeepSeek证据审计 + {len(voter_models)} 个独立投票模型\n")
+
+    # 全局比分坍缩统计：收集每场 top 比分，循环结束后做跨场次分布检测。
+    score_prefs_collected = []
+    # 主胜比例熔断：收集每场 (match_idx, match, agg)，循环结束后做方向坍缩检测。
+    breaker_results = []
 
     for i, (match_idx, m) in enumerate(selected_matches, 1):
         if i > 1:
@@ -755,12 +990,14 @@ def main():
             ), ensure_ascii=False))
             continue
 
+        breaker_results.append((match_idx, m, dict(agg)))
+
         print(f"\n  📊 综合方向: {agg['direction']}  "
               f"({agg['votes']:.1f}/{agg['total_votes']:.1f}票, "
               f"强度{agg['strength']*100:.0f}%)")
         # 冷门/谨慎标记
         if is_two_legged(m.get("league", ""), ev_text or ""):
-            print(f"  ⚠️ 两回合制/杯赛场次(冷门风险高)")
+            print("  ⚠️ 两回合制/杯赛场次(冷门风险高)")
         if agg.get("caution"):
             alt_dir = agg.get("alt_direction") or "?"
             caution_reasons = []
@@ -771,29 +1008,109 @@ def main():
             reason_text = "、".join(caution_reasons) or "聚合风控"
             print(f"  🚨 谨慎({reason_text}): 建议双选 {agg['direction']}/{alt_dir}")
         print(f"  🎯 比分偏好: {agg['top_score_pref'] or '分散'}")
+        if agg.get("top_score_pref"):
+            score_prefs_collected.append(agg["top_score_pref"])
         if agg.get("top_ou25"):
             print(f"  📦 大小球2.5: {agg['top_ou25']}")
         if agg.get("top_hafu"):
             print(f"  ⏱️ 半全场: {agg['top_hafu']}")
         if agg.get("collapse_flags"):
             print(f"  ⚠️ 坍缩标记: {', '.join(agg['collapse_flags'])}")
-        print(f"  🗳️ 投票分布: " + " | ".join(
+        # ---------- EV 下注推荐 ----------
+        mo = m.get("model_odds") or []
+        ev_rec = None
+        if all(isinstance(x, (int, float)) and x > 0 for x in mo[:3]) if len(mo) >= 3 else False:
+            # 概率来源取轨道A融合引擎的 final_1x2_pct（核心引擎按联赛校准过的真概率）。
+            # 取不到就传 None，ev_calculator 会 fail closed——**不得回退到投票比例**。
+            fusion_probs = fps.load_fusion_probabilities(m.get("match_id"))
+            ev_rec = evc.generate_betting_recommendation(
+                votes=agg["all_votes"],
+                model_odds=list(mo[:3]),
+                strength=agg["strength"],
+                evidence_gap=bool(agg.get("evidence_gap")) or bool(evidence_status.get("evidence_gap")),
+                calibrated_probs=(fusion_probs or {}).get("probabilities"),
+                prob_source=(fusion_probs or {}).get("source"),
+                prob_calibration_status=(fusion_probs or {}).get("calibration_status", "UNFITTED"),
+                market_derived=bool((fusion_probs or {}).get("market_derived")),
+            )
+            if fusion_probs:
+                ev_rec["fusion_reference"] = {
+                    k: fusion_probs.get(k) for k in
+                    ("prediction_id", "model_version", "snapshot_type", "mode",
+                     "market_dependency_pct", "calibration_basis")
+                }
+            print("\n  💰 下注推荐:")
+            for line in evc.format_betting_advice(ev_rec).split("\n"):
+                print(f"     {line}")
+            if not fusion_probs:
+                print("     （量化轨尚未登记该场，无概率来源）")
+        else:
+            print("\n  💰 下注推荐: 跳过(官方赔率缺失或非法)")
+        # ---------- 单选主推(双选→单选决策层) ----------
+        fl = extract_first_leg_info(m.get("league", ""), ev_text or "", home=m.get("home", ""), away=m.get("away", ""))
+        # 2026-08-15：只有 action=bet 的 EV 才允许进入决策层。此前无论 skip 与否都把
+        # ev_analysis 传下去，等于绕开 ev_calculator 自己的风控闸门——这正是 8-15 报告
+        # 把 skip 场次塞进推荐表的同一条通路，只不过那次发生在人工摘录环节。
+        ev_results = (ev_rec.get("ev_analysis", {}) or {}) if (
+            isinstance(ev_rec, dict) and ev_rec.get("action") == "bet") else {}
+        sp = decide_single_pick(agg, ev_results, fl, match=m)
+        print(f"  🎯 下注建议: {sp['pick']} (信心{sp['confidence']*100:.0f}%) | {sp['reason']}")
+        if fl.get("is_second_leg"):
+            if fl.get("margin") is not None and fl["margin"] >= 2:
+                print(f"  ⚠️ 次回合战意提示: 首回合{fl.get('first_leg_score') or '?'}(净胜{fl['margin']}球) → 领先方可能轮换/保守, 平局概率上升")
+            else:
+                print(f"  ⚠️ 次回合战意提示: 首回合{fl.get('first_leg_score') or '?'}(分差小) → 领先方优势有限, 战意仍强")
+        print("  🗳️ 投票分布: " + " | ".join(
             f"{k}:{v:.1f}" for k, v in
             sorted(agg['all_votes'].items(), key=lambda x: -x[1])))
-        print(f"  🤖 各模型判断:")
+        print("  🤖 各模型判断:")
         for md, p in agg["individual"].items():
             if p["status"] == "failed":
                 print(f"     [{md.split('/')[-1].split(':')[0][:20]:<20}] 失败 — {p['error'][:60]}")
                 continue
             alt = f" (备选:{p['alt_direction']})" if p.get("alt_direction") else ""
-            sp = f" 比分:{p['score_pref']}" if p.get("score_pref") else ""
+            score_txt = f" 比分:{p['score_pref']}" if p.get("score_pref") else ""
             print(f"     [{md.split('/')[-1].split(':')[0][:20]:<20}] "
-                  f"{p['direction']}{alt}{sp} — {p['reasoning'][:60]}")
+                  f"{p['direction']}{alt}{score_txt} — {p['reasoning'][:60]}")
         print(json.dumps(build_audit_record(
             agg, voter_models, voter_prompt, evidence_status,
+            ev_recommendation=ev_rec, single_pick=sp,
             evidence_audit=evidence_audit, consensus_gate=consensus_gate,
         ), ensure_ascii=False))
         print()
+
+    # ---------- 主胜比例熔断（方向坍缩修正） ----------
+    corrections, breaker_report = enforce_home_bias_breaker(breaker_results)
+    if corrections:
+        print("=" * 64)
+        for line in breaker_report:
+            print("  " + line)
+        print("=" * 64)
+        # 熔断后最终方向总表（权威结论，改判已写回）
+        print("🔒 熔断后最终方向总表:")
+        for idx, m, agg in breaker_results:
+            final_dir = corrections.get(idx, agg["direction"])
+            mark = "  ⚠️熔断改判" if idx in corrections else ""
+            print(f"    {m.get('match_num','?'):<8} {m.get('home','')}vs{m.get('away','')}: {final_dir}{mark}")
+        print("  注: 登记/回测方向以本表熔断后方向为准（纠正赛季初主胜系统性高估）。")
+        print("=" * 64)
+        print()
+
+    # ---------- 全局比分坍缩统计（跨场次分布检测） ----------
+    if len(score_prefs_collected) >= 3:
+        sc = Counter(score_prefs_collected)
+        total = len(score_prefs_collected)
+        top, n = sc.most_common(1)[0]
+        ratio = n / total
+        print("=" * 64)
+        if ratio >= lpr.SCORE_COLLAPSE_RATIO:
+            print(f"⚠️ 全局比分坍缩警报: 本批 {total} 场中, 比分 {top} 出现 {n} 场 ({ratio*100:.0f}%)")
+            print("   分布: " + " | ".join(f"{k}:{v}场" for k, v in sc.most_common()))
+            print(f"   判定: 单一比分占比 ≥ {lpr.SCORE_COLLAPSE_RATIO*100:.0f}% = 模型在套默认模板, 非独立判断。")
+            print("   建议: 该比分 Top1 不可作下注依据, 应视为坍缩噪声。")
+        else:
+            print(f"✅ 比分分布健康: {total} 场 top 比分分布 " + " | ".join(f"{k}:{v}场" for k, v in sc.most_common()))
+        print("=" * 64)
 
 
 if __name__ == "__main__":

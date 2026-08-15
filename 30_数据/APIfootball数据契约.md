@@ -71,7 +71,7 @@ apifootball.com   → APIkey query 参数（当前会员key）
 ## MCP 与 Crawl 证据层（2026-08-11 起）
 
 - MCP 是第三方结构化数据，只能作主证据独立过门禁后的补充；sidecar 需 `match_identity(...)` 与体彩ID、主客队一致。
-- Crawl4AI（`C:\Users\Administrator\football-llm-predictor\crawl_evidence.py`）只采官方/已知可信 JS 网页快照，`url`/`final_url` 同 hostname（仅容忍 www.），每类实质事实至少2个独立域名，默认不覆盖已有主证据。详见 `C:\Users\Administrator\football-llm-predictor\CRAWL4AI_EVIDENCE.md`。
+- Crawl4AI（`project018_技能工作区整合/02_脚本/llm/football-llm-predictor/crawl_evidence.py`，2026-08-16 从 C 盘迁入仓库）只采官方/已知可信 JS 网页快照，`url`/`final_url` 同 hostname（仅容忍 www.），每类实质事实至少2个独立域名，默认不覆盖已有主证据。详见同目录 `CRAWL4AI_EVIDENCE.md`。
 - 网页全文只存快照，禁止整页投给 LLM。
 
 ## 事实源

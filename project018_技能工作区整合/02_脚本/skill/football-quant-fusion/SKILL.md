@@ -78,7 +78,7 @@ python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\fusion
 
 `--research-route` 的输出必须带 `research_only=true`，不能写入正式预测登记库或 current cohort。`--production-route` 仅运行生产安全路由和 shadow 候选，不表示候选模型已获准融合。
 
-LLM轨只负责证据整理和定性分析。DeepSeek先分析、Kimi K3与GLM复核投票时，仍必须分别展示来源、弃权理由、`action` 和 `reason`；不得把共识票数当概率。真实生产 LLM 工程由环境变量 `FOOTBALL_LLM_ROOT` 指定，默认位于 `C:\Users\Administrator\football-llm-predictor`：
+LLM轨只负责证据整理和定性分析。DeepSeek先分析、Kimi K3与GLM复核投票时，仍必须分别展示来源、弃权理由、`action` 和 `reason`；不得把共识票数当概率。真实生产 LLM 工程位于本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/`（2026-08-16 迁入），可用环境变量 `FOOTBALL_LLM_ROOT` 覆盖：
 
 ```powershell
 python $cli llm-evidence --input match.json --out-dir evidence --watch-refresh --refresh-before-minutes 75

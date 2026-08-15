@@ -154,7 +154,8 @@ def export_ppt(sales_day: str):
     data_file = HERE / "data" / f"ppt_data_{sales_day}.json"
     data_file.write_text(json.dumps(parsed, ensure_ascii=False), encoding="utf-8")
     out_file = HERE / "data" / f"预测PPT_{sales_day}.pptx"
-    r = subprocess.run(["node", r"C:/Users/Administrator/football-llm-predictor/build_ppt_web.js",
+    # 2026-08-16：LLM 工程已迁入仓库；复用 runner 解析好的 LLM_DIR，不再硬编码 C 盘
+    r = subprocess.run(["node", str(runner.LLM_DIR / "build_ppt_web.js"),
                         "--parsed", str(data_file), "--out", str(out_file), "--title", sales_day],
                        capture_output=True, text=True, timeout=300, cwd=str(HERE))
     if r.returncode != 0 or not out_file.exists():

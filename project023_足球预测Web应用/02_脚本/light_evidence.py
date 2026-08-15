@@ -9,12 +9,15 @@ evidence_gap=true 但门禁 ok=true）。
 深度证据可手动放到同一目录覆盖（文件名 evidence_NNN_*.md）。
 """
 import json
+import os
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-LLM_DATA = Path(r"C:/Users/Administrator/football-llm-predictor/data")
+# 2026-08-16：LLM 工程已从 C:/Users/Administrator/football-llm-predictor 迁入仓库
+LLM_DATA = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
+    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor")) / "data"
 
 NOW_STR = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%dT%H:%M:%S+08:00")
 

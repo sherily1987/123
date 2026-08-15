@@ -36,13 +36,11 @@ def test_normalize():
 
 
 def test_production_default_models_are_three_domestic_voters_including_kimi():
-    """qwen/qwen3.8-max 已于 2026-08-12 移除（DASHSCOPE key 401 失效），正式池 3 模。"""
     assert fp.DEFAULT_MODELS == [
         "zhipu/glm-4-flash",
         "deepseek/deepseek-chat",
         "moonshot/kimi-k3",
     ]
-    assert "qwen/qwen3.8-max" not in fp.DEFAULT_MODELS
     assert "moonshot/kimi-k2.6" not in fp.DEFAULT_MODELS
     assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k3"] == 1.0
 
@@ -59,7 +57,8 @@ def test_evidence_prompts_are_neutral_and_allow_abstention():
 
 def test_deepseek_audit_prompt_has_no_result_direction_fields():
     prompt = lpr.system_prompt_evidence_audit()
-    assert "usable_evidence_ids" in prompt and "market_readiness" in prompt
+    assert "usable_evidence_ids" in prompt
+    assert "market_readiness" in prompt
     assert '"direction"' not in prompt
     assert "不得输出胜平负" in prompt
 
@@ -201,28 +200,24 @@ def test_evidence_gap_forces_dual_direction_and_caution():
 
 
 def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
-    """故意不用 fp.DEFAULT_MODELS：这里测的是聚合/审计机制本身，不是生产模型池组成，
-    绑定 DEFAULT_MODELS 的具体内容/长度会在每次调池子时无谓break（见 2026-08-12 踩坑记录）。
-    """
-    models = ["zhipu/glm-4-flash", "qwen/qwen3.8-max",
-              "deepseek/deepseek-chat", "moonshot/kimi-k3"]
+    models = list(fp.DEFAULT_MODELS)
     successful = pr.parse_evidence_prediction(
         '{"direction":"主胜","score_pref":"1-0","reasoning":"【近况:主队连胜】"}'
     )
     agg = pr.aggregate_directions({models[0]: successful, models[1]: {"error": "timeout"},
-                                   models[2]: successful, models[3]: successful})
+                                   models[2]: successful})
     evidence_status = pr.assess_evidence(SIX_SECTIONS)
     prompt = "evidence prompt"
 
     record = pr.build_audit_record(agg, models, prompt, evidence_status)
 
     assert agg["direction"] == "主胜"
-    assert agg["all_votes"] == {"主胜": 3.0}
+    assert agg["all_votes"] == {"主胜": 1.3}
     assert record["individual"][models[0]]["model_id"] == models[0]
     assert record["individual"][models[0]]["provider"] == "zhipu"
     assert record["individual"][models[0]]["status"] == "success"
     assert record["individual"][models[1]] == {
-        "model_id": models[1], "provider": "qwen", "status": "failed", "error": "timeout"
+        "model_id": models[1], "provider": "deepseek", "status": "failed", "error": "timeout"
     }
     assert record["llm_model_pool_sha256"] == hashlib.sha256(
         json.dumps(models, ensure_ascii=False, separators=(",", ":")).encode("utf-8")

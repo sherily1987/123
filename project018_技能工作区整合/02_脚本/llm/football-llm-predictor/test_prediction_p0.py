@@ -108,55 +108,86 @@ def test_prompt_assigns_evidence_ids_without_claiming_cross_verification():
 """
     catalog = predict.build_evidence_catalog(text)
     assert catalog == [{
-        "id": "E1", "status": "UNAVAILABLE", "fact": "接口返回0条，不能解读为无伤停",
+        "id": "E1",
+        "status": "UNAVAILABLE",
+        "fact": "接口返回0条，不能解读为无伤停",
         "source": "https://example.test/injuries",
     }]
     prompt = predict.build_evidence_prompt({"home": "A", "away": "B"}, text, 1)
-    assert "E1" in prompt and "UNAVAILABLE" in prompt
+    assert "E1" in prompt
+    assert "UNAVAILABLE" in prompt
     assert "来源已交叉验证" not in prompt
 
 
 def test_parser_accepts_abstain_and_nullable_markets():
-    payload = {"decision":"abstain","direction":None,"alt_direction":None,"score_pref":None,
-               "ou25":None,"hafu":None,"evidence_gap":True,"evidence_ids":["E1"],
-               "unsupported_assumptions":[],"reason_codes":["LINEUP_UNAVAILABLE"],"summary":"证据不足"}
-    out = predict.parse_evidence_prediction(__import__("json").dumps(payload, ensure_ascii=False),
-                                            [{"id":"E1","status":"UNAVAILABLE"}])
-    assert out["decision"] == "abstain" and out["direction"] is None and out["score_pref"] is None
+    payload = {
+        "decision": "abstain", "direction": None, "alt_direction": None,
+        "score_pref": None, "ou25": None, "hafu": None,
+        "evidence_gap": True, "evidence_ids": ["E1"],
+        "unsupported_assumptions": [], "reason_codes": ["LINEUP_UNAVAILABLE"],
+        "summary": "证据不足",
+    }
+    out = predict.parse_evidence_prediction(
+        __import__("json").dumps(payload, ensure_ascii=False),
+        [{"id": "E1", "status": "UNAVAILABLE"}],
+    )
+    assert out["decision"] == "abstain"
+    assert out["direction"] is None
+    assert out["score_pref"] is None
 
 
 @pytest.mark.parametrize("evidence_ids", [["E404"], ["E1"]])
 def test_parser_downgrades_opinion_with_unknown_or_unusable_evidence_ids(evidence_ids):
-    payload = {"decision":"opinion","direction":"主胜","alt_direction":None,"score_pref":None,
-               "ou25":None,"hafu":None,"evidence_gap":False,"evidence_ids":evidence_ids,
-               "unsupported_assumptions":[],"reason_codes":[],"summary":"主队方向"}
-    out = predict.parse_evidence_prediction(__import__("json").dumps(payload, ensure_ascii=False),
-                                            [{"id":"E1","status":"UNAVAILABLE"}])
-    assert out["decision"] == "abstain" and out["direction"] is None and out["evidence_gap"] is True
+    payload = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": None,
+        "score_pref": None, "ou25": None, "hafu": None,
+        "evidence_gap": False, "evidence_ids": evidence_ids,
+        "unsupported_assumptions": [], "reason_codes": [], "summary": "主队方向",
+    }
+    out = predict.parse_evidence_prediction(
+        __import__("json").dumps(payload, ensure_ascii=False),
+        [{"id": "E1", "status": "UNAVAILABLE"}],
+    )
+    assert out["decision"] == "abstain"
+    assert out["direction"] is None
+    assert out["evidence_gap"] is True
 
 
 def test_abstentions_do_not_vote_but_remain_auditable():
-    abstain = {"decision":"abstain","direction":None,"alt_direction":None,"score_pref":None,
-               "ou25":None,"hafu":None,"evidence_gap":True,"evidence_ids":["E1"],
-               "reasoning":"证据不足","reasoning_ok":True,"collapse_score":False}
-    opinion = {"decision":"opinion","direction":"主胜","alt_direction":None,"score_pref":None,
-               "ou25":None,"hafu":None,"evidence_gap":False,"evidence_ids":["E2"],
-               "reasoning":"证据支持","reasoning_ok":True,"collapse_score":False}
-    result = predict.aggregate_directions({"zhipu/glm-4-flash":abstain,
-                                           "deepseek/deepseek-chat":opinion,
-                                           "moonshot/kimi-k3":opinion})
-    assert result["valid_model_count"] == 2 and result["direction"] == "主胜"
+    abstain = {
+        "decision": "abstain", "direction": None, "alt_direction": None,
+        "score_pref": None, "ou25": None, "hafu": None,
+        "evidence_gap": True, "evidence_ids": ["E1"], "reasoning": "证据不足",
+        "reasoning_ok": True, "collapse_score": False,
+    }
+    opinion = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": None,
+        "score_pref": None, "ou25": None, "hafu": None,
+        "evidence_gap": False, "evidence_ids": ["E2"], "reasoning": "证据支持",
+        "reasoning_ok": True, "collapse_score": False,
+    }
+    result = predict.aggregate_directions({
+        "zhipu/glm-4-flash": abstain,
+        "deepseek/deepseek-chat": opinion,
+        "moonshot/kimi-k3": opinion,
+    })
+    assert result["valid_model_count"] == 2
+    assert result["direction"] == "主胜"
     assert result["individual"]["zhipu/glm-4-flash"]["decision"] == "abstain"
 
 
 def test_evidence_audit_validates_ids_and_unavailable_status():
-    catalog = [{"id":"E1","status":"UNAVAILABLE"},{"id":"E2","status":"SINGLE_SOURCE"}]
+    catalog = [
+        {"id":"E1","status":"UNAVAILABLE"},
+        {"id":"E2","status":"SINGLE_SOURCE"},
+    ]
     payload = {"usable_evidence_ids":["E2"],"unusable_evidence_ids":["E1"],
                "conflict_evidence_ids":[],"gaps":["LINEUP_UNAVAILABLE"],
                "market_readiness":{"one_x_two":True,"score":False,"ou25":False,"hafu":False},
                "summary":"E2可用，E1不可用。"}
     audit = predict.parse_evidence_audit(__import__("json").dumps(payload, ensure_ascii=False), catalog)
-    assert audit["status"] == "ok" and audit["usable_evidence_ids"] == ["E2"]
+    assert audit["status"] == "ok"
+    assert audit["usable_evidence_ids"] == ["E2"]
     payload["usable_evidence_ids"] = ["E1"]
     assert "error" in predict.parse_evidence_audit(__import__("json").dumps(payload, ensure_ascii=False), catalog)
 
@@ -167,17 +198,22 @@ def test_voter_prompt_contains_neutral_audit_not_direction():
              "market_readiness":{"one_x_two":True,"score":False,"ou25":False,"hafu":False},
              "summary":"E2可用。"}
     prompt = predict.build_voter_prompt("BASE", audit)
-    assert "BASE" in prompt and "E2" in prompt and '"direction"' not in prompt
+    assert "BASE" in prompt and "E2" in prompt
+    assert '"direction"' not in prompt
 
 
 def test_two_voter_consensus_requires_two_matching_opinions():
-    glm = {"decision":"opinion","direction":"主胜"}; kimi = {"decision":"opinion","direction":"主胜"}
+    glm = {"decision":"opinion","direction":"主胜"}
+    kimi = {"decision":"opinion","direction":"主胜"}
     voters = ["zhipu/glm-4-flash", "moonshot/kimi-k3"]
     agreed = predict.two_voter_consensus({voters[0]:glm, voters[1]:kimi}, voters)
-    assert agreed == {"status":"consensus","action":"research_opinion","direction":"主胜","voter_models":voters}
-    disagreed = predict.two_voter_consensus({voters[0]:glm,voters[1]:{"decision":"opinion","direction":"客胜"}}, voters)
+    assert agreed == {"status":"consensus","action":"research_opinion","direction":"主胜",
+                      "voter_models":voters}
+    disagreed = predict.two_voter_consensus(
+        {voters[0]:glm, voters[1]:{"decision":"opinion","direction":"客胜"}}, voters)
     assert disagreed["status"] == "skip" and disagreed["reason"] == "voter_disagreement"
-    abstained = predict.two_voter_consensus({voters[0]:glm,voters[1]:{"decision":"abstain","direction":None}}, voters)
+    abstained = predict.two_voter_consensus(
+        {voters[0]:glm, voters[1]:{"decision":"abstain","direction":None}}, voters)
     assert abstained["status"] == "skip" and abstained["reason"] == "voter_abstained_or_failed"
 
 

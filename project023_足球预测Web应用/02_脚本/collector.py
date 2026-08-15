@@ -5,6 +5,7 @@
 量化档位：读 project021 的 full_backtest.json，复刻 league_tiers 分档规则。
 """
 import json
+import os
 import subprocess
 import sys
 import urllib.parse
@@ -16,7 +17,9 @@ HERE = Path(__file__).resolve().parent
 FETCH_SCRIPT = Path(r"F:/HM足球比赛预测/project015_足彩移动采集接口导出/02_脚本/fetch_sporttery_full.py")
 PROJECT021 = Path(r"F:/HM足球比赛预测/project021_五大联赛APIFootball训练")
 FULL_BT = PROJECT021 / "05_交付" / "full_backtest.json"
-LLM_DATA = Path(r"C:/Users/Administrator/football-llm-predictor/data")
+# 2026-08-16：LLM 工程已从 C:/Users/Administrator/football-llm-predictor 迁入仓库
+LLM_DATA = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
+    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor")) / "data"
 
 LIST_API = "https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry"
 UA = {"User-Agent": "Mozilla/5.0 (Linux; Android 14)",

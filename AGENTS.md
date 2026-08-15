@@ -140,20 +140,34 @@ CI ±0.002，因为 market_only 模式下模型概率就是同一份赔率去水
 
 **LLM 轨报告纪律（2026-08-15，重要，写报告前必读；同日两次更正，见下）**：
 
-⚠️ **头号事实：LLM 轨真正的生产代码不在这个 git 仓库里**，在
-`C:\Users\Administrator\football-llm-predictor\`（`00_项目入口.md` 已注明"非Git仓库"）。
-本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/` 是一份**独立副本**，
-两边没有任何自动或约定的同步机制（不像 zu-yu-dashi-3 核心库那样至少有个"必须手动 cp"的
-纪律，这里连纪律都没有）。**只查本仓库/只查 git 历史，得出的"某功能不存在"这类结论可能
-是假的**——本条下方就是一次真实的翻车案例。改任何一侧的代码前，先确认改的是不是真正在跑
-的那一份；只改了仓库副本不代表生产行为变了，反之亦然。
+✅ **2026-08-16：LLM 轨生产工程已迁入本仓库，双份分裂结束。**
+唯一事实源现在是 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/`。
+`FOOTBALL_LLM_ROOT` 环境变量仍可覆盖（当前未设置，各处默认值已改为仓库内相对路径）。
 
-**分裂程度已量化（2026-08-15 实测）**：生产 `predict.py` 1101 行，仓库副本 800 行，
-仓库副本缺 `import model_weights` / `import ev_calculator`、缺主胜比例熔断
-（`HOME_BIAS_THRESHOLD`）、缺次回合战意提示、`select_matches()` 少 `min_match` 分批参数。
-**仓库副本的 predict.py 是一个停更的旧分支，不要拿它推断生产行为**。2026-08-15 起
-`ev_calculator.py` 与 `test_ev_calculator.py` 两个文件已在两侧保持一致（手工 cp），
-其余文件仍然各走各的。
+~~头号事实：LLM 轨真正的生产代码不在这个 git 仓库里~~ —— 这条曾经是本文件的头号警告：
+生产在 `C:\Users\Administrator\football-llm-predictor\`（非 Git），仓库里那份是**停更旧分支**
+（生产 `predict.py` 1101 行 vs 仓库副本 800 行，副本缺 `ev_calculator`/`model_weights` 导入、
+缺主胜比例熔断、缺次回合战意提示），两边无任何同步机制。**它导致过一次真实翻车**：
+只查仓库 git 历史就断言「这个仓库没有任何代码计算 EV」，而生产目录里 `ev_calculator.py`
+一直在跑。教训保留：**查证范围只覆盖仓库，不等于事实覆盖仓库**。
+
+迁移的边界，改代码前先知道：
+
+- **C 盘原目录 `C:\Users\Administrator\football-llm-predictor\` 仍在原地未删**（迁移时刻意
+  保留以便回滚）。它现在是**过期快照**——所有活跃入口都已指向仓库内，别再往它写东西，
+  也别拿它的内容推断当前行为。确认新位置稳定后可自行删除。
+- **`.venv`（350M）与 `node_modules` 没有迁**：虚拟环境烧死了创建时的绝对路径，拷过来是
+  坏的，必须在新位置重建，见该目录 `README.md` §2.5。日常 pytest 不依赖 `.venv`。
+- **一次性网页抓取不入库**：根目录 129 个 `*.html`、`data/` 下的 `.tmp_evi*` 等由该目录
+  `.gitignore` 排除（文件仍在磁盘上可用）。真正留档的证据在 `data/evidence_<日期>/`，入库。
+- 已重新指向新位置的活跃消费方：`fusion_cli.py::run_llm_evidence()`、
+  `project023_足球预测Web应用/02_脚本/` 的 `runner.py`/`collector.py`/`light_evidence.py`/
+  `app.py`。`project001`、`project021` 里那些**按日期归档的一次性脚本没有改**——它们是历史
+  运行记录，改了等于篡改历史。
+
+注：`00_项目入口.md` 与 `30_数据/APIfootball数据契约.md` 里的旧 C 盘路径已同步更新。
+另外 **`project023` 编号已被 `project023_足球预测Web应用` 占用**，本文件 §4 说的
+「当前是 project023」已过时，下一个可用编号是 `project024`。
 
 - `predict.py::aggregate_directions()` 的 `strength` 字段是**投票比例**
   （`top_votes / total_votes`，如 2/3、5/6），**不是校准概率**，这一点两边代码一致，是真的。
@@ -245,7 +259,8 @@ python -m pytest "project007_APIFootball数据接入/02_脚本" "project021_五�
 
 标准结构（详见 `全局工作台.md` §3）：`01_规划/ 02_文案/ 03_配图/ 04_素材/ 05_交付/ 06_复盘/`，
 数据/代码类项目常用 `02_脚本` 替代 `02_文案+03_配图`。新建项目前先看
-`全局工作台.md` 第 6 节确认下一个可用编号（当前是 `project023`），流程按 `新项目SOP.md` 走。
+`全局工作台.md` 第 6 节确认下一个可用编号（**2026-08-16 更正：`project023` 已被
+`project023_足球预测Web应用` 占用，下一个可用是 `project024`**），流程按 `新项目SOP.md` 走。
 
 **每日一次的预测/回测类任务不再新开项目编号**——归到对应长期项目的
 `05_交付/<任务名>/<日期>/`，例如 `project021_五大联赛APIFootball训练/05_交付/每日开售预测/2026-08-12/`。

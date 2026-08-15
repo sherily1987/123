@@ -1,0 +1,956 @@
+[
+  {
+    "num": "周六025",
+    "home": "里奥阿维",
+    "away": "波尔图",
+    "league": "葡超",
+    "kickoff": "2026-08-16T03:30:00+08:00",
+    "dir": "客胜",
+    "alt": null,
+    "strength": 100,
+    "votes": 2.4,
+    "total_votes": 2.4,
+    "sp": "客胜",
+    "sp_conf": 100,
+    "sp_skip": false,
+    "score": "0-2",
+    "score_prefs": {
+      "0-2": 2.1,
+      "2-0": 0.3
+    },
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -1.0,
+      "平局": -1.0,
+      "客胜": 0.25
+    },
+    "ev_action": "bet",
+    "ev_reason": "发现 1 个正 EV 机会",
+    "caution": false,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:0-2x2",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": null,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "客胜"
+    }
+  },
+  {
+    "num": "周六026",
+    "home": "弗鲁米嫩",
+    "away": "帕梅拉斯",
+    "league": "巴甲",
+    "kickoff": "2026-08-16T03:30:00+08:00",
+    "dir": "平局",
+    "alt": "客胜",
+    "strength": 51,
+    "votes": 1.7325,
+    "total_votes": 3.3975,
+    "sp": "平局/客胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "1-1",
+    "score_prefs": {
+      "1-1": 1.2,
+      "0-1": 1.065
+    },
+    "ou25": "小2.5",
+    "hafu": "平平",
+    "evs": {
+      "主胜": -1.0,
+      "平局": 0.4278,
+      "客胜": 0.2448
+    },
+    "ev_action": "skip",
+    "ev_reason": "投票强度 51.0% < 60.0%，共识不足",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:0-1x2",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": null,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "平局",
+      "doubao-seed-evolving": "客胜"
+    }
+  },
+  {
+    "num": "周六027",
+    "home": "盐湖城",
+    "away": "明尼苏达",
+    "league": "美职",
+    "kickoff": "2026-08-16T09:30:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 43,
+    "votes": 1.5,
+    "total_votes": 3.45,
+    "sp": "平局/主胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 1.2,
+      "1-0": 0.3,
+      "1-1": 0.9
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": -0.2913,
+      "平局": 0.6174,
+      "客胜": -0.4717
+    },
+    "ev_action": "skip",
+    "ev_reason": "投票强度 43.5% < 60.0%，共识不足",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": null,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "平局"
+    }
+  },
+  {
+    "num": "周日001",
+    "home": "德岛漩涡",
+    "away": "鸟栖沙岩",
+    "league": "日乙",
+    "kickoff": "2026-08-16T18:00:00+08:00",
+    "dir": "平局",
+    "alt": "主胜",
+    "strength": 48,
+    "votes": 1.4025,
+    "total_votes": 2.9325,
+    "sp": "平局/主胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "1-1",
+    "score_prefs": {
+      "1-1": 1.02,
+      "1-0": 0.255,
+      "0-1": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": -0.3739,
+      "平局": 0.4109,
+      "客胜": -0.3009
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "平局",
+      "doubao-seed-evolving": "客胜"
+    }
+  },
+  {
+    "num": "周日002",
+    "home": "海牙",
+    "away": "格罗宁根",
+    "league": "荷甲",
+    "kickoff": "2026-08-16T18:15:00+08:00",
+    "dir": "客胜",
+    "alt": "主胜",
+    "strength": 35,
+    "votes": 1.02,
+    "total_votes": 2.9325,
+    "sp": "平局/主胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "0-1",
+    "score_prefs": {
+      "0-1": 1.02,
+      "2-0": 0.255,
+      "1-0": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -0.1304,
+      "平局": 0.0348,
+      "客胜": -0.2
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日003",
+    "home": "富川FC",
+    "away": "全北现代",
+    "league": "韩职",
+    "kickoff": "2026-08-16T18:30:00+08:00",
+    "dir": "客胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.04,
+    "total_votes": 2.9325,
+    "sp": "客胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "0-2",
+    "score_prefs": {
+      "0-2": 1.02,
+      "0-1": 1.02
+    },
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -1.0,
+      "平局": 0.0409,
+      "客胜": 0.1478
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:0-1x2",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "客胜"
+    }
+  },
+  {
+    "num": "周日004",
+    "home": "仁川联",
+    "away": "金泉尚武",
+    "league": "韩职",
+    "kickoff": "2026-08-16T18:30:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.085,
+    "total_votes": 2.9775,
+    "sp": "主胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "1-0",
+    "score_prefs": {
+      "1-0": 2.085
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": 0.5055,
+      "平局": -0.1097,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:1-0x3",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日005",
+    "home": "布鲁马波",
+    "away": "厄格里特",
+    "league": "瑞超",
+    "kickoff": "2026-08-16T20:00:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.04,
+    "total_votes": 2.9325,
+    "sp": "主胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 1.02,
+      "1-0": 0.255,
+      "2-1": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": 0.1339,
+      "平局": 0.1413,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日006",
+    "home": "代格福什",
+    "away": "哥德堡",
+    "league": "瑞超",
+    "kickoff": "2026-08-16T20:00:00+08:00",
+    "dir": "平局",
+    "alt": "客胜",
+    "strength": 50,
+    "votes": 1.53,
+    "total_votes": 3.06,
+    "sp": "平局/主胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "1-1",
+    "score_prefs": {
+      "1-1": 1.02,
+      "0-1": 0.255,
+      "2-1": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平平",
+    "evs": {
+      "主胜": -0.3325,
+      "平局": 0.64,
+      "客胜": -0.445
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "平局",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日007",
+    "home": "佐加顿斯",
+    "away": "索尔纳",
+    "league": "瑞超",
+    "kickoff": "2026-08-16T20:00:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.085,
+    "total_votes": 2.9775,
+    "sp": "平局",
+    "sp_conf": 66,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 1.32,
+      "3-1": 0.765
+    },
+    "ou25": "大2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": -0.0407,
+      "平局": 0.3489,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:2-0x2",
+      "OU_COLLAPSE:大2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日008",
+    "home": "特温特",
+    "away": "兹沃勒",
+    "league": "荷甲",
+    "kickoff": "2026-08-16T20:30:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 84,
+    "votes": 2.04,
+    "total_votes": 2.4225,
+    "sp": "主胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 1.275,
+      "2-1": 0.765
+    },
+    "ou25": "大2.5",
+    "hafu": "胜胜",
+    "evs": {
+      "主胜": -0.0316,
+      "平局": -0.0211,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:2-0x2",
+      "OU_COLLAPSE:大2.5x2",
+      "HAFU_COLLAPSE:胜胜x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日009",
+    "home": "费耶诺德",
+    "away": "前进之鹰",
+    "league": "荷甲",
+    "kickoff": "2026-08-16T20:30:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 84,
+    "votes": 2.085,
+    "total_votes": 2.4675,
+    "sp": "主胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 1.32,
+      "3-1": 0.765
+    },
+    "ou25": "大2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": 0.0816,
+      "平局": -0.2094,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:2-0x2",
+      "OU_COLLAPSE:大2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日010",
+    "home": "奥勒松",
+    "away": "瓦勒伦加",
+    "league": "挪超",
+    "kickoff": "2026-08-16T20:30:00+08:00",
+    "dir": "客胜",
+    "alt": "平局",
+    "strength": 43,
+    "votes": 1.275,
+    "total_votes": 2.9325,
+    "sp": "平局",
+    "sp_conf": 60,
+    "sp_skip": false,
+    "score": "0-2",
+    "score_prefs": {
+      "0-2": 1.02,
+      "0-1": 0.255,
+      "1-0": 0.765
+    },
+    "ou25": "大2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -0.3609,
+      "平局": 0.1413,
+      "客胜": -0.0435
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日011",
+    "home": "阿森纳",
+    "away": "曼城",
+    "league": "英社区盾",
+    "kickoff": "2026-08-16T22:00:00+08:00",
+    "dir": "平局",
+    "alt": "客胜",
+    "strength": 61,
+    "votes": 1.7850000000000001,
+    "total_votes": 2.9325,
+    "sp": "平局/客胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "1-1",
+    "score_prefs": {
+      "1-1": 1.02,
+      "0-1": 0.255,
+      "2-2": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平平",
+    "evs": {
+      "主胜": -0.5878,
+      "平局": 0.9296,
+      "客胜": -0.4457
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "平局",
+      "doubao-seed-evolving": "平局"
+    }
+  },
+  {
+    "num": "周日012",
+    "home": "AC奥卢",
+    "away": "国际图尔",
+    "league": "芬超",
+    "kickoff": "2026-08-16T22:00:00+08:00",
+    "dir": "客胜",
+    "alt": "主胜",
+    "strength": 35,
+    "votes": 1.02,
+    "total_votes": 2.9325,
+    "sp": "平局/主胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "0-1",
+    "score_prefs": {
+      "0-1": 1.02,
+      "1-0": 1.02
+    },
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -0.0261,
+      "平局": -0.0413,
+      "客胜": -0.2348
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:1-0x2",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日013",
+    "home": "葡国民",
+    "away": "埃斯托里",
+    "league": "葡超",
+    "kickoff": "2026-08-16T22:30:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 53,
+    "votes": 1.5750000000000002,
+    "total_votes": 2.9775,
+    "sp": "平局/主胜",
+    "sp_conf": 50,
+    "sp_skip": false,
+    "score": "1-1",
+    "score_prefs": {
+      "1-1": 1.02,
+      "1-0": 0.3,
+      "2-1": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": 0.2113,
+      "平局": 0.5214,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "平局",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日014",
+    "home": "卡尔马",
+    "away": "哈马比",
+    "league": "瑞超",
+    "kickoff": "2026-08-16T22:30:00+08:00",
+    "dir": "客胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.04,
+    "total_votes": 2.9325,
+    "sp": "客胜",
+    "sp_conf": 78,
+    "sp_skip": false,
+    "score": "0-2",
+    "score_prefs": {
+      "0-2": 1.02,
+      "0-1": 0.255,
+      "1-2": 0.765
+    },
+    "ou25": "大2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -1.0,
+      "平局": 0.1717,
+      "客胜": 0.0991
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "OU_COLLAPSE:大2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "客胜"
+    }
+  },
+  {
+    "num": "周日015",
+    "home": "盖斯",
+    "away": "马尔默",
+    "league": "瑞超",
+    "kickoff": "2026-08-16T22:30:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.04,
+    "total_votes": 2.9325,
+    "sp": "主胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "1-0",
+    "score_prefs": {
+      "1-0": 2.04
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": 0.4609,
+      "平局": 0.05,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:1-0x3",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日016",
+    "home": "阿贾克斯",
+    "away": "海伦芬",
+    "league": "荷甲",
+    "kickoff": "2026-08-16T22:45:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.085,
+    "total_votes": 2.9775,
+    "sp": "平局",
+    "sp_conf": 70,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 2.085
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": -0.0687,
+      "平局": 0.4088,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:2-0x3",
+      "OU_COLLAPSE:小2.5x2"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日017",
+    "home": "伯恩利",
+    "away": "西汉姆联",
+    "league": "英冠",
+    "kickoff": "2026-08-16T23:00:00+08:00",
+    "dir": "客胜",
+    "alt": "平局",
+    "strength": 43,
+    "votes": 1.275,
+    "total_votes": 2.9325,
+    "sp": "平局",
+    "sp_conf": 56,
+    "sp_skip": false,
+    "score": "0-1",
+    "score_prefs": {
+      "0-1": 1.275,
+      "1-0": 0.765
+    },
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -0.2226,
+      "平局": 0.0287,
+      "客胜": -0.1261
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:0-1x2",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日018",
+    "home": "桑坦德",
+    "away": "比利亚雷",
+    "league": "西甲",
+    "kickoff": "2026-08-16T23:00:00+08:00",
+    "dir": "客胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.04,
+    "total_votes": 2.9325,
+    "sp": "客胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "0-2",
+    "score_prefs": {
+      "0-2": 1.02,
+      "0-1": 1.02
+    },
+    "ou25": "小2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -1.0,
+      "平局": 0.05,
+      "客胜": 0.3217
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:0-1x2",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": "客胜"
+    }
+  },
+  {
+    "num": "周日019",
+    "home": "莫尔德",
+    "away": "特罗姆瑟",
+    "league": "挪超",
+    "kickoff": "2026-08-16T23:00:00+08:00",
+    "dir": "客胜",
+    "alt": "平局",
+    "strength": 71,
+    "votes": 1.275,
+    "total_votes": 1.785,
+    "sp": "客胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "1-2",
+    "score_prefs": {
+      "1-2": 1.02,
+      "0-1": 0.255
+    },
+    "ou25": "大2.5",
+    "hafu": "平负",
+    "evs": {
+      "主胜": -1.0,
+      "平局": 0.0086,
+      "客胜": 1.1286
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "客胜",
+      "deepseek-chat": "客胜",
+      "doubao-seed-evolving": null
+    }
+  },
+  {
+    "num": "周日020",
+    "home": "布兰",
+    "away": "汉坎",
+    "league": "挪超",
+    "kickoff": "2026-08-16T23:00:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.085,
+    "total_votes": 2.9775,
+    "sp": "平局",
+    "sp_conf": 66,
+    "sp_skip": false,
+    "score": "2-0",
+    "score_prefs": {
+      "2-0": 1.32,
+      "3-1": 0.765
+    },
+    "ou25": "大2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": -0.0407,
+      "平局": 0.3489,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:2-0x2",
+      "OU_COLLAPSE:大2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  },
+  {
+    "num": "周日021",
+    "home": "萨普斯堡",
+    "away": "桑纳菲",
+    "league": "挪超",
+    "kickoff": "2026-08-16T23:00:00+08:00",
+    "dir": "主胜",
+    "alt": "平局",
+    "strength": 70,
+    "votes": 2.04,
+    "total_votes": 2.9325,
+    "sp": "主胜",
+    "sp_conf": 85,
+    "sp_skip": false,
+    "score": "1-0",
+    "score_prefs": {
+      "1-0": 2.04
+    },
+    "ou25": "小2.5",
+    "hafu": "平胜",
+    "evs": {
+      "主胜": 0.1965,
+      "平局": 0.1717,
+      "客胜": -1.0
+    },
+    "ev_action": "skip",
+    "ev_reason": "证据存在缺口，风险过高",
+    "caution": true,
+    "collapse_flags": [
+      "SCORE_COLLAPSE:1-0x3",
+      "OU_COLLAPSE:小2.5x3"
+    ],
+    "evidence_gap": true,
+    "model_dirs": {
+      "glm-4-flash": "主胜",
+      "deepseek-chat": "主胜",
+      "doubao-seed-evolving": "主胜"
+    }
+  }
+]

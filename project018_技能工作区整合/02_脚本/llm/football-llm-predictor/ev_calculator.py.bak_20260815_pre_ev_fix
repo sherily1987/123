@@ -1,0 +1,226 @@
+# -*- coding: utf-8 -*-
+"""
+EV (期望值) 计算与下注推荐模块
+================================
+将 LLM 投票转化为隐含概率，与市场赔率比较，只在 EV > 0 时推荐下注。
+
+核心公式：
+  EV = (预测概率 × 赔率) - 1
+  EV > 0 → 正期望值，值得下注
+  EV < 0 → 负期望值，不下注
+
+问题诊断(2026-08-12)：
+  - 当前系统只输出"方向 + 比分偏好"，没有计算期望值
+  - 没有"不下注"信号，即使置信度低也不说"这场别碰"
+  - 没有资金管理，不知道哪些场次值得下注、下多少
+"""
+from __future__ import annotations
+
+from typing import Dict, List
+
+
+def votes_to_probabilities(votes: Dict[str, float]) -> Dict[str, float]:
+    """将投票计数转化为归一化概率分布。
+    
+    输入: {"主胜": 3.2, "平局": 1.5, "客胜": 0.8}
+    输出: {"主胜": 0.58, "平局": 0.27, "客胜": 0.15}
+    """
+    total = sum(votes.values())
+    if total == 0:
+        return {"主胜": 1/3, "平局": 1/3, "客胜": 1/3}
+    return {k: v / total for k, v in votes.items()}
+
+
+def odds_to_implied_prob(odds: float) -> float:
+    """赔率转化为隐含概率（不含水位）。
+    
+    例: 赔率 2.0 → 隐含概率 0.5 (50%)
+    """
+    if odds <= 1.0:
+        return 1.0
+    return 1.0 / odds
+
+
+def calculate_ev(predicted_prob: float, odds: float) -> float:
+    """计算期望值 (Expected Value)。
+    
+    EV = (预测概率 × 赔率) - 1
+    EV > 0 → 正期望值
+    EV < 0 → 负期望值
+    
+    例: 预测概率 0.6，赔率 2.0
+      EV = (0.6 × 2.0) - 1 = 0.2 (20% 正期望值)
+    """
+    return (predicted_prob * odds) - 1.0
+
+
+def calculate_all_ev(
+    votes: Dict[str, float],
+    model_odds: List[float],
+) -> Dict[str, Dict[str, float]]:
+    """为所有方向计算 EV。
+    
+    model_odds: [主胜赔率, 平赔率, 客胜赔率]
+    
+    返回: {
+      "主胜": {"predicted_prob": 0.58, "odds": 1.73, "ev": 0.003},
+      "平局": {"predicted_prob": 0.27, "odds": 3.9, "ev": 0.053},
+      "客胜": {"predicted_prob": 0.15, "odds": 4.5, "ev": -0.325},
+    }
+    """
+    if not model_odds or len(model_odds) < 3:
+        return {}
+    
+    probs = votes_to_probabilities(votes)
+    directions = ["主胜", "平局", "客胜"]
+    
+    result = {}
+    for i, direction in enumerate(directions):
+        odds = model_odds[i]
+        pred_prob = probs.get(direction, 0)
+        ev = calculate_ev(pred_prob, odds)
+        result[direction] = {
+            "predicted_prob": pred_prob,
+            "odds": odds,
+            "ev": ev,
+        }
+    
+    return result
+
+
+def find_positive_ev_bets(
+    ev_results: Dict[str, Dict[str, float]],
+    min_ev_threshold: float = 0.05,
+    max_strength_threshold: float = 0.6,
+) -> List[Dict[str, any]]:
+    """筛选正期望值下注机会。
+    
+    参数:
+      min_ev_threshold: 最低 EV 阈值（默认 5%），低于此不下注
+      max_strength_threshold: 如果投票强度 < 此阈值，即使 EV > 0 也不推荐
+    
+    返回: 正 EV 下注机会列表
+    """
+    opportunities = []
+    
+    for direction, data in ev_results.items():
+        ev = data["ev"]
+        pred_prob = data["predicted_prob"]
+        odds = data["odds"]
+        
+        if ev >= min_ev_threshold:
+            opportunities.append({
+                "direction": direction,
+                "predicted_prob": pred_prob,
+                "odds": odds,
+                "ev": ev,
+                "recommendation": "下注",
+            })
+    
+    # 按 EV 排序
+    opportunities.sort(key=lambda x: x["ev"], reverse=True)
+    return opportunities
+
+
+def generate_betting_recommendation(
+    votes: Dict[str, float],
+    model_odds: List[float],
+    strength: float,
+    evidence_gap: bool = False,
+    min_ev: float = 0.05,
+    min_strength: float = 0.6,
+) -> Dict[str, any]:
+    """生成完整的下注推荐。
+    
+    返回: {
+      "action": "bet" | "skip",
+      "reason": "...",
+      "recommended_bets": [...],
+      "ev_analysis": {...},
+    }
+    """
+    ev_results = calculate_all_ev(votes, model_odds)
+    
+    if not ev_results:
+        return {
+            "action": "skip",
+            "reason": "缺少赔率数据，无法计算 EV",
+            "recommended_bets": [],
+            "ev_analysis": {},
+        }
+    
+    # 检查证据缺口
+    if evidence_gap:
+        return {
+            "action": "skip",
+            "reason": "证据存在缺口，风险过高",
+            "recommended_bets": [],
+            "ev_analysis": ev_results,
+        }
+    
+    # 检查投票强度
+    if strength < min_strength:
+        return {
+            "action": "skip",
+            "reason": f"投票强度 {strength:.1%} < {min_strength:.1%}，共识不足",
+            "recommended_bets": [],
+            "ev_analysis": ev_results,
+        }
+    
+    # 筛选正 EV 机会
+    opportunities = find_positive_ev_bets(ev_results, min_ev_threshold=min_ev)
+    
+    if not opportunities:
+        return {
+            "action": "skip",
+            "reason": "无正期望值机会（所有方向 EV < 5%）",
+            "recommended_bets": [],
+            "ev_analysis": ev_results,
+        }
+    
+    # 有正 EV 机会
+    return {
+        "action": "bet",
+        "reason": f"发现 {len(opportunities)} 个正 EV 机会",
+        "recommended_bets": opportunities,
+        "ev_analysis": ev_results,
+    }
+
+
+def format_betting_advice(recommendation: Dict[str, any]) -> str:
+    """格式化下注建议为可读文本。"""
+    lines = []
+    
+    action = recommendation["action"]
+    reason = recommendation["reason"]
+    
+    if action == "skip":
+        lines.append(f"🚫 不下注 — {reason}")
+        lines.append("")
+        lines.append("EV 分析:")
+        for direction, data in recommendation.get("ev_analysis", {}).items():
+            prob = data.get("predicted_prob", 0)
+            odds = data.get("odds", 0)
+            ev = data.get("ev", 0)
+            symbol = "✅" if ev >= 0 else "❌"
+            lines.append(f"  {direction}: 预测 {prob:.1%} × 赔率 {odds:.2f} = EV {ev:+.1%} {symbol}")
+    else:
+        lines.append(f"✅ 推荐下注 — {reason}")
+        lines.append("")
+        lines.append("正 EV 机会:")
+        for bet in recommendation["recommended_bets"]:
+            direction = bet["direction"]
+            prob = bet["predicted_prob"]
+            odds = bet["odds"]
+            ev = bet["ev"]
+            lines.append(f"  🎯 {direction}: 预测 {prob:.1%} × 赔率 {odds:.2f} = EV {ev:+.1%}")
+        lines.append("")
+        lines.append("其他方向:")
+        for direction, data in recommendation.get("ev_analysis", {}).items():
+            if direction not in [b["direction"] for b in recommendation["recommended_bets"]]:
+                prob = data.get("predicted_prob", 0)
+                odds = data.get("odds", 0)
+                ev = data.get("ev", 0)
+                lines.append(f"  {direction}: 预测 {prob:.1%} × 赔率 {odds:.2f} = EV {ev:+.1%}")
+    
+    return "\n".join(lines)

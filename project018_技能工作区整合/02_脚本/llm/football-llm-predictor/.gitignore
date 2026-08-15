@@ -1,0 +1,36 @@
+# 2026-08-16 迁移自 C:\Users\Administrator\football-llm-predictor（原生产目录，非 Git）。
+# 这里排除的都是**磁盘上照常存在、只是不进版本库**的东西：
+# 一次性网页抓取、临时证据快照、可重建的环境目录。
+
+# 可重建的环境（到新位置必须重建，不能拷贝——里面烧死了绝对路径）
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+# 临时证据抓取目录，可能出现在根目录或 data/ 下，且是隐藏目录（.tmp_evi15 / .tmp_evidence_005_008 …）
+.tmp_evi*/
+.tmp_evidence*/
+data/.tmp*
+
+# 一次性网页快照：证据采集过程中抓下来的原始页面，体积大、无复现价值
+# （真正要留档的证据在 data/evidence_<日期>/ 里，那些是入库的）
+/*.html
+data/*.html
+data/_tmp*
+
+# 一次性接口抓取与调试用 JSON/文本（按赛事/球队命名的散件，非可复现输入）
+/_*.txt
+/espn*.json
+/fotmob_*.json
+/om.json
+/riyadh_weather.json
+/sp_*.json
+/sporttery_*.json
+/st*.json
+/wiki_*
+/wttr_*
+*.raw
+
+# 运行日志
+*.log

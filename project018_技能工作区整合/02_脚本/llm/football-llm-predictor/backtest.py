@@ -21,6 +21,34 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import predict as fp
 
+# 方向 -> one-hot 向量索引 (Brier Score 用)
+DIR_INDEX = {"主胜": 0, "平局": 1, "客胜": 2}
+
+
+def votes_to_prob(vote_dist_str):
+    """从 '主胜:3.0 | 平局:1.5 | 客胜:0.5' 格式的投票分布解析概率向量。"""
+    probs = [1/3, 1/3, 1/3]
+    if not vote_dist_str:
+        return probs
+    total = 0.0
+    raw = {}
+    for part in vote_dist_str.split("|"):
+        m = re.match(r"\s*(主胜|平局|客胜)\s*:\s*([\d.]+)", part.strip())
+        if m:
+            raw[m.group(1)] = float(m.group(2))
+            total += float(m.group(2))
+    if total > 0 and raw:
+        probs = [raw.get("主胜", 0)/total, raw.get("平局", 0)/total, raw.get("客胜", 0)/total]
+    return probs
+
+
+def brier_score(prob_vec, actual_dir):
+    """多类 Brier Score: sum((p_i - y_i)^2), 越小越好。随机=0.667, 完美=0。"""
+    y = [0, 0, 0]
+    if actual_dir in DIR_INDEX:
+        y[DIR_INDEX[actual_dir]] = 1
+    return sum((p - yi) ** 2 for p, yi in zip(prob_vec, y))
+
 
 def parse_report(path):
     """解析证据版预测报告 -> {场次idx: {direction, votes, strength, score_pref, individual}}"""
@@ -76,7 +104,8 @@ def evaluate_date(date_str, verbose=False):
     raw = {}
     if os.path.exists(raw_f):
         with open(raw_f, encoding="utf-8") as f:
-            raw = {m["match_id"]: m for m in json.load(f)["matches"]}
+            # match_id 类型归一化：raw 里可能是 int、results 里是 str，统一用 str 作 key
+            raw = {str(m["match_id"]): m for m in json.load(f)["matches"]}
 
     rows = []
     for idx in sorted(preds):
@@ -128,10 +157,37 @@ def evaluate_date(date_str, verbose=False):
     dir_hits_with_alt = sum(1 for r in rows if r[5] or r[8])
     score_hits = sum(1 for r in rows if r[6])
     official_hits = sum(1 for r in rows if r[7] == r[4])
+
+    # Brier Score (基于综合方向投票分布的隐含概率)
+    brier_list = []
+    for (p, r, h, a, actual, dh, sh, od, ah) in rows:
+        prob_vec = votes_to_prob(p.get("vote_dist", ""))
+        brier_list.append(brier_score(prob_vec, actual))
+    avg_brier = sum(brier_list) / n if n else None
+
+    # 各模型独立命中率 (单选)
+    model_stats = {}
+    for (p, r, h, a, actual, dh, sh, od, ah) in rows:
+        for ind in p["individual"]:
+            mm = re.match(r"(.+?)(?: \(备选:(.+?)\))?$", ind["dir"])
+            if not mm:
+                continue
+            model = ind["model"].strip()
+            if model not in model_stats:
+                model_stats[model] = {"total": 0, "hit": 0, "alt": 0, "home_pred": 0}
+            model_stats[model]["total"] += 1
+            if mm.group(1) == actual:
+                model_stats[model]["hit"] += 1
+            elif mm.group(2) == actual:
+                model_stats[model]["alt"] += 1
+            if mm.group(1) == "主胜":
+                model_stats[model]["home_pred"] += 1
+
     summary = {
         "date": date_str, "n": n,
         "dir_hits": dir_hits, "dir_with_alt": dir_hits_with_alt,
         "score_hits": score_hits, "official_hits": official_hits,
+        "avg_brier": avg_brier, "model_stats": model_stats,
     }
     return rows, summary
 
@@ -160,6 +216,17 @@ def main():
         print(f"   方向命中(含双选): {s['dir_with_alt']}/{s['n']} = {s['dir_with_alt']/s['n']*100:.0f}%")
         print(f"   比分偏好命中: {s['score_hits']}/{s['n']} = {s['score_hits']/s['n']*100:.0f}%")
         print(f"   官方赔率方向: {s['official_hits']}/{s['n']} = {s['official_hits']/s['n']*100:.0f}%")
+        if s["avg_brier"] is not None:
+            print(f"   Brier Score(越低越好, 随机0.667): {s['avg_brier']:.3f}")
+        if s.get("model_stats"):
+            print("\n   🤖 各模型独立命中率:")
+            for model, st in sorted(s["model_stats"].items(),
+                                    key=lambda x: -x[1]["hit"]/max(1, x[1]["total"])):
+                pct = st["hit"]/st["total"]*100 if st["total"] else 0
+                home_pct = st["home_pred"]/st["total"]*100 if st["total"] else 0
+                short = model.split("/")[-1][:20]
+                print(f"     {short:<20} {st['hit']}/{st['total']} ({pct:.0f}%) "
+                      f"+双选{st['alt']} | 主胜预测占比{home_pct:.0f}%")
         return
 
     # 多日累计模式: 扫描所有 predictions_*.txt + results_*.json
@@ -176,10 +243,12 @@ def main():
     print("=" * 90)
     print("🔁 LLM 证据驱动预测 · 多日累计回测")
     print("=" * 90)
-    print(f"{'日期':<12} {'场次':>4} {'方向单选':>14} {'含双选':>14} {'比分':>12} {'官方赔率':>14}")
+    print(f"{'日期':<12} {'场次':>4} {'方向单选':>14} {'含双选':>14} {'比分':>8} {'Brier':>8} {'官方赔率':>14}")
     print("-" * 90)
 
     agg = {"n": 0, "dir": 0, "alt": 0, "score": 0, "official": 0}
+    brier_sum = 0.0
+    cum_model = {}
     for d in dates:
         _, s = evaluate_date(d)
         if s is None:
@@ -189,11 +258,18 @@ def main():
         agg["alt"] += s["dir_with_alt"]
         agg["score"] += s["score_hits"]
         agg["official"] += s["official_hits"]
+        if s["avg_brier"] is not None:
+            brier_sum += s["avg_brier"] * s["n"]
+        for model, st in (s.get("model_stats") or {}).items():
+            c = cum_model.setdefault(model, {"total": 0, "hit": 0, "alt": 0, "home_pred": 0})
+            for k in c:
+                c[k] += st.get(k, 0)
         dir_txt = f"{s['dir_hits']}/{s['n']} ({s['dir_hits']/s['n']*100:.0f}%)"
         alt_txt = f"{s['dir_with_alt']}/{s['n']} ({s['dir_with_alt']/s['n']*100:.0f}%)"
         score_txt = f"{s['score_hits']}/{s['n']}"
+        brier_txt = f"{s['avg_brier']:.3f}" if s["avg_brier"] is not None else "—"
         off_txt = f"{s['official_hits']}/{s['n']} ({s['official_hits']/s['n']*100:.0f}%)"
-        print(f"{d:<12} {s['n']:>4} {dir_txt:>14} {alt_txt:>14} {score_txt:>12} {off_txt:>14}")
+        print(f"{d:<12} {s['n']:>4} {dir_txt:>14} {alt_txt:>14} {score_txt:>8} {brier_txt:>8} {off_txt:>14}")
 
     print("-" * 90)
     n = agg["n"]
@@ -201,10 +277,21 @@ def main():
         dir_txt = f"{agg['dir']}/{n} ({agg['dir']/n*100:.0f}%)"
         alt_txt = f"{agg['alt']}/{n} ({agg['alt']/n*100:.0f}%)"
         score_txt = f"{agg['score']}/{n}"
+        brier_txt = f"{brier_sum/n:.3f}" if brier_sum else "—"
         off_txt = f"{agg['official']}/{n} ({agg['official']/n*100:.0f}%)"
-        print(f"{'累计':<12} {n:>4} {dir_txt:>14} {alt_txt:>14} {score_txt:>12} {off_txt:>14}")
+        print(f"{'累计':<12} {n:>4} {dir_txt:>14} {alt_txt:>14} {score_txt:>8} {brier_txt:>8} {off_txt:>14}")
+
+    if cum_model:
+        print("\n🤖 各模型累计独立命中率(单选):")
+        for model, st in sorted(cum_model.items(), key=lambda x: -x[1]["hit"]/max(1, x[1]["total"])):
+            pct = st["hit"]/st["total"]*100 if st["total"] else 0
+            home_pct = st["home_pred"]/st["total"]*100 if st["total"] else 0
+            short = model.split("/")[-1][:22]
+            print(f"  {short:<22} {st['hit']}/{st['total']} ({pct:.0f}%) +双选{st['alt']} | 主胜预测占比{home_pct:.0f}%")
+
     print("=" * 90)
     print("说明: 方向单选=综合方向直接命中; 含双选=单选命中或任一模型双选覆盖; 官方赔率=市场方向命中")
+    print("     Brier: 综合方向投票隐含概率的多类Brier, 越低越好, 三选一随机基线≈0.667")
     print("     样本越多越可信, 单日 5-10 场只是噪声, 建议积累 2-3 周再看趋势")
 
 

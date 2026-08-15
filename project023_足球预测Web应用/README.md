@@ -21,7 +21,7 @@
 ## 重要说明（必读）
 
 - **轻量证据 = 降级口径**：一键预测的证据只含体彩官方赔率/身份 + 量化档位（自动生成），伤停/首发/近况新闻不自动搜索 → 预测会带 ⚠证据缺口标记、EV 风控偏保守。需要深度证据时：手工把证据文件放到
-  `C:\Users\Administrator\football-llm-predictor\data\evidence_YYYY-MM-DD\evidence_NNN_主队_客队.md`
+  `project018_技能工作区整合\02_脚本\llm\football-llm-predictor\data\evidence_YYYY-MM-DD\evidence_NNN_主队_客队.md`
   （NNN = raw 场次序号，六类标题格式见 `football-evidence-collection` 技能），再点预测会跳过已有证据文件。
 - **LLM 轨依赖 3 个 API key**（环境变量：DEEPSEEK_API_KEY / 智谱 / ARK）。量化轨与采集完全离线。
 - **仅绑定 127.0.0.1**，单机单用户，无鉴权。
@@ -42,7 +42,7 @@ app.py（FastAPI, 127.0.0.1:8765）
 ## 复用的既有资产（不复制代码）
 
 - 体彩采集：`project015/02_脚本/fetch_sporttery_full.py`
-- LLM 预测：`C:\Users\Administrator\football-llm-predictor\predict.py`（3模型投票+EV+坍缩检测+熔断）
+- LLM 预测：`project018_技能工作区整合\02_脚本\llm\football-llm-predictor\predict.py`（3模型投票+EV+坍缩检测+熔断）
 - 解析：`parse_predictions.py`
 - 量化档位：`project021/05_交付/full_backtest.json`（复刻 league_tiers 分档规则）
 

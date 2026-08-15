@@ -138,7 +138,17 @@ def fmt_lineups_block(lineups, home_en, away_en):
     for tag, en, side in (("主队", home_en, "home"), ("客队", away_en, "away")):
         s = lineups.get(side) or {}
         starters = _fmt_players(s.get("starting") or [], 11)
-        missing = _fmt_players(s.get("missing") or [], 15)
+        missing_rows = s.get("missing") or []
+        # 缺阵球员按影响等级打 [HIGH]/[MEDIUM]/[LOW] 标签 (Layer 1 结构化分级)
+        missing_tagged = []
+        for r in missing_rows[:15]:
+            base = (_fmt_players([r], 1) or ["缺阵球员"])[0]
+            lvl, detail = classify_injury_impact(r)
+            if lvl != IMPACT_LOW:
+                suffix = f" | impact: {detail}" if detail else ""
+                missing_tagged.append(f"{lvl} {base}{suffix}")
+            else:
+                missing_tagged.append(base)
         subs_n = len(s.get("subs") or [])
         label = f"{tag}({en})" if en else tag
         lines.append(f"### {label}")
@@ -146,8 +156,11 @@ def fmt_lineups_block(lineups, home_en, away_en):
             lines.append(f"- 首发({len(starters)}): " + " / ".join(starters))
         else:
             lines.append("- 首发: 暂无公布")
-        if missing:
-            lines.append(f"- 缺阵/不可用({len(missing)}): " + " / ".join(missing))
+        if missing_tagged:
+            lines.append(f"- 缺阵/不可用({len(missing_rows)}): " + " / ".join(missing_tagged))
+            n_hi = sum(1 for r in missing_rows if classify_injury_impact(r)[0] == IMPACT_HIGH)
+            if n_hi:
+                lines.append(f"- ⚠️ {IMPACT_HIGH} 核心缺阵 {n_hi} 人 → 战力折损显著, 方向判断须重点权衡")
         else:
             lines.append("- 缺阵名单: 无或未提供")
         if subs_n:
@@ -368,6 +381,217 @@ def safe_float(x):
         return None
 
 
+def safe_int(x):
+    try:
+        return int(x)
+    except (TypeError, ValueError):
+        return None
+
+
+# ---------- 证据影响分级 (Layer 1) ----------
+
+IMPACT_HIGH = "[HIGH]"
+IMPACT_MEDIUM = "[MEDIUM]"
+IMPACT_LOW = "[LOW]"
+
+
+def classify_injury_impact(player_row, team_total_goals=None):
+    """根据球员赛季数据判断缺阵影响等级。
+    返回 (等级标签, 量化说明字符串)。
+    player_row: apifootball get_lineups missing_players 中的 dict (可能只有 name/reason)。
+    team_total_goals: 该队赛季总进球 (可选, 用于计算占比)。
+    """
+    if not isinstance(player_row, dict):
+        return IMPACT_LOW, ""
+    # 尝试从球员统计推算
+    goals = safe_float(player_row.get("player_goals") or player_row.get("goals"))
+    assists = safe_float(player_row.get("player_assists") or player_row.get("assists"))
+    minutes = safe_float(player_row.get("player_minutes") or player_row.get("minutes"))
+    matches = safe_float(player_row.get("player_match_played") or player_row.get("matches"))
+
+    contribution = (goals or 0) + (assists or 0) * 0.5
+    goals_pct = None
+    if goals and team_total_goals and team_total_goals > 0:
+        goals_pct = goals / team_total_goals * 100
+
+    # 分级逻辑
+    if goals_pct is not None and goals_pct >= 15:
+        return IMPACT_HIGH, f"赛季{int(goals)}球占比{goals_pct:.0f}%"
+    if contribution >= 10:
+        return IMPACT_HIGH, f"赛季贡献{contribution:.0f}(进球+助攻×0.5)"
+    if minutes and matches and matches > 0 and minutes / matches >= 60 and contribution >= 3:
+        return IMPACT_MEDIUM, f"主力轮换(场均{minutes/matches:.0f}分钟, 贡献{contribution:.0f})"
+    if contribution >= 2:
+        return IMPACT_MEDIUM, f"赛季贡献{contribution:.0f}"
+    # 无数据时按位置猜测
+    pos = str(player_row.get("lineup_position") or player_row.get("position") or "").lower()
+    reason = str(player_row.get("lineup_time") or player_row.get("reason") or player_row.get("type") or "").lower()
+    if "gk" in pos or "goalkeeper" in pos or "门将" in pos:
+        return IMPACT_MEDIUM, "门将缺阵"
+    if any(kw in reason for kw in ("suspended", "red card", "停赛")):
+        return IMPACT_MEDIUM, "停赛缺阵"
+    return IMPACT_LOW, ""
+
+
+def classify_odds_divergence(home_odds_list):
+    """根据多家机构赔率极差判断盘口分歧等级。
+    返回 (等级标签, 说明)。
+    """
+    if not home_odds_list or len(home_odds_list) < 2:
+        return IMPACT_LOW, ""
+    spread = max(home_odds_list) - min(home_odds_list)
+    if spread >= 0.5:
+        return IMPACT_HIGH, f"主胜赔率极差{spread:.2f}, 机构严重分歧"
+    if spread >= 0.2:
+        return IMPACT_MEDIUM, f"主胜赔率极差{spread:.2f}, 机构有分歧"
+    return IMPACT_LOW, "盘口一致"
+
+
+def classify_standings_gap(home_pos, away_pos, home_pts, away_pts):
+    """根据积分排名差判断实力差距等级。"""
+    if home_pos is None or away_pos is None:
+        return IMPACT_LOW, ""
+    pos_gap = abs(home_pos - away_pos)
+    pts_gap = abs((home_pts or 0) - (away_pts or 0))
+    if pos_gap >= 12 or pts_gap >= 20:
+        return IMPACT_HIGH, f"排名差{pos_gap}位, 积分差{pts_gap}分, 实力差距显著"
+    if pos_gap >= 6 or pts_gap >= 10:
+        return IMPACT_MEDIUM, f"排名差{pos_gap}位, 积分差{pts_gap}分"
+    return IMPACT_LOW, f"排名差{pos_gap}位, 实力接近"
+
+
+def classify_form_trend(recent_form):
+    """根据近期战绩(最近6场)判断状态趋势等级。
+    recent_form: list of dict, 每条含 home_score/away_score。
+    返回 (等级标签, 说明, ppg值)。
+    """
+    if not recent_form or len(recent_form) < 3:
+        return IMPACT_LOW, "", None
+    points = 0
+    n = 0
+    for it in recent_form[:5]:
+        hs = safe_float(it.get("home_score"))
+        as_ = safe_float(it.get("away_score"))
+        if hs is None or as_ is None:
+            continue
+        n += 1
+        # 注意: h2h recent_form 中 home/away 是相对于该队
+        # 简化处理: 胜=3 平=1 负=0
+        if hs > as_:
+            points += 3
+        elif hs == as_:
+            points += 1
+    if n == 0:
+        return IMPACT_LOW, "", None
+    ppg = points / n
+    if ppg >= 2.5:
+        return IMPACT_HIGH, f"近{n}场{points}分(场均{ppg:.1f}), 状态火热", ppg
+    if ppg <= 0.5:
+        return IMPACT_HIGH, f"近{n}场{points}分(场均{ppg:.1f}), 状态低迷", ppg
+    if ppg >= 2.0:
+        return IMPACT_MEDIUM, f"近{n}场{points}分(场均{ppg:.1f}), 状态不错", ppg
+    if ppg <= 1.0:
+        return IMPACT_MEDIUM, f"近{n}场{points}分(场均{ppg:.1f}), 状态一般", ppg
+    return IMPACT_LOW, f"近{n}场{points}分(场均{ppg:.1f})", ppg
+
+
+def build_quant_summary(quant: dict) -> str:
+    """从收集到的量化指标生成信号摘要段。
+    quant: dict 包含各级别指标。
+    """
+    lines = ["## 量化信号摘要", ""]
+    items = []
+
+    # 伤停影响（用缺阵人数判断阵容完整度偏向）
+    hm = quant.get("home_missing_count", 0)
+    am = quant.get("away_missing_count", 0)
+    if hm or am:
+        bias = ""
+        if hm - am >= 2:
+            bias = " → 阵容完整度偏向客队"
+        elif am - hm >= 2:
+            bias = " → 阵容完整度偏向主队"
+        items.append(f"伤停: 主队缺阵{hm}人 / 客队缺阵{am}人{bias}")
+
+    # 赔率分歧
+    od = quant.get("odds_divergence_level", "")
+    od_detail = quant.get("odds_divergence_detail", "")
+    if od and od != IMPACT_LOW:
+        items.append(f"赔率分歧: {od} {od_detail}")
+
+    # 实力差
+    sg = quant.get("standings_gap_level", "")
+    sg_detail = quant.get("standings_gap_detail", "")
+    if sg and sg != IMPACT_LOW:
+        items.append(f"实力差: {sg} {sg_detail}")
+
+    # 近期状态
+    hf = quant.get("home_form_detail", "")
+    af = quant.get("away_form_detail", "")
+    if hf:
+        items.append(f"主队状态: {quant.get('home_form_level', '')} {hf}")
+    if af:
+        items.append(f"客队状态: {quant.get('away_form_level', '')} {af}")
+
+    # 模型vs市场
+    mkt_vs_model = quant.get("model_vs_market", "")
+    if mkt_vs_model:
+        items.append(f"模型vs市场: {mkt_vs_model}")
+
+    if not items:
+        return "## 量化信号摘要\n- 各项指标均在正常范围, 无显著异常信号\n"
+    for it in items:
+        lines.append(f"- {it}")
+    return "\n".join(lines) + "\n"
+
+
+def collect_quant_signals(odds_list, lineups, standings, h2h, pred=None, home_en="", away_en=""):
+    """汇总各块的量化指标, 供 build_quant_summary 生成摘要 (Layer 1 汇总)。"""
+    quant = {}
+    # 伤停
+    if lineups and lineups.get("available"):
+        hm_rows = (lineups.get("home") or {}).get("missing") or []
+        am_rows = (lineups.get("away") or {}).get("missing") or []
+        quant["home_missing_count"] = len(hm_rows)
+        quant["away_missing_count"] = len(am_rows)
+        quant["injury_impact_home"] = sum(1 for r in hm_rows if classify_injury_impact(r)[0] == IMPACT_HIGH)
+        quant["injury_impact_away"] = sum(1 for r in am_rows if classify_injury_impact(r)[0] == IMPACT_HIGH)
+    # 赔率分歧
+    if odds_list:
+        hs = []
+        for o in odds_list:
+            v = safe_float((o.get("1x2") or {}).get("home"))
+            if v:
+                hs.append(v)
+        lvl, detail = classify_odds_divergence(hs)
+        quant["odds_divergence_level"] = lvl
+        quant["odds_divergence_detail"] = detail
+    # 积分差
+    if standings and isinstance(standings, dict):
+        hr = ar = None
+        for t in standings.get("table", []):
+            nm = str(t.get("team", "")).lower()
+            if nm == home_en.lower():
+                hr = t
+            elif nm == away_en.lower():
+                ar = t
+        if hr and ar:
+            lvl, detail = classify_standings_gap(
+                safe_int(hr.get("position")), safe_int(ar.get("position")),
+                safe_int(hr.get("points")), safe_int(ar.get("points")))
+            quant["standings_gap_level"] = lvl
+            quant["standings_gap_detail"] = detail
+    # 近况
+    if h2h:
+        for side, key, lk in (("home", "team1_recent_form", "home_form"),
+                              ("away", "team2_recent_form", "away_form")):
+            rf = h2h.get(key) or []
+            lvl, detail, ppg = classify_form_trend(rf)
+            quant[f"{lk}_level"] = lvl
+            quant[f"{lk}_detail"] = detail
+    return quant
+
+
 def fmt_odds_block(odds_list):
     """odds_list: 该场所有公司条目 -> markdown 段。"""
     if not odds_list:
@@ -390,11 +614,13 @@ def fmt_odds_block(odds_list):
     import statistics
     h, d, a = statistics.mean(hs), statistics.mean(ds), statistics.mean(as_)
     inv = 1 / h + 1 / d + 1 / a
+    # 盘口分歧影响等级 (Layer 1)
+    div_lvl, div_detail = classify_odds_divergence(hs)
+    div_txt = f" | {div_lvl} {div_detail}" if div_lvl != IMPACT_LOW else ", 盘口一致"
     lines = [f"## 1. 国际盘赔率 ({n}家公司均值, 更新 {odds_list[0].get('updated','')})",
              f"- 平均: 主胜 {h:.2f} / 平 {d:.2f} / 客胜 {a:.2f}",
              f"- 去水位隐含概率: 主胜 {1/h/inv*100:.1f}% / 平 {1/d/inv*100:.1f}% / 客胜 {1/a/inv*100:.1f}%",
-             f"- 主胜分布: {min(hs):.2f}~{max(hs):.2f} (极差 {max(hs)-min(hs):.2f})" +
-             (", 盘口一致" if max(hs) - min(hs) < 0.2 else ", ⚠️ 盘口分歧较大")]
+             f"- 主胜分布: {min(hs):.2f}~{max(hs):.2f} (极差 {max(hs)-min(hs):.2f}){div_txt}"]
     if o2:
         lines.append(f"- 大小球2.5: 大 {statistics.mean(o2):.2f} / 小 {statistics.mean(u2):.2f}")
     return "\n".join(lines)
@@ -403,7 +629,7 @@ def fmt_odds_block(odds_list):
 def fmt_predictions_block(pred):
     if not pred:
         return None
-    lines = [f"## 2. 官方数学模型预测 (apifootball 官方统计模型, 独立于LLM与市场)",
+    lines = ["## 2. 官方数学模型预测 (apifootball 官方统计模型, 独立于LLM与市场)",
              f"- 主胜 {pred.get('home_win_pct')}% / 平 {pred.get('draw_pct')}% / 客胜 {pred.get('away_win_pct')}% | favorite: {pred.get('favorite')}",
              f"- 双方进球 {pred.get('both_teams_score_pct')}% | 大2.5球 {pred.get('over_2_5_goals_pct')}% / 小2.5球 {pred.get('under_2_5_goals_pct')}%"]
     return "\n".join(lines)
@@ -414,8 +640,14 @@ def fmt_standings_block(standings, home_en, away_en):
         return None
     table = standings.get("table", [])
     rows = []
+    home_row = away_row = None
     for t in table:
-        if str(t.get("team", "")).lower() in (home_en.lower(), away_en.lower()):
+        if str(t.get("team", "")).lower() == home_en.lower():
+            home_row = t
+            rows.append(f"- {t.get('team')}: 第{t.get('position')}名 ({t.get('played')}场 "
+                        f"{t.get('wins')}胜{t.get('draws')}平{t.get('losses')}负, 进{t.get('goals_for')}失{t.get('goals_against')}, {t.get('points')}分)")
+        elif str(t.get("team", "")).lower() == away_en.lower():
+            away_row = t
             rows.append(f"- {t.get('team')}: 第{t.get('position')}名 ({t.get('played')}场 "
                         f"{t.get('wins')}胜{t.get('draws')}平{t.get('losses')}负, 进{t.get('goals_for')}失{t.get('goals_against')}, {t.get('points')}分)")
     if not rows:
@@ -423,7 +655,17 @@ def fmt_standings_block(standings, home_en, away_en):
     # 新赛季未开始: 全部 0 场, 积分榜无参考价值
     if table and all(str(r.get("played") or "0") in ("0", "") for r in table):
         return "## 3. 联赛积分榜 (战意判断)\n- ⚠️ 新赛季未开始, 积分榜为空, 无战意参考价值"
-    return "## 3. 联赛积分榜 (战意判断)\n" + "\n".join(rows)
+    lines = ["## 3. 联赛积分榜 (战意判断)"] + rows
+    # 积分差影响等级 (Layer 1)
+    if home_row and away_row:
+        hp = safe_int(home_row.get("position")); ap = safe_int(away_row.get("position"))
+        hp_pts = safe_int(home_row.get("points")); ap_pts = safe_int(away_row.get("points"))
+        lvl, detail = classify_standings_gap(hp, ap, hp_pts, ap_pts)
+        if lvl != IMPACT_LOW:
+            lines.append(f"- {lvl} {detail}")
+        else:
+            lines.append(f"- 实力信号: {detail}")
+    return "\n".join(lines)
 
 
 def utc_date(item):
@@ -492,9 +734,31 @@ def fmt_h2h_block(h2h):
         lines.append("")
         lines.append("## 4b. 近期状态 (apifootball 附带数据)")
         for tag, rf in (("主队", rf1), ("客队", rf2)):
+            # 近况影响等级 (Layer 1)
+            lvl, detail, ppg = classify_form_trend(rf or [])
+            if lvl != IMPACT_LOW and detail:
+                lines.append(f"- {tag}状态: {lvl} {detail}")
             for it in (rf or [])[:5]:
                 lines.append(f"- {tag}: {it.get('date')} {it.get('home_team')} {it.get('home_score')}-{it.get('away_score')} {it.get('away_team')}")
     return "\n".join(lines) if lines else None
+
+
+def detect_season_opener(standings, h2h):
+    """检测赛季首战/赛季初场景: 积分榜全空 或 无近期状态数据。
+    08-05 回测教训: 赛季首战无近况/积分数据, 传统量化指标全部失效,
+    模型只能靠"主场优势"空话推理 → 5场错4场。必须显式标注数据缺口。"""
+    standings_empty = False
+    if standings and isinstance(standings, dict):
+        table = standings.get("table", [])
+        if table and all(str(r.get("played") or "0") in ("0", "") for r in table):
+            standings_empty = True
+    form_empty = True
+    if h2h:
+        rf1 = h2h.get("team1_recent_form") or []
+        rf2 = h2h.get("team2_recent_form") or []
+        if rf1 or rf2:
+            form_empty = False
+    return standings_empty and form_empty
 
 
 def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None, api_sports=None):
@@ -507,6 +771,11 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
              f"> 第三方结构化数据: apifootball MCP | source({source_url}) collected_at({collected_at})",
              f"> match_identity(sporttery_match_id={raw_m.get('match_id', '')};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
              f"> 竞彩: {raw_m.get('match_num','')} | 体彩matchId {raw_m.get('match_id')} | apifootball match_id {mid}", ""]
+    # 赛季首战数据缺口警告 (08-05 回测教训: 此时量化指标全部失效, 主胜偏见高发)
+    if detect_season_opener(standings, h2h):
+        parts.append("> ⚠️ [赛季首战数据缺口] 积分榜为空且无近期状态数据 → 近况/积分/状态类量化指标全部失效。"
+                     "历史回测(2026-08-05)显示此类场次模型靠'主场优势'空话推理, 5场错4场。"
+                     "本场必须只依赖伤停/阵容/交锋/赔率/战意证据, 且优先双选, 禁止仅凭'主场作战'选主胜。")
     blocks = [lee.render_sporttery_markets(raw_m, collected_at)]
     if api_sports is not None:
         blocks.append(lee.render_api_sports_evidence(api_sports, collected_at))
@@ -524,7 +793,6 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
         except (TypeError, ValueError):
             pct_h = None
         if pct_h is not None and odds_list:
-            import statistics
             x = odds_list[0].get("1x2") or {}
             h = safe_float(x.get("home"))
             if h:
@@ -539,6 +807,10 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
         blocks.append(b4)
     if len(blocks) < 2:
         blocks.append("## 5. 数据缺口\n- 本场 MCP 数据覆盖不全 (部分块未取到), 预测时以人工证据为主, 此块仅参考")
+    # Layer 1 量化信号摘要 (置顶注入, 让 LLM 先看到核心异常信号)
+    quant = collect_quant_signals(odds_list, lineups, standings, h2h, pred, home_en, away_en)
+    if quant:
+        blocks.insert(0, build_quant_summary(quant).rstrip("\n"))
     text = "\n\n".join(parts + blocks)
     annotated = []
     for line in text.splitlines():
