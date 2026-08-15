@@ -35,13 +35,14 @@ def test_normalize():
     assert lpr.normalize_score_pref("6-0") == "胜其他"
 
 
-def test_production_default_models_are_four_domestic_voters_including_kimi():
+def test_production_default_models_are_three_domestic_voters_including_kimi():
+    """qwen/qwen3.8-max 已于 2026-08-12 移除（DASHSCOPE key 401 失效），正式池 3 模。"""
     assert fp.DEFAULT_MODELS == [
         "zhipu/glm-4-flash",
-        "qwen/qwen3.8-max",
         "deepseek/deepseek-chat",
         "moonshot/kimi-k2.6",
     ]
+    assert "qwen/qwen3.8-max" not in fp.DEFAULT_MODELS
     assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k2.6"] == 1.0
 
 
@@ -182,7 +183,11 @@ def test_evidence_gap_forces_dual_direction_and_caution():
 
 
 def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
-    models = list(fp.DEFAULT_MODELS)
+    """故意不用 fp.DEFAULT_MODELS：这里测的是聚合/审计机制本身，不是生产模型池组成，
+    绑定 DEFAULT_MODELS 的具体内容/长度会在每次调池子时无谓break（见 2026-08-12 踩坑记录）。
+    """
+    models = ["zhipu/glm-4-flash", "qwen/qwen3.8-max",
+              "deepseek/deepseek-chat", "moonshot/kimi-k2.6"]
     successful = pr.parse_evidence_prediction(
         '{"direction":"主胜","score_pref":"1-0","reasoning":"【近况:主队连胜】"}'
     )

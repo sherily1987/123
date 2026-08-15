@@ -57,9 +57,10 @@ MODEL_TEMPERATURE_OVERRIDES = {
 # 不得因默认值混入生产投票或同一回测池。
 DEFAULT_MODELS = [
     "zhipu/glm-4-flash",                    # 智谱 (完全免费, 无限量)
-    "qwen/qwen3.8-max",                     # 千问 Max（百炼混合思考模型）
     "deepseek/deepseek-chat",               # DeepSeek V3 (国内直连, 强推理, 极低价)
     "moonshot/kimi-k2.6",                   # Kimi K2.6 (推理模型, temperature=1)
+    # qwen/qwen3.8-max 已于 2026-08-12 移除（DASHSCOPE key 401 失效，不再续用）；
+    # 见 全局复利与踩坑日志.md 2026-08-12 条目与 00_收件箱/待处理.md。
 ]
 
 TIMEOUT = 90          # 单模型调用超时(秒)
