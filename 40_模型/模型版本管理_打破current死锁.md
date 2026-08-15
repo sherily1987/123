@@ -144,6 +144,39 @@ unknown  =  无法取得 model_version 或 probability_signature（08-03 之前�
 - 作为 walk-forward OOS 的**扩展训练/验证集**（不同版本可作稳健性对照）；
 - 用于验证「按 model_version 分组后，各版本的概率质量是否单调改进」。
 
+## 5.3 补丁（2026-08-16）：签名字节哈希留下的残余死锁，与重放别名
+
+**方案上线第二天就被自己踩中了。** 08-15 的「融合门控与契约一致性修订」重构了
+`production_router.py` 的影子路由并拆分了 `fusion_predict_core.py` 的签名字段——
+两个文件都在 `probability_files` 名单里，字节一变 `probability_signature` 就变，
+`audit_version_consistency.py` 判违规，于是 bump 到 m2，当天 13:32 登记的 34 场
+（08-16 赛事）落进 m1，m2 从 0 起算。
+
+**但那次 bump 数值上是中性的**：08-16 用同一批 input 重放，35/35 场
+`final_1x2_pct` 与 `model_1x2_pct` 与登记值完全一致。
+
+根因是 §2.2 的概率签名**仍然是字节哈希**，只是把名单从「8 源文件 + 3 config」缩到
+「6 概率文件 + 1 config」。§1.3 诊断的「字节哈希无法区分影响概率的变更与不影响概率的
+变更」在这个更小的名单里原封不动地成立。
+
+### 补丁机制：重放等价性 + 版本别名
+
+1. **`scripts/probability_replay_check.py`**：取旧样本登记时保存的 `input`，用当前代码
+   重跑，与登记的概率逐场比对，输出 `equivalent` / `changed` / `inconclusive`。
+2. **`config/version_manifest.json` 的 `model_version_aliases`**：只有判 `equivalent`
+   的旧版本可以写入，条目必须带 `probability_signature`、`verified_at`、`verified_by`、
+   `verified_scope` 和证据说明。
+3. **`fusion_backtest.version_cohort()`**：`(model_version, probability_signature)` 与
+   别名条目精确成对匹配时也算 `current`。
+
+这套逻辑与 §5.1 是同一把尺子：08-15 正是用重放测试**否决**了 1466 场 legacy 的并入
+（30 场抽样 11 场概率不同）。这次同样的测试给出肯定结论，所以 m1 并入 m2。
+判否就重攒，判是就并入——标准不因结论方向而变。
+
+**边界**：等价结论只覆盖被重放的路由（m1 这次只有 `market_only`），不可外推到
+hybrid 或未重放的衍生市场；别名不改写样本的原始 `model_version`，分版本明细里
+m1 仍显示为 m1。
+
 ## 6. 风险与纪律
 
 1. **语义版本靠人判断**，存在「该 bump 没 bump」的漏判风险 → 由 §2.2 的

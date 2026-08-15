@@ -4,7 +4,11 @@ import argparse,json,math
 from pathlib import Path
 from statistics import mean
 import sys
-sys.path.insert(0,'C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts')
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from runtime_paths import core_scripts_dir  # noqa: E402
+# 2026-08-16：原硬编码指向外部 football-quant-fusion-suite 的 zu-yu-dashi-3 物理拷贝
+# （靠人工 cp 同步、历史上真的漂移过）。改走 core_scripts_dir()，默认仓库内唯一事实源。
+sys.path.insert(0, str(core_scripts_dir()))
 from odds_methods import devig
 METHODS=('proportional','additive','power','shin'); SNAPS=('opening','t_minus_24h','t_minus_6h','closing')
 # [中文功能] 把比分转成胜平负索引（主胜0/平1/客胜2）

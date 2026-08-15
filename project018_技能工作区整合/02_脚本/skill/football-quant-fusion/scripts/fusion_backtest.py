@@ -14,12 +14,21 @@ import argparse
 import json
 import math
 import random
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+# 本模块常被 importlib.spec_from_file_location 直接加载（测试、外部工具），
+# 那种加载方式不会把 scripts/ 放进 sys.path，同目录模块会 ModuleNotFoundError。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-DEFAULT_STORE = Path("C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/backtest")
+from runtime_paths import backtest_store
+
+# 2026-08-16 修正：原默认值硬编码指向外部 football-quant-fusion-suite。
+# 那是一份物理拷贝、且比仓库内唯一事实源旧，忘了传 --store 就会**静默评测错的库**
+# （calibration_gate、current_version_n 全部跟着错）。改走 runtime_paths 的仓库内默认值。
+DEFAULT_STORE = backtest_store()
 
 
 # [中文功能] 按行读取 jsonl
@@ -111,20 +120,51 @@ def engine_build_key(row):
     return ""
 
 
+def load_version_aliases():
+    """读取 manifest 里经重放验证的等价旧版本清单。
+
+    2026-08-16 新增。`probability_signature` 是概率文件的**字节**哈希，所以对
+    `probability_files` 名单里的文件而言，「改一个字节就重置样本」的死锁原样存在——
+    m1→m2 就是这么丢掉 34 场的（影子路由重构，生产路由概率一位没变）。
+
+    别名的唯一合法来源是 `probability_replay_check.py` 的 `equivalent` 判定：
+    用旧样本登记时保存的 input 重跑当前代码，概率逐场一致才可写进 manifest。
+    匹配要求 (model_version, probability_signature) **精确成对**，避免把该版本
+    其他签名的样本一起放进来。
+    """
+    path = Path(__file__).resolve().parent.parent / "config" / "version_manifest.json"
+    if not path.exists():
+        return []
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8-sig"))
+    except Exception:
+        return []
+    aliases = manifest.get("model_version_aliases") or []
+    return [a for a in aliases if isinstance(a, dict)
+            and a.get("model_version") and _is_sha256(a.get("probability_signature"))]
+
+
 def version_cohort(row, current_identity):
     """语义版本 model_version + 概率签名匹配才属于 current；旧版 legacy，其余 unknown。
 
     2026-08-15 版本管理方案：cohort 主键从「5 字段全量字节哈希」改为
     「model_version + probability_signature」，框架代码/日志/注释的改动不再重置样本。
     旧记录无 model_version/probability_signature 时回退到引擎构建指纹归 legacy。
+
+    2026-08-16 补充：经重放验证概率等价的旧版本（manifest `model_version_aliases`）
+    也算 current——否则一次数值中性的重构就要重新攒 100 场。
     """
     model = row.get("model") or {}
+    row_mv = str(model.get("model_version") or "").strip()
+    row_ps = str(model.get("probability_signature") or "").strip()
     cur_mv = str(current_identity.get("model_version") or "").strip()
     cur_ps = str(current_identity.get("probability_signature") or "").strip()
     if cur_mv and cur_mv != "unknown" and cur_ps and _is_sha256(cur_ps):
-        if str(model.get("model_version") or "").strip() == cur_mv and \
-                str(model.get("probability_signature") or "").strip() == cur_ps:
+        if row_mv == cur_mv and row_ps == cur_ps:
             return "current"
+        for alias in load_version_aliases():
+            if row_mv == alias["model_version"] and row_ps == alias["probability_signature"]:
+                return "current"
     version = str(row.get("version") or "").strip().lower()
     identifiable = version and version not in {"unknown", "offline", "none"} and "unknown" not in version
     if identifiable or engine_build_key(row):

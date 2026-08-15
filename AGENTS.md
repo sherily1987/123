@@ -20,33 +20,36 @@
   `export_skill_for_hermes.py` 会重新拉取 `project018` 的当前代码打包（2026-08-12 已把
   该脚本里硬编码指向已废弃 H 盘的路径改成了 F 盘，之前一直在写一个不存在的目标）。
 
-### ⚠️ 未解决的数据分裂（发现但本轮未修，2026-08-12 补充精确范围）
+### ✅ 数据分裂：已修复并核验（2026-08-15 复核，此前长期标记为「未解决」）
 
-`fusion_daily_pipeline.py` 里 `STORE`/`ODDS_STORE`/`WORK` 三个数据路径仍硬编码指向上面那个
-外部套件，而环境变量 `FUSION_DATA_ROOT` 实际配置的是仓库内路径。实测外部副本的
-`production_movement.jsonl`（926KB，最后写入 2026-08-12 09:00）比仓库内那份
-（753KB，2026-08-11 10:00）更新更大——**这几天的赔率移动数据只写进了外部副本，
-仓库内那份"唯一事实源"缺了这段**。在合并两份历史数据、确认权威来源之前，不要
-直接把这三个路径也改成走仓库内——会让流水线突然读不到最近几天的数据。
+这一节曾经写着「`fusion_daily_pipeline.py` 里 `STORE`/`ODDS_STORE`/`WORK` 仍硬编码
+指向外部套件」和「registry 还差 8 条没补」。**两条都已经不成立，2026-08-15 逐条实测**：
 
-**`backtest/registry.jsonl`（预测登记库本身）的分裂范围已查清、比想象中小**：
-仓库内 `project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/backtest/`
-已经是 1550 条预测记录的完整物理副本（`predictions/2026/08/` 下文件数与外部一致），
-不是空壳。与外部套件（`C:\Users\Administrator\.codex\skills\football-quant-fusion-suite\
-shared\football-quant-fusion\backtest\`，1555 条）逐条按 `prediction_id` 比对，
-**只差 8 条**：`sporttery-2040812/2040813/2040814/2040815/2040816/2040817/2040818/2040830`，
-均来自 2026-08-11 11:02 UTC 那一批（大概率是某次 `fusion_daily_pipeline.py` 用旧默认
-外部 `--store` 跑的，早于本轮修 `CORE_DIR` 之前）。
+1. **路径已统一**：`fusion_daily_pipeline.py` 的三个路径走
+   `02_脚本/skill/football-quant-fusion/scripts/runtime_paths.py`，默认解析到仓库内
+   `04_素材/shared-data/football-quant-fusion/`，可用 `FUSION_DATA_ROOT` 覆盖，
+   并由 `assert_writable_target()` 拒绝写入路径含
+   `/.codex/skills/football-quant-fusion-suite/` 的目标（抛
+   `legacy fusion suite is read-only`）。`fusion_backtest.resolve_path()` 也已改为
+   优先按 `--store` 内相对路径定位，不再因为外部文件还在就静默读外部那份。
 
-**不能直接把这 8 条 append 到仓库内 `registry.jsonl` 末尾去补齐**——`fusion_record.py`
-里 `entry_hash = sha(previous_hash + record_hash)` 是逐文件维护的哈希链，外部那 8 条的
-`previous_hash` 是在外部链上算的，接到仓库内链末尾会对不上仓库内链的实际
-`entry_hash`，破坏这之后的可验证性。要补齐必须专门写一次"重算哈希链"的合并脚本，
-不能手动拼接——这正是之前"需要专门一轮核对再合并"警告里说的那类操作，本轮
-仍然没有做，只是把范围从"不知道差多少"精确到了"就差这 8 条"。
+   **但 2026-08-16 复查发现「已统一」当时只覆盖了 daily-pipeline**：`fusion_backtest.py`、
+   `sample_audit.py`、`evaluate_walk_forward.py`、`fusion_combo.py` 的 `--store` 默认值，
+   以及 `odds_api_adapter.py` 的 odds 输出目录，都还硬编码指向外部套件——忘了传 `--store`
+   就**静默评测/写入错的库**（`calibration_gate`、`current_version_n` 会跟着一起错）。
+   这几处已在 2026-08-16 一并改走 `runtime_paths`。
+   `assert_writable_target()` 只在 `fusion_daily_pipeline.py` 里被调用，**不是全局守卫**，
+   其余脚本靠默认值正确；显式传 `--store` 指向外部仍然能绕开。
+   仍以 `sys.path.insert` 方式引用外部套件 zu-yu-dashi-3 的一次性研究脚本
+   （`calibrate_league_kt.py`、`refit_kt_power.py`、`understat_enrich.py` 等）本轮未动。
+2. **8 条缺口已补齐**：按 `prediction_id` 全量比对，仓库内 1597 条 ⊃ 外部 1555 条，
+   **外部独有 0 条**，仓库内多出 42 条（08-12 之后新登记的）。合并痕迹见
+   `backtest/registry.jsonl.bak_20260812_merge8`。哈希链完整性有
+   `registry_chain_verification_20260814.json` 佐证。
 
-2026-08-12 起新登记的预测（比如今天双轨实测的 3 场 UCL/解放者杯赛事）已经用
-`--store` 显式指向仓库内路径写入，不会再扩大这个既有的 8 条历史缺口。
+保留的教训：外部套件是**物理拷贝不是链接**，历史上确实发生过「流水线默认写外部、
+仓库内唯一事实源缺数据」。现在靠 `runtime_paths.py` 的默认值 + 写入守卫兜住，
+但只要有人显式传 `--store` 指向外部，仍然能绕开——传路径参数时看清指向哪一份。
 
 ## 1. 三个当前活跃的核心项目
 
@@ -90,24 +93,119 @@ project018 内部还有一个指向自身 `02_脚本/skill/football-quant-fusion
   市场锚逻辑）才需要 bump `config/version_manifest.json` 的 `model_version`。
 - 生产预测批次前跑 `python release_lock.py` 锁定发布快照；改概率文件后跑
   `python audit_version_consistency.py` 检测「改了概率但忘了 bump 版本」的违规（非 0 即违规）。
-- 当前 `model_version=m1`，尚无 current 样本（1466 场 legacy 经重放审计确认概率不等价，
-  不归入 current，从 m1 重新累积）。完整机制见 `40_模型/模型版本管理_打破current死锁.md`。
+- **当前 `model_version=m2`**（概率签名 `ceab23711523`，发布锁 2026-08-15T15:33Z）。
+  m1 只存活了约两小时：08-15 13:32 UTC 登记的 08-16 那批 34 场签的是 m1，两小时后
+  「融合门控与契约一致性修订」改动了 `production_router.py`/`fusion_predict_core.py`
+  触发 bump，**m2 的样本从 0 起算，那 34 场 m1 结算后进的是一个不会再增长的队列**。
+  1466 场 legacy 经重放审计确认概率不等价，同样不归入 current。
+  完整机制见 `40_模型/模型版本管理_打破current死锁.md`。
+- **签名字节哈希的死锁没有真正解除，用重放等价性兜底（2026-08-16）**：
+  `probability_signature` 仍是概率文件的**字节**哈希，所以对 `probability_files` 名单里的
+  文件而言，「改一个字节 → 签名变 → 审计要求 bump → 样本清零」原样成立，
+  只是范围从全部源文件缩小到了那几个。m1→m2 就是这么丢的。
+  新增 `scripts/probability_replay_check.py` 回答字节哈希答不了的那个问题——**概率变没变**：
 
-**LLM 轨报告纪律（2026-08-15，重要，写报告前必读）**：`predict.py::aggregate_directions()`
-的 `strength` 字段是**投票比例**（`top_votes / total_votes`，如 2/3、5/6），不是校准概率；
-`build_audit_record()` 的 JSON 输出里**没有 EV 字段**，`export_report.py` 也不产出 EV。
-换句话说：**这个仓库目前没有任何代码计算 EV**。
-- ⚠️ `全局复利与踩坑日志.md` 2026-08-12 那条"新增 `ev_calculator.py`（EV=预测概率×赔率-1）"
-  的记录是**从未落地的**——`git log --all` 对该文件零匹配，此文件在本仓库历史上不存在过。
-  别因为日志写了"已新增"就假设它存在或引用它的行为，先用 `git log --all -- <path>` 核实。
-- 2026-08-15 的开售预测报告（如 `project001_足球预测/05_交付/2026-08-15_开售预测/`）出现
-  的 `EV +113%` 等数字，是**报告撰写环节手算/编造**的，把投票比例当概率代入
-  `概率×赔率-1`——不是代码 bug，是没有代码兜底，写报告的会话可以随意编。
-- **规则：写每日预测报告时，不得输出任何"EV"/"期望值"字段或列**，除非能指出它是从哪段
-  可审计代码算出来的。可以照常展示 `strength`（投票强度，如实标注"投票比例，非概率"），
-  但不得拿它去乘赔率、不得包装成"正 EV 推荐"或排序依据。
-- 若确实需要 EV 排序，必须先有一个真实概率来源（如轨道 A 融合引擎的 `final_1x2_pct`），
-  不能用轨道 B 的投票比例替代——这也是双轨"各自登记、各自结算、不合并"纪律的延伸。
+  ```powershell
+  python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\probability_replay_check.py --model-version m1
+  ```
+
+  它取旧样本登记时保存的 `input` 用当前代码重跑，与登记的 `final_1x2_pct`/`model_1x2_pct`
+  逐场比对。判 `equivalent` 才可以把旧版本写进 `version_manifest.json` 的
+  `model_version_aliases`，由 `fusion_backtest.version_cohort()` 按 current 计。
+  **m1 已实测 35/35 完全一致**（仅 market_only 路由），已登记为 m2 的别名，
+  那 34 场因此不必重攒。别名必须 `(model_version, probability_signature)` 精确成对，
+  且等价结论不可外推到未重放的路由/衍生市场。这与 08-15 用同一把尺子**否决** 1466 场
+  legacy 并入是同一套方法论，只是这次结论是肯定的。
+- 查「当前版本还差多少样本」用（2026-08-15 新增，不必跑全量回测）：
+
+  ```powershell
+  python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\fusion_cli.py version-progress
+  ```
+
+  它同时给**已结算**和**在途未结算**两个数——后者原先没有任何入口，只能手写脚本查。
+  它的 settled 是回测 `n` 的上界（回测会丢弃已结算但无法评分的记录；2026-08-16 实测
+  两边都是 474，当前没有这类记录，但别假定永远相等），门禁分子仍以 `backtest` 的
+  `calibration_gate` 为准。`signature_drift` 非空 = 有人改了概率文件却没 bump 版本，
+  那些样本会被静默排除出 current。
+
+**精度现状与靶子（2026-08-16 诊断）**：模型 Brier 不优于市场（473 场 delta +0.0076，
+95%CI 跨 0）。但这个全局数字**具有误导性**——劣势由 43 场（9%）产生，即市场依赖度 <80%、
+模型真正动用独立信息偏离市场的那批（delta +0.0903）；其余 430 场 delta −0.0006、
+CI ±0.002，因为 market_only 模式下模型概率就是同一份赔率去水反解的，**同源，不是打平**。
+按联赛/分箱排出来的名次全部不显著，**照着调校准层会调错地方**，靶子是独立信息融合通路。
+完整分解与三个候选方向见
+`project018_技能工作区整合/06_复盘/2026-08-16_精度诊断/诊断_模型在哪里输给市场_20260816.md`。
+注意 n=43、CI 跨 0，是有机制的假设不是定论；要坐实它需要**有意识地积累 hybrid 路由样本**，
+继续堆 market_only 学不到任何东西。
+
+**LLM 轨报告纪律（2026-08-15，重要，写报告前必读；同日两次更正，见下）**：
+
+⚠️ **头号事实：LLM 轨真正的生产代码不在这个 git 仓库里**，在
+`C:\Users\Administrator\football-llm-predictor\`（`00_项目入口.md` 已注明"非Git仓库"）。
+本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/` 是一份**独立副本**，
+两边没有任何自动或约定的同步机制（不像 zu-yu-dashi-3 核心库那样至少有个"必须手动 cp"的
+纪律，这里连纪律都没有）。**只查本仓库/只查 git 历史，得出的"某功能不存在"这类结论可能
+是假的**——本条下方就是一次真实的翻车案例。改任何一侧的代码前，先确认改的是不是真正在跑
+的那一份；只改了仓库副本不代表生产行为变了，反之亦然。
+
+**分裂程度已量化（2026-08-15 实测）**：生产 `predict.py` 1101 行，仓库副本 800 行，
+仓库副本缺 `import model_weights` / `import ev_calculator`、缺主胜比例熔断
+（`HOME_BIAS_THRESHOLD`）、缺次回合战意提示、`select_matches()` 少 `min_match` 分批参数。
+**仓库副本的 predict.py 是一个停更的旧分支，不要拿它推断生产行为**。2026-08-15 起
+`ev_calculator.py` 与 `test_ev_calculator.py` 两个文件已在两侧保持一致（手工 cp），
+其余文件仍然各走各的。
+
+- `predict.py::aggregate_directions()` 的 `strength` 字段是**投票比例**
+  （`top_votes / total_votes`，如 2/3、5/6），**不是校准概率**，这一点两边代码一致，是真的。
+- ~~"这个仓库没有任何代码计算 EV"~~ **这是本节 2026-08-15 当天写下又被推翻的错误结论**：
+  C 盘生产目录下的 `ev_calculator.py` 真实存在、`predict.py` 第 31/826 行确有
+  `import ev_calculator as evc` 和 `evc.generate_betting_recommendation(...)` 调用，
+  产出的 EV 会打进控制台输出（`💰 下注推荐` 段）。当时判断"从未落地"只是因为
+  `git log --all` 只查了本仓库历史，没意识到生产代码根本不在仓库里——**结论的错误来源是
+  查证范围只覆盖了仓库，不是代码真的不存在**。
+- ~~`ev_calculator.py` 用 `votes_to_probabilities()` 把投票计数归一化当概率代入 EV~~
+  **已于 2026-08-15 修复**（备份 `ev_calculator.py.bak_20260815_pre_ev_fix`）：
+  - `votes_to_probabilities()` 已删除，调用直接抛 `NotImplementedError`，不再静默返回假概率；
+    要票比用 `votes_to_vote_share()`，语义写死在函数名里。
+  - `generate_betting_recommendation()` **无校准概率来源时 fail closed**：必须同时传
+    `calibrated_probs` 和 `prob_source` 才产出 EV，否则 `action=skip`，只给
+    `vote_share_analysis`（**刻意不含 `ev` 键**，下游误用会 KeyError 而不是拿到假数字）。
+  - `predict.py` 的决策层同步收紧：只有 `action=bet` 的 `ev_analysis` 才传给
+    `decide_single_pick()`。此前无论 skip 与否都传，等于在代码里绕开了自己的风控闸门——
+    与 8-15 报告手工摘录时犯的是同一个错，只是那次发生在人工环节。
+  - 顺带修掉 `find_positive_ev_bets()` 里那个签名上有、函数体里从没用过的
+    `max_strength_threshold` 参数（调用方以为设了强度门槛，其实没生效）。
+  - 配套测试 `test_ev_calculator.py`（10 项），C 盘生产与仓库副本两侧均 66 项通过。
+  - **概率来源已于 2026-08-16 接上**：新增 `fusion_probability_source.py`，按
+    `sporttery-<match_id>`（LLM 原始输入里就有 `match_id`）从量化轨登记库取最新一条
+    `final_1x2_pct`。那是核心引擎按联赛校准过的真概率（记录里 `calibration.applied=true`，
+    带 `league_basis` 与 test ECE），与未校准的「融合层推荐置信度」不是一个东西。
+    取不到就返回 `None`，`ev_calculator` 照常 fail closed——**不得回退到投票比例**。
+  - **但接上之后仍然出不了胆，这是对的**：`ev_calculator` 新增两道闸门——概率来源
+    `calibration_status != VALID` 不出胆；`market_derived=True`（量化轨 `mode=market_only`，
+    概率由**同一个盘口**去水反解而来）也不出胆，因为对同一盘口算 EV 量到的是庄家水位
+    而不是独立信息 edge。当前登记的绝大多数是 market_only，所以实际表现是
+    「给出 EV 数字 + `action=skip`」。这与融合技能 `edge_min_pp=5` 的判断一致
+    （实测 675 样本 edge 范围 [-6.3,+1.6]pp，market_only 几乎必然不出胆）。
+  - **修复前后的量级**（阿森纳vs曼城 08-16，真实登记场次）：旧口径票比 57.1% 当概率、
+    平局 EV **+88.6%**；新口径校准概率 30.1%、平局 EV **-0.7%**。单场虚高 89 个百分点。
+  - 双轨纪律不变：借用轨道A概率**只发生在 EV 这一层**，方向/比分/投票/登记仍各自独立。
+- `generate_betting_recommendation()` 自己是有风控闸门的：`evidence_gap=True` 或
+  `strength < 0.6` 时返回 `action=skip`，理由就是"证据存在缺口，风险过高"
+  / "投票强度 X% < 60.0%，共识不足"这两句**硬编码字符串**（不是报告撰写者现编的）。
+  但 2026-08-15 报告的"正 EV 下注推荐 Top"栏目里，恰恰是这几个被判定 `skip` 的场次
+  带着 EV 数字出现在推荐表里——**没找到一个把 `predict.py` 控制台输出转成这份 markdown
+  表格的脚本**，大概率是撰写报告的会话手动摘录时把 `skip` 场次的 `ev_analysis`
+  （所有方向都有数字，不管 skip/bet）当成了 `recommended_bets`（只有 bet 时才有）来抄，
+  绕开了代码自己的风控判断——**这个具体因果没有百分百实锤，是较强推测，不是定论**。
+- **规则（修正版）**：①改 LLM 轨代码前先确认在改 C 盘生产目录还是 F 盘仓库副本，两边都要
+  改就都要改，只改一边等于没改；②`strength` 不是概率，不要在任何新写的分析里把它当概率用；
+  ③`ev_calculator.py` 的 EV 数字方法论上有效但依据不可靠（投票比例≠概率），报告里出现 EV
+  时必须同时展示 `action`（`bet`/`skip`）和 `reason`，**不能只摘 EV 数字不摘判定结果**；
+  ④若某场 `action=skip`，报告里就不能把它塞进"推荐"表，哪怕它的 EV 数字很好看。
+- 若确实需要更可靠的 EV 排序，应该先有一个真实概率来源（如轨道 A 融合引擎的
+  `final_1x2_pct`），不能用轨道 B 的投票比例替代——这也是双轨"各自登记、各自结算、
+  不合并"纪律的延伸。
 
 **独立工具（2026-08-15 新增）**：`project018_技能工作区整合/05_交付/独立工具/` 是给用户
 日常双击使用的菜单入口（`fusion_tool.bat`，桌面有「足球预测工具」快捷方式），菜单 8 项

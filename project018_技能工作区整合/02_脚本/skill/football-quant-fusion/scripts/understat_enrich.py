@@ -14,7 +14,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from runtime_paths import core_scripts_dir, data_root  # noqa: E402
+# 2026-08-16：原硬编码指向外部 football-quant-fusion-suite 的 zu-yu-dashi-3 物理拷贝
+# （靠人工 cp 同步、历史上真的漂移过）。改走 core_scripts_dir()，默认仓库内唯一事实源。
+sys.path.insert(0, str(core_scripts_dir()))
 import understat_xg as UX
 
 CN2US = {"英超": "EPL", "西甲": "La_liga", "德甲": "Bundesliga", "意甲": "Serie_A", "法甲": "Ligue_1"}
@@ -64,7 +68,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--output", required=True)
-    ap.add_argument("--store", default=r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/datasets/understat_store.jsonl")
+    # 2026-08-16：默认值原指向外部套件的 datasets（物理拷贝），改走仓库内唯一事实源
+    ap.add_argument("--store", default=str(data_root() / "datasets" / "understat_store.jsonl"))
     ap.add_argument("--mode", default="model_first", choices=("model_first", "hybrid_prior"))
     ap.add_argument("--prior-weight", type=float, default=0.05)
     a = ap.parse_args()

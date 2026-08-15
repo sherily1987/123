@@ -34,12 +34,14 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+from runtime_paths import data_root
+
 HERE = Path(__file__).resolve().parent
 SKILL_ROOT = HERE.parent
 DEFAULT_CONFIG = SKILL_ROOT / "config" / "intl_odds_sources.json"
-DEFAULT_STORE = Path(
-    "C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/odds"
-)
+# 2026-08-16：本脚本会 append 写入 odds 目录。默认值原指向外部 football-quant-fusion-suite，
+# 那是只读引用副本，写进去的国际盘数据在仓库内唯一事实源里根本看不到。改走 runtime_paths。
+DEFAULT_STORE = data_root() / "odds"
 
 
 def now_iso():

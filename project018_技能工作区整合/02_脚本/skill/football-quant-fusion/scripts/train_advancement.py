@@ -21,7 +21,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/football-quant-fusion/scripts")
+# 2026-08-16：原硬编码指向外部套件里的 football-quant-fusion 副本；
+# 本文件就在该技能的 scripts/ 下，直接用自身目录，不必绕外部拷贝。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_advancement_library as B
 
 D = B.D

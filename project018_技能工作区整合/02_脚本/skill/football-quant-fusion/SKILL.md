@@ -27,6 +27,7 @@ python $cli --help
 | 赔率移动对照 | `odds-add` / `odds-drift` / `odds-intl` |
 | LLM赛前证据采集 | `llm-evidence` |
 | 结算与回测 | `settle` / `backtest` |
+| 当前版本还差多少样本 | `version-progress` |
 | 赛事模拟 | `tournament`，仅在赛制和输入已核验时 |
 | 双回合晋级 | 先分别计算每场90分钟，再显式处理总比分、加时和点球；没有统一 CLI 时不得声称已自动完成 |
 
@@ -106,9 +107,19 @@ current cohort 以 `model_version + probability_signature` 识别。概率算法
 100场、200场等数量只能作为复审触发点，不是统计证明。任何效果结论都要同时报告赛事范围、时间切分、版本、样本量、基线、指标点估计和不确定性；样本外结果不优于基线时不得推广。
 
 ```powershell
+python $cli version-progress
+python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\probability_replay_check.py --model-version m1
 python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\release_lock.py
 python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\audit_version_consistency.py
 ```
+
+`probability_signature` 是概率文件的字节哈希，数值中性的重构同样会触发 bump 并清零样本。
+`probability_replay_check.py` 用旧样本登记时保存的 input 重跑当前代码，逐场比对概率；
+仅当判定 `equivalent` 时，才可把旧版本写入 manifest 的 `model_version_aliases` 并按
+current 计入样本。别名要求 `model_version` 与 `probability_signature` 精确成对，
+等价结论不得外推到未重放的路由或衍生市场。
+
+`version-progress` 报告当前 `model_version` 的已结算与在途样本数，以及与复审触发点的距离；其中已结算数是回测 `n` 的上界（不含已结算但无法评分的记录），门禁分子仍以 `backtest` 为准。`signature_drift` 非空表示改了概率文件却未升级 `model_version`，这些样本不会计入 current cohort。
 
 版本审计非零退出时不得发布新概率。历史迁移只建立索引与来源映射，不改写原预测。
 

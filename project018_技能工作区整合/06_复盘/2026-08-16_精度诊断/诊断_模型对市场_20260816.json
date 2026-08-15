@@ -1,0 +1,412 @@
+{
+  "schema_version": "fusion-precision-diagnosis-1.0",
+  "paired_n": 473,
+  "overall": {
+    "n": 473,
+    "model_brier": 0.6164,
+    "market_brier": 0.6088,
+    "delta": 0.0076,
+    "delta_95ci": [
+      -0.0041,
+      0.0196
+    ],
+    "excludes_zero": false
+  },
+  "by_league": {
+    "荷甲": {
+      "n": 8,
+      "model_brier": 0.6435,
+      "market_brier": 0.4715,
+      "delta": 0.172
+    },
+    "欧超杯": {
+      "n": 1,
+      "model_brier": 0.2776,
+      "market_brier": 0.2408,
+      "delta": 0.0368
+    },
+    "日乙": {
+      "n": 1,
+      "model_brier": 0.5925,
+      "market_brier": 0.5652,
+      "delta": 0.0273
+    },
+    "沙职": {
+      "n": 2,
+      "model_brier": 0.4633,
+      "market_brier": 0.4367,
+      "delta": 0.0266
+    },
+    "巴甲": {
+      "n": 4,
+      "model_brier": 0.5253,
+      "market_brier": 0.5025,
+      "delta": 0.0228
+    },
+    "德甲": {
+      "n": 53,
+      "model_brier": 0.521,
+      "market_brier": 0.5029,
+      "delta": 0.0181,
+      "delta_95ci": [
+        -0.0188,
+        0.0558
+      ],
+      "excludes_zero": false
+    },
+    "意甲": {
+      "n": 105,
+      "model_brier": 0.598,
+      "market_brier": 0.5851,
+      "delta": 0.0129,
+      "delta_95ci": [
+        -0.0131,
+        0.0387
+      ],
+      "excludes_zero": false
+    },
+    "西甲": {
+      "n": 98,
+      "model_brier": 0.5935,
+      "market_brier": 0.5808,
+      "delta": 0.0127,
+      "delta_95ci": [
+        -0.0072,
+        0.0333
+      ],
+      "excludes_zero": false
+    },
+    "瑞超": {
+      "n": 11,
+      "model_brier": 0.6753,
+      "market_brier": 0.6669,
+      "delta": 0.0084
+    },
+    "芬超": {
+      "n": 10,
+      "model_brier": 0.6339,
+      "market_brier": 0.6257,
+      "delta": 0.0082
+    },
+    "英联赛杯": {
+      "n": 4,
+      "model_brier": 0.4198,
+      "market_brier": 0.4125,
+      "delta": 0.0073
+    },
+    "巴西杯": {
+      "n": 4,
+      "model_brier": 0.7408,
+      "market_brier": 0.7348,
+      "delta": 0.0061
+    },
+    "日职": {
+      "n": 4,
+      "model_brier": 0.6029,
+      "market_brier": 0.5976,
+      "delta": 0.0053
+    },
+    "韩职": {
+      "n": 3,
+      "model_brier": 0.4511,
+      "market_brier": 0.4462,
+      "delta": 0.0049
+    },
+    "英超": {
+      "n": 57,
+      "model_brier": 0.7157,
+      "market_brier": 0.7116,
+      "delta": 0.004,
+      "delta_95ci": [
+        -0.0271,
+        0.0352
+      ],
+      "excludes_zero": false
+    },
+    "美职": {
+      "n": 6,
+      "model_brier": 0.7283,
+      "market_brier": 0.7264,
+      "delta": 0.0018
+    },
+    "欧冠": {
+      "n": 12,
+      "model_brier": 0.6158,
+      "market_brier": 0.6238,
+      "delta": -0.008
+    },
+    "葡超": {
+      "n": 6,
+      "model_brier": 0.7345,
+      "market_brier": 0.7432,
+      "delta": -0.0087
+    },
+    "挪超": {
+      "n": 11,
+      "model_brier": 0.5414,
+      "market_brier": 0.5517,
+      "delta": -0.0103
+    },
+    "法甲": {
+      "n": 56,
+      "model_brier": 0.6487,
+      "market_brier": 0.6591,
+      "delta": -0.0104,
+      "delta_95ci": [
+        -0.0549,
+        0.0267
+      ],
+      "excludes_zero": false
+    },
+    "法乙": {
+      "n": 3,
+      "model_brier": 0.8061,
+      "market_brier": 0.824,
+      "delta": -0.0179
+    },
+    "欧罗巴": {
+      "n": 3,
+      "model_brier": 0.8892,
+      "market_brier": 0.9148,
+      "delta": -0.0256
+    },
+    "德乙": {
+      "n": 3,
+      "model_brier": 0.6616,
+      "market_brier": 0.6985,
+      "delta": -0.0369
+    },
+    "亚冠精英": {
+      "n": 1,
+      "model_brier": 0.6853,
+      "market_brier": 0.7441,
+      "delta": -0.0587
+    },
+    "解放者杯": {
+      "n": 5,
+      "model_brier": 0.8982,
+      "market_brier": 0.9735,
+      "delta": -0.0752
+    },
+    "荷乙": {
+      "n": 2,
+      "model_brier": 0.1538,
+      "market_brier": 0.4104,
+      "delta": -0.2566
+    }
+  },
+  "by_model_top_prob_band": {
+    "0.00-0.40": {
+      "n": 110,
+      "model_brier": 0.6628,
+      "market_brier": 0.6346,
+      "delta": 0.0282,
+      "delta_95ci": [
+        -0.0133,
+        0.0713
+      ],
+      "excludes_zero": false
+    },
+    "0.70-1.01": {
+      "n": 64,
+      "model_brier": 0.4673,
+      "market_brier": 0.4558,
+      "delta": 0.0115,
+      "delta_95ci": [
+        -0.0237,
+        0.0594
+      ],
+      "excludes_zero": false
+    },
+    "0.40-0.50": {
+      "n": 131,
+      "model_brier": 0.6287,
+      "market_brier": 0.6275,
+      "delta": 0.0011,
+      "delta_95ci": [
+        -0.0018,
+        0.0038
+      ],
+      "excludes_zero": false
+    },
+    "0.50-0.60": {
+      "n": 93,
+      "model_brier": 0.5997,
+      "market_brier": 0.6019,
+      "delta": -0.0022,
+      "delta_95ci": [
+        -0.0075,
+        0.0026
+      ],
+      "excludes_zero": false
+    },
+    "0.60-0.70": {
+      "n": 75,
+      "model_brier": 0.6751,
+      "market_brier": 0.6775,
+      "delta": -0.0024,
+      "delta_95ci": [
+        -0.0072,
+        0.0014
+      ],
+      "excludes_zero": false
+    }
+  },
+  "by_market_dependency": {
+    "<80": {
+      "n": 43,
+      "model_brier": 0.6554,
+      "market_brier": 0.5652,
+      "delta": 0.0903,
+      "delta_95ci": [
+        -0.0336,
+        0.2166
+      ],
+      "excludes_zero": false
+    },
+    "80-99": {
+      "n": 12,
+      "model_brier": 0.6436,
+      "market_brier": 0.639,
+      "delta": 0.0046
+    },
+    "100 (market_only)": {
+      "n": 418,
+      "model_brier": 0.6117,
+      "market_brier": 0.6124,
+      "delta": -0.0008,
+      "delta_95ci": [
+        -0.0026,
+        0.0009
+      ],
+      "excludes_zero": false
+    }
+  },
+  "by_snapshot": {
+    "prematch": {
+      "n": 45,
+      "model_brier": 0.6717,
+      "market_brier": 0.6575,
+      "delta": 0.0143,
+      "delta_95ci": [
+        -0.0366,
+        0.0839
+      ],
+      "excludes_zero": false
+    },
+    "closing": {
+      "n": 369,
+      "model_brier": 0.6116,
+      "market_brier": 0.6029,
+      "delta": 0.0087,
+      "delta_95ci": [
+        -0.004,
+        0.0218
+      ],
+      "excludes_zero": false
+    },
+    "py314test2": {
+      "n": 1,
+      "model_brier": 0.7488,
+      "market_brier": 0.7408,
+      "delta": 0.008
+    },
+    "2026-08-02_15:1553": {
+      "n": 10,
+      "model_brier": 0.5855,
+      "market_brier": 0.5791,
+      "delta": 0.0064
+    },
+    "T-4h": {
+      "n": 12,
+      "model_brier": 0.6436,
+      "market_brier": 0.639,
+      "delta": 0.0046
+    },
+    "T-7h": {
+      "n": 36,
+      "model_brier": 0.5928,
+      "market_brier": 0.6028,
+      "delta": -0.01,
+      "delta_95ci": [
+        -0.0244,
+        0.0032
+      ],
+      "excludes_zero": false
+    }
+  },
+  "note": "delta = 模型Brier - 市场Brier，正数表示模型更差。分组样本量小时不得据此下结论。",
+  "decomposition": {
+    "low_market_dependency(<80)": {
+      "n": 43,
+      "model_brier": 0.6554,
+      "market_brier": 0.5652,
+      "delta": 0.0903,
+      "delta_95ci": [
+        -0.0336,
+        0.2166
+      ],
+      "excludes_zero": false
+    },
+    "rest(>=80)": {
+      "n": 430,
+      "model_brier": 0.6125,
+      "market_brier": 0.6132,
+      "delta": -0.0006,
+      "delta_95ci": [
+        -0.0024,
+        0.001
+      ],
+      "excludes_zero": false
+    },
+    "top_prob_band_0.00-0.40_all": {
+      "n": 110,
+      "model_brier": 0.6628,
+      "market_brier": 0.6346,
+      "delta": 0.0282,
+      "delta_95ci": [
+        -0.0133,
+        0.0713
+      ],
+      "excludes_zero": false
+    },
+    "top_prob_band_0.00-0.40_excluding_low_dependency": {
+      "n": 74,
+      "model_brier": 0.6624,
+      "market_brier": 0.6627,
+      "delta": -0.0004,
+      "delta_95ci": [
+        -0.005,
+        0.0034
+      ],
+      "excludes_zero": false
+    },
+    "note": "低依赖样本的联赛/快照分布见 low_market_dependency_profile；它们同时也是低概率分箱的主要来源，所以那一箱的劣势不是分箱本身的问题。"
+  },
+  "low_market_dependency_profile": {
+    "league": {
+      "挪超": 2,
+      "西甲": 10,
+      "意甲": 8,
+      "英超": 6,
+      "德甲": 4,
+      "法甲": 7,
+      "荷甲": 1,
+      "荷乙": 2,
+      "德乙": 1,
+      "英联赛杯": 1,
+      "葡超": 1
+    },
+    "snapshot": {
+      "2026-08-02_15:1553": 1,
+      "closing": 35,
+      "prematch": 7
+    },
+    "prob_band": {
+      "0.50-0.60": 3,
+      "0.00-0.40": 36,
+      "0.40-0.50": 2,
+      "0.70-1.01": 2
+    }
+  }
+}

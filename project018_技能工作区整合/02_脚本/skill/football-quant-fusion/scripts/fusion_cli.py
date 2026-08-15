@@ -36,6 +36,7 @@ Supported commands:
   record | daily-pipeline | preview | merge-preview | settle | backtest
   odds-add | odds-drift | odds-intl | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
+  version-progress
 """
 
 
@@ -205,6 +206,11 @@ def main():
         return
     if cmd == "daily-pipeline":
         run_script("fusion_daily_pipeline.py", rest)
+        return
+    if cmd == "version-progress":
+        # 发布窗口期盯样本累积：当前 model_version 已结算/在途场次与门槛距离。
+        # 用法：fusion_cli.py version-progress [--store DIR] [--json] [--output FILE]
+        run_script("version_progress.py", rest)
         return
     if cmd == "llm-evidence":
         run_llm_evidence(rest)

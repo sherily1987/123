@@ -6,6 +6,19 @@
     "fusion_schema_version":  "1.4.0",
     "model_version":  "m2",
     "model_version_note":  "语义版本主锚：只有改变概率数值输出的变更才 bump（改市场权重/Dixon-Coles系数/校准系数/去水方法/市场锚逻辑）。改框架代码/日志/注释/字段解析不 bump。见 40_模型/模型版本管理_打破current死锁.md",
+    "model_version_aliases":  [
+                                  {
+                                      "model_version":  "m1",
+                                      "probability_signature":  "5b608c3debf8d1de2659d552e5569f84e684e7e86105255e5de76f03a7d5b633",
+                                      "verified_at":  "2026-08-16",
+                                      "verified_by":  "scripts/probability_replay_check.py --model-version m1",
+                                      "verified_scope":  [
+                                                             "market_only"
+                                                         ],
+                                      "evidence":  "35/35 场重放 final_1x2_pct 与 model_1x2_pct 完全一致；m1→m2 的 bump 由影子路由与签名拆分的字节变更触发，生产路由概率未变。",
+                                      "note":  "别名只在 (model_version, probability_signature) 精确成对匹配时生效，且必须先跑重放等价性验证；未经验证的旧版本不得写进这里。"
+                                  }
+                              ],
     "probability_files":  [
                               "scripts/fusion_predict_core.py",
                               "scripts/production_router.py",

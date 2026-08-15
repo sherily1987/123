@@ -18,8 +18,14 @@ import urllib.request
 from datetime import date, timedelta
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from runtime_paths import core_scripts_dir  # noqa: E402
+
 HERE = Path(__file__).resolve().parent
-CORE = Path('C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts/fetch_sporttery_full.py')
+# 2026-08-16：原硬编码指向外部 football-quant-fusion-suite 的 zu-yu-dashi-3 物理拷贝。
+# 那份拷贝靠人工 cp 同步、历史上真的漂移过（AGENTS.md §0），而这条是**每日生产采集链路**，
+# 不该依赖一份会静默过期的副本。改走 core_scripts_dir()（默认仓库内，FUSION_CORE_DIR 可覆盖）。
+CORE = core_scripts_dir() / 'fetch_sporttery_full.py'
 
 UA = {'User-Agent': 'Mozilla/5.0 (Linux; Android 14)',
       'Referer': 'https://m.sporttery.cn/mjc/zqsj/?tab=concern'}

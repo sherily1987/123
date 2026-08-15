@@ -6,12 +6,14 @@ from pathlib import Path
 
 from fusion_backtest import (dedupe_snapshot_rows, load_jsonl, resolve_path,
                              select_primary_rows, version_cohort)
+from runtime_paths import backtest_store
 from fusion_predict_core import build_identity
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--store', default='C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/backtest')
+    # 2026-08-16：默认值原指向外部套件（物理拷贝、比仓库内旧），改走仓库内唯一事实源
+    ap.add_argument('--store', default=str(backtest_store()))
     ap.add_argument('--snapshot')
     ap.add_argument('--league')
     ap.add_argument('--snapshot-policy', choices=('latest_before_kickoff', 'prematch', 'closing'),

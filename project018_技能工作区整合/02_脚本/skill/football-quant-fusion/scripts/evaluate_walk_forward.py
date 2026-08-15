@@ -10,9 +10,12 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from runtime_paths import backtest_store
+
 HERE = Path(__file__).resolve().parent
 BACKTEST = HERE / "fusion_backtest.py"
-DEFAULT_STORE = "C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/backtest"
+# 2026-08-16：默认值原指向外部套件（物理拷贝、比仓库内旧），改走仓库内唯一事实源
+DEFAULT_STORE = str(backtest_store())
 
 
 def main():

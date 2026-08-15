@@ -16,7 +16,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, r"C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from runtime_paths import core_scripts_dir  # noqa: E402
+# 2026-08-16：原硬编码指向外部 football-quant-fusion-suite 的 zu-yu-dashi-3 物理拷贝
+# （靠人工 cp 同步、历史上真的漂移过）。改走 core_scripts_dir()，默认仓库内唯一事实源。
+sys.path.insert(0, str(core_scripts_dir()))
 from odds_methods import devig
 from predict import calibrate_1x2
 
