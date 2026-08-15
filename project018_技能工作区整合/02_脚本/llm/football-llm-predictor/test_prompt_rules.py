@@ -46,6 +46,23 @@ def test_production_default_models_are_three_domestic_voters_including_kimi():
     assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k2.6"] == 1.0
 
 
+def test_evidence_prompts_are_neutral_and_allow_abstention():
+    for model in fp.DEFAULT_MODELS:
+        prompt = lpr.system_prompt_evidence(model, fp.DEFAULT_MODELS)
+        assert '"decision":"abstain"' in prompt
+        assert '"direction":null' in prompt
+        assert "evidence_ids" in prompt
+        for biased in ("平局与低比分比想象中多", "优先低比分", "专猎冷门"):
+            assert biased not in prompt
+
+
+def test_deepseek_audit_prompt_has_no_result_direction_fields():
+    prompt = lpr.system_prompt_evidence_audit()
+    assert "usable_evidence_ids" in prompt and "market_readiness" in prompt
+    assert '"direction"' not in prompt
+    assert "不得输出胜平负" in prompt
+
+
 def test_parse_four_market_anti_collapse():
     good = fp.parse_prediction(
         '{"home_score":1,"away_score":0,"result":"主胜","total_goals":"1",'

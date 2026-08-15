@@ -70,7 +70,8 @@ AGGREGATION_RULE_SPEC = {
     "reasoning_invalid_weight": 0.5,
     "weak_strength_threshold": 0.6,
 }
-MIN_VALID_EVIDENCE_MODELS = 3
+MIN_VALID_EVIDENCE_MODELS = 2
+EVIDENCE_AUDITOR_MODEL = "deepseek/deepseek-chat"
 
 
 def _parse_evidence_datetime(value):
@@ -205,6 +206,31 @@ def evidence_collection_label(evidence_text):
     return f"采集时间 {timestamps[0]}" if timestamps else "当前采集证据"
 
 
+def build_evidence_catalog(evidence_text):
+    """将已通过时间和来源门禁的 Markdown 事实转为紧凑证据目录。"""
+    catalog = []
+    for line in (evidence_text or "").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith(("-", "*")):
+            continue
+        fact = stripped[1:].strip().split("| source(", 1)[0].strip()
+        source_match = re.search(r"source\(\s*(https?://[^)\s]+)\s*\)", stripped, re.I)
+        if not fact or not source_match:
+            continue
+        lowered = fact.lower()
+        if any(marker in lowered for marker in ("来源冲突", "source_conflict", "说法冲突")):
+            status = "SOURCE_CONFLICT"
+        elif any(marker in lowered for marker in ("无记录", "0条", "未获得", "未检索到", "未拿到", "证据缺口")):
+            status = "UNAVAILABLE"
+        elif any(marker in lowered for marker in ("双源一致", "交叉验证", "verified_multi_source")):
+            status = "VERIFIED_MULTI_SOURCE"
+        else:
+            status = "SINGLE_SOURCE"
+        catalog.append({"id": f"E{len(catalog) + 1}", "status": status,
+                        "fact": fact, "source": source_match.group(1)})
+    return catalog
+
+
 def build_evidence_prompt(match, evidence_text, match_idx):
     """证据 + 官方赔率 -> LLM prompt。
     冷门规则: 两回合制/杯赛场次在 prompt 中提示冷门风险, 引导模型不盲从赔率。"""
@@ -236,22 +262,69 @@ def build_evidence_prompt(match, evidence_text, match_idx):
             lines.append(f"官方让球({sign}{line:g})赔率: 主胜{hh['odds'][0]} / 平{hh['odds'][1]} / 客胜{hh['odds'][2]}")
     elif hh.get("odds"):
         lines.append("官方让球赔率: 数据缺口（字段不完整或非法，不生成市场倾向）")
-    # 冷门提示: 两回合制赛事主队被高估风险
-    if is_two_legged(match.get("league", ""), evidence_text or ""):
-        lines.append("\n⚠️ 冷门提示: 本场为两回合制/杯赛(资格赛/杯赛首回合), 历史数据显示此类赛事"
-                     "主队胜率低于赔率隐含概率, 冷门频发。请特别警惕'大热主胜', 独立判断时"
-                     "不要盲从赔率, 优先参考伤停/状态/战意等基本面证据, 可考虑双选。")
-    # 证据
-    if evidence_text:
-        lines.append(f"\n=== 六类证据(来源已交叉验证, {evidence_collection_label(evidence_text)}) ===")
-        lines.append(evidence_text.strip())
-    lines.append("\n请基于上述证据输出 JSON。硬性要求: 禁止无依据写2-1/1-2; ou25/hafu独立; reasoning必须含【伤停|近况|战意|主客|身份|交锋:事实】; 缺口时evidence_gap=true并填alt_direction。")
-    if evidence_text and ("未检索到" in evidence_text or "证据缺口" in evidence_text or "未拿到" in evidence_text):
-        lines.append("⚠️ 证据文件含缺口标记: 不得编造伤停/首发, 须 evidence_gap=true。")
+    catalog = build_evidence_catalog(evidence_text)
+    lines.append(f"\n=== 结构化证据（{evidence_collection_label(evidence_text)}） ===")
+    lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
+    lines.append("\n只使用上述 E 编号。每个市场证据不足时单独填 null；整体不足时 decision=abstain。")
     return "\n".join(lines)
 
 
-def parse_evidence_prediction(content):
+def parse_evidence_audit(content, evidence_catalog):
+    """校验 DeepSeek 的无方向证据审计结果。"""
+    text = (content or "").strip()
+    text = re.sub(r"^```(json)?\s*|\s*```$", "", text)
+    match = re.search(r"\{.*\}", text, re.S)
+    if not match:
+        return {"error": "audit_missing_json"}
+    try:
+        data = json.loads(match.group(0))
+    except json.JSONDecodeError as exc:
+        return {"error": f"audit_invalid_json:{exc}"}
+    if {"direction", "alt_direction", "score_pref", "ou25", "hafu"} & set(data):
+        return {"error": "audit_contains_prediction_fields"}
+    catalog = {str(item.get("id")): item for item in (evidence_catalog or [])}
+    usable = [str(value) for value in (data.get("usable_evidence_ids") or [])]
+    unusable = [str(value) for value in (data.get("unusable_evidence_ids") or [])]
+    conflicts = [str(value) for value in (data.get("conflict_evidence_ids") or [])]
+    if any(value not in catalog for value in usable + unusable + conflicts):
+        return {"error": "audit_unknown_evidence_id"}
+    if any(catalog[value].get("status") not in ("SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE") for value in usable):
+        return {"error": "audit_marks_unusable_evidence_as_usable"}
+    if any(catalog[value].get("status") != "UNAVAILABLE" for value in unusable):
+        return {"error": "audit_unavailable_status_mismatch"}
+    if any(catalog[value].get("status") != "SOURCE_CONFLICT" for value in conflicts):
+        return {"error": "audit_conflict_status_mismatch"}
+    readiness = data.get("market_readiness") or {}
+    required = ("one_x_two", "score", "ou25", "hafu")
+    if any(not isinstance(readiness.get(name), bool) for name in required):
+        return {"error": "audit_invalid_market_readiness"}
+    return {"status":"ok","usable_evidence_ids":usable,"unusable_evidence_ids":unusable,
+            "conflict_evidence_ids":conflicts,"gaps":[str(v) for v in (data.get("gaps") or [])],
+            "market_readiness":{name:readiness[name] for name in required},
+            "summary":str(data.get("summary") or "").strip()[:220]}
+
+
+def build_voter_prompt(base_prompt, evidence_audit):
+    audit = {key:value for key,value in evidence_audit.items() if key != "status"}
+    return (f"{base_prompt}\n\n=== DeepSeek 证据审计（无预测方向） ===\n"
+            f"{json.dumps(audit, ensure_ascii=False, separators=(',', ':'))}\n"
+            "请独立判断；审计结果只说明证据可用性，不是另一个模型的比赛结论。")
+
+
+def two_voter_consensus(predictions, voter_models):
+    voter_models = list(voter_models)
+    if len(voter_models) != 2:
+        return {"status":"skip","action":"skip","reason":"requires_exactly_two_voters","voter_models":voter_models}
+    records = [predictions.get(model) for model in voter_models]
+    if any(not isinstance(item,dict) or "error" in item or item.get("decision") != "opinion" for item in records):
+        return {"status":"skip","action":"skip","reason":"voter_abstained_or_failed","voter_models":voter_models}
+    directions = [item.get("direction") for item in records]
+    if directions[0] != directions[1]:
+        return {"status":"skip","action":"skip","reason":"voter_disagreement","voter_models":voter_models,"directions":directions}
+    return {"status":"consensus","action":"research_opinion","direction":directions[0],"voter_models":voter_models}
+
+
+def parse_evidence_prediction(content, evidence_catalog=None):
     """解析模型输出 JSON（ou25/hafu/evidence_gap/reasoning 质检）。"""
     text = content.strip()
     text = re.sub(r"^```(json)?\s*|\s*```$", "", text)
@@ -262,30 +335,54 @@ def parse_evidence_prediction(content):
         data = json.loads(m.group(0))
     except json.JSONDecodeError as e:
         return {"error": f"JSON解析失败: {e}"}
-    direction = str(data.get("direction", "")).strip()
-    if direction not in ("主胜", "平局", "客胜"):
+    is_new_contract = "decision" in data
+    decision = str(data.get("decision") or "opinion").strip().lower()
+    if decision not in ("opinion", "abstain"):
+        return {"error": f"非法decision: {decision}"}
+    raw_direction = data.get("direction")
+    direction = str(raw_direction).strip() if raw_direction is not None else None
+    if decision == "opinion" and direction not in ("主胜", "平局", "客胜"):
         return {"error": f"非法direction: {direction}"}
+    if decision == "abstain":
+        direction = None
     alt = str(data.get("alt_direction") or "").strip() or None
     if alt not in (None, "主胜", "平局", "客胜"):
         alt = None
     sp = normalize_score_pref(data.get("score_pref"))
-    reasoning = str(data.get("reasoning", "")).strip()[:220]
+    reasoning = str(data.get("summary") or data.get("reasoning") or "").strip()[:220]
     ou25 = lpr.normalize_ou25(data.get("ou25"))
     hafu = lpr.normalize_hafu(data.get("hafu"))
     egap = bool(data.get("evidence_gap", False))
-    rq = lpr.reasoning_quality(reasoning)
-    if not rq.get("ok"):
+    evidence_ids = [str(value).strip() for value in (data.get("evidence_ids") or []) if str(value).strip()]
+    reason_codes = [str(value).strip() for value in (data.get("reason_codes") or []) if str(value).strip()]
+    unsupported = [str(value).strip() for value in (data.get("unsupported_assumptions") or []) if str(value).strip()]
+    catalog_by_id = {str(item.get("id")): item for item in (evidence_catalog or [])}
+    invalid_ids = [value for value in evidence_ids if evidence_catalog is not None and value not in catalog_by_id]
+    usable_ids = [value for value in evidence_ids if catalog_by_id.get(value, {}).get("status") in ("SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE")]
+    if decision == "opinion" and evidence_catalog is not None and (invalid_ids or not usable_ids or unsupported):
+        decision = "abstain"
+        direction = alt = sp = ou25 = hafu = None
         egap = True
-    collapse_score = bool(sp in lpr.COLLAPSE_SCORES and not rq.get("ok"))
+        reason_codes.append("INVALID_OR_UNUSABLE_EVIDENCE")
+    rq = lpr.reasoning_quality(reasoning)
+    reasoning_ok = bool(reasoning) if is_new_contract else bool(rq.get("ok"))
+    if not reasoning_ok:
+        egap = True
+    collapse_score = bool(sp in lpr.LOW_SCORE_SET and not reasoning_ok)
     return {
+        "decision": decision,
         "direction": direction,
         "alt_direction": alt,
         "score_pref": sp,
         "ou25": ou25,
         "hafu": hafu,
         "evidence_gap": egap,
+        "evidence_ids": evidence_ids,
+        "invalid_evidence_ids": invalid_ids,
+        "unsupported_assumptions": unsupported,
+        "reason_codes": list(dict.fromkeys(reason_codes)),
         "reasoning": reasoning,
-        "reasoning_ok": bool(rq.get("ok")),
+        "reasoning_ok": reasoning_ok,
         "reasoning_flags": rq,
         "collapse_score": collapse_score,
     }
@@ -319,8 +416,26 @@ JSON_RULES_SUFFIX = lpr.JSON_RULES_EVIDENCE
 EVIDENCE_SYSTEM_PROMPT = lpr.EVIDENCE_SYSTEM_PROMPT
 
 
+def output_token_budget(model):
+    """Reserve enough room for reasoning models to emit their final JSON."""
+    return 4096 if fp.strip_provider(model) == "kimi-k2.6" else 1024
 
-def call_evidence_model(client, model, prompt, models_used=None):
+
+def _empty_response_diagnostic(response):
+    choice = response.choices[0]
+    finish_reason = getattr(choice, "finish_reason", None)
+    usage = getattr(response, "usage", None)
+    completion_tokens = getattr(usage, "completion_tokens", None) if usage else None
+    reasoning = getattr(choice.message, "reasoning_content", None)
+    reasoning_chars = len(str(reasoning)) if reasoning else 0
+    return ("empty_content"
+            f"; finish_reason={finish_reason}"
+            f"; completion_tokens={completion_tokens}"
+            f"; reasoning_chars={reasoning_chars}")
+
+
+
+def call_evidence_model(client, model, prompt, models_used=None, evidence_catalog=None):
     """调用单个模型做定性判断, 重试逻辑与 call_model 一致。"""
     err = "未知错误"
     real_model = fp.strip_provider(model)
@@ -337,12 +452,13 @@ def call_evidence_model(client, model, prompt, models_used=None):
                     {"role": "user", "content": prompt},
                 ],
                 temperature=temperature,
+                max_tokens=output_token_budget(model),
             )
             content = resp.choices[0].message.content
             if content is None or not str(content).strip():
-                err = "模型返回空内容(None)"
+                err = _empty_response_diagnostic(resp)
             else:
-                return model, parse_evidence_prediction(content)
+                return model, parse_evidence_prediction(content, evidence_catalog)
         except Exception as e:
             err = str(e)[:120]
             if "429" in err or "Rate limit" in err:
@@ -351,6 +467,18 @@ def call_evidence_model(client, model, prompt, models_used=None):
                 time.sleep(3)
                 break
     return model, {"error": err}
+
+
+def call_evidence_auditor(client, prompt, evidence_catalog):
+    try:
+        response = client.chat.completions.create(
+            model=fp.strip_provider(EVIDENCE_AUDITOR_MODEL),
+            messages=[{"role":"system","content":lpr.system_prompt_evidence_audit()},
+                      {"role":"user","content":prompt}],
+            temperature=0.0, max_tokens=768)
+        return parse_evidence_audit(response.choices[0].message.content, evidence_catalog)
+    except Exception as exc:
+        return {"error":str(exc)[:160]}
 
 
 def is_two_legged(league, evidence_text):
@@ -390,7 +518,7 @@ def is_two_legged(league, evidence_text):
 def aggregate_directions(predictions):
     """单选1票/双选0.5; reasoning差与2-1坍缩降权; 强度<60%强制双选。"""
     valid = {md: p for md, p in predictions.items()
-             if isinstance(p, dict) and "error" not in p}
+             if isinstance(p, dict) and "error" not in p and p.get("decision", "opinion") == "opinion"}
     if not valid:
         return {"error": "所有模型均调用失败",
                 "errors": [p for p in predictions.values() if isinstance(p, dict) and "error" in p]}
@@ -476,7 +604,8 @@ def _stable_sha256(value):
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
-def build_audit_record(aggregation, models_used, prompt, evidence_status):
+def build_audit_record(aggregation, models_used, prompt, evidence_status,
+                       evidence_audit=None, consensus_gate=None):
     """Build the successful per-match JSON audit payload without calling an LLM."""
     if aggregation.get("error"):
         raise ValueError("cannot audit a failed aggregation")
@@ -494,8 +623,31 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status):
         "evidence_file_sha256": evidence_status["evidence_file_sha256"],
         "evidence_collected_at_min": evidence_status["evidence_collected_at_min"],
         "evidence_collected_at_max": evidence_status["evidence_collected_at_max"],
+        "evidence_audit": evidence_audit,
+        "consensus_gate": consensus_gate,
     })
     return record
+
+
+def build_skip_audit_record(predictions, models_used, prompt, evidence_status,
+                            evidence_audit, consensus_gate, aggregation_error):
+    """Preserve a complete audit trail when the two-voter gate skips a match."""
+    return {
+        "status": "skip",
+        "action": "skip",
+        "reason": consensus_gate.get("reason") or aggregation_error,
+        "aggregation_error": aggregation_error,
+        "individual": fp.standardize_individual_predictions(predictions, models_used),
+        "llm_model_pool_sha256": hashlib.sha256(
+            json.dumps(models_used, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        "evidence_file_sha256": evidence_status["evidence_file_sha256"],
+        "evidence_collected_at_min": evidence_status["evidence_collected_at_min"],
+        "evidence_collected_at_max": evidence_status["evidence_collected_at_max"],
+        "evidence_audit": evidence_audit,
+        "consensus_gate": consensus_gate,
+    }
 
 
 def main():
@@ -519,7 +671,8 @@ def main():
     for n in sorted(evidence_files):
         print(f"   - {n}")
 
-    print(f"🎯 共 {len(selected_matches)} 场比赛待预测, 每场 {len(args.models)} 个模型定性判断\n")
+    voter_models = [model for model in args.models if model != EVIDENCE_AUDITOR_MODEL]
+    print(f"🎯 共 {len(selected_matches)} 场比赛待预测, DeepSeek证据审计 + {len(voter_models)} 个独立投票模型\n")
 
     for i, (match_idx, m) in enumerate(selected_matches, 1):
         if i > 1:
@@ -556,13 +709,22 @@ def main():
         print(f"   证据: {ev_name}")
         print("=" * 64)
 
+        evidence_catalog = build_evidence_catalog(ev_text)
         prompt = build_evidence_prompt(m, ev_text, match_idx)
+        evidence_audit = call_evidence_auditor(
+            fp.get_client(fp.provider_for(EVIDENCE_AUDITOR_MODEL)), prompt, evidence_catalog)
+        if "error" in evidence_audit:
+            print(json.dumps({"match_index": i, "status": "evidence_audit_failed",
+                              "reason": evidence_audit["error"]}, ensure_ascii=False))
+            continue
+        voter_prompt = build_voter_prompt(prompt, evidence_audit)
         predictions = {}
         lock = threading.Lock()
         with ThreadPoolExecutor(max_workers=4) as ex:
             futs = {ex.submit(call_evidence_model,
-                              fp.get_client(fp.provider_for(md)), md, prompt, args.models): md
-                    for md in args.models}
+                              fp.get_client(fp.provider_for(md)), md, voter_prompt, voter_models,
+                              evidence_catalog): md
+                    for md in voter_models}
             for fut in as_completed(futs):
                 md, p = fut.result()
                 with lock:
@@ -570,16 +732,27 @@ def main():
                 if "error" in p:
                     print(f"     ✗ [{md}] 失败: {p['error'][:55]}")
                 else:
+                    if p.get("decision") == "abstain":
+                        reason_codes = ",".join(p.get("reason_codes") or []) or "unspecified"
+                        print(f"     ⊘ [{md.split('/')[-1].split(':')[0][:18]:<18}] -> 弃权 ({reason_codes})")
+                        continue
                     alt = f" / {p['alt_direction']}" if p.get("alt_direction") else ""
                     sp = f" 比分偏好:{p['score_pref']}" if p.get("score_pref") else ""
                     print(f"     ✓ [{md.split('/')[-1].split(':')[0][:18]:<18}] "
                           f"-> {p['direction']}{alt}{sp}")
 
         agg = aggregate_directions(predictions)
+        consensus_gate = two_voter_consensus(predictions, voter_models)
+        if consensus_gate["status"] != "consensus":
+            print(f"  🚫 最终门控: skip ({consensus_gate['reason']})")
         if evidence_status["evidence_gap"] and "error" not in agg:
             agg = enforce_evidence_gap(agg)
         if "error" in agg:
             print(f"  [失败] {agg['error']}")
+            print(json.dumps(build_skip_audit_record(
+                predictions, voter_models, voter_prompt, evidence_status,
+                evidence_audit, consensus_gate, agg["error"],
+            ), ensure_ascii=False))
             continue
 
         print(f"\n  📊 综合方向: {agg['direction']}  "
@@ -616,7 +789,10 @@ def main():
             sp = f" 比分:{p['score_pref']}" if p.get("score_pref") else ""
             print(f"     [{md.split('/')[-1].split(':')[0][:20]:<20}] "
                   f"{p['direction']}{alt}{sp} — {p['reasoning'][:60]}")
-        print(json.dumps(build_audit_record(agg, args.models, prompt, evidence_status), ensure_ascii=False))
+        print(json.dumps(build_audit_record(
+            agg, voter_models, voter_prompt, evidence_status,
+            evidence_audit=evidence_audit, consensus_gate=consensus_gate,
+        ), ensure_ascii=False))
         print()
 
 

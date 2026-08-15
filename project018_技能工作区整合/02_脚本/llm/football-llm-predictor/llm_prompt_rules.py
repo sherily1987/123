@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Optional, Sequence
 
 # ---------- 竞彩 CRS ----------
 CRS_OPTIONS = [
@@ -22,10 +22,14 @@ CRS_OPTIONS = [
 CRS_OTHER = {"主胜": "胜其他", "平局": "平其他", "客胜": "负其他"}
 CRS_VALID = set(CRS_OPTIONS) | set(CRS_OTHER.values())
 
-# 低比分优先集合（反 2-1 锚定）
+# 低比分默认模板集合（检测用）：模型无依据退回这些"安全低比分"时标记坍缩。
+# 注意：不再是 prompt 引导清单（规则4 已删除"默认优先低比分"），只作 collapse_score 判定锚点。
 LOW_SCORE_SET = {"0-0", "1-0", "0-1", "1-1", "2-0", "0-2"}
-# 常见坍缩比分
-COLLAPSE_SCORES = {"2-1", "1-2"}
+# 动态坍缩检测阈值：不再硬编码"哪些比分是坍缩比分"。
+# 历史教训：先坍缩 2-1（反锚定后），又坍缩 1-0（规则4"默认优先低比分"引导）。
+# 硬编码单一比分治标不治本——改按"聚合占比"动态判定，任何比分都逃不掉检测。
+SCORE_COLLAPSE_RATIO = 0.6     # top 比分占比 >= 60% 即标记坍缩
+SCORE_COLLAPSE_MIN_VOTES = 2   # 且至少 2 票（3 模型池下即 2/3 票）
 
 HAFU_VALID = {"胜胜", "胜平", "胜负", "平胜", "平平", "平负", "负胜", "负平", "负负"}
 OU25_VALID = {"大", "小", "大2.5", "小2.5", "over", "under"}
@@ -183,83 +187,47 @@ def reasoning_quality(reasoning: str) -> Dict[str, Any]:
     }
 
 
-# ---------- 角色 ----------
-ROLE_PROMPTS: Dict[str, str] = {
-    "zhipu/glm-4-flash": (
-        "你是一名注重基本面的足球分析师。核心信念: 伤病、状态、战意比赔率更可靠。\n"
-        "重点: 伤停/阵容、近况趋势、战意(杯赛轮次/保级/争冠/揭幕)。\n"
-        "硬规则: ①证据未写明伤停时禁止编造伤员名；②反市场必须点名哪条基本面；"
-        "③无进攻大战证据时优先低比分(0-0/1-0/1-1/0-1/2-0)。\n"
-        "兼负「低比分审慎」职责(三模型场景): 警惕默认2-1与无脑大球。"
-    ),
-    "qwen/qwen-flash": (
-        "你是一名市场分析派足球分析师。核心信念: 赔率异动反映增量信息，但终盘强弱≠赛果。\n"
-        "重点: 初盘→即盘方向、让球线移动、TTG最低赔档；只认异动，不把低赔当成必胜。\n"
-        "硬规则: ①与市场同向时必须找一条否证；②reasoning 不能只有赔率，须再引基本面或写【证据缺口】。"
-    ),
-    "groq/llama-3.3-70b-versatile": (
-        "你是一名专猎冷门的足球分析师。核心信念: 热门常被高估，冷门多于大众预期。\n"
-        "重点: 两回合/杯赛首回合、大热主胜风险、客队旅行疲惫、升班马战意。\n"
-        "你倾向双选；对「稳赢」高度怀疑；避免无依据的大比分。"
-    ),
-    "moonshot/kimi-k2.6": (
-        "你是一名保守审慎的足球分析师。核心信念: 平局与低比分比想象中多。\n"
-        "重点: 双方防守、近期平局率、低总进球信号。\n"
-        "硬规则: 优先从 0-0/1-0/0-1/1-1/2-0/0-2 中选比分；**不要**因为「常见」就选 2-1。"
-    ),
-    "gemini/gemini-3-flash-preview": (
-        "你是一名战术流足球分析师。核心信念: 阵型克制、核心球员与教练部署决定比赛。\n"
-        "重点: 预计首发、对位、射手/组织者、新帅磨合、主客与天气对战术影响。"
-    ),
-    "ark/doubao-seed-evolving": (
-        "你是一名逆向思维足球分析师。核心信念: 市场常错误定价，机会在赔率与证据背离处。\n"
-        "重点: 被忽视的客队/弱队、证据支撑不足的大热；有证据时敢反市场。"
-    ),
-    "deepseek/deepseek-chat": (
-        "你是一名深度推理派足球分析师。核心信念: 好预测来自系统推演而非单一信号。\n"
-        "流程: 先列关键证据(伤停/状态/战意/主客/赔率) → 正方一条 + 反方一条 → 结论。\n"
-        "注意竞彩90分钟口径与两回合冷门；拿不准给双选。\n"
-        "兼负「冷门怀疑」职责(三模型场景): 大热主胜必须写风险点；避免全员2-1模板。"
-    ),
-}
-
-# 仅跑国内三模时的附加职责（拼到角色后）
-DOMESTIC3_EXTRA = {
-    "zhipu/glm-4-flash": "\n[三模增强] 你同时负责压低无依据的大球/2-1默认；证据缺口大时倾向双选或低比分。",
-    "qwen/qwen-flash": "\n[三模增强] 市场派也必须标注证据缺口；禁止 reasoning 纯盘口。",
-    "deepseek/deepseek-chat": "\n[三模增强] 你同时负责冷门审查与正反推演；强度不足时 alt_direction 必填。",
-}
-
+# ---------- 中性角色 ----------
+NEUTRAL_EVIDENCE_ROLE = (
+    "你是一名中性的足球证据审核员。不预设主胜、平局、客胜、大小球或比分方向。\n"
+    "只使用提供的编号证据；先识别可用事实、冲突和缺口，再决定每个市场是否有足够依据表达定性意见。\n"
+    "不得编造伤停、首发、战意、状态或战术；不得把 UNAVAILABLE 解读为反向事实。"
+)
+ROLE_PROMPTS: Dict[str, str] = {}
 
 def role_prompt_for(model: str, models_used: Optional[Sequence[str]] = None) -> str:
-    base = ROLE_PROMPTS.get(model, "")
-    if not models_used:
-        return base
-    # 国内三件套场景
-    domestic = {"zhipu/glm-4-flash", "qwen/qwen-flash", "deepseek/deepseek-chat"}
-    used = set(models_used)
-    if used <= domestic or (len(used) <= 3 and used & domestic == used):
-        base = base + DOMESTIC3_EXTRA.get(model, "")
-    return base
+    return NEUTRAL_EVIDENCE_ROLE
 
 
 # ---------- JSON 规则：证据轨（direction） ----------
-JSON_RULES_EVIDENCE = """请基于证据做定性判断, 只输出一个 JSON 对象, 不要输出任何其他文字:
-{"direction":"主胜","alt_direction":null,"score_pref":"1-0","ou25":"小","hafu":"平胜","evidence_gap":false,"reasoning":"【近况:…】【战意:…】"}
+JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外文字。
+证据不足示例:
+{"decision":"abstain","direction":null,"alt_direction":null,"score_pref":null,"ou25":null,"hafu":null,"evidence_gap":true,"evidence_ids":["E1"],"unsupported_assumptions":[],"reason_codes":["LINEUP_UNAVAILABLE"],"summary":"证据不足以形成独立方向。"}
+有足够证据示例:
+{"decision":"opinion","direction":"主胜","alt_direction":null,"score_pref":null,"ou25":null,"hafu":null,"evidence_gap":false,"evidence_ids":["E2","E4"],"unsupported_assumptions":[],"reason_codes":[],"summary":"E2 与 E4 支持主队方向；进球与半场证据不足，其他市场弃权。"}
 
 规则:
-1. direction 只能是 "主胜"/"平局"/"客胜"(单选必填)。
-2. alt_direction 为备选(双选); 拿不准或证据缺口大时必填, 单选坚定则 null。
-3. score_pref 必须是竞彩可兑奖项: 主胜1-0/2-0/2-1/3-0/3-1/3-2/4-0/4-1/4-2/5-0/5-1/5-2/胜其他; 平0-0/1-1/2-2/3-3/平其他; 客0-1/0-2/1-2/0-3/1-3/2-3/0-4/1-4/2-4/0-5/1-5/2-5/负其他。
-4. **禁止无进攻/对攻证据就写 2-1 或 1-2**。默认优先 0-0/1-0/0-1/1-1/2-0/0-2；只有证据支持进球战时才用 2-1+。
-5. ou25 必须独立判断: 只能 "大" 或 "小"(2.5球)。**禁止**仅因比分总进球≥3就选大；无对攻证据默认倾向 "小"。
-6. hafu 半全场九宫格: 胜胜/胜平/胜负/平胜/平平/平负/负胜/负平/负负。**禁止**「全场主胜⇒默认胜胜」；无半场信息时优先平胜/平平/平负。
-7. evidence_gap: 伤停/近况等关键类缺失时为 true。
-8. reasoning 60-100字, **必须**含至少一处【类别: 事实】, 类别从 伤停/阵容/首发/缺阵/近况/战意/主客/身份/交锋 中选；若证据含 get_lineups 首发/缺阵名单必须引用；**禁止**只有【赔率】；禁止编造。
-9. 禁止伪概率、伪xG。官方赔率仅参考；与基本面冲突时以证据为准。
-10. 两回合/杯赛首回合冷门多, 大热方优先双选。
-11. 竞彩口径: 仅90分钟(含补时), 不含加时/点球。
-12. **不得因为「常见比分统计」选择 2-1。**"""
+1. decision 只能是 opinion 或 abstain。abstain 时 direction 必须为 null。
+2. direction/alt_direction 只能是主胜/平局/客胜或 null。score_pref/ou25/hafu 均可单独为 null；缺少对应证据时必须为 null，不得猜测。
+3. evidence_ids 只能引用提示词中存在的 E 编号。UNAVAILABLE 和 SOURCE_CONFLICT 只能证明缺口/冲突，不能支持 opinion。
+4. 不得使用未在证据中出现的事实。任何必须假设的内容写入 unsupported_assumptions；存在影响结论的未支持假设时应 abstain。
+5. 禁止伪概率、伪 xG、常见比分模板和人设先验。赔率只是一类证据，不得冒充独立基本面。
+6. 比分、大小球、半全场必须各自有直接证据；无直接证据则对应字段为 null。
+7. 口径仅为90分钟含补时，不含加时和点球。summary 限两句。"""
+
+EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据可用性，不做比赛预测。
+不得输出胜平负、比分、大小球或半全场的任何方向。
+只输出一个 JSON 对象:
+{"usable_evidence_ids":["E2"],"unusable_evidence_ids":["E1"],"conflict_evidence_ids":[],"gaps":["LINEUP_UNAVAILABLE"],"market_readiness":{"one_x_two":true,"score":false,"ou25":false,"hafu":false},"summary":"E2可用；阵容信息不可用。"}
+规则:
+1. 所有 ID 必须存在于输入证据目录。
+2. UNAVAILABLE 只能放入 unusable_evidence_ids；SOURCE_CONFLICT 只能放入 conflict_evidence_ids。
+3. market_readiness 只评估证据是否足以供下游判断，不暗示任何结果。
+4. 不得补充输入中没有的事实。summary 限两句。"""
+
+
+def system_prompt_evidence_audit() -> str:
+    return EVIDENCE_AUDIT_SYSTEM_PROMPT
 
 
 # ---------- JSON 规则：四玩法轨（比分+半场+OU） ----------
@@ -271,13 +239,13 @@ JSON_RULES_FOUR_MARKET = """你是专业足球分析师。只输出一个 JSON �
 2. home_score/away_score 为 0-7 整数。
 3. total_goals 为 "0"-"6" 或 "7+", 必须等于两队进球之和(≥7为7+)。
 4. half_result 为上半场 主胜/平局/客胜。
-5. ou25 独立字段: "大" 或 "小"(2.5)。**不要**只从比分抄; 无对攻证据默认 "小"。
+5. ou25 独立字段: "大" 或 "小"(2.5)。**不要**只从比分抄; 必须给独立依据(两队场均进球/攻防/天气), 禁止"无对攻就默认小"或"低比分就默认小"。无进球证据时按赔率方向判断并标注。
 6. hafu 独立字段九宫格(胜胜…负负)。**不要**默认「主胜=胜胜」; 半场不明优先平X。
 7. alt_direction: 拿不准时填备选方向, 否则 null。
 8. evidence_gap: 关键证据缺失时 true。
 9. confidence 0-1。
 10. reasoning 必须含【伤停|阵容|首发|缺阵|近况|战意|主客|身份|交锋 : 事实】至少一类; 有 get_lineups 名单时必须引用; 禁止纯赔率; 禁止编造伤员。
-11. **禁止无依据输出 2-1/1-2 模板**; 优先 0-0/1-0/0-1/1-1/2-0/0-2。
+11. 比分由攻防强度推导, reasoning 写进球逻辑; **禁止**套"常见比分"模板, **禁止**机械默认(主胜配1-0/平局配1-1); 比分须与 result、ou25 自洽。
 12. 官方赔率只参考不盲从; 90分钟口径。
 13. 不得因常见比分统计而选 2-1。"""
 
@@ -307,14 +275,15 @@ def apply_score_collapse_penalty(
     score_counter: Counter,
     individuals: Dict[str, dict],
 ) -> Counter:
-    """若多数票是 2-1/1-2 且 reasoning 质量差, 降权。"""
+    """若 top 比分占比过高且 reasoning 质量差, 动态降权（不再限定 2-1/1-2）。"""
     c = Counter(score_counter)
     total = sum(c.values())
     if total <= 0:
         return c
     for sc in list(c.keys()):
         key = sc if isinstance(sc, str) else f"{sc[0]}-{sc[1]}"
-        if key not in COLLAPSE_SCORES:
+        # 动态检测：该比分占比 < 阈值则跳过（不硬编码"哪些比分会坍缩"）
+        if c[sc] / total < SCORE_COLLAPSE_RATIO:
             continue
         # 统计该比分票中无效 reasoning 比例
         bad = 0
@@ -327,7 +296,7 @@ def apply_score_collapse_penalty(
             rq = reasoning_quality(p.get("reasoning") or "")
             if not rq["ok"]:
                 bad += 1
-        if n and bad / n >= 0.5 and c[sc] / total >= 0.5:
+        if n and bad / n >= 0.5:
             # 降到一半票
             c[sc] = max(1, c[sc] // 2) if isinstance(c[sc], int) else c[sc] * 0.5
     return c
@@ -362,7 +331,7 @@ def summarize_collapse(individuals: Dict[str, dict]) -> Dict[str, Any]:
     flags = []
     if sc:
         top, n = sc.most_common(1)[0]
-        if top in COLLAPSE_SCORES and n >= max(2, int(0.6 * sum(sc.values()))):
+        if n >= SCORE_COLLAPSE_MIN_VOTES and n >= SCORE_COLLAPSE_RATIO * sum(sc.values()):
             flags.append(f"SCORE_COLLAPSE:{top}x{n}")
     oc = Counter(ou)
     if oc:
