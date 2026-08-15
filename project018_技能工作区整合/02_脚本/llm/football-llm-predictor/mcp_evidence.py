@@ -238,6 +238,48 @@ LEAGUE_KEYWORDS = {
 }
 
 
+def fetch_match_candidates(d_from, d_to, retries=4):
+    """拉取日期区间内的比赛候选；**按天分次拉再合并**。
+
+    2026-08-16 修复：服务端单次最多返回 50 条，超出时只在响应里给
+    `truncated: true` + `note: "... only the first 50 are shown"`，原实现直接取
+    `matches` 而不看 `truncated`，整段区间一次拉就会静默丢掉后面的场次。
+    实测 2026-08-16~18 共 120 场只返回前 50，西甲那场排在 50 名之后，
+    于是被判「未匹配到 apifootball 比赛, 跳过」——失败表现为漏场次，不是报错。
+
+    对策两条：①显式传 `limit=100`（工具 schema 允许的最大值，默认只给 50）；
+    ②按天分次拉再合并。万一某天仍被截断，明确警告而不是继续装作拿全了
+    （那种情况需要按 `league_id` 进一步收窄，工具也支持）。
+    """
+    per_day_limit = 100  # get_football_matches 的 schema 上限
+    start = datetime.strptime(d_from, "%Y-%m-%d").date()
+    end = datetime.strptime(d_to, "%Y-%m-%d").date()
+    merged, seen = [], set()
+    day = start
+    while day <= end:
+        ds = day.strftime("%Y-%m-%d")
+        raw = mcp_tool("get_football_matches",
+                       {"date_from": ds, "date_to": ds, "limit": per_day_limit}, retries=retries)
+        if isinstance(raw, list):
+            items, truncated, total = raw, False, len(raw)
+        else:
+            items = raw.get("matches", [])
+            truncated = bool(raw.get("truncated"))
+            total = raw.get("count", len(items))
+        if truncated:
+            print(f"⚠️ {ds} 服务端截断：匹配 {total} 场但只返回 {len(items)} 场，"
+                  f"该日候选不完整，可能漏场次")
+        for item in items:
+            key = item.get("match_id") or (
+                item.get("match_date"), item.get("match_hometeam_name"), item.get("match_awayteam_name"))
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(item)
+        day += timedelta(days=1)
+    return merged
+
+
 def mcp_tool(name, args, retries=4):
     """调 MCP 工具, 返回解析后的 JSON dict/list。"""
     sid, body = mcp_query.call({"jsonrpc": "2.0", "id": 1, "method": "initialize",
@@ -303,6 +345,20 @@ TEAM_NAME_ALIASES = {
     "圣克拉拉": {"santa clara"},
     "葡萄牙国民": {"nacional"},
 }
+
+
+def _safe_name(value):
+    """把队名转成文件名安全的片段，**保留中文**。
+
+    2026-08-16 修复：原来直接用 `re.sub(r'[^a-z0-9]+', '_', name.lower())`，
+    这个字符类是纯 ASCII 的，中文队名会被整段折成一个下划线——
+    「西班牙人 vs 莱万特」生成出 `evidence_001_____mcp.md`，队名信息全丢，
+    而且**同一天的两场比赛会折成同一个文件名、静默互相覆盖**。
+    人工 `--match-id` 路径下 home_en/away_en 拿到的就是 raw 里的中文名，
+    所以这条路径必然踩中。改用 Unicode 感知的 `\\w`，只替换文件系统不安全的字符。
+    """
+    cleaned = re.sub(r"\W+", "_", str(value or ""), flags=re.UNICODE).strip("_")
+    return cleaned.lower() or "unknown"
 
 
 def _normal_name(value):
@@ -876,8 +932,7 @@ def main():
         d_from = args.date_from or (min(dates) - timedelta(days=1)).strftime("%Y-%m-%d")
         d_to = args.date_to or (max(dates) + timedelta(days=1)).strftime("%Y-%m-%d")
         print(f"🔭 拉取 apifootball 比赛 {d_from} ~ {d_to} ...")
-        cands_raw = mcp_tool("get_football_matches", {"date_from": d_from, "date_to": d_to})
-        cands = cands_raw if isinstance(cands_raw, list) else cands_raw.get("matches", [])
+        cands = fetch_match_candidates(d_from, d_to)
         print(f"   候选 {len(cands)} 场")
         pairs = match_raw_to_candidates(raw_ms, cands)
         for ri, c in pairs:
@@ -968,7 +1023,7 @@ def main():
                       {"status": "UNAVAILABLE", "reason": "missing_identity_or_kickoff"})
         block = build_block(raw_m, item.get("cand") or {}, odds_list, pred, standings, h2h, mid,
                             lineups=lineups, api_sports=api_sports)
-        fname = f"evidence_{ri:03d}_{re.sub(r'[^a-z0-9]+', '_', home_en.lower())}_{re.sub(r'[^a-z0-9]+', '_', away_en.lower())}_mcp.md"
+        fname = f"evidence_{ri:03d}_{_safe_name(home_en)}_{_safe_name(away_en)}_mcp.md"
         path = os.path.join(args.out_dir, fname)
         written = lee.write_canonical_snapshot(path, block, datetime.now(timezone.utc).isoformat())
         contexts.append({"item": item, "path": path, "kickoff": kickoff,
