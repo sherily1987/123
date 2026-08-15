@@ -36,7 +36,7 @@ PROVIDERS = {
     "groq": {"base_url": "https://api.groq.com/openai/v1",
              "env": "GROQ_API_KEY"},             # 需代理(大陆IP 403)
     "moonshot": {"base_url": "https://api.moonshot.cn/v1",
-                 "env": "MOONSHOT_API_KEY"},     # Kimi K2.6 推理模型
+              "env": "MOONSHOT_API_KEY"},     # Kimi K3 推理模型
     "gemini": {"base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
                "env": "GOOGLE_API_KEY"},         # Google Gemini 3 (需代理)
     "ark": {"base_url": "https://ark.cn-beijing.volces.com/api/v3",
@@ -49,7 +49,7 @@ PROVIDERS = {
 
 # 模型级温度覆盖(推理模型只允许 temperature=1)
 MODEL_TEMPERATURE_OVERRIDES = {
-    "kimi-k2.6": 1.0,
+    "kimi-k3": 1.0,
     "doubao-seed-evolving": 1.0,
 }
 
@@ -58,7 +58,7 @@ MODEL_TEMPERATURE_OVERRIDES = {
 DEFAULT_MODELS = [
     "zhipu/glm-4-flash",                    # 智谱 (完全免费, 无限量)
     "deepseek/deepseek-chat",               # DeepSeek V3 (国内直连, 强推理, 极低价)
-    "moonshot/kimi-k2.6",                   # Kimi K2.6 (推理模型, temperature=1)
+    "moonshot/kimi-k3",                     # Kimi K3 (推理模型, temperature=1)
     # qwen/qwen3.8-max 已于 2026-08-12 移除（DASHSCOPE key 401 失效，不再续用）；
     # 见 全局复利与踩坑日志.md 2026-08-12 条目与 00_收件箱/待处理.md。
 ]

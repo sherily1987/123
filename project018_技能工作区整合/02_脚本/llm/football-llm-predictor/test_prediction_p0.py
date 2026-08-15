@@ -144,7 +144,7 @@ def test_abstentions_do_not_vote_but_remain_auditable():
                "reasoning":"证据支持","reasoning_ok":True,"collapse_score":False}
     result = predict.aggregate_directions({"zhipu/glm-4-flash":abstain,
                                            "deepseek/deepseek-chat":opinion,
-                                           "moonshot/kimi-k2.6":opinion})
+                                           "moonshot/kimi-k3":opinion})
     assert result["valid_model_count"] == 2 and result["direction"] == "主胜"
     assert result["individual"]["zhipu/glm-4-flash"]["decision"] == "abstain"
 
@@ -172,7 +172,7 @@ def test_voter_prompt_contains_neutral_audit_not_direction():
 
 def test_two_voter_consensus_requires_two_matching_opinions():
     glm = {"decision":"opinion","direction":"主胜"}; kimi = {"decision":"opinion","direction":"主胜"}
-    voters = ["zhipu/glm-4-flash", "moonshot/kimi-k2.6"]
+    voters = ["zhipu/glm-4-flash", "moonshot/kimi-k3"]
     agreed = predict.two_voter_consensus({voters[0]:glm, voters[1]:kimi}, voters)
     assert agreed == {"status":"consensus","action":"research_opinion","direction":"主胜","voter_models":voters}
     disagreed = predict.two_voter_consensus({voters[0]:glm,voters[1]:{"decision":"opinion","direction":"客胜"}}, voters)
@@ -182,14 +182,14 @@ def test_two_voter_consensus_requires_two_matching_opinions():
 
 
 def test_kimi_reasoning_model_gets_larger_output_budget():
-    assert predict.output_token_budget("moonshot/kimi-k2.6") == 4096
+    assert predict.output_token_budget("moonshot/kimi-k3") == 4096
     assert predict.output_token_budget("zhipu/glm-4-flash") == 1024
 
 
 def test_skip_audit_record_preserves_gate_and_evidence_audit():
     record = predict.build_skip_audit_record(
-        {"moonshot/kimi-k2.6": {"decision": "abstain", "direction": None}},
-        ["moonshot/kimi-k2.6"], "PROMPT",
+        {"moonshot/kimi-k3": {"decision": "abstain", "direction": None}},
+        ["moonshot/kimi-k3"], "PROMPT",
         {"evidence_file_sha256": "abc", "evidence_collected_at_min": "t1",
          "evidence_collected_at_max": "t2"},
         {"status": "ok", "summary": "audit"},

@@ -40,10 +40,11 @@ def test_production_default_models_are_three_domestic_voters_including_kimi():
     assert fp.DEFAULT_MODELS == [
         "zhipu/glm-4-flash",
         "deepseek/deepseek-chat",
-        "moonshot/kimi-k2.6",
+        "moonshot/kimi-k3",
     ]
     assert "qwen/qwen3.8-max" not in fp.DEFAULT_MODELS
-    assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k2.6"] == 1.0
+    assert "moonshot/kimi-k2.6" not in fp.DEFAULT_MODELS
+    assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k3"] == 1.0
 
 
 def test_evidence_prompts_are_neutral_and_allow_abstention():
@@ -204,7 +205,7 @@ def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
     绑定 DEFAULT_MODELS 的具体内容/长度会在每次调池子时无谓break（见 2026-08-12 踩坑记录）。
     """
     models = ["zhipu/glm-4-flash", "qwen/qwen3.8-max",
-              "deepseek/deepseek-chat", "moonshot/kimi-k2.6"]
+              "deepseek/deepseek-chat", "moonshot/kimi-k3"]
     successful = pr.parse_evidence_prediction(
         '{"direction":"主胜","score_pref":"1-0","reasoning":"【近况:主队连胜】"}'
     )

@@ -100,7 +100,7 @@ python simulate_from_odds.py --input data/raw_2026-08-05.json --sim 10000
 - `zhipu/glm-4-flash` → 智谱（完全免费无限量，国内直连，key 已持久化 `ZHIPU_API_KEY`）
 - `qwen/qwen-flash` → 千问/阿里云百炼（完全免费无限量，国内直连，key 用 `DASHSCOPE_API_KEY`，需在 https://bailian.console.aliyun.com 创建）
 - `groq/llama-3.3-70b-versatile` → Groq（需代理 `127.0.0.1:10809`，key 已持久化 `GROQ_API_KEY`）
-- `moonshot/kimi-k2.6` → Kimi（推理模型，国内直连，key 已持久化 `MOONSHOT_API_KEY`）
+- `moonshot/kimi-k3` → Kimi K3（推理模型，国内直连，key 已持久化 `MOONSHOT_API_KEY`）
 - `deepseek/deepseek-chat` → DeepSeek V3（国内直连，强推理，极低价，key 用 `DEEPSEEK_API_KEY`，需在 https://platform.deepseek.com 注册）
 - `gemini/gemini-3-flash-preview` → Google Gemini 3（需代理，key 已持久化 `GOOGLE_API_KEY`；注意 2.5 系列已对新用户关闭，用 3 系列）
 - `ark/doubao-seed-evolving` → 豆包/火山方舟（key 已持久化 `ARK_API_KEY`；需控制台开通模型，当前账户已开通 doubao-seed-evolving）

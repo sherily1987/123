@@ -418,7 +418,7 @@ EVIDENCE_SYSTEM_PROMPT = lpr.EVIDENCE_SYSTEM_PROMPT
 
 def output_token_budget(model):
     """Reserve enough room for reasoning models to emit their final JSON."""
-    return 4096 if fp.strip_provider(model) == "kimi-k2.6" else 1024
+    return 4096 if fp.strip_provider(model) == "kimi-k3" else 1024
 
 
 def _empty_response_diagnostic(response):
