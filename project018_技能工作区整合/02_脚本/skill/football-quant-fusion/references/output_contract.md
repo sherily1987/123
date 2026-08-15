@@ -40,14 +40,14 @@
 - O/U 3.5：大 27.3%（shift -3.11pp）
 - BTTS：是 54.2%（校准 applied=false，理由：Platt 测试集恶化24.4%）
 - 体彩HHAD（-1）：让胜 24.7 / 让平 23.8 / 让负 51.5；一球胜风险 23.8%（≥18% 禁单推让负）
-- 让球推荐（hhad_recommendation，2026-08-13 加入）：主推让负（51.5% ≥ 50%阈值可出胆）；跟1X2独立判定，不是亚洲盘（win/push/half），仅体彩HHAD固定线三项盘
+- HHAD研究输出：主方向让负（原始概率51.5%）；当前校准状态 `UNFITTED`，只作 shadow，`banker_allowed=false`。它不是亚洲盘（win/push/half），仅指体彩固定让球线三项盘。
 - 亚洲盘五态（如有 ah_line）
 
 ### 风险与门控
 - reliability_flags：原样列出（HIGH_MARKET_DEPENDENCY/TTG_SCORE_CONFLICT/EXTREME_*/...）
 - sensitivity：λ扰动±10%下各概率区间
-- recommendation_gate：banker_allowed=false；confidence=null（UNFITTED）；stale_pools；reasons
-- recommendation_gate.hhad_recommendation：让球轨独立出胆判断，字段结构见 `recommendation_policy.py::evaluate()`
+- recommendation_gate：production_recommendations_enabled / banker_allowed / raw_primary_probability / calibrated_primary_probability / confidence_pct / stale_pools / reasons
+- recommendation_gate.hhad_recommendation：让球轨独立研究字段；在独立校准完成前 `calibration_status=UNFITTED`、`banker_allowed=false`
 
 **结论**：{fusion_decision.action} —— MARKET_BASELINE 只作基线；UNFITTED_NO_VALUE / AVOID_DATA_RISK → 观察/回避。
 ```
@@ -57,7 +57,8 @@
 - `reliability_flags` 与 `sensitivity` 原样展示
 - `fusion_decision`：status / primary_outcome / top_gap_pp / sensitivity_width_pp / edge_pp_for_primary（market_only=null）/ uncertainty_level / action
 - `core_calibration`：one_x2_calibration（applied/method/league_key/draw_k/temperature/test_set_effect）、confidence、derived_market_status——**不等同于融合推荐置信度**
-- `hhad_recommendation`（2026-08-13 加入）：available/line/primary_pick/confidence_pct/banker_allowed，与1X2独立判定；非亚洲盘
+- `hhad_recommendation`：available/line/primary_pick/raw_primary_probability/calibrated_primary_probability/confidence_pct/banker_allowed/reasons；非亚洲盘
+- 每个可选市场必须单列 `status` 和 `value`：`VALID` / `UNAVAILABLE` / `UNFITTED` / `NOT_OFFERED`。不得用零值或推测值填补缺失市场。
 - 组合：腿ID强校验结果（valid/invalid_combo_reference）+ 腿间相关性提示
 - 最终固定附注：**概率模型输出，非投注建议。**
 
@@ -65,12 +66,12 @@
 
 | status | 含义 | 动作 |
 |---|---|---|
-| MARKET_BASELINE | 仅复述市场（market_only） | 只给概率排序/玩法结构，不给价值优势 |
+| MARKET_BASELINE | 仅复述市场（market_only） | 只给概率排序/玩法结构，不给价值优势，永不出胆 |
 | UNFITTED_NO_VALUE | 无市场锚或无显著 edge | 观察/回避，不形成独立单选 |
-| AVOID_DATA_RISK | 数据风险（陈旧/极端λ/冲突） | 回避 |
+| AVOID_DATA_RISK | 数据风险（陈旧/极端λ/冲突） | 回避，永不出胆 |
 | blocked | 核心引擎崩溃被兜底 | 报诊断，禁止手工补概率 |
 
 ## 5. 回测报告
 
 - 至少分版本/联赛/市场/快照；同 (match_id, snapshot_type) 一个样本（去重计数）。
-- 主指标 Brier / Log Loss / ECE；命中率只作辅指标；样本<200 不宣称优于市场；有固定赛前策略与赔率才评 ROI/CLV。
+- 主指标 Brier / Log Loss / ECE；命中率只作辅指标；100/200场等样本数只是复审触发点，不是统计证明。只有固定赛前策略、真实赔率、样本外基线比较和不确定性报告齐全时才评 ROI/CLV 或推广。

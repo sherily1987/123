@@ -70,8 +70,8 @@ def build_field_meta(match, collected_at):
             "collected_at": collected_at,
             "source_updated_at": source_updated_at,
             "prediction_as_of": collected_at,
-            # 兼容旧消费者；新鲜度逻辑不再使用observed_at。
-            "observed_at": source_updated_at or collected_at,
+            # observed_at 表示本次确实观察到盘口的时间；官方最后变更时间单列保存。
+            "observed_at": collected_at,
         }
     return result
 

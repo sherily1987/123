@@ -36,12 +36,26 @@ class ProductionRouterTests(unittest.TestCase):
         rows.append(xg_row("2026-08-11", "Arsenal", "Chelsea", 9.0, 9.0))
         result = route_matches({"matches": [base_match("英超", "Arsenal", "Chelsea")]}, rows, [], min_history=5)
         match = result["matches"][0]
-        self.assertEqual(match["mode"], "hybrid")
-        self.assertEqual(match["lambda_prior"]["source"], "understat_rolling_xg")
+        self.assertEqual(match["mode"], "market_only")
+        self.assertNotIn("lambda_prior", match)
+        self.assertEqual(match["research_candidate"]["lambda_prior"]["source"], "understat_rolling_xg")
         self.assertEqual(match["field_meta"]["production_router"]["route"], "understat_xg")
         self.assertTrue(match["field_meta"]["production_router"]["no_future_leakage"])
-        self.assertEqual(match["lambda_prior"]["sample_legs"], 12)
-        self.assertLess(match["lambda_prior"]["lambda_home"], 3)
+        self.assertEqual(match["research_candidate"]["lambda_prior"]["team_sample_sizes"],
+                         {"home": 6, "away": 6})
+        self.assertLess(match["research_candidate"]["lambda_prior"]["lambda_home"], 3)
+
+    def test_explicit_research_route_can_apply_experimental_prior(self):
+        rows = []
+        for i in range(1, 7):
+            day = f"2026-08-0{i}"
+            rows.append(xg_row(day, "Arsenal", f"Team{i}", 1.5, 0.8))
+            rows.append(xg_row(day, f"Team{i}", "Chelsea", 1.1, 1.0))
+        result = route_matches(base_match("英超", "Arsenal", "Chelsea"), rows, [],
+                               min_history=5, enable_experimental=True)
+        self.assertEqual(result["mode"], "hybrid")
+        self.assertEqual(result["lambda_prior"]["source"], "understat_rolling_xg")
+        self.assertTrue(result["research_only"])
 
     def test_other_league_uses_goals_only_route(self):
         events = []
@@ -51,8 +65,8 @@ class ProductionRouterTests(unittest.TestCase):
             events.append(event_row(day, f"Club{i}", "PSV", 0, 1))
         result = route_matches({"matches": [base_match("荷甲", "Ajax", "PSV")]}, [], events, min_history=5)
         match = result["matches"][0]
-        self.assertEqual(match["mode"], "hybrid")
-        self.assertEqual(match["lambda_prior"]["source"], "apifootball_events_goals_only")
+        self.assertEqual(match["mode"], "market_only")
+        self.assertEqual(match["research_candidate"]["lambda_prior"]["source"], "apifootball_events_goals_only")
         self.assertEqual(match["field_meta"]["production_router"]["route"], "apifootball_goals_only")
 
     def test_goals_only_accepts_configured_chinese_team_alias(self):
@@ -63,8 +77,17 @@ class ProductionRouterTests(unittest.TestCase):
             events.append(event_row(day, f"Club{i}", "PSV", 0, 1))
         result = route_matches({"matches": [base_match("荷甲", "库奥皮奥", "PSV")]}, [], events, min_history=5)
         match = result["matches"][0]
-        self.assertEqual(match["mode"], "hybrid")
-        self.assertEqual(match["lambda_prior"]["source"], "apifootball_events_goals_only")
+        self.assertEqual(match["mode"], "market_only")
+        self.assertEqual(match["research_candidate"]["lambda_prior"]["source"], "apifootball_events_goals_only")
+
+    def test_each_team_must_independently_meet_history_minimum(self):
+        rows = [xg_row(f"2026-08-0{i}", "Arsenal", f"Team{i}", 1.5, 0.8) for i in range(1, 7)]
+        rows.append(xg_row("2026-08-01", "Other", "Chelsea", 1.0, 1.1))
+        match = route_matches(base_match("英超", "Arsenal", "Chelsea"), rows, [], min_history=5)
+        self.assertEqual(match["mode"], "market_only")
+        self.assertNotIn("research_candidate", match)
+        self.assertEqual(match["field_meta"]["production_router"]["fallback_reason"],
+                         "understat_pre_kickoff_history_unavailable")
 
     def test_missing_features_fallbacks_to_market_baseline_with_reason(self):
         result = route_matches({"matches": [base_match("英超", "Unknown A", "Unknown B")]}, [], [], min_history=5)

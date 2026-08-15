@@ -68,9 +68,13 @@ def build_identity():
     config_files = [VERSION_FILE, WEIGHTS_FILE, policy_file]
     # 概率签名：只哈希「影响概率数值输出」的文件组，与全量 engine_bundle 分离。
     # 语义版本 model_version 作 cohort 主锚，概率签名作审计（见版本管理方案）。
-    probability_code = [CORE_FILE, CORE_DIR / "market_fit.py",
+    probability_code = [HERE / "fusion_predict_core.py", HERE / "production_router.py",
+                        CORE_FILE, CORE_DIR / "market_fit.py",
                         CORE_DIR / "odds_methods.py", CORE_DIR / "team_strength.py"]
-    probability_config = [WEIGHTS_FILE, policy_file]
+    probability_config = [WEIGHTS_FILE]
+    decision_policy_files = [HERE / "recommendation_policy.py", policy_file]
+    evidence_pipeline_files = [HERE / "sales_day_collect.py", HERE / "apifootball_model_features.py",
+                               HERE / "mcp_model_adapter.py"]
     return {
         "skill_version": str(manifest.get("skill_version") or "unknown"),
         "fusion_version": str(manifest.get("fusion_version") or "unknown"),
@@ -78,6 +82,8 @@ def build_identity():
         "fusion_schema_version": str(manifest.get("fusion_schema_version") or "1.3.0"),
         "model_version": str(manifest.get("model_version") or "unknown"),
         "probability_signature": _hash_files(probability_code + probability_config),
+        "decision_policy_signature": _hash_files(decision_policy_files),
+        "evidence_pipeline_signature": _hash_files(evidence_pipeline_files),
         "prediction_code_sha256": _hash_files(prediction_code),
         "config_sha256": _hash_files(config_files),
         "engine_bundle_sha256": _hash_files(prediction_code + core_code + config_files),
@@ -484,7 +490,7 @@ def predict_one(core, version, data):
             ),
         }
         return {
-            "fusion_schema_version": "1.3.0",
+            "fusion_schema_version": build["fusion_schema_version"],
             "fusion_status": "blocked",
             "core_engine_version": version,
             "build_identity": build,
@@ -501,7 +507,7 @@ def predict_one(core, version, data):
             )
     if out.get("status") != "ok":
         return {
-            "fusion_schema_version": "1.3.0",
+            "fusion_schema_version": build["fusion_schema_version"],
             "fusion_status": "blocked",
             "core_engine_version": version,
             "build_identity": build,
@@ -644,13 +650,15 @@ def predict_one(core, version, data):
             version_manifest = None
 
     result = {
-        "fusion_schema_version": "1.3.0",
+        "fusion_schema_version": build["fusion_schema_version"],
         "version_manifest": version_manifest,
         "build_identity": build,
         "fusion_status": "ok",
         "core_engine_version": version,
         "match": out.get("match"),
         "mode": out.get("mode"),
+        "research_only": bool(data.get("research_only")),
+        "research_candidate": data.get("research_candidate"),
         "input_coverage": input_coverage,
         "data_quality": quality,
         "source_evidence": data.get("source_evidence"),
@@ -717,7 +725,9 @@ def main():
     parser.add_argument("input", help="input JSON path")
     parser.add_argument("--output", help="optional output JSON path")
     parser.add_argument("--production-route", action="store_true",
-                        help="按联赛启用Understat/APIfootball生产路由；缺失时回退MARKET_BASELINE")
+                        help="按联赛生成Understat/APIfootball影子候选；不改变生产概率")
+    parser.add_argument("--research-route", action="store_true",
+                        help="显式研究模式：允许实验lambda先验进入hybrid；输出research_only=true")
     parser.add_argument("--understat-store",
                         default=str(data_root() / "datasets" / "understat_store.jsonl"))
     parser.add_argument("--apifootball-events",
@@ -727,7 +737,9 @@ def main():
     core, version = load_core()
     with open(args.input, "r", encoding="utf-8-sig") as handle:
         raw = json.load(handle)
-    if args.production_route:
+    if args.production_route and args.research_route:
+        parser.error("--production-route and --research-route are mutually exclusive")
+    if args.production_route or args.research_route:
         def load_rows(path):
             if not path or not Path(path).exists():
                 return []
@@ -746,13 +758,15 @@ def main():
             load_rows(args.understat_store),
             load_rows(args.apifootball_events),
             min_history=args.router_min_history,
+            enable_experimental=args.research_route,
         )
     if isinstance(raw, dict) and isinstance(raw.get("matches"), list):
         result = {
-            "fusion_schema_version": "1.3.0",
+            "fusion_schema_version": build_identity()["fusion_schema_version"],
             "fusion_status": "batch",
             "core_engine_version": version,
             "count": len(raw["matches"]),
+            "research_only": bool(args.research_route),
             "results": [predict_one(core, version, item) for item in raw["matches"]],
         }
     else:

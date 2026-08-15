@@ -67,8 +67,10 @@
 
 ## 6. 字段状态枚举
 
-`VALID` / `MISSING` / `UNAVAILABLE` / `UNVERIFIED` / `OUTDATED` / `IMAGE_EXTRACTED` / `ASSUMED` / `PROXY_XG` / `EXPLICIT_XG`。
+通用证据状态：`VALID` / `MISSING` / `UNAVAILABLE` / `UNVERIFIED` / `OUTDATED` / `IMAGE_EXTRACTED` / `ASSUMED` / `PROXY_XG` / `EXPLICIT_XG`。
 数值 0 或 false 仍算已提供。`field_meta.<pool>.observed_at` 必须与 kickoff 同时区（Asia/Shanghai），按相对开球时间算新鲜度：FRESH(<6h)/AGING(<12h)/STALE(<24h)/OUTDATED(≥24h)。
+
+衍生市场必须使用独立状态：`VALID` / `UNAVAILABLE` / `UNFITTED` / `NOT_OFFERED`。其中 `UNFITTED` 允许保留研究值但禁止生产推荐；`NOT_OFFERED` 表示该市场未开售或不适用。人工复核写入 `manual_check`，不得覆盖脚本生产字段。
 
 ## 7. APIfootball赛前特征
 
@@ -109,4 +111,4 @@
 - `get_statistics`中的射门、射正、禁区内射门只能进入后续比赛的滚动历史特征；
 - `get_predictions`只能输出`p_apifootball`，不得改名为xG；
 - `get_odds`只能进入外部市场层，不进入独立球队强度训练；
-- `lambda_prior`只有显式`--mode hybrid/model_first`才注入，且必须有`adjustment_ledger`；未完成联赛OOS校准时标记`UNFITTED`，引擎保持安全门控。
+- 候选 `lambda_prior` 默认只写入 `research_candidate`，生产保持 `market_only`。只有显式 `--research-route` 才可注入，并必须标 `research_only=true`、包含 `adjustment_ledger`；未完成联赛OOS校准时标记 `UNFITTED`，不得登记进生产回测库。

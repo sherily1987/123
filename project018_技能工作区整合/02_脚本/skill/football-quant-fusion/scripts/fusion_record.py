@@ -88,6 +88,8 @@ def main():
         sys.exit('record one match per invocation; input must be a bare match dict')
     if out.get('fusion_status') != 'ok':
         sys.exit(f"refuse registration: fusion_status={out.get('fusion_status')}")
+    if out.get('research_only') is True:
+        sys.exit('refuse registration: research_only output cannot enter formal registry')
 
     ko = inp.get('kickoff')
     if not ko:
@@ -114,7 +116,7 @@ def main():
     core_ver = str(build.get('core_version')
                    or (out.get('core_output') or {}).get('engine_version')
                    or out.get('core_engine_version') or 'unknown')
-    fusion_ver = str(build.get('fusion_version') or '1.4.0')
+    fusion_ver = str(build.get('fusion_version') or 'unknown')
     frozen_hashes = {
         key: build.get(key, 'unknown')
         for key in ('engine_bundle_sha256', 'prediction_code_sha256', 'config_sha256')
@@ -122,11 +124,18 @@ def main():
     # 语义版本主锚 + 概率签名（版本管理方案：cohort 主键不再依赖全量字节哈希）
     model_version = str(build.get('model_version') or 'unknown')
     probability_signature = str(build.get('probability_signature') or 'unknown')
+    governance_signatures = {
+        key: build.get(key, 'unknown')
+        for key in ('decision_policy_signature', 'evidence_pipeline_signature')
+    }
     if a.snapshot == 'prematch':
         if not all(is_complete_sha256(value) for value in frozen_hashes.values()):
             sys.exit('complete build hashes required for formal snapshot=prematch registration')
         if not is_complete_sha256(probability_signature):
             sys.exit('complete probability_signature required for formal snapshot=prematch registration')
+        if model_version == 'm2' and not all(
+                is_complete_sha256(value) for value in governance_signatures.values()):
+            sys.exit('complete decision/evidence signatures required for formal model m2 registration')
     created = datetime.now(timezone.utc)
     if a.snapshot == 'prematch':
         prediction_as_of = formal_prediction_as_of(inp, kd)
@@ -186,6 +195,8 @@ def main():
                                          out.get('fusion_schema_version') or 'unknown'),
             'model_version': model_version,
             'probability_signature': probability_signature,
+            'decision_policy_signature': governance_signatures['decision_policy_signature'],
+            'evidence_pipeline_signature': governance_signatures['evidence_pipeline_signature'],
             'engine_sha256': sha(engine),
             'engine_bundle_sha256': frozen_hashes['engine_bundle_sha256'],
             'prediction_code_sha256': frozen_hashes['prediction_code_sha256'],

@@ -100,9 +100,6 @@ def _eligible_xg(rows: list[dict], home: str, away: str, kickoff: datetime) -> l
 
 def _rolling_xg(rows: list[dict], home: str, away: str, kickoff: datetime, min_history: int) -> dict | None:
     eligible = _eligible_xg(rows, home, away, kickoff)
-    if len(eligible) < min_history:
-        return None
-
     home_for, home_against, away_for, away_against = [], [], [], []
     for row in eligible:
         rh, ra = str(row.get("home")), str(row.get("away"))
@@ -115,15 +112,16 @@ def _rolling_xg(rows: list[dict], home: str, away: str, kickoff: datetime, min_h
             away_for.append(hxg); away_against.append(axg)
         elif _same_team(ra, away):
             away_for.append(axg); away_against.append(hxg)
-    if not home_for or not away_for or not home_against or not away_against:
+    if len(home_for) < min_history or len(away_for) < min_history:
         return None
-    # 先取近期过程均值，再用对手防守均值合成λ；保留保守缩放，避免单场极端值。
-    lh = max(0.05, min(6.0, 0.9 * mean((mean(home_for), mean(away_against)))))
-    la = max(0.05, min(6.0, 0.9 * mean((mean(away_for), mean(home_against)))))
+    # 透明候选：本队进攻与对手防守均值合成。只作研究影子，不使用未验证缩放。
+    lh = max(0.05, min(6.0, mean((mean(home_for), mean(away_against)))))
+    la = max(0.05, min(6.0, mean((mean(away_for), mean(home_against)))))
     return {
         "lambda_home": round(lh, 6),
         "lambda_away": round(la, 6),
         "sample_legs": len(eligible),
+        "team_sample_sizes": {"home": len(home_for), "away": len(away_for)},
         "history_latest": max(_dt(r.get("datetime") or r.get("kickoff")) for r in eligible).isoformat(),
     }
 
@@ -148,8 +146,6 @@ def _rolling_goals(events: list[dict], home: str, away: str, kickoff: datetime, 
             except (KeyError, TypeError, ValueError):
                 continue
             eligible.append((row, hs, aws))
-    if len(eligible) < min_history:
-        return None
     home_for, home_against, away_for, away_against = [], [], [], []
     for row, hs, aws in eligible:
         if _same_team(row.get("home"), home):
@@ -160,7 +156,7 @@ def _rolling_goals(events: list[dict], home: str, away: str, kickoff: datetime, 
             away_for.append(hs); away_against.append(aws)
         elif _same_team(row.get("away"), away):
             away_for.append(aws); away_against.append(hs)
-    if not home_for or not away_for:
+    if len(home_for) < min_history or len(away_for) < min_history:
         return None
     lh = max(0.05, min(6.0, mean((mean(home_for), mean(away_against)))))
     la = max(0.05, min(6.0, mean((mean(away_for), mean(home_against)))))
@@ -168,18 +164,21 @@ def _rolling_goals(events: list[dict], home: str, away: str, kickoff: datetime, 
         "lambda_home": round(lh, 6),
         "lambda_away": round(la, 6),
         "sample_legs": len(eligible),
+        "team_sample_sizes": {"home": len(home_for), "away": len(away_for)},
         "history_latest": max(_event_time(r[0]) for r in eligible).isoformat(),
     }
 
 
 def _apply_prior(match: dict, prior: dict, source: str, route: str, kickoff: datetime, note: str) -> dict:
     match["mode"] = "hybrid"
+    match["research_only"] = True
     match["lambda_prior"] = {
         "lambda_home": prior["lambda_home"],
         "lambda_away": prior["lambda_away"],
         "weight": 0.05 if source == "understat_rolling_xg" else 0.02,
         "source": source,
         "sample_legs": prior["sample_legs"],
+        "team_sample_sizes": prior["team_sample_sizes"],
         "note": note,
     }
     match.setdefault("field_meta", {})["production_router"] = _audit(
@@ -205,7 +204,34 @@ def _apply_prior(match: dict, prior: dict, source: str, route: str, kickoff: dat
     return match
 
 
-def route_match(match: dict, understat_rows: list[dict], events: list[dict], min_history: int = 5) -> dict:
+def _attach_shadow_candidate(match: dict, prior: dict, source: str, route: str,
+                             kickoff: datetime, note: str) -> dict:
+    """Attach an auditable candidate without changing production inputs or mode."""
+    match["research_candidate"] = {
+        "status": "SHADOW_ONLY",
+        "lambda_prior": {
+            "lambda_home": prior["lambda_home"],
+            "lambda_away": prior["lambda_away"],
+            "proposed_weight": 0.05 if source == "understat_rolling_xg" else 0.02,
+            "source": source,
+            "sample_legs": prior["sample_legs"],
+            "team_sample_sizes": prior["team_sample_sizes"],
+            "note": note,
+        },
+    }
+    match.setdefault("field_meta", {})["production_router"] = _audit(
+        route, kickoff, source=source, sample_legs=prior["sample_legs"],
+        team_sample_sizes=prior["team_sample_sizes"], history_latest=prior["history_latest"],
+        candidate_status="SHADOW_ONLY",
+    )
+    match.setdefault("assumptions", []).append(
+        f"研究影子候选：{route}；未注入lambda_prior，未改变生产概率"
+    )
+    return match
+
+
+def route_match(match: dict, understat_rows: list[dict], events: list[dict], min_history: int = 5,
+                enable_experimental: bool = False) -> dict:
     match = deepcopy(match)
     kickoff = _kickoff(match)
     if kickoff is None:
@@ -217,27 +243,31 @@ def route_match(match: dict, understat_rows: list[dict], events: list[dict], min
     if competition in BIG5:
         prior = _rolling_xg(understat_rows, home, away, kickoff, min_history)
         if prior:
-            return _apply_prior(match, prior, "understat_rolling_xg", "understat_xg", kickoff, "开球前历史滚动xG生成λ先验")
+            fn = _apply_prior if enable_experimental else _attach_shadow_candidate
+            return fn(match, prior, "understat_rolling_xg", "understat_xg", kickoff, "开球前历史滚动xG生成λ候选")
         return _set_fallback(match, "understat_pre_kickoff_history_unavailable", kickoff)
     league_id = GOALS_ONLY.get(competition)
     if league_id is not None:
         prior = _rolling_goals(events, home, away, kickoff, league_id, min_history)
         if prior:
-            return _apply_prior(match, prior, "apifootball_events_goals_only", "apifootball_goals_only", kickoff, "开球前APIfootball Finished历史进球生成λ先验")
+            fn = _apply_prior if enable_experimental else _attach_shadow_candidate
+            return fn(match, prior, "apifootball_events_goals_only", "apifootball_goals_only", kickoff, "开球前APIfootball Finished历史进球生成λ候选")
         return _set_fallback(match, "apifootball_pre_kickoff_history_unavailable", kickoff)
     return _set_fallback(match, "league_not_in_production_experiment_scope", kickoff)
 
 
-def route_matches(data: dict | list, understat_rows: list[dict], events: list[dict], min_history: int = 5) -> dict | list:
+def route_matches(data: dict | list, understat_rows: list[dict], events: list[dict], min_history: int = 5,
+                  enable_experimental: bool = False) -> dict | list:
     if isinstance(data, dict) and isinstance(data.get("matches"), list):
         out = deepcopy(data)
-        out["matches"] = [route_match(m, understat_rows, events, min_history) for m in data["matches"]]
+        out["matches"] = [route_match(m, understat_rows, events, min_history, enable_experimental)
+                          for m in data["matches"]]
         out["production_route"] = {
-            "status": "enabled",
+            "status": "research_only" if enable_experimental else "shadow_only",
             "fallback": "MARKET_BASELINE",
             "understat_rows": len(understat_rows),
             "apifootball_event_rows": len(events),
             "no_future_leakage": True,
         }
         return out
-    return route_match(data, understat_rows, events, min_history)
+    return route_match(data, understat_rows, events, min_history, enable_experimental)

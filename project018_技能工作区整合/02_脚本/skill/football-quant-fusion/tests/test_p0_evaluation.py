@@ -6,6 +6,7 @@ import hashlib
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 SKILL_ROOT = Path(r"C:\Users\Administrator\.codex\skills\football-quant-fusion")
@@ -18,18 +19,25 @@ import fusion_predict_core as fusion
 import fusion_backtest as backtest
 import market_fit
 import sales_day_collect
+import fusion_cli
 
 
 class BuildIdentityTests(unittest.TestCase):
     def test_prediction_contains_stable_code_and_config_hashes(self):
         identity = fusion.build_identity()
         manifest = json.loads((SKILL_ROOT / "config" / "version_manifest.json").read_text(encoding="utf-8-sig"))
-        for key in ("engine_bundle_sha256", "prediction_code_sha256", "config_sha256"):
+        for key in ("engine_bundle_sha256", "prediction_code_sha256", "config_sha256",
+                    "probability_signature", "decision_policy_signature",
+                    "evidence_pipeline_signature"):
             self.assertRegex(identity[key], r"^[0-9a-f]{64}$")
         self.assertEqual(identity["fusion_schema_version"], manifest["fusion_schema_version"])
         self.assertEqual(manifest["record_schema_version"], "fusion-1.1")
         self.assertEqual(manifest["backtest_schema_version"], "fusion-backtest-2.0")
         self.assertEqual(manifest["sample_audit_schema_version"], "sample-audit-2.0")
+        self.assertEqual(manifest["model_version"], "m2")
+        self.assertIn("scripts/production_router.py", manifest["probability_files"])
+        self.assertNotIn("config/recommendation_policy.json", manifest["probability_files"])
+        self.assertIn("config/recommendation_policy.json", manifest["decision_policy_files"])
 
         core, version = fusion.load_core()
         result = fusion.predict_one(core, version, {
@@ -86,6 +94,30 @@ class BuildIdentityTests(unittest.TestCase):
             self.assertEqual(model["config_sha256"], identity["config_sha256"])
             self.assertEqual(model["fusion_version"], identity["fusion_version"])
             self.assertEqual(model["core_version"], identity["core_version"])
+
+    def test_formal_registration_rejects_research_only_output(self):
+        identity = fusion.build_identity()
+        with tempfile.TemporaryDirectory(prefix="fusion-research-record-") as td:
+            root = Path(td)
+            input_path, output_path, store = root / "input.json", root / "output.json", root / "store"
+            input_path.write_text(json.dumps({
+                "home": "Home", "away": "Away", "stage": "Test",
+                "kickoff": "2099-08-10T20:00:00+08:00",
+                "prediction_as_of": "2099-08-09T20:00:00+08:00",
+                "sporttery_meta": {"match_id": "research-test"},
+            }), encoding="utf-8")
+            output_path.write_text(json.dumps({
+                "fusion_status": "ok", "research_only": True,
+                "build_identity": identity, "core_engine_version": identity["core_version"],
+                "core_output": {"engine_version": identity["core_version"]},
+            }), encoding="utf-8")
+            proc = subprocess.run([
+                sys.executable, str(SCRIPTS / "fusion_record.py"),
+                "--input", str(input_path), "--output", str(output_path),
+                "--store", str(store), "--snapshot", "prematch",
+            ], text=True, capture_output=True)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("research_only", proc.stderr or proc.stdout)
 
     def test_prematch_registration_freezes_time_route_mode_hashes_and_raw_payload_hashes(self):
         identity = fusion.build_identity()
@@ -396,7 +428,34 @@ class TimeSemanticsTests(unittest.TestCase):
         self.assertEqual(meta["odds"]["collected_at"], fetched_at)
         self.assertEqual(meta["odds"]["source_updated_at"], "2026-08-07T23:00:00+08:00")
         self.assertEqual(meta["odds"]["prediction_as_of"], fetched_at)
-        self.assertEqual(meta["odds"]["observed_at"], "2026-08-07T23:00:00+08:00")
+        self.assertEqual(meta["odds"]["observed_at"], fetched_at)
+
+
+class OddsMovementPathTests(unittest.TestCase):
+    def test_record_odds_capture_uses_canonical_data_root(self):
+        completed = subprocess.CompletedProcess([], 0, stdout='{"added": 1}', stderr='')
+        with patch.object(fusion_cli.subprocess, "run", return_value=completed) as run:
+            fusion_cli.maybe_odds_add("raw.json")
+        command = run.call_args.args[0]
+        self.assertIn("--store", command)
+        store = Path(command[command.index("--store") + 1]).resolve()
+        self.assertEqual(store, fusion_cli.odds_store().resolve())
+
+    def test_record_help_does_not_require_input_files(self):
+        proc = subprocess.run([sys.executable, str(SCRIPTS / "fusion_cli.py"), "record", "--help"],
+                              text=True, capture_output=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr or proc.stdout)
+        self.assertIn("record --input", proc.stdout)
+
+    def test_llm_evidence_delegates_to_configured_predictor_root(self):
+        with tempfile.TemporaryDirectory(prefix="fusion-llm-root-") as td:
+            root = Path(td)
+            script = root / "mcp_evidence.py"
+            script.write_text("# test", encoding="utf-8")
+            with patch.dict(fusion_cli.os.environ, {"FOOTBALL_LLM_ROOT": str(root)}), \
+                 patch.object(fusion_cli, "run_external_script") as delegated:
+                fusion_cli.run_llm_evidence(["--help"])
+            delegated.assert_called_once_with(script, ["--help"])
 
 
 if __name__ == "__main__":

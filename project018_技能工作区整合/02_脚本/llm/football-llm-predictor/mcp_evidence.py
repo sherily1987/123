@@ -492,7 +492,7 @@ def fmt_h2h_block(h2h):
         lines.append("")
         lines.append("## 4b. 近期状态 (apifootball 附带数据)")
         for tag, rf in (("主队", rf1), ("客队", rf2)):
-            for it in (rf or [])[:6]:
+            for it in (rf or [])[:5]:
                 lines.append(f"- {tag}: {it.get('date')} {it.get('home_team')} {it.get('home_score')}-{it.get('away_score')} {it.get('away_team')}")
     return "\n".join(lines) if lines else None
 

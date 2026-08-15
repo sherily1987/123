@@ -2,22 +2,23 @@
 """football-quant-fusion command router.
 
 REBUILT 2026-08-02：原文件在文件系统同步事故中损坏，本文件基于
-SKILL.md 1.4.0 命令表、会话中读取的 record_fusion 逻辑与已恢复脚本重建。
+SKILL.md 1.5.0 命令表、会话中读取的 record_fusion 逻辑与已恢复脚本重建。
 子命令依赖的脚本如缺失会返回明确错误，不静默吞错。
 """
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 from runtime import resolve_python
-from runtime_paths import core_scripts_dir, data_root
+from runtime_paths import core_scripts_dir, data_root, odds_store
 
 # 统一解释器：当前为 3.14 等非 3.12 时，所有子进程改用内置 Python 3.12
 PY = resolve_python()
 
 HERE = Path(__file__).resolve().parent
-FUSION_VERSION = "1.4.0"
+FUSION_VERSION = "1.5.0"
 STORE = data_root() / "backtest"
 
 # 子命令 → 负责脚本（相对本目录；缺失时给出恢复提示）
@@ -34,7 +35,7 @@ Supported commands:
   collect | sales-day-collect | kickoff-date-collect
   record | daily-pipeline | preview | merge-preview | settle | backtest
   odds-add | odds-drift | odds-intl | tournament
-  football-data-enrich | market-ablation | collect-date
+  football-data-enrich | market-ablation | collect-date | llm-evidence
 """
 
 
@@ -64,13 +65,44 @@ def run_script(script, rest):
     return proc
 
 
+# [中文功能] 运行仓库外的显式脚本入口；用于独立部署的 LLM 证据链。
+def run_external_script(path, rest):
+    p = Path(path).resolve()
+    if not p.is_file():
+        raise SystemExit(f"外部脚本缺失：{p}")
+    proc = subprocess.Popen(
+        [PY, str(p), *rest], text=True, encoding="utf-8", errors="replace",
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    for line in proc.stdout:
+        sys.stdout.write(line)
+        sys.stdout.flush()
+    proc.wait()
+    if proc.returncode != 0:
+        raise SystemExit(proc.returncode)
+    return proc
+
+
+def run_llm_evidence(rest):
+    """委托生产 LLM 工程采集近期战绩、CRS/TTG/HAFU 与临场阵容证据。"""
+    root = Path(os.environ.get("FOOTBALL_LLM_ROOT", r"C:\Users\Administrator\football-llm-predictor"))
+    script = root / "mcp_evidence.py"
+    if not script.is_file():
+        raise SystemExit(
+            f"LLM 证据链不可用：未找到 {script}。"
+            "请设置 FOOTBALL_LLM_ROOT 指向真实生产目录；不得静默回退到仓库副本。"
+        )
+    return run_external_script(script, rest)
+
+
 # [中文功能] 可选项：把采集结果写入赔率移动库
 def maybe_odds_add(odds_source):
     if not odds_source:
         return None
     try:
         proc = subprocess.run(
-            [PY, str(HERE / 'fusion_cli.py'), 'odds-add', '--source', odds_source],
+            [PY, str(HERE / 'fusion_cli.py'), 'odds-add', '--source', odds_source,
+             '--store', str(odds_store())],
             text=True, capture_output=True)
         if proc.returncode == 0 and proc.stdout.strip():
             return json.loads(proc.stdout)
@@ -152,6 +184,10 @@ def main():
         print(HELP)
         return
     cmd, rest = sys.argv[1], sys.argv[2:]
+    if cmd == "record" and any(arg in ("-h", "--help") for arg in rest):
+        print("Usage: fusion_cli.py record --input MATCH.json --output MODEL.json "
+              "[--snapshot prematch] [--store DIR] [--odds-source ODDS.json]")
+        return
     if cmd in ("collect", "sales-day-collect", "kickoff-date-collect"):
         script = MAP[cmd]
         p = HERE / script
@@ -169,6 +205,9 @@ def main():
         return
     if cmd == "daily-pipeline":
         run_script("fusion_daily_pipeline.py", rest)
+        return
+    if cmd == "llm-evidence":
+        run_llm_evidence(rest)
         return
     if cmd == "odds-intl":
         # 国际盘对照（可选，The Odds API）：仅 CLV/edge 研究，不参与概率建模。

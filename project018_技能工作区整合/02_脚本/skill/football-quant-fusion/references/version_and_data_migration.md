@@ -4,6 +4,14 @@
 
 版本分为：匹配 `model_version + probability_signature` 的 `current`、可识别旧版本 `legacy`、证据不足的 `unknown_legacy`，以及只表示结构更新的 `schema_migrated`。旧记录不得通过补字段伪装成 current。
 
+自 1.5.0 / model m2 起，发布身份拆为三条相互独立的签名：
+
+- `probability_signature`：只覆盖会改变概率数值的核心算法、生产路由和概率配置；
+- `decision_policy_signature`：覆盖推荐门控代码与政策配置；
+- `evidence_pipeline_signature`：覆盖赛前采集、特征适配与LLM证据入口。
+
+概率代码改变必须升级 `model_version` 并重建发布锁。只改推荐政策或证据管线不得伪装成新概率模型，但正式登记仍须冻结三条签名以便复现。
+
 2026-08-15审计确认：仓库 registry 1596条、外部 registry 1555条，两条链完整；外部记录全部存在于仓库且内容相同，仓库多41条，其中34条识别为 `m1`。因此不重写历史预测或原链，只生成1555条来源映射并切断旧默认写入口。审计产物位于 `project018_技能工作区整合/05_交付/数据统一迁移/2026-08-15/`。
 
 回滚时只回退路径提交；不要让任一数据副本反向覆盖另一份。旧外部库保持只读，作为迁移前证据。

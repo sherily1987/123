@@ -1,32 +1,43 @@
 {
     "schema_version":  "football-quant-fusion-version-manifest-1.0",
-    "skill_version":  "1.4.0",
-    "fusion_version":  "1.4.0",
+    "skill_version":  "1.5.0",
+    "fusion_version":  "1.5.0",
     "core_version":  "3.4.4",
-    "fusion_schema_version":  "1.3.0",
-    "model_version":  "m1",
+    "fusion_schema_version":  "1.4.0",
+    "model_version":  "m2",
     "model_version_note":  "语义版本主锚：只有改变概率数值输出的变更才 bump（改市场权重/Dixon-Coles系数/校准系数/去水方法/市场锚逻辑）。改框架代码/日志/注释/字段解析不 bump。见 40_模型/模型版本管理_打破current死锁.md",
     "probability_files":  [
+                              "scripts/fusion_predict_core.py",
+                              "scripts/production_router.py",
                               "core/zu-yu-dashi-3/scripts/predict.py",
                               "core/zu-yu-dashi-3/scripts/market_fit.py",
                               "core/zu-yu-dashi-3/scripts/odds_methods.py",
                               "core/zu-yu-dashi-3/scripts/team_strength.py",
-                              "config/market_weights.json",
-                              "config/recommendation_policy.json"
+                              "config/market_weights.json"
                           ],
+    "decision_policy_files":  [
+                                  "scripts/recommendation_policy.py",
+                                  "config/recommendation_policy.json"
+                              ],
+    "evidence_pipeline_files":  [
+                                    "scripts/sales_day_collect.py",
+                                    "scripts/apifootball_model_features.py",
+                                    "scripts/mcp_model_adapter.py"
+                                ],
     "record_schema_version":  "fusion-1.1",
     "backtest_schema_version":  "fusion-backtest-2.0",
     "sample_audit_schema_version":  "sample-audit-2.0",
     "walk_forward_schema_version":  "fusion-walk-forward-1.0",
     "market_fit_version":  "timestamp-aware-v1+fbl-band-20260803",
-    "policy_version":  "recommendation-policy-1.0+band-edge-20260803",
-    "calibration_status":  "PARTIAL — core single-market pools fitted (see core_calibration); fusion-level band/edge calibration VALID (2026-08-03 band table, see recommendation_policy.json); fusion combo superiority claim still blocked",
+    "policy_version":  "recommendation-policy-2.0-fail-closed",
+    "calibration_status":  "PARTIAL — core market-derived probability calibration retained; legacy fusion band table is research-only; production recommendations disabled pending m2 prematch OOS review",
     "production_entrypoint":  "C:/Users/Administrator/.codex/skills/football-quant-fusion/scripts/fusion_cli.py",
     "legacy_entries":  [
                            "C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/soccer-lottery/scripts/analyzer.py",
                            "C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/skills/zu-yu-dashi-3/scripts/predict.py"
                        ],
     "notes":  [
+                  "1.5.0/m2: production recommendations fail closed; market baseline/data-risk/uncalibrated HHAD cannot become banker. Probability, decision-policy and evidence-pipeline signatures are separated; experimental priors default to shadow-only.",
                   "Core fitted 1X2/O-U2.5/O-U3.5 calibration exists and is now surfaced via fusion output\u0027s `core_calibration` field (1.4.0); it is NOT the same artifact as fusion-level recommendation confidence, which remains blocked until an approved fusion-level calibration exists.",
                   "1.4.0 wraps two confirmed core-engine crash scenarios (ZeroDivisionError / TypeError on stale-anchor inputs) into structured `fusion_status=blocked` responses instead of raw tracebacks; see references/pitfalls.md 1.1. Root cause not yet fixed in core predict.py.",
                   "All registered snapshots must preserve fusion/core versions and engine bundle hash.",

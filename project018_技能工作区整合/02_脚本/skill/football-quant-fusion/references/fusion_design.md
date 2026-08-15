@@ -1,4 +1,4 @@
-# 融合设计（football-quant-fusion 1.4.0）
+# 融合设计（football-quant-fusion 1.5.0 / model m2）
 
 > ⚠️ REBUILT 2026-08-02：原文件在文件系统同步事故中损坏，本文件基于 SKILL.md、会话记忆（2026-07-31/08-01/08-02 每日记录）恢复重建。
 
@@ -24,17 +24,17 @@ football-quant-fusion 是统一生产入口，覆盖单场、批量竞彩、双�
 3. `model_uncertainty`：敏感性与可靠性缺陷（必须原样展示）
 4. `decision_value`：相对市场是否存在超过不确定性的差异（edge vs sensitivity）
 
-混称"信心"是禁止的。推荐门控 `recommendation_gate`：UNFITTED / 无显著 edge / 盘口陈旧 → 不得出胆、confidence=null。
+混称"信心"是禁止的。推荐门控 `recommendation_gate` 采用 fail closed：当前 `production_recommendations_enabled=false`；UNFITTED、MARKET_BASELINE、AVOID_DATA_RISK、无显著 edge、市场依赖过高或盘口陈旧均不得出胆，`confidence_pct=null`。
 
 ## 4. 校准分层
 
 - **核心单项盘口校准（FITTED）**：1X2（draw_k=1.14, temperature=0.96，体彩1348场时间切分训练943/测试405，ECE 0.04697→0.03456）、O/U2.5（Platt a=1.03 b=-0.08）、O/U3.5（Platt a=1.05 b=-0.11）、BTTS（**验证后刻意不校准**——Platt 反而恶化 24.4%）、星级区间（★≥70% 实测命中87.5% 等五档单调）。
 - **融合层组合/edge 校准（UNFITTED）**：组合路径尚未完成独立大样本回测 → 标 `UNFITTED_FUSION`，不得声称优于市场。
-- 已结算样本 <100 场前不重校准；≥200 场后复审阈值。
+- 100场、200场只作为复审触发点，不是统计证明。推广仍需样本外时间切分、基线比较、误差区间和版本一致性证据。
 
 ## 5. 数据治理要点
 
-- 数字只由脚本产生；禁止手算/编造概率。
+- 正式生产数字只由发布脚本产生；人工核验可写入 `manual_check`，不得覆盖生产字段或编造概率。
 - 访问失败区分 MISSING/UNAVAILABLE/UNVERIFIED/OUTDATED/INVALID；单源失败尝试两个合理备源，不得虚构。
 - football-data.org 只读环境变量 FOOTBALL_DATA_API_KEY，无覆盖标 UNAVAILABLE。
 - 截图模式锁定截图数据源，读不清就请用户补图/手输，禁止联网替数。

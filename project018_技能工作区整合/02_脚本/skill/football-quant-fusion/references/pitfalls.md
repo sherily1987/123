@@ -2,6 +2,13 @@
 
 > ⚠️ REBUILT 2026-08-02：原文件在文件系统同步事故中损坏，本文件基于 SKILL.md 1.4.0 变更记录、会话记忆与运行产物恢复重建。与底层引擎的 `zu-yu-dashi-3/references/pitfalls.md` 分层维护：底层坑位（数据采集/建模/校准）见底层文件，本文件只记录融合层自身的坑。
 
+## 0. 生产门控与签名边界（1.5.0，2026-08-15）
+
+- 原门控会把未校准的原始最大概率当成推荐置信度，使 `MARKET_BASELINE`、`AVOID_DATA_RISK` 或 HHAD 在达到50%时仍可能出胆。现改为全局默认关闭、校准概率缺失即拒绝，HHAD固定为 shadow。
+- 候选球队强度原先只要总样本量达标就可能自动进入 `hybrid`，还会乘任意0.9系数。现要求两队分别达标；默认只写 `research_candidate`，显式 `--research-route` 才产生 `research_only` 输出。
+- 原概率签名遗漏生产路由，却包含不改变概率的推荐政策。现拆成概率、决策政策、证据管线三条签名，避免漏追踪概率变更和无关重置样本。
+- SKILL 原先把意图标签写得像命令，并承诺所有衍生市场。现只列真实入口；缺失盘口必须输出 `VALID` / `UNAVAILABLE` / `UNFITTED` / `NOT_OFFERED` 状态，不得补数。
+
 ## 1. 三Skill横向审计补丁（1.4.0，2026-08-02）
 
 对 football-quant-fusion / soccer-lottery / zu-yu-dashi-3.4.1 做了代码级（非仅文档）审计后发现的融合层问题：
