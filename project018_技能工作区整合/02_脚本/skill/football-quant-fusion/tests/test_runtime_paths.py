@@ -25,3 +25,22 @@ def test_environment_overrides_are_used(monkeypatch, tmp_path):
 
     assert paths.data_root() == tmp_path / "data"
     assert paths.core_scripts_dir() == tmp_path / "core"
+
+
+def test_derived_data_paths_use_canonical_root(monkeypatch, tmp_path):
+    monkeypatch.setenv("FUSION_DATA_ROOT", str(tmp_path / "canonical"))
+    paths = _load_module()
+    assert paths.backtest_store() == tmp_path / "canonical" / "backtest"
+    assert paths.odds_store() == tmp_path / "canonical" / "odds" / "production_movement.jsonl"
+    assert paths.forward_work_dir() == tmp_path / "canonical" / "forward"
+
+
+def test_legacy_suite_write_is_blocked(monkeypatch):
+    paths = _load_module()
+    legacy = Path("C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/x")
+    try:
+        paths.assert_writable_target(legacy)
+    except ValueError as exc:
+        assert "legacy" in str(exc).lower()
+    else:
+        raise AssertionError("legacy suite path should be blocked")

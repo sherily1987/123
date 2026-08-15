@@ -31,7 +31,13 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from runtime import resolve_python
-from runtime_paths import core_scripts_dir
+from runtime_paths import (
+    assert_writable_target,
+    backtest_store,
+    core_scripts_dir,
+    forward_work_dir,
+    odds_store,
+)
 
 # 统一解释器：当前为非 3.12 时，子进程改用内置 Python 3.12
 PY = resolve_python()
@@ -42,14 +48,9 @@ HERE = Path(__file__).resolve().parent
 # core_scripts_dir()：读 FUSION_CORE_DIR 环境变量（当前实际配置的就是仓库内路径），
 # 没设置时回退到仓库内路径——不再有第二处需要手动保持一致的路径来源。
 CORE_DIR = core_scripts_dir()
-# ⚠️ STORE/ODDS_STORE/WORK 仍指向外部物理拷贝（下方三行），刻意未在本轮改动：
-# 实测该外部副本的 production_movement.jsonl（926KB，8-12 09:00 写入）比仓库内那份
-# （753KB，8-11 10:00）更新更大，说明两边数据已经分裂。贸然切换会让流水线"丢失"
-# 这几天写入外部副本的数据。这是独立的数据一致性问题，需要先合并两份历史数据、
-# 确认权威来源，再统一路径——不能顺手在这次改动里一起做。
-STORE = 'C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/backtest'
-ODDS_STORE = 'C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/odds/production_movement.jsonl'
-WORK = Path('C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/football-quant-fusion/forward')
+STORE = backtest_store()
+ODDS_STORE = odds_store()
+WORK = forward_work_dir()
 CST = timezone(timedelta(hours=8))
 
 
@@ -82,11 +83,20 @@ def main():
     ap.add_argument('--kickoff-date', help='[新规则] 按开球日期采集：同日开球为一组 YYYY-MM-DD')
     ap.add_argument('--sales-day', help='YYYY-MM-DD; defaults to today (Asia/Shanghai)')
     ap.add_argument('--snapshot', default='T-7h')
-    ap.add_argument('--store', default=STORE)
+    ap.add_argument('--store', type=Path, default=STORE)
+    ap.add_argument('--odds-store', type=Path, default=ODDS_STORE)
+    ap.add_argument('--work-dir', type=Path, default=WORK)
+    ap.add_argument('--allow-legacy-write', action='store_true', help=argparse.SUPPRESS)
     ap.add_argument('--dry-run', action='store_true')
     ap.add_argument('--apifootball-fallback', action='store_true',
                     help='体彩官方赛果缺失时显式启用 APIFootball 欧冠补全')
     a = ap.parse_args()
+    try:
+        a.store = assert_writable_target(a.store, a.allow_legacy_write)
+        a.odds_store = assert_writable_target(a.odds_store, a.allow_legacy_write)
+        a.work_dir = assert_writable_target(a.work_dir, a.allow_legacy_write)
+    except ValueError as exc:
+        ap.error(str(exc))
 
     today = datetime.now(CST)
     sales_day = a.kickoff_date or a.sales_day or today.strftime('%Y-%m-%d')
@@ -114,7 +124,7 @@ def main():
         report['settle'] = {'error': (r.stderr or r.stdout)[:200]}
 
     # 2) Collect the full cross-midnight sales day via fusion's own collector.
-    d = WORK / sales_day
+    d = a.work_dir / sales_day
     d.mkdir(parents=True, exist_ok=True)
     raw = d / f'sporttery_{a.snapshot}.json'
     batch = d / f'inputs_{a.snapshot}.json'
@@ -136,7 +146,7 @@ def main():
     # 3) Append odds movement snapshot (best-effort; fusion_cli does this too,
     #    duplicated here so the pipeline is a single source of truth even if
     #    the caller does not run `collect` separately).
-    m = run([CORE_DIR / 'odds_movement.py', 'add', '--source', raw, '--store', ODDS_STORE])
+    m = run([CORE_DIR / 'odds_movement.py', 'add', '--source', raw, '--store', a.odds_store])
     try:
         report['movement'] = json.loads(m.stdout)
     except ValueError:
@@ -145,10 +155,10 @@ def main():
     # 3.5) 国际盘对照（可选，The Odds API）：设置了 ODDS_API_KEY 才抓取；
     #      失败只记录、不阻断主链路。结果存 odds/intl_production.jsonl。
     if os.environ.get('ODDS_API_KEY'):
-        intl_out = WORK / sales_day / f'intl_{a.snapshot}.json'
+        intl_out = a.work_dir / sales_day / f'intl_{a.snapshot}.json'
         ir = run([HERE / 'odds_api_adapter.py', '--match-file', raw,
                   '--out', intl_out,
-                  '--store', str(Path(ODDS_STORE).parent)])
+                  '--store', str(a.odds_store.parent)])
         try:
             report['intl_odds'] = json.loads(ir.stdout)
         except ValueError:

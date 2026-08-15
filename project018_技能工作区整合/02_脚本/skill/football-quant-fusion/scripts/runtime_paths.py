@@ -26,3 +26,27 @@ def core_scripts_dir() -> Path:
         "FUSION_CORE_DIR",
         project_root() / "02_脚本" / "core" / "zu-yu-dashi-3" / "scripts",
     )).resolve()
+
+
+def backtest_store() -> Path:
+    return data_root() / "backtest"
+
+
+def odds_store() -> Path:
+    return data_root() / "odds" / "production_movement.jsonl"
+
+
+def forward_work_dir() -> Path:
+    return data_root() / "forward"
+
+
+def is_legacy_suite_path(path: Path) -> bool:
+    normalized = str(Path(path).resolve()).replace("\\", "/").lower()
+    return "/.codex/skills/football-quant-fusion-suite/" in normalized
+
+
+def assert_writable_target(path: Path, allow_legacy: bool = False) -> Path:
+    resolved = Path(path).resolve()
+    if is_legacy_suite_path(resolved) and not allow_legacy:
+        raise ValueError(f"legacy fusion suite is read-only: {resolved}")
+    return resolved
