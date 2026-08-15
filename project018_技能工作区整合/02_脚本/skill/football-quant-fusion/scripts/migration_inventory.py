@@ -14,8 +14,7 @@ def stable_json(value: object) -> str:
 
 
 def sha256(value: object) -> str:
-    raw = value if isinstance(value, str) else stable_json(value)
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    return hashlib.sha256(stable_json(value).encode("utf-8")).hexdigest()
 
 
 def load_registry(store: Path) -> tuple[list[dict], list[dict]]:
