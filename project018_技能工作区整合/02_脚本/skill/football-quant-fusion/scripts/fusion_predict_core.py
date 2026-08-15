@@ -66,11 +66,18 @@ def build_identity():
                        HERE / "production_router.py"]
     core_code = [CORE_FILE, CORE_DIR / "market_fit.py", CORE_DIR / "odds_methods.py"]
     config_files = [VERSION_FILE, WEIGHTS_FILE, policy_file]
+    # 概率签名：只哈希「影响概率数值输出」的文件组，与全量 engine_bundle 分离。
+    # 语义版本 model_version 作 cohort 主锚，概率签名作审计（见版本管理方案）。
+    probability_code = [CORE_FILE, CORE_DIR / "market_fit.py",
+                        CORE_DIR / "odds_methods.py", CORE_DIR / "team_strength.py"]
+    probability_config = [WEIGHTS_FILE, policy_file]
     return {
         "skill_version": str(manifest.get("skill_version") or "unknown"),
         "fusion_version": str(manifest.get("fusion_version") or "unknown"),
         "core_version": str(manifest.get("core_version") or "unknown"),
         "fusion_schema_version": str(manifest.get("fusion_schema_version") or "1.3.0"),
+        "model_version": str(manifest.get("model_version") or "unknown"),
+        "probability_signature": _hash_files(probability_code + probability_config),
         "prediction_code_sha256": _hash_files(prediction_code),
         "config_sha256": _hash_files(config_files),
         "engine_bundle_sha256": _hash_files(prediction_code + core_code + config_files),

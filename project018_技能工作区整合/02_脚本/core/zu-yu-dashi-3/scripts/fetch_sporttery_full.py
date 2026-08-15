@@ -21,6 +21,37 @@ def fetch(url):
         raise RuntimeError(f"API error {data.get('errorCode')}: {data.get('errorMessage')}")
     return data
 
+# [中文功能] 按 pageNo 翻页拉取列表接口全部场次并合并去重。
+# 接口每页默认只返回 10 场（getMatchDataPageListV1），下一页由 value.nextPage=1 指示。
+# 2026-08-15 实测：08-14 销售日 15 场分两页，只拉第一页会静默漏掉周五013~017。
+def fetch_pages(base_params, max_pages=20):
+    """返回与 fetch() 相同结构的数据（value.matchInfoList 为合并去重后的 day 列表）。"""
+    days = {}      # matchDate -> {matchId: match}
+    order = []     # 保持 day 出现顺序
+    page = 1
+    while page <= max_pages:
+        q = dict(base_params)
+        q["pageNo"] = page
+        q["pageSize"] = 10
+        data = fetch(LIST_API + "?" + urllib.parse.urlencode(q))
+        v = data.get("value") or {}
+        for day in v.get("matchInfoList") or []:
+            dkey = day.get("matchDate") or f"page{page}"
+            if dkey not in days:
+                days[dkey] = {}
+                order.append(dkey)
+            for m in day.get("subMatchList") or []:
+                mid = m.get("matchId")
+                if mid is not None:
+                    days[dkey].setdefault(mid, m)
+        if int(v.get("nextPage") or 0) == 1:
+            page += 1
+            time.sleep(0.3)
+        else:
+            break
+    return {"value": {"matchInfoList": [
+        {"matchDate": k, "subMatchList": list(days[k].values())} for k in order]}}
+
 # [中文功能] 安全转float（失败返回None）
 def num(x):
     try: return float(x)
@@ -136,7 +167,7 @@ def main():
         q={"method":"result"}
         if a.date: q["matchDate"]=a.date
         url=LIST_API+"?"+urllib.parse.urlencode(q)
-        rows=parse_results(fetch(url),a.date)
+        rows=parse_results(fetch_pages(q),a.date)
         if a.match_num: rows=[r for r in rows if r["match_num"]==a.match_num]
         if a.match_id: rows=[r for r in rows if r["match_id"]==a.match_id]
         out={"schema_version":"1.0","collector_version":"mobile-results-3.5.0",
@@ -153,7 +184,7 @@ def main():
         q={"method":a.method}
         if a.date: q["matchDate"]=a.date
         list_url=LIST_API+"?"+urllib.parse.urlencode(q)
-        seeds=parse_list(fetch(list_url))
+        seeds=parse_list(fetch_pages(q))
         if a.date: seeds=[m for m in seeds if m.get("businessDate")==a.date or m.get("matchDate")==a.date]
         if a.match_num: seeds=[m for m in seeds if (m.get("matchNumStr") or str(m.get("matchNum")))==a.match_num]
     items=[]

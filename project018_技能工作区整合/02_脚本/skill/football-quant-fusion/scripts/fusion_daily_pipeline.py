@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """One-shot daily pipeline for football-quant-fusion.
 
 Ported from zu-yu-dashi-3's daily_pipeline.py (settle -> collect -> record ->
@@ -53,13 +53,24 @@ WORK = Path('C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/sh
 CST = timezone(timedelta(hours=8))
 
 
-# [中文功能] 带重试地执行子进程命令
+# [中文功能] 带重试地执行子进程命令（实时转发输出，同时保留 stdout 供调用方解析）
 def run(cmd, retries=0):
     import time
     for i in range(retries + 1):
-        r = subprocess.run([PY] + [str(x) for x in cmd],
-                           capture_output=True, text=True)
-        if r.returncode == 0 or i == retries:
+        proc = subprocess.Popen([PY] + [str(x) for x in cmd],
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                text=True, encoding="utf-8", errors="replace")
+        chunks = []
+        for line in proc.stdout:
+            chunks.append(line)
+            sys.stdout.write(line)
+            sys.stdout.flush()
+        proc.wait()
+        r = type("Completed", (), {})()
+        r.stdout = "".join(chunks)
+        r.stderr = ""
+        r.returncode = proc.returncode
+        if proc.returncode == 0 or i == retries:
             return r
         time.sleep(3 * (i + 1))
     return r

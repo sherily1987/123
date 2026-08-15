@@ -1,0 +1,73 @@
+{
+  "match_num": "周六021",
+  "home": "Al-Nassr",
+  "away": "Al-Fateh",
+  "home_cn": "利雅胜利",
+  "away_cn": "穆拜征服",
+  "match_id": "sporttery-2040881",
+  "neutral": false,
+  "home_league": "saudi_pro_league",
+  "away_league": "saudi_pro_league",
+  "cross_league": false,
+  "verdict": "可用",
+  "reasons": [
+    "联赛档位取较差者：saudi_pro_league=F-A, saudi_pro_league=F-A -> F-A",
+    "⚠️ 联赛无赛前赔率基线，分档基于频率基线对比，未经过市场验证，置信度低于市场对比联赛"
+  ],
+  "league_tiers": {
+    "saudi_pro_league": {
+      "tier": "F-A",
+      "gap": -0.118,
+      "n": 280,
+      "tier_basis": "frequency"
+    }
+  },
+  "weighted_n": {
+    "Al-Nassr": 65.58,
+    "Al-Fateh": 65.59
+  },
+  "basis": {
+    "mode": "same_league",
+    "league": "saudi_pro_league",
+    "xg": true,
+    "xg_weight": 0.4,
+    "home_adv": 0.2205011585084019,
+    "note": "复刻回测协议：half_life=500，启用 xG 时按 w=0.4 混合，不加收缩"
+  },
+  "market_dependency": "UNAVAILABLE",
+  "prediction": {
+    "lambda": [
+      2.6848,
+      0.8348
+    ],
+    "probs_1x2": [
+      0.77,
+      0.1332,
+      0.0968
+    ],
+    "over25": 0.6827,
+    "btts": 0.5221,
+    "top_scores": [
+      {
+        "score": "2-0",
+        "p": 0.1067
+      },
+      {
+        "score": "3-0",
+        "p": 0.0955
+      },
+      {
+        "score": "2-1",
+        "p": 0.0891
+      },
+      {
+        "score": "1-0",
+        "p": 0.0848
+      },
+      {
+        "score": "3-1",
+        "p": 0.0797
+      }
+    ]
+  }
+}

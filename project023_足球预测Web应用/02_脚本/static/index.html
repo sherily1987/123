@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>足球预测工作台</title>
+<style>
+:root {
+  --bg: #0d1f17; --bg2: #123326; --card: #16382a; --card2: #1c4433;
+  --ink: #e8f0eb; --muted: #8fae9e; --gold: #e9b44c; --green: #4ade80;
+  --red: #f87171; --line: #27523e; --blue: #60a5fa;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: "Microsoft YaHei", sans-serif; font-size: 14px; }
+header { background: var(--bg2); padding: 14px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; flex-wrap: wrap; }
+header h1 { font-size: 18px; color: var(--gold); letter-spacing: 1px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { background: var(--card2); color: var(--ink); border: 1px solid var(--line); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+button:hover { border-color: var(--gold); }
+button.primary { background: #1b5e3b; border-color: #2d8f5a; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+input[type=date] { background: var(--card2); color: var(--ink); border: 1px solid var(--line); padding: 6px 10px; border-radius: 6px; }
+#progress { flex: 1; min-width: 240px; display: none; align-items: center; gap: 10px; }
+#bar { flex: 1; height: 8px; background: var(--card); border-radius: 4px; overflow: hidden; }
+#bar > div { height: 100%; background: var(--gold); width: 0%; transition: width .5s; }
+main { padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
+.stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 18px; }
+.stat b { font-size: 22px; color: var(--gold); display: block; }
+.stat span { font-size: 12px; color: var(--muted); }
+h2 { font-size: 16px; margin: 20px 0 10px; color: var(--gold); letter-spacing: 1px; }
+table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; }
+th { background: var(--bg2); padding: 8px 6px; font-size: 12px; color: var(--muted); text-align: center; white-space: nowrap; }
+td { padding: 7px 6px; text-align: center; border-top: 1px solid var(--line); font-size: 13px; }
+tr:hover td { background: var(--card2); }
+.dir-h { color: var(--green); font-weight: bold; }
+.dir-a { color: var(--blue); font-weight: bold; }
+.dir-d { color: var(--gold); font-weight: bold; }
+.ev-pos { color: var(--green); font-weight: bold; }
+.ev-neg { color: var(--red); }
+.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px; background: var(--bg2); color: var(--muted); margin-left: 4px; }
+.tag.warn { color: var(--gold); }
+.tag.nomodel { color: var(--red); }
+.banner { padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 13px; }
+.banner.err { background: #3d1c1c; border: 1px solid #7a3434; color: #fca5a5; }
+.banner.ok { background: #153a26; border: 1px solid #2d6b47; color: #86efac; }
+.pick-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+.pick { background: #2b2113; border: 1px solid #6b5420; border-radius: 8px; padding: 10px 14px; }
+.pick b { color: var(--gold); }
+footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⚽ 足球预测工作台</h1>
+  <div class="toolbar">
+    <input type="date" id="salesDay">
+    <button class="primary" id="btnCollect" onclick="doCollect()">① 采集场次</button>
+    <button class="primary" id="btnPredict" onclick="doPredict()">② 一键预测</button>
+    <button id="btnBacktest" onclick="doBacktest()">③ 回测赛果</button>
+    <button id="btnReport" onclick="doReport()">导出报告</button>
+    <button id="btnPpt" onclick="doPpt()">导出PPT</button>
+    <div id="progress"><span id="pMsg">…</span><div id="bar"><div id="barFill"></div></div></div>
+  </div>
+</header>
+<main>
+  <div id="banner"></div>
+  <div class="stats" id="stats"></div>
+  <h2>正 EV 下注推荐</h2>
+  <div class="pick-row" id="picks"></div>
+  <h2>场次与预测总表</h2>
+  <table id="tbl"><thead></thead><tbody></tbody></table>
+  <h2>回测结果</h2>
+  <div id="backtest"></div>
+</main>
+<footer>project023 · 数据源：中国体彩官方接口 + LLM 3模型投票 + Dixon-Coles 量化轨 · 仅供研究参考，理性投注</footer>
+<script>
+let pollTimer = null;
+let salesDay = null;
+
+function todayStr() {
+  const d = new Date(Date.now() + 8 * 3600 * 1000); // 北京时间
+  return d.toISOString().slice(0, 10);
+}
+document.getElementById("salesDay").value = todayStr();
+salesDay = todayStr();
+
+function banner(msg, cls) {
+  const b = document.getElementById("banner");
+  if (!msg) { b.innerHTML = ""; return; }
+  b.innerHTML = `<div class="banner ${cls}">${msg}</div>`;
+}
+
+async function api(path, opt) {
+  const r = await fetch(path, opt);
+  if (!r.ok) throw new Error((await r.text()).slice(0, 200));
+  return r.json();
+}
+
+function doCollect() {
+  salesDay = document.getElementById("salesDay").value;
+  banner("", "");
+  document.getElementById("btnCollect").disabled = true;
+  api("/api/collect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sales_day: salesDay }) })
+    .then(r => { banner("采集任务已启动…", "ok"); watchRun(r.run_id, () => { document.getElementById("btnCollect").disabled = false; loadAll(); }); })
+    .catch(e => { banner("采集失败: " + e.message, "err"); document.getElementById("btnCollect").disabled = false; });
+}
+
+function doPredict() {
+  salesDay = document.getElementById("salesDay").value;
+  banner("", "");
+  document.getElementById("btnPredict").disabled = true;
+  api("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sales_day: salesDay }) })
+    .then(r => { banner("预测任务已启动（3 模型 × 全量场次，约 30-60 分钟）…", "ok"); watchRun(r.run_id, () => { document.getElementById("btnPredict").disabled = false; loadAll(); }); })
+    .catch(e => { banner("预测失败: " + e.message, "err"); document.getElementById("btnPredict").disabled = false; });
+}
+
+function doBacktest() {
+  salesDay = document.getElementById("salesDay").value;
+  banner("", "");
+  document.getElementById("btnBacktest").disabled = true;
+  api("/api/backtest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sales_day: salesDay }) })
+    .then(r => { banner("回测任务已启动…", "ok"); watchRun(r.run_id, () => { document.getElementById("btnBacktest").disabled = false; loadBacktest(); }); })
+    .catch(e => { banner("回测失败: " + e.message, "err"); document.getElementById("btnBacktest").disabled = false; });
+}
+
+function doReport() {
+  salesDay = document.getElementById("salesDay").value;
+  window.open(`/api/export/report?sales_day=${salesDay}`, "_blank");
+}
+
+function doPpt() {
+  salesDay = document.getElementById("salesDay").value;
+  banner("PPT 生成中（约 5-10 秒）…", "ok");
+  window.open(`/api/export/ppt?sales_day=${salesDay}`, "_blank");
+}
+
+function watchRun(runId, onDone) {
+  const pg = document.getElementById("progress");
+  pg.style.display = "flex";
+  pollTimer = setInterval(async () => {
+    try {
+      const r = await api(`/api/run/${runId}`);
+      document.getElementById("pMsg").textContent = r.message || r.status;
+      const fill = document.getElementById("barFill");
+      if (r.total > 0) fill.style.width = (r.done / r.total * 100) + "%";
+      if (r.status === "done") {
+        clearInterval(pollTimer); pg.style.display = "none";
+        banner("✅ " + (r.message || "完成"), "ok"); onDone();
+      } else if (r.status === "error") {
+        clearInterval(pollTimer); pg.style.display = "none";
+        banner("❌ " + (r.message || "任务失败"), "err"); onDone();
+      }
+    } catch (e) { clearInterval(pollTimer); pg.style.display = "none"; banner("状态查询失败: " + e.message, "err"); onDone(); }
+  }, 4000);
+}
+
+function dirCls(d) { return d === "主胜" ? "dir-h" : d === "客胜" ? "dir-a" : "dir-d"; }
+
+function evCell(evs) {
+  if (!evs) return "-";
+  const best = Object.entries(evs).reduce((a, b) => Math.abs(a[1]) > Math.abs(b[1]) ? a : b);
+  const t = best[1] * 100;
+  return `<span class="${t > 0 ? 'ev-pos' : 'ev-neg'}">${best[0]} ${t >= 0 ? '+' : ''}${t.toFixed(0)}%</span>`;
+}
+
+function loadAll() {
+  loadMatches();
+  loadBacktest();
+}
+
+async function loadMatches() {
+  try {
+    const d = await api(`/api/matches?sales_day=${salesDay}`);
+    const ms = d.matches || [];
+    const th = document.querySelector("#tbl thead");
+    th.innerHTML = `<tr><th>场次</th><th>比赛</th><th>联赛</th><th>开球</th><th>赔率(主/平/客)</th><th>量化</th><th>方向</th><th>强度</th><th>下注建议</th><th>比分</th><th>大小球</th><th>EV</th></tr>`;
+    const tb = document.querySelector("#tbl tbody");
+    tb.innerHTML = ms.map(m => {
+      const p = m.prediction;
+      const odds = m.odds_1x2 ? m.odds_1x2.join("/") : "未开胜平负";
+      const q = m.quant_tier || "无模型";
+      const qt = q === "无模型" ? '<span class="tag nomodel">无模型</span>' : `<span class="tag">${q}</span>`;
+      if (!p) {
+        return `<tr><td>${m.match_num}</td><td>${m.home} vs ${m.away}</td><td>${m.league}</td><td>${(m.kickoff||"").slice(5,16)}</td><td>${odds}</td><td>${qt}</td><td colspan="6" style="color:var(--muted)">未预测</td></tr>`;
+      }
+      const gap = p.evidence_gap ? '<span class="tag warn">⚠缺口</span>' : "";
+      const skip = p.sp_skip ? "（风控拦截）" : "";
+      return `<tr><td>${m.match_num}</td><td>${m.home} vs ${m.away}</td><td>${m.league}</td><td>${(m.kickoff||"").slice(5,16)}</td><td>${odds}</td><td>${qt}</td>
+        <td class="${dirCls(p.direction)}">${p.direction}</td><td>${p.strength}%</td>
+        <td><b>${p.single_pick || "-"}</b>${gap}${skip}</td><td>${p.score || "-"}</td><td>${p.ou25 || "-"}</td><td>${evCell(p.evs)}</td></tr>`;
+    }).join("");
+    // 统计
+    const np = ms.filter(m => m.prediction).length;
+    const nh = ms.filter(m => m.prediction && m.prediction.direction === "主胜").length;
+    const ngap = ms.filter(m => m.prediction && m.prediction.evidence_gap).length;
+    const pos = [];
+    ms.forEach(m => {
+      const p = m.prediction;
+      if (!p || p.sp_skip || !p.evs) return;
+      const best = Object.entries(p.evs).reduce((a, b) => Math.abs(a[1]) > Math.abs(b[1]) ? a : b);
+      if (best[1] > 0) pos.push({ m, best: best[0], ev: best[1] });
+    });
+    pos.sort((a, b) => b.ev - a.ev);
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><b>${ms.length}</b><span>在售场次</span></div>
+      <div class="stat"><b>${np}</b><span>已预测</span></div>
+      <div class="stat"><b>${nh} (${np ? Math.round(nh/np*100) : 0}%)</b><span>主胜占比</span></div>
+      <div class="stat"><b>${ngap}</b><span>证据缺口</span></div>
+      <div class="stat"><b>${pos.length}</b><span>正 EV 场次</span></div>`;
+    document.getElementById("picks").innerHTML = pos.length
+      ? pos.slice(0, 8).map((x, i) => `<div class="pick">${["🥇","🥈","🥉"][i] || (i+1)} <b>${x.m.match_num}</b> ${x.m.home} vs ${x.m.away} → <b>${x.m.prediction.single_pick}</b> <b style="color:var(--green)">EV +${Math.round(x.ev*100)}%</b></div>`).join("")
+      : '<div class="banner err">暂无正 EV 场次（证据缺口风控或 EV 全负）</div>';
+  } catch (e) { banner("加载失败: " + e.message, "err"); }
+}
+
+async function loadBacktest() {
+  try {
+    const d = await api(`/api/backtests?sales_day=${salesDay}`);
+    const el = document.getElementById("backtest");
+    if (!d.summary) { el.innerHTML = '<span style="color:var(--muted)">该日暂无回测记录（赛后可点"③ 回测赛果"）</span>'; return; }
+    const s = d.summary;
+    el.innerHTML = `<div class="banner ok">方向单选 <b>${s.hit_single}/${s.n}</b>（${Math.round(s.hit_single/s.n*100)}%） ·
+      含双选 <b>${s.hit_double}/${s.n}</b> · 比分命中 <b>${s.score_hit}/${s.n}</b></div>
+      <table><thead><tr><th>场次</th><th>赛果</th><th>实际方向</th><th>单选命中</th><th>含双选命中</th><th>比分命中</th></tr></thead>
+      <tbody>${d.rows.map(r => `<tr><td>${r.match_num}</td><td>${r.score_90}</td><td class="${dirCls(r.actual_direction)}">${r.actual_direction}</td>
+        <td>${r.hit_single ? "✅" : "❌"}</td><td>${r.hit_double ? "✅" : "❌"}</td><td>${r.score_hit ? "✅" : "❌"}</td></tr>`).join("")}</tbody></table>`;
+  } catch (e) { /* 静默 */ }
+}
+
+document.getElementById("salesDay").addEventListener("change", () => { salesDay = document.getElementById("salesDay").value; loadAll(); });
+loadAll();
+</script>
+</body>
+</html>

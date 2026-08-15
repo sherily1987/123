@@ -1,0 +1,107 @@
+{
+  "league": {
+    "id": 307,
+    "slug": "saudi_pro_league",
+    "name": "Saudi Pro League"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1398,
+    "season_count": 5,
+    "team_id_coverage": 1.0,
+    "team_count": 26,
+    "train_n": 838,
+    "validation_n": 280,
+    "test_n": 280
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "03_模型\\saudi_pro_league_candidate.json",
+  "validation": {
+    "n": 273,
+    "skip": 6,
+    "model": {
+      "n": 273,
+      "brier_mean": 0.571836,
+      "log_loss": 0.960463,
+      "accuracy_pct": 52.75
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 273,
+      "brier_mean": 0.643803,
+      "log_loss": 1.062039,
+      "probs": [
+        0.4482,
+        0.2384,
+        0.3135
+      ]
+    },
+    "by_league": {
+      "307": {
+        "n": 273,
+        "model": {
+          "n": 273,
+          "brier_mean": 0.571836,
+          "log_loss": 0.960463,
+          "accuracy_pct": 52.75
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 280,
+    "skip": 0,
+    "model": {
+      "n": 280,
+      "brier_mean": 0.533823,
+      "log_loss": 0.904558,
+      "accuracy_pct": 58.21
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 280,
+      "brier_mean": 0.645352,
+      "log_loss": 1.065952,
+      "probs": [
+        0.4445,
+        0.2281,
+        0.3274
+      ]
+    },
+    "by_league": {
+      "307": {
+        "n": 280,
+        "model": {
+          "n": 280,
+          "brier_mean": 0.533823,
+          "log_loss": 0.904558,
+          "accuracy_pct": 58.21
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}

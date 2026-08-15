@@ -54,15 +54,23 @@ def combine_reports(
 
 
 def run_command(command: list[str]) -> dict[str, Any]:
-    proc = subprocess.run(command, text=True, capture_output=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            text=True, encoding="utf-8", errors="replace")
+    chunks = []
+    for line in proc.stdout:
+        chunks.append(line)
+        sys.stdout.write(line)
+        sys.stdout.flush()
+    proc.wait()
+    stdout = "".join(chunks)
     try:
-        payload = json.loads(proc.stdout)
+        payload = json.loads(stdout)
     except json.JSONDecodeError:
         payload = {
             "status": "failed",
             "settled": 0,
             "returncode": proc.returncode,
-            "error": (proc.stderr or proc.stdout)[-1000:],
+            "error": stdout[-1000:],
         }
     if proc.returncode != 0:
         payload.setdefault("status", "failed")

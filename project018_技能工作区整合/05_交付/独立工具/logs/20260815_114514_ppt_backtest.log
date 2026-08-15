@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "F:\HM足球比赛预测\project018_技能工作区整合\05_交付\独立工具\gen_report_ppt.py", line 253, in <module>
+    main()
+  File "F:\HM足球比赛预测\project018_技能工作区整合\05_交付\独立工具\gen_report_ppt.py", line 248, in main
+    out, n = build_backtest_ppt(a.input, a.out)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\HM足球比赛预测\project018_技能工作区整合\05_交付\独立工具\gen_report_ppt.py", line 220, in build_backtest_ppt
+    _bullet(s, lines)
+  File "F:\HM足球比赛预测\project018_技能工作区整合\05_交付\独立工具\gen_report_ppt.py", line 56, in _bullet
+    _style(p.runs[0], size=size, bold=bold, color=color)
+           ~~~~~~^^^
+IndexError: tuple index out of range

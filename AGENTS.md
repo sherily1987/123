@@ -84,6 +84,37 @@ shared\football-quant-fusion\backtest\`，1555 条）逐条按 `prediction_id` �
 project018 内部还有一个指向自身 `02_脚本/skill/football-quant-fusion` 的 junction
 （`05_交付/plugin/football-quant-fusion/skills/football-quant-fusion`），同样不能动。
 
+**版本管理（2026-08-15 起，重要）**：融合引擎的 cohort 主键已从「5 字段全量字节哈希」
+改为「语义版本 `model_version` + 概率签名 `probability_signature`」，打破 current=0 死锁。
+- 改框架/日志/注释**不再重置样本**；只有改变概率数值输出（市场权重/校准系数/去水方法/
+  市场锚逻辑）才需要 bump `config/version_manifest.json` 的 `model_version`。
+- 生产预测批次前跑 `python release_lock.py` 锁定发布快照；改概率文件后跑
+  `python audit_version_consistency.py` 检测「改了概率但忘了 bump 版本」的违规（非 0 即违规）。
+- 当前 `model_version=m1`，尚无 current 样本（1466 场 legacy 经重放审计确认概率不等价，
+  不归入 current，从 m1 重新累积）。完整机制见 `40_模型/模型版本管理_打破current死锁.md`。
+
+**LLM 轨报告纪律（2026-08-15，重要，写报告前必读）**：`predict.py::aggregate_directions()`
+的 `strength` 字段是**投票比例**（`top_votes / total_votes`，如 2/3、5/6），不是校准概率；
+`build_audit_record()` 的 JSON 输出里**没有 EV 字段**，`export_report.py` 也不产出 EV。
+换句话说：**这个仓库目前没有任何代码计算 EV**。
+- ⚠️ `全局复利与踩坑日志.md` 2026-08-12 那条"新增 `ev_calculator.py`（EV=预测概率×赔率-1）"
+  的记录是**从未落地的**——`git log --all` 对该文件零匹配，此文件在本仓库历史上不存在过。
+  别因为日志写了"已新增"就假设它存在或引用它的行为，先用 `git log --all -- <path>` 核实。
+- 2026-08-15 的开售预测报告（如 `project001_足球预测/05_交付/2026-08-15_开售预测/`）出现
+  的 `EV +113%` 等数字，是**报告撰写环节手算/编造**的，把投票比例当概率代入
+  `概率×赔率-1`——不是代码 bug，是没有代码兜底，写报告的会话可以随意编。
+- **规则：写每日预测报告时，不得输出任何"EV"/"期望值"字段或列**，除非能指出它是从哪段
+  可审计代码算出来的。可以照常展示 `strength`（投票强度，如实标注"投票比例，非概率"），
+  但不得拿它去乘赔率、不得包装成"正 EV 推荐"或排序依据。
+- 若确实需要 EV 排序，必须先有一个真实概率来源（如轨道 A 融合引擎的 `final_1x2_pct`），
+  不能用轨道 B 的投票比例替代——这也是双轨"各自登记、各自结算、不合并"纪律的延伸。
+
+**独立工具（2026-08-15 新增）**：`project018_技能工作区整合/05_交付/独立工具/` 是给用户
+日常双击使用的菜单入口（`fusion_tool.bat`，桌面有「足球预测工具」快捷方式），菜单 8 项
+覆盖预测/回测结算/版本管理/辅助功能，所有操作显式 `--store` 指向仓库内唯一事实源。
+改菜单逻辑改 `fusion_menu.py`；工具只是入口，每日预测/回测产物仍归
+`project021/05_交付/每日开售预测/<日期>/`。
+
 跑测试：
 
 ```bash

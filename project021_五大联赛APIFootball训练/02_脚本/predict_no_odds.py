@@ -54,26 +54,51 @@ strength = calib.strength
 
 HALF_LIFE, XG_WEIGHT = 500.0, 0.4
 TIER_BOUNDS = ((0.010, "A"), (0.018, "B"), (0.030, "C"))
+# 频率基线分档（比市场基线弱得多，阈值必须更严）：大幅跑赢才 A，打平/略差一律 D
+FREQ_TIER_BOUNDS = ((-0.050, "A"), (-0.020, "B"), (0.0, "C"))
 MIN_TEST_N = 120
 MIN_WEIGHTED_N = 10.0
 EXTREME_PCT = 0.15
 
 
 def league_tiers(project: Path) -> dict:
-    """由回测结果实时计算档位，避免与报告脱节。"""
+    """由回测结果实时计算档位，避免与报告脱节。
+
+    无市场基线（market=None，api-sports.io 源）的联赛改用频率基线分档，
+    tier 加 F- 前缀（如 F-A），表示"基于频率基线，未经市场对比"。
+    """
     path = project / "05_交付" / "full_backtest.json"
     if not path.exists():
         return {}
     out = {}
     for slug, v in json.loads(path.read_text(encoding="utf-8"))["leagues"].items():
-        gap = v["model_subset"] - v["market"]
+        if not isinstance(v.get("model_subset"), float):
+            continue
+        if isinstance(v.get("market"), float):
+            gap = v["model_subset"] - v["market"]
+            basis = "market"
+        elif isinstance(v.get("frequency"), float):
+            gap = v["model_subset"] - v["frequency"]
+            basis = "frequency"
+        else:
+            continue
         tier = "D"
         if v["n_subset"] >= MIN_TEST_N:
-            for bound, label in TIER_BOUNDS:
-                if gap < bound:
-                    tier = label
-                    break
-        out[slug] = {"tier": tier, "gap": round(gap, 4), "n": v["n_subset"]}
+            if basis == "market":
+                for bound, label in TIER_BOUNDS:
+                    if gap < bound:
+                        tier = label
+                        break
+            else:
+                # 频率基线不看主客、极易跑赢，必须用更严阈值：大幅跑赢才 A，
+                # 打平或略差（gap>=0）一律 D（与市场口径的 A/B/C 不可比）
+                for bound, label in FREQ_TIER_BOUNDS:
+                    if gap < bound:
+                        tier = label
+                        break
+        if basis == "frequency":
+            tier = f"F-{tier}"
+        out[slug] = {"tier": tier, "gap": round(gap, 4), "n": v["n_subset"], "tier_basis": basis}
     return out
 
 
@@ -162,15 +187,19 @@ def percentile(model, key) -> float:
     return alphas.index(model["alpha"][idx]) / max(len(alphas) - 1, 1)
 
 
+_TIER_RANK = {"A": 0, "F-A": 1, "B": 2, "F-B": 3, "C": 4, "F-C": 5, "D": 6, "F-D": 7}
+_TIER_DOWN = {"A": "B", "B": "C", "C": "D", "D": "D"}
+
+
 def verdict(tiers, home_lg, away_lg, cross, extremes, low_n):
     reasons = []
-    order = ["A", "B", "C", "D"]
     t_home = (tiers.get(home_lg) or {}).get("tier", "D")
     t_away = (tiers.get(away_lg) or {}).get("tier", "D")
-    tier = max(t_home, t_away, key=order.index)
+    tier = t_home if _TIER_RANK[t_home] <= _TIER_RANK[t_away] else t_away
     reasons.append(f"联赛档位取较差者：{home_lg}={t_home}, {away_lg}={t_away} -> {tier}")
     if cross:
-        tier = order[min(order.index(tier) + 1, 3)]
+        pfx = "F-" if tier.startswith("F-") else ""
+        tier = pfx + _TIER_DOWN[tier[2:] if pfx else tier]
         reasons.append("跨联赛对阵，降一档（单标量偏移在两队非本联赛平均水平时失真）")
     if low_n:
         return "拒绝", reasons + [f"低样本球队：{low_n}（weighted_n<{MIN_WEIGHTED_N:g}，评分不可信）"]
@@ -180,8 +209,14 @@ def verdict(tiers, home_lg, away_lg, cross, extremes, low_n):
             "实测欧超杯 PSG vs 维拉此情形下模型与市场差 22.7pp"]
     if tier == "D":
         return "拒绝", reasons + ["档位 D：无市场兜底时不建议单独使用"]
+    if tier == "F-D":
+        return "拒绝", reasons + ["档位 F-D：无市场基线且未跑赢频率基线，不建议使用"]
     if tier == "C":
         return "降级", reasons + ["档位 C：只看方向，不要采用具体数值"]
+    if tier == "F-C":
+        return "降级", reasons + ["档位 F-C：只看方向，不要采用具体数值（且无市场基线，置信度更低）"]
+    if tier.startswith("F-"):
+        reasons.append("⚠️ 联赛无赛前赔率基线，分档基于频率基线对比，未经过市场验证，置信度低于市场对比联赛")
     return "可用", reasons
 
 

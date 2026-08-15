@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """fusion_record — 融合登记（REBUILT 2026-08-02）
 
 移植自 zu-yu-dashi-3/scripts/record_prediction.py，登记完整融合 payload。
@@ -50,12 +50,16 @@ def formal_prediction_as_of(inp, kickoff):
     return value
 
 
-def cohort_key(frozen_hashes, route, mode, llm_model_pool_sha256=None):
-    """Stable cohort identity; old records deliberately remain without this field."""
+def cohort_key(model_version, probability_signature, route, mode, llm_model_pool_sha256=None):
+    """Stable cohort identity keyed by semantic model_version (primary anchor).
+
+    语义版本 model_version 是 cohort 主锚（只有概率数值变更才 bump），
+    probability_signature 是概率文件组的哈希审计。旧记录无这两个字段时
+    传 'unknown'，天然落 legacy/unknown，不参与 current 归因。
+    """
     parts = [
-        frozen_hashes['prediction_code_sha256'],
-        frozen_hashes['config_sha256'],
-        frozen_hashes['engine_bundle_sha256'],
+        str(model_version),
+        str(probability_signature),
         str(route),
         str(mode),
     ]
@@ -115,8 +119,14 @@ def main():
         key: build.get(key, 'unknown')
         for key in ('engine_bundle_sha256', 'prediction_code_sha256', 'config_sha256')
     }
-    if a.snapshot == 'prematch' and not all(is_complete_sha256(value) for value in frozen_hashes.values()):
-        sys.exit('complete build hashes required for formal snapshot=prematch registration')
+    # 语义版本主锚 + 概率签名（版本管理方案：cohort 主键不再依赖全量字节哈希）
+    model_version = str(build.get('model_version') or 'unknown')
+    probability_signature = str(build.get('probability_signature') or 'unknown')
+    if a.snapshot == 'prematch':
+        if not all(is_complete_sha256(value) for value in frozen_hashes.values()):
+            sys.exit('complete build hashes required for formal snapshot=prematch registration')
+        if not is_complete_sha256(probability_signature):
+            sys.exit('complete probability_signature required for formal snapshot=prematch registration')
     created = datetime.now(timezone.utc)
     if a.snapshot == 'prematch':
         prediction_as_of = formal_prediction_as_of(inp, kd)
@@ -165,7 +175,8 @@ def main():
         'snapshot_type': a.snapshot,
         'route': route,
         'mode': mode,
-        'cohort_key': cohort_key(frozen_hashes, route, mode, llm_audit['llm_model_pool_sha256']),
+        'cohort_key': cohort_key(model_version, probability_signature, route, mode,
+                                 llm_audit['llm_model_pool_sha256']),
         'model': {
             'name': 'football-quant-fusion',
             'version': version,
@@ -173,6 +184,8 @@ def main():
             'core_version': core_ver,
             'fusion_schema_version': str(build.get('fusion_schema_version') or
                                          out.get('fusion_schema_version') or 'unknown'),
+            'model_version': model_version,
+            'probability_signature': probability_signature,
             'engine_sha256': sha(engine),
             'engine_bundle_sha256': frozen_hashes['engine_bundle_sha256'],
             'prediction_code_sha256': frozen_hashes['prediction_code_sha256'],

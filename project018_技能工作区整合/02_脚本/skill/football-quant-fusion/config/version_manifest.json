@@ -4,6 +4,16 @@
     "fusion_version":  "1.4.0",
     "core_version":  "3.4.4",
     "fusion_schema_version":  "1.3.0",
+    "model_version":  "m1",
+    "model_version_note":  "语义版本主锚：只有改变概率数值输出的变更才 bump（改市场权重/Dixon-Coles系数/校准系数/去水方法/市场锚逻辑）。改框架代码/日志/注释/字段解析不 bump。见 40_模型/模型版本管理_打破current死锁.md",
+    "probability_files":  [
+                              "core/zu-yu-dashi-3/scripts/predict.py",
+                              "core/zu-yu-dashi-3/scripts/market_fit.py",
+                              "core/zu-yu-dashi-3/scripts/odds_methods.py",
+                              "core/zu-yu-dashi-3/scripts/team_strength.py",
+                              "config/market_weights.json",
+                              "config/recommendation_policy.json"
+                          ],
     "record_schema_version":  "fusion-1.1",
     "backtest_schema_version":  "fusion-backtest-2.0",
     "sample_audit_schema_version":  "sample-audit-2.0",

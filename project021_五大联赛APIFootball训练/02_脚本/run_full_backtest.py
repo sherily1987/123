@@ -114,11 +114,18 @@ def backtest_league(project: Path, league_id, events_file: str, xg_file: str | N
 
     sub = rep.get("model_on_baseline_subset") or {}
     mkt = rep.get(baseline) or {}
+    model_subset = sub.get("brier_mean")
+    n_subset = sub.get("n")
+    if not isinstance(model_subset, float):
+        # 无市场基线联赛（api-sports.io 源无赛前赔率）：没有 baseline 子集，
+        # 用全测试集指标代替，market 保持 None
+        model_subset = (rep.get("model") or {}).get("brier_mean")
+        n_subset = rep.get("n")
     return {
         "config": config, "baseline": baseline, "test_from": test_from,
         "n_all": rep.get("n"), "skip": rep.get("skip"),
         "model_all": (rep.get("model") or {}).get("brier_mean"),
-        "n_subset": sub.get("n"), "model_subset": sub.get("brier_mean"),
+        "n_subset": n_subset, "model_subset": model_subset,
         "market": mkt.get("brier_mean"),
         "frequency": (rep.get("frequency_baseline") or {}).get("brier_mean"),
         "accuracy_pct": (rep.get("model") or {}).get("accuracy_pct"),
@@ -144,19 +151,27 @@ def main() -> None:
         except Exception as exc:
             print(f"{name:<40}跳过：{type(exc).__name__} {str(exc)[:60]}", flush=True)
             continue
-        if not isinstance(r.get("model_subset"), float) or not isinstance(r.get("market"), float):
-            print(f"{name:<40}跳过：无可用市场基线", flush=True)
+        if not isinstance(r.get("model_subset"), float):
+            print(f"{name:<40}跳过：模型子集不可用", flush=True)
             continue
+        r["no_market"] = not isinstance(r.get("market"), float)
         r["thin"] = r["n_subset"] < a.min_test
         results[name] = r
+        if r["no_market"]:
+            gap_freq = (r["model_subset"] - r["frequency"]) if isinstance(r.get("frequency"), float) else None
+            flag = "  ⚠样本薄" if r["thin"] else ""
+            gtxt = f"  差(频率) {gap_freq:+.4f}" if gap_freq is not None else ""
+            print(f"{name:<40}n={r['n_subset']:<5}模型 {r['model_subset']:.4f}  "
+                  f"无市场基线（频率 {r['frequency']:.4f}{gtxt}）{flag}", flush=True)
+            continue
         flag = "  ⚠样本薄" if r["thin"] else ""
         print(f"{name:<40}n={r['n_subset']:<5}模型 {r['model_subset']:.4f}  "
               f"基线 {r['market']:.4f}  差 {r['model_subset'] - r['market']:+.4f}{flag}", flush=True)
 
     groups = {}
     for name, r in results.items():
-        if r.get("thin"):
-            continue          # 样本过薄的联赛不进汇总，避免噪声污染合计数
+        if r.get("thin") or r.get("no_market"):
+            continue          # 样本过薄/无市场基线的联赛不进市场口径汇总（后者见下方 no_mkt 组）
         g = groups.setdefault(r["baseline"], {"n": 0, "model": 0.0, "market": 0.0, "freq": 0.0, "leagues": []})
         n = r["n_subset"]
         g["n"] += n
@@ -168,6 +183,22 @@ def main() -> None:
                    "model": round(v["model"] / v["n"], 4), "market": round(v["market"] / v["n"], 4),
                    "frequency": round(v["freq"] / v["n"], 4),
                    "gap": round((v["model"] - v["market"]) / v["n"], 4)} for k, v in groups.items()}
+    # 无市场基线联赛（api-sports.io 源，无赛前赔率）单独分组：只与频率基线对比，不混入市场口径
+    no_mkt = {"n": 0, "model": 0.0, "freq": 0.0, "leagues": []}
+    for name, r in results.items():
+        if r.get("thin") or not r.get("no_market"):
+            continue
+        n = r["n_subset"]
+        no_mkt["n"] += n
+        no_mkt["model"] += n * r["model_subset"]
+        no_mkt["freq"] += n * r["frequency"]
+        no_mkt["leagues"].append(name)
+    if no_mkt["leagues"]:
+        summary["no_market"] = {"leagues": no_mkt["leagues"], "n": no_mkt["n"],
+                                "model": round(no_mkt["model"] / no_mkt["n"], 4),
+                                "market": None,
+                                "frequency": round(no_mkt["freq"] / no_mkt["n"], 4),
+                                "gap_vs_frequency": round((no_mkt["model"] - no_mkt["freq"]) / no_mkt["n"], 4)}
 
     payload = {"config": {"step_days": STEP_DAYS, "half_life": HALF_LIFE, "xg_weight": XG_WEIGHT,
                           "shrinkage": "off", "metric_basis": "model_on_baseline_subset"},
@@ -175,8 +206,12 @@ def main() -> None:
     a.report.parent.mkdir(parents=True, exist_ok=True)
     a.report.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    print("\n== 分口径汇总（两种市场基线不可合并）==")
+    print("\n== 分口径汇总（两种市场基线不可合并；no_market 无赛前赔率，只比频率基线）==")
     for k, v in summary.items():
+        if k == "no_market":
+            print(f"  无市场基线（{len(v['leagues'])} 个联赛，{v['n']} 场）"
+                  f"  模型 {v['model']:.4f}  频率基线 {v['frequency']:.4f}  差 {v['gap_vs_frequency']:+.4f}")
+            continue
         label = "赛前快照" if k == "provider_market" else "收盘线"
         print(f"  {label}（{len(v['leagues'])} 个联赛，{v['n']} 场）"
               f"  模型 {v['model']:.4f}  市场 {v['market']:.4f}  差 {v['gap']:+.4f}  频率基线 {v['frequency']:.4f}")

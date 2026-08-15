@@ -7,19 +7,36 @@
     "metric_basis": "model_on_baseline_subset"
   },
   "leagues": {
+    "apisports_korea_k_league_1": {
+      "config": "滚动+xG w=0.4",
+      "baseline": "provider_market",
+      "test_from": 739039,
+      "n_all": 135,
+      "skip": 3,
+      "model_all": 0.647954,
+      "n_subset": 135,
+      "model_subset": 0.647954,
+      "market": null,
+      "frequency": 0.647337,
+      "accuracy_pct": 36.3,
+      "log_loss": 1.06899,
+      "no_market": true,
+      "thin": false
+    },
     "austria_bundesliga": {
       "config": "滚动+xG w=0.4",
       "baseline": "provider_market",
       "test_from": 739465,
       "n_all": 195,
       "skip": 0,
-      "model_all": 0.651734,
+      "model_all": 0.651739,
       "n_subset": 188,
-      "model_subset": 0.648286,
+      "model_subset": 0.648291,
       "market": 0.646837,
       "frequency": 0.653226,
       "accuracy_pct": 46.67,
-      "log_loss": 1.07766,
+      "log_loss": 1.077666,
+      "no_market": false,
       "thin": false
     },
     "belarus_premier_league": {
@@ -35,6 +52,7 @@
       "frequency": 0.65342,
       "accuracy_pct": 48.93,
       "log_loss": 1.01556,
+      "no_market": false,
       "thin": false
     },
     "belgium_first_division_a": {
@@ -43,13 +61,14 @@
       "test_from": 739401,
       "n_all": 318,
       "skip": 2,
-      "model_all": 0.632621,
+      "model_all": 0.631985,
       "n_subset": 280,
-      "model_subset": 0.619161,
+      "model_subset": 0.618742,
       "market": 0.595609,
       "frequency": 0.656337,
-      "accuracy_pct": 44.97,
-      "log_loss": 1.060144,
+      "accuracy_pct": 45.28,
+      "log_loss": 1.058851,
+      "no_market": false,
       "thin": false
     },
     "bosnia_and_herzegovina_1st_league": {
@@ -65,6 +84,7 @@
       "frequency": 0.614121,
       "accuracy_pct": 53.56,
       "log_loss": 0.987244,
+      "no_market": false,
       "thin": false
     },
     "bulgaria_first_league": {
@@ -80,6 +100,7 @@
       "frequency": 0.655415,
       "accuracy_pct": 49.82,
       "log_loss": 1.028247,
+      "no_market": false,
       "thin": false
     },
     "bundesliga": {
@@ -88,13 +109,14 @@
       "test_from": 739493,
       "n_all": 310,
       "skip": 1,
-      "model_all": 0.57748,
+      "model_all": 0.577147,
       "n_subset": 276,
-      "model_subset": 0.575252,
+      "model_subset": 0.57494,
       "market": 0.554001,
       "frequency": 0.646725,
       "accuracy_pct": 54.52,
-      "log_loss": 0.976118,
+      "log_loss": 0.975629,
+      "no_market": false,
       "thin": false
     },
     "croatia_hnl": {
@@ -103,13 +125,14 @@
       "test_from": 739465,
       "n_all": 169,
       "skip": 11,
-      "model_all": 0.585026,
+      "model_all": 0.58502,
       "n_subset": 169,
-      "model_subset": 0.585026,
+      "model_subset": 0.58502,
       "market": 0.578231,
       "frequency": 0.646339,
       "accuracy_pct": 53.25,
-      "log_loss": 0.986629,
+      "log_loss": 0.986618,
+      "no_market": false,
       "thin": false
     },
     "cyprus_1_division": {
@@ -125,6 +148,7 @@
       "frequency": 0.636273,
       "accuracy_pct": 53.22,
       "log_loss": 0.955451,
+      "no_market": false,
       "thin": false
     },
     "czech_liga": {
@@ -133,13 +157,14 @@
       "test_from": 739400,
       "n_all": 274,
       "skip": 6,
-      "model_all": 0.599808,
+      "model_all": 0.599798,
       "n_subset": 269,
-      "model_subset": 0.604036,
+      "model_subset": 0.604027,
       "market": 0.593801,
       "frequency": 0.653119,
       "accuracy_pct": 51.46,
-      "log_loss": 1.003289,
+      "log_loss": 1.003272,
+      "no_market": false,
       "thin": false
     },
     "denmark_superliga": {
@@ -148,13 +173,14 @@
       "test_from": 739404,
       "n_all": 191,
       "skip": 2,
-      "model_all": 0.632155,
+      "model_all": 0.632162,
       "n_subset": 185,
-      "model_subset": 0.634664,
+      "model_subset": 0.634671,
       "market": 0.613323,
       "frequency": 0.653016,
       "accuracy_pct": 51.31,
-      "log_loss": 1.05095,
+      "log_loss": 1.050957,
+      "no_market": false,
       "thin": false
     },
     "eredivisie": {
@@ -163,13 +189,14 @@
       "test_from": 739392,
       "n_all": 316,
       "skip": 0,
-      "model_all": 0.578464,
+      "model_all": 0.578394,
       "n_subset": 304,
-      "model_subset": 0.578294,
+      "model_subset": 0.578211,
       "market": 0.576377,
       "frequency": 0.648125,
       "accuracy_pct": 52.85,
-      "log_loss": 0.975774,
+      "log_loss": 0.975658,
+      "no_market": false,
       "thin": false
     },
     "estonia_meistriliiga": {
@@ -185,6 +212,7 @@
       "frequency": 0.619101,
       "accuracy_pct": 61.45,
       "log_loss": 0.875189,
+      "no_market": false,
       "thin": false
     },
     "finland_veikkausliiga": {
@@ -193,13 +221,14 @@
       "test_from": 739444,
       "n_all": 133,
       "skip": 41,
-      "model_all": 0.627078,
+      "model_all": 0.627207,
       "n_subset": 128,
-      "model_subset": 0.616184,
+      "model_subset": 0.616316,
       "market": 0.581539,
       "frequency": 0.670529,
       "accuracy_pct": 48.87,
-      "log_loss": 1.048142,
+      "log_loss": 1.048383,
+      "no_market": false,
       "thin": false
     },
     "greece_super_league_1": {
@@ -208,13 +237,14 @@
       "test_from": 739393,
       "n_all": 236,
       "skip": 3,
-      "model_all": 0.563581,
+      "model_all": 0.56357,
       "n_subset": 234,
-      "model_subset": 0.567049,
+      "model_subset": 0.567039,
       "market": 0.557789,
       "frequency": 0.655678,
       "accuracy_pct": 52.54,
-      "log_loss": 0.950145,
+      "log_loss": 0.950124,
+      "no_market": false,
       "thin": false
     },
     "hungary_nb_i": {
@@ -230,6 +260,7 @@
       "frequency": 0.659137,
       "accuracy_pct": 50.25,
       "log_loss": 1.037153,
+      "no_market": false,
       "thin": false
     },
     "iceland_1_deild": {
@@ -245,6 +276,7 @@
       "frequency": 0.621899,
       "accuracy_pct": 52.52,
       "log_loss": 1.029934,
+      "no_market": false,
       "thin": false
     },
     "israel_liga_leumit": {
@@ -260,6 +292,7 @@
       "frequency": 0.67232,
       "accuracy_pct": 39.16,
       "log_loss": 1.122712,
+      "no_market": false,
       "thin": false
     },
     "israel_ligat_ha_al": {
@@ -275,6 +308,7 @@
       "frequency": 0.65533,
       "accuracy_pct": 49.37,
       "log_loss": 1.027983,
+      "no_market": false,
       "thin": false
     },
     "la_liga": {
@@ -283,13 +317,14 @@
       "test_from": 739483,
       "n_all": 383,
       "skip": 0,
-      "model_all": 0.58212,
+      "model_all": 0.582128,
       "n_subset": 345,
-      "model_subset": 0.577917,
+      "model_subset": 0.577926,
       "market": 0.567652,
       "frequency": 0.631867,
       "accuracy_pct": 52.48,
-      "log_loss": 0.994932,
+      "log_loss": 0.99494,
+      "no_market": false,
       "thin": false
     },
     "latvia_1_liga": {
@@ -305,6 +340,7 @@
       "frequency": 0.636625,
       "accuracy_pct": 59.39,
       "log_loss": 0.955104,
+      "no_market": false,
       "thin": false
     },
     "ligue_1": {
@@ -313,13 +349,14 @@
       "test_from": 739369,
       "n_all": 334,
       "skip": 3,
-      "model_all": 0.587967,
+      "model_all": 0.588214,
       "n_subset": 307,
-      "model_subset": 0.600828,
+      "model_subset": 0.60113,
       "market": 0.587142,
       "frequency": 0.640701,
       "accuracy_pct": 52.99,
-      "log_loss": 0.986731,
+      "log_loss": 0.986882,
+      "no_market": false,
       "thin": false
     },
     "lithuania_1_lyga": {
@@ -335,6 +372,7 @@
       "frequency": 0.634016,
       "accuracy_pct": 58.41,
       "log_loss": 0.949738,
+      "no_market": false,
       "thin": false
     },
     "luxembourg_national_division": {
@@ -350,6 +388,7 @@
       "frequency": 0.643449,
       "accuracy_pct": 51.71,
       "log_loss": 1.037678,
+      "no_market": false,
       "thin": false
     },
     "moldova_super_liga": {
@@ -365,6 +404,7 @@
       "frequency": 0.628654,
       "accuracy_pct": 58.87,
       "log_loss": 0.936937,
+      "no_market": false,
       "thin": false
     },
     "montenegro_first_league": {
@@ -380,6 +420,7 @@
       "frequency": 0.649381,
       "accuracy_pct": 44.38,
       "log_loss": 1.105312,
+      "no_market": false,
       "thin": false
     },
     "norway_eliteserien": {
@@ -388,13 +429,14 @@
       "test_from": 739425,
       "n_all": 241,
       "skip": 4,
-      "model_all": 0.557468,
+      "model_all": 0.55781,
       "n_subset": 227,
-      "model_subset": 0.557168,
+      "model_subset": 0.557519,
       "market": 0.528893,
       "frequency": 0.61776,
       "accuracy_pct": 58.92,
-      "log_loss": 0.943662,
+      "log_loss": 0.94419,
+      "no_market": false,
       "thin": false
     },
     "poland_ekstraklasa": {
@@ -403,13 +445,14 @@
       "test_from": 739451,
       "n_all": 301,
       "skip": 5,
-      "model_all": 0.649144,
+      "model_all": 0.648314,
       "n_subset": 292,
-      "model_subset": 0.647005,
+      "model_subset": 0.64609,
       "market": 0.637446,
       "frequency": 0.647172,
       "accuracy_pct": 44.19,
-      "log_loss": 1.077321,
+      "log_loss": 1.076305,
+      "no_market": false,
       "thin": false
     },
     "portugal_primeira_liga": {
@@ -418,13 +461,14 @@
       "test_from": 739472,
       "n_all": 302,
       "skip": 6,
-      "model_all": 0.549064,
+      "model_all": 0.549038,
       "n_subset": 273,
-      "model_subset": 0.548134,
+      "model_subset": 0.548105,
       "market": 0.535321,
       "frequency": 0.657593,
       "accuracy_pct": 54.64,
-      "log_loss": 0.930393,
+      "log_loss": 0.930351,
+      "no_market": false,
       "thin": false
     },
     "premier_league": {
@@ -433,13 +477,14 @@
       "test_from": 739482,
       "n_all": 379,
       "skip": 0,
-      "model_all": 0.624748,
+      "model_all": 0.624301,
       "n_subset": 356,
-      "model_subset": 0.620682,
+      "model_subset": 0.620184,
       "market": 0.607958,
       "frequency": 0.656125,
-      "accuracy_pct": 47.76,
-      "log_loss": 1.046813,
+      "accuracy_pct": 47.49,
+      "log_loss": 1.046385,
+      "no_market": false,
       "thin": false
     },
     "republic_of_ireland_premier_division": {
@@ -455,6 +500,7 @@
       "frequency": 0.661064,
       "accuracy_pct": 43.78,
       "log_loss": 1.042261,
+      "no_market": false,
       "thin": false
     },
     "romania_liga_i": {
@@ -465,11 +511,12 @@
       "skip": 7,
       "model_all": 0.623847,
       "n_subset": 304,
-      "model_subset": 0.626853,
+      "model_subset": 0.626849,
       "market": 0.616629,
       "frequency": 0.646061,
       "accuracy_pct": 49.36,
-      "log_loss": 1.038693,
+      "log_loss": 1.038691,
+      "no_market": false,
       "thin": false
     },
     "russia_premier_league": {
@@ -478,13 +525,30 @@
       "test_from": 739452,
       "n_all": 241,
       "skip": 2,
-      "model_all": 0.577777,
+      "model_all": 0.577237,
       "n_subset": 237,
-      "model_subset": 0.574998,
+      "model_subset": 0.574482,
       "market": 0.562142,
       "frequency": 0.646849,
       "accuracy_pct": 55.6,
-      "log_loss": 0.976504,
+      "log_loss": 0.975788,
+      "no_market": false,
+      "thin": false
+    },
+    "saudi_pro_league": {
+      "config": "滚动+xG w=0.4",
+      "baseline": "provider_market",
+      "test_from": 739515,
+      "n_all": 280,
+      "skip": 0,
+      "model_all": 0.52731,
+      "n_subset": 280,
+      "model_subset": 0.52731,
+      "market": null,
+      "frequency": 0.645352,
+      "accuracy_pct": 58.21,
+      "log_loss": 0.898446,
+      "no_market": true,
       "thin": false
     },
     "scotland_premiership": {
@@ -493,13 +557,14 @@
       "test_from": 739465,
       "n_all": 225,
       "skip": 9,
-      "model_all": 0.591794,
+      "model_all": 0.591788,
       "n_subset": 210,
-      "model_subset": 0.591192,
+      "model_subset": 0.591187,
       "market": 0.57388,
       "frequency": 0.648395,
       "accuracy_pct": 53.33,
-      "log_loss": 0.995339,
+      "log_loss": 0.995328,
+      "no_market": false,
       "thin": false
     },
     "serbia_super_liga": {
@@ -515,6 +580,7 @@
       "frequency": 0.654509,
       "accuracy_pct": 50.63,
       "log_loss": 1.067141,
+      "no_market": false,
       "thin": false
     },
     "serie_a": {
@@ -523,13 +589,14 @@
       "test_from": 739487,
       "n_all": 377,
       "skip": 3,
-      "model_all": 0.595522,
+      "model_all": 0.59552,
       "n_subset": 355,
-      "model_subset": 0.598749,
+      "model_subset": 0.598745,
       "market": 0.583598,
       "frequency": 0.658857,
       "accuracy_pct": 50.4,
-      "log_loss": 0.997501,
+      "log_loss": 0.997497,
+      "no_market": false,
       "thin": false
     },
     "slovakia_1_liga": {
@@ -538,13 +605,14 @@
       "test_from": 739395,
       "n_all": 194,
       "skip": 0,
-      "model_all": 0.594802,
+      "model_all": 0.59482,
       "n_subset": 192,
-      "model_subset": 0.59298,
+      "model_subset": 0.592997,
       "market": 0.589079,
       "frequency": 0.637993,
       "accuracy_pct": 56.19,
-      "log_loss": 0.997592,
+      "log_loss": 0.997621,
+      "no_market": false,
       "thin": false
     },
     "slovenia_1_snl": {
@@ -560,6 +628,7 @@
       "frequency": 0.637948,
       "accuracy_pct": 57.87,
       "log_loss": 0.974931,
+      "no_market": false,
       "thin": false
     },
     "sweden_allsvenskan": {
@@ -568,13 +637,14 @@
       "test_from": 739394,
       "n_all": 242,
       "skip": 2,
-      "model_all": 0.635256,
+      "model_all": 0.634656,
       "n_subset": 238,
-      "model_subset": 0.631746,
+      "model_subset": 0.631138,
       "market": 0.590759,
       "frequency": 0.657765,
       "accuracy_pct": 46.69,
-      "log_loss": 1.052361,
+      "log_loss": 1.05148,
+      "no_market": false,
       "thin": false
     },
     "switzerland_super_league": {
@@ -583,13 +653,14 @@
       "test_from": 739487,
       "n_all": 209,
       "skip": 1,
-      "model_all": 0.638743,
+      "model_all": 0.638737,
       "n_subset": 198,
-      "model_subset": 0.641821,
+      "model_subset": 0.641814,
       "market": 0.609998,
       "frequency": 0.664442,
       "accuracy_pct": 42.11,
-      "log_loss": 1.056761,
+      "log_loss": 1.056753,
+      "no_market": false,
       "thin": false
     },
     "turkey_super_lig": {
@@ -598,13 +669,14 @@
       "test_from": 739376,
       "n_all": 337,
       "skip": 8,
-      "model_all": 0.611413,
+      "model_all": 0.611396,
       "n_subset": 321,
-      "model_subset": 0.618027,
+      "model_subset": 0.617967,
       "market": 0.589748,
       "frequency": 0.662803,
       "accuracy_pct": 49.55,
-      "log_loss": 1.019952,
+      "log_loss": 1.020106,
+      "no_market": false,
       "thin": false
     },
     "ukraine_premier_league": {
@@ -620,6 +692,7 @@
       "frequency": 0.662582,
       "accuracy_pct": 52.49,
       "log_loss": 1.006547,
+      "no_market": false,
       "thin": false
     },
     "fd_arg": {
@@ -635,6 +708,7 @@
       "frequency": 0.652786,
       "accuracy_pct": 42.72,
       "log_loss": 1.072021,
+      "no_market": false,
       "thin": false
     },
     "fd_bra": {
@@ -650,6 +724,7 @@
       "frequency": 0.637299,
       "accuracy_pct": 50.09,
       "log_loss": 1.021384,
+      "no_market": false,
       "thin": false
     },
     "fd_e1": {
@@ -658,13 +733,14 @@
       "test_from": 739471,
       "n_all": 544,
       "skip": 8,
-      "model_all": 0.648159,
+      "model_all": 0.64812,
       "n_subset": 544,
-      "model_subset": 0.648159,
+      "model_subset": 0.64812,
       "market": 0.62668,
       "frequency": 0.655543,
       "accuracy_pct": 43.75,
-      "log_loss": 1.071837,
+      "log_loss": 1.071783,
+      "no_market": false,
       "thin": false
     },
     "fd_f2": {
@@ -673,13 +749,14 @@
       "test_from": 739352,
       "n_all": 337,
       "skip": 13,
-      "model_all": 0.661849,
+      "model_all": 0.661556,
       "n_subset": 337,
-      "model_subset": 0.661849,
+      "model_subset": 0.661556,
       "market": 0.637965,
       "frequency": 0.667168,
-      "accuracy_pct": 41.84,
-      "log_loss": 1.094908,
+      "accuracy_pct": 41.25,
+      "log_loss": 1.094316,
+      "no_market": false,
       "thin": false
     },
     "fd_jpn": {
@@ -695,6 +772,7 @@
       "frequency": 0.656478,
       "accuracy_pct": 44.69,
       "log_loss": 1.081643,
+      "no_market": false,
       "thin": false
     }
   },
@@ -744,10 +822,10 @@
         "ukraine_premier_league"
       ],
       "n": 9176,
-      "model": 0.6019,
+      "model": 0.6018,
       "market": 0.5831,
       "frequency": 0.6488,
-      "gap": 0.0188
+      "gap": 0.0187
     },
     "closing_market": {
       "leagues": [
@@ -758,10 +836,21 @@
         "fd_jpn"
       ],
       "n": 4133,
-      "model": 0.6405,
+      "model": 0.6404,
       "market": 0.6234,
       "frequency": 0.651,
-      "gap": 0.0171
+      "gap": 0.017
+    },
+    "no_market": {
+      "leagues": [
+        "apisports_korea_k_league_1",
+        "saudi_pro_league"
+      ],
+      "n": 415,
+      "model": 0.5666,
+      "market": null,
+      "frequency": 0.646,
+      "gap_vs_frequency": -0.0794
     }
   }
 }

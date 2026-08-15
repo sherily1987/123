@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """football-quant-fusion command router.
 
 REBUILT 2026-08-02：原文件在文件系统同步事故中损坏，本文件基于
@@ -48,14 +48,17 @@ def option_value(rest, flag):
     return None
 
 
-# [中文功能] 以子进程运行脚本并转发其输出
+# [中文功能] 以子进程运行脚本并实时转发其输出（不再 capture 吞掉进度）
 def run_script(script, rest):
     p = HERE / script
     if not p.exists():
         raise SystemExit(f'脚本缺失（事故损坏待恢复）：{p}\n可用 zu-yu-dashi-3 对应脚本替代或联系重建。')
-    proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
-    sys.stdout.write(proc.stdout)
-    sys.stderr.write(proc.stderr)
+    proc = subprocess.Popen([PY, str(p), *rest], text=True, encoding="utf-8", errors="replace",
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in proc.stdout:
+        sys.stdout.write(line)
+        sys.stdout.flush()
+    proc.wait()
     if proc.returncode != 0:
         raise SystemExit(proc.returncode)
     return proc
@@ -197,28 +200,39 @@ def main():
         p = HERE / "fusion_settle.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
-        proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
-        sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
+        proc = subprocess.Popen([PY, str(p), *rest], text=True, encoding="utf-8", errors="replace",
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in proc.stdout:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+        proc.wait()
         raise SystemExit(proc.returncode)
     if cmd == "backtest":
         # fusion 全参数回测：委托融合回测脚本（缺失时回退 zu-yu-dashi-3 回测并说明）
         fb = HERE / "fusion_backtest.py"
         if fb.exists():
-            proc = subprocess.run([PY, str(fb), *rest], text=True, capture_output=True)
-            sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
-            raise SystemExit(proc.returncode)
-        p = core_scripts_dir() / "backtest.py"
-        print('提示：fusion_backtest.py 缺失（事故损坏），回退核心引擎回测', file=sys.stderr)
-        proc = subprocess.run([PY, str(p), *rest], text=True, capture_output=True)
-        sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
+            p = fb
+        else:
+            p = core_scripts_dir() / "backtest.py"
+            print('提示：fusion_backtest.py 缺失（事故损坏），回退核心引擎回测', file=sys.stderr)
+        proc = subprocess.Popen([PY, str(p), *rest], text=True, encoding="utf-8", errors="replace",
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in proc.stdout:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+        proc.wait()
         raise SystemExit(proc.returncode)
     if cmd in ("odds-add", "odds-drift"):
         p = core_scripts_dir() / "odds_movement.py"
         if not p.exists():
             raise SystemExit(f'依赖脚本缺失：{p}')
         sub_cmd = 'add' if cmd == 'odds-add' else 'drift'
-        proc = subprocess.run([PY, str(p), sub_cmd, *rest], text=True, capture_output=True)
-        sys.stdout.write(proc.stdout); sys.stderr.write(proc.stderr)
+        proc = subprocess.Popen([PY, str(p), sub_cmd, *rest], text=True, encoding="utf-8",
+                                errors="replace", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in proc.stdout:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+        proc.wait()
         raise SystemExit(proc.returncode)
     if cmd in ("football-data-enrich", "market-ablation", "collect-date"):
         script = {"football-data-enrich": "football_data_enrich.py",

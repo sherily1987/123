@@ -112,20 +112,19 @@ def engine_build_key(row):
 
 
 def version_cohort(row, current_identity):
-    """精确哈希匹配才属于current；可识别旧版为legacy，其余为unknown。
+    """语义版本 model_version + 概率签名匹配才属于 current；旧版 legacy，其余 unknown。
 
-    2026-08-14 修正：原实现只看 version 字符串，凡是 version=="unknown" 一律判 unknown，
-    导致 1445 条有完整 engine_sha256 的历史样本被误判为不可归因（生产回测里占 81%）。
-    现改为先做精确哈希匹配，再回退到引擎构建指纹，只有连指纹都拿不到才是 unknown。
+    2026-08-15 版本管理方案：cohort 主键从「5 字段全量字节哈希」改为
+    「model_version + probability_signature」，框架代码/日志/注释的改动不再重置样本。
+    旧记录无 model_version/probability_signature 时回退到引擎构建指纹归 legacy。
     """
     model = row.get("model") or {}
-    required = ("fusion_version", "core_version", "engine_bundle_sha256",
-                "prediction_code_sha256", "config_sha256")
-    if all(_is_sha256(current_identity.get(key)) or current_identity.get(key)
-           for key in required) and all(
-            str(model.get(key) or "") == str(current_identity.get(key) or "")
-            for key in required):
-        return "current"
+    cur_mv = str(current_identity.get("model_version") or "").strip()
+    cur_ps = str(current_identity.get("probability_signature") or "").strip()
+    if cur_mv and cur_mv != "unknown" and cur_ps and _is_sha256(cur_ps):
+        if str(model.get("model_version") or "").strip() == cur_mv and \
+                str(model.get("probability_signature") or "").strip() == cur_ps:
+            return "current"
     version = str(row.get("version") or "").strip().lower()
     identifiable = version and version not in {"unknown", "offline", "none"} and "unknown" not in version
     if identifiable or engine_build_key(row):
@@ -135,12 +134,28 @@ def version_cohort(row, current_identity):
 
 # [中文功能] 旧容器路径 /var/minis/... 自动映射到本机 shared 目录
 def resolve_path(p_str, root):
-    p = Path(p_str)
-    if p.exists():
-        return p
-    if p_str.startswith("/var/minis/shared/"):
-        return root.parents[1] / p_str[len("/var/minis/shared/"):]
-    return p
+    """解析预测文件路径，`--store` 指向的仓库内目录是唯一权威来源。
+
+    2026-08-15 修正：原实现优先信任 registry 里记录的绝对路径（`p.exists()` 命中
+    就直接用），但那是登记当时生效的容器/外部套件路径。仓库内 `--store` 与外部套件
+    `C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/...`
+    是两份物理分裂的目录（见 AGENTS.md §0），只要外部那份文件还在，就会被静默读取，
+    --store 形同虚设（复盘 `06_复盘/2026-08-15_模型评测/复盘_模型评测_20260815.md`
+    审计出全部 1562 条走的都是这条隐藏分支，只是内容当时恰好一致，不能保证以后也一致）。
+    现改为优先按 `.../football-quant-fusion/backtest/` 标记之后的相对段落定位到
+    `--store` 内；只有仓库内确实找不到，才退回 registry 记录的原始路径兜底。
+    """
+    norm = str(p_str).replace("\\", "/")
+    marker = "/football-quant-fusion/backtest/"
+    if marker in norm:
+        cand = root / norm.split(marker, 1)[1]
+        if cand.exists():
+            return cand
+    if norm.startswith("/var/minis/shared/"):
+        cand = root.parents[1] / norm[len("/var/minis/shared/"):]
+        if cand.exists():
+            return cand
+    return Path(p_str)
 
 
 # [中文功能] 在融合输出中按多级位置查找字段
@@ -519,11 +534,14 @@ def main():
     by_snapshot = {}
     by_cohort = {"current": [], "legacy": [], "unknown": []}
     by_engine_build = {}
+    by_model_version = {}
     for r in rows:
         by_version.setdefault(r["version"], []).append(r)
         by_league.setdefault(r["league"], []).append(r)
         by_cohort[r["version_cohort"]].append(r)
         by_engine_build.setdefault(engine_build_key(r) or "unattributable", []).append(r)
+        by_model_version.setdefault(
+            str((r.get("model") or {}).get("model_version") or "unattributable"), []).append(r)
     for r in snapshot_rows:
         by_snapshot.setdefault(r["snapshot_type"], []).append(r)
     current_n = len(by_cohort["current"])
@@ -542,6 +560,7 @@ def main():
         "by_version": {k: summarize(v) for k, v in sorted(by_version.items())},
         "by_version_cohort": {k: summarize(v) for k, v in by_cohort.items()},
         "by_engine_build": {k: summarize(v) for k, v in sorted(by_engine_build.items())},
+        "by_model_version": {k: summarize(v) for k, v in sorted(by_model_version.items())},
         "by_league": {k: summarize(v) for k, v in sorted(by_league.items())},
         "snapshot_research": {
             "record_sample_size": len(snapshot_rows),

@@ -75,20 +75,23 @@ def collect_by_kickoff_date(target):
 def collect_by_sales_day(start, label):
     collected = {}
     source_urls = []
-    for idx, day in enumerate([start, start + timedelta(days=1)]):
-        qdate = day.isoformat()
-        method = 'all' if idx == 0 else 'concern'
-        url, rows = list_matches(method, qdate)
-        source_urls.append(url)
-        for row in rows:
-            num = str(row.get('matchNumStr') or '')
-            if '已完成' in str(row.get('matchStatusName') or ''):
-                continue
-            if not num.startswith(label):
-                continue
-            mid = row.get('matchId')
-            if mid is not None:
-                collected[str(mid)] = row
+    # 必须 2 天 × 2 method 全遍历：当天傍晚/深夜开球的场次（如周五001 18:00、周五002 23:00）
+    # 在 start 日的 concern 列表里，而次日凌晨场次在 start+1 日的 all/concern 列表里。
+    # 若每天只查一个 method，会漏掉当天开球的那批（2026-08-14 实测漏了周五001/002）。
+    for day in [start, start + timedelta(days=1)]:
+        for method in ('all', 'concern'):
+            qdate = day.isoformat()
+            url, rows = list_matches(method, qdate)
+            source_urls.append(url)
+            for row in rows:
+                num = str(row.get('matchNumStr') or '')
+                if '已完成' in str(row.get('matchStatusName') or ''):
+                    continue
+                if not num.startswith(label):
+                    continue
+                mid = row.get('matchId')
+                if mid is not None:
+                    collected[str(mid)] = row
     return collected, source_urls
 
 

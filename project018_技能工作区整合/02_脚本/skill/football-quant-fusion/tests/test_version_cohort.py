@@ -1,8 +1,8 @@
-"""版本归因回归测试（2026-08-14）。
+"""版本归因回归测试（2026-08-15 版本管理方案更新）。
 
-背景：原 version_cohort 只看 model.version 字符串，凡是 "unknown" 一律判 unknown，
-导致 1445 条带完整 engine_sha256 的历史样本被当成不可归因（生产回测里占 81%），
-掩盖了「当前引擎构建确实零样本」这个真实结论。
+背景：2026-08-15 起 cohort 主键从「5 字段全量字节哈希」改为
+「model_version + probability_signature」，让框架代码/日志/注释改动不再重置样本。
+本测试保留 08-14 的 legacy/unknown 回归用例，并新增新逻辑的 current 判定用例。
 """
 import importlib.util
 from pathlib import Path
@@ -15,6 +15,8 @@ spec.loader.exec_module(fb)
 SHA_A = "9fe6e8e8a988e6dfcf0c3ca52a90682330e37e3fe679921da16b1e6e4c3b3c69"
 SHA_B = "b30608d06d7f88fb47608893cb25b194eab4085c0d2efe682b862d50afa4ac9b"
 IDENTITY = {
+    "model_version": "m1",
+    "probability_signature": SHA_A,
     "fusion_version": "1.4.0",
     "core_version": "3.4.4",
     "engine_bundle_sha256": SHA_B,
@@ -27,19 +29,44 @@ def _row(model, core_engine_version=None, version=None):
     return {"model": model, "core_engine_version": core_engine_version, "version": version}
 
 
-def test_exact_hash_match_is_current():
-    row = _row(dict(IDENTITY), version="fusion-1.4.0-core-3.4.4")
+# ---- 新逻辑：model_version + probability_signature 判定 current ----
+
+def test_model_version_and_signature_match_is_current():
+    row = _row({"model_version": "m1", "probability_signature": SHA_A},
+               version="fusion-1.4.0-core-3.4.4")
     assert fb.version_cohort(row, IDENTITY) == "current"
 
 
-def test_hash_mismatch_is_legacy_not_current():
-    model = dict(IDENTITY)
-    model["config_sha256"] = SHA_A
-    assert fb.version_cohort(_row(model, version="fusion-1.4.0-core-3.4.4"), IDENTITY) == "legacy"
+def test_probability_signature_mismatch_is_legacy():
+    """概率文件已改但 model_version 未 bump → 不能算 current，归 legacy。"""
+    row = _row({"model_version": "m1", "probability_signature": SHA_B},
+               version="fusion-1.4.0-core-3.4.4")
+    assert fb.version_cohort(row, IDENTITY) == "legacy"
 
+
+def test_model_version_mismatch_is_legacy():
+    row = _row({"model_version": "m2", "probability_signature": SHA_A},
+               version="fusion-1.4.0-core-3.4.4")
+    assert fb.version_cohort(row, IDENTITY) == "legacy"
+
+
+def test_framework_code_change_does_not_reset_current():
+    """框架代码（engine_bundle/prediction_code）变化不影响 current 判定。"""
+    row = _row({"model_version": "m1", "probability_signature": SHA_A,
+                "engine_bundle_sha256": SHA_A, "prediction_code_sha256": SHA_B},
+               version="fusion-1.4.0-core-3.4.4")
+    assert fb.version_cohort(row, IDENTITY) == "current"
+
+
+def test_old_record_without_model_version_is_legacy_not_current():
+    """旧记录无 model_version/probability_signature → 回退引擎构建指纹归 legacy。"""
+    row = _row({"engine_sha256": SHA_A}, core_engine_version="3.4.4", version="unknown")
+    assert fb.version_cohort(row, IDENTITY) == "legacy"
+
+
+# ---- legacy/unknown 回归（沿用 08-14 逻辑，不因版本管理改动而变） ----
 
 def test_vunknown_with_engine_sha_is_legacy_not_unknown():
-    """核心回归：version=="unknown" 但有 engine_sha256 的历史样本必须可归因。"""
     row = _row({"version": "unknown", "engine_sha256": SHA_A}, core_engine_version="3.4.4",
                version="unknown")
     assert fb.version_cohort(row, IDENTITY) == "legacy"

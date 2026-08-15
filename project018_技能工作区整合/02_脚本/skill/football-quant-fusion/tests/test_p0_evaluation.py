@@ -224,8 +224,8 @@ class BuildIdentityTests(unittest.TestCase):
             self.assertEqual(record["llm_model_pool_sha256"], "d" * 64)
             self.assertEqual(record["evidence_file_sha256"], "e" * 64)
             self.assertEqual(record["cohort_key"], hashlib.sha256(
-                "|".join([identity["prediction_code_sha256"], identity["config_sha256"],
-                          identity["engine_bundle_sha256"], "llm_production", "llm_ensemble", "d" * 64]).encode()
+                "|".join([identity["model_version"], identity["probability_signature"],
+                          "llm_production", "llm_ensemble", "d" * 64]).encode()
             ).hexdigest())
 
 
@@ -248,12 +248,15 @@ class BacktestSamplingTests(unittest.TestCase):
 
     def test_version_cohort_requires_matching_hashes_for_current(self):
         current = {
+            "model_version": "m1",
+            "probability_signature": "a" * 64,
             "fusion_version": "1.4.0", "core_version": "3.4.4",
             "engine_bundle_sha256": "a" * 64,
             "prediction_code_sha256": "b" * 64,
             "config_sha256": "c" * 64,
         }
-        exact = {"version": "fusion-1.4.0-core-3.4.4", "model": dict(current)}
+        exact = {"version": "fusion-1.4.0-core-3.4.4",
+                 "model": {"model_version": "m1", "probability_signature": "a" * 64}}
         unhashed = {"version": "fusion-1.4.0-core-3.4.4", "model": {}}
         unknown = {"version": "unknown", "model": {}}
         self.assertEqual(backtest.version_cohort(exact, current), "current")
