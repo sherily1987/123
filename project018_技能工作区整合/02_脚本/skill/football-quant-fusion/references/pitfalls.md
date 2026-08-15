@@ -80,3 +80,8 @@
 - 导出/备份用流式 `zip -r` 直接从源目录打包，不要先建 staging 复制目录。
 - 若发现"listdir 有文件但 open ENOENT"：立即停止一切删除操作，先用 `file_read`（app 通道）尝试读取，再从对话/记忆/运行产物重建。
 
+# 2026-08-15：双库看似分裂时先验证集合关系和旧链算法
+
+- 旧 registry 的 `entry_hash` 使用 `sha(canonical_json(previous_hash + record_hash))`，不是直接对字符串字节做 SHA256。审计工具必须复用这一语义，否则会把完整链误报为全链损坏。
+- 本轮验证仓库1596条是外部1555条的无冲突超集。此时安全动作是生成来源映射并停止旧路径写入，而不是复制、拼接或重算全部历史记录。
+- “结构更新”不能变成“模型版本更新”；旧记录缺少 `model_version + probability_signature` 时归入 `unknown_legacy`。
