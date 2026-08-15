@@ -45,8 +45,14 @@ APIV3_BASE = "https://apiv3.apifootball.com/"
 
 
 def _api_football_key():
-    """优先 API_FOOTBALL_KEY, 其次 MCP_APIFOOTBALL_API_KEY。"""
-    return (os.environ.get("API_FOOTBALL_KEY") or os.environ.get("MCP_APIFOOTBALL_API_KEY") or "").strip()
+    """apiv3.apifootball.com 的 key，只能是 MCP_APIFOOTBALL_API_KEY。
+
+    2026-08-16 修复：原实现优先取 `API_FOOTBALL_KEY`，但那是 **api-sports.io** 的 key
+    （见 AGENTS.md project021 条目：两家是完全不同的供应商），拿它请求
+    apifootball.com 只会换来 `Authentification failed!`。跨供应商回退比没有回退更糟——
+    它把「没配 key」伪装成「key 无效」。
+    """
+    return (os.environ.get("MCP_APIFOOTBALL_API_KEY") or "").strip()
 
 
 def fetch_lineups_rest(match_id, retries=4):

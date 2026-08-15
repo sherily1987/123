@@ -22,12 +22,30 @@ import json, os, sys, time, http.client, ssl
 
 HOST = "mcp.apifootball.com"
 PATH = "/mcp"
+# 本模块打的是 mcp.apifootball.com，只认 **apifootball.com** 的 key。
+#
+# ⚠️ 不要拿 `API_FOOTBALL_KEY` 来兜底——那是 **api-sports.io** 的 key，两家是
+# 完全不同的供应商（见 AGENTS.md project021 条目）。2026-08-16 实测过这条弯路：
+# 加上 `API_FOOTBALL_KEY` 回退后，服务端从「Malformed Authorization header」
+# 变成「apifootball API error (action=get_events): Authentification failed!」，
+# 反而更难定位。空 key 与错 key 都不可用，但空 key 至少不误导。
 KEY = os.environ.get("MCP_APIFOOTBALL_API_KEY", "")
+
+
+def require_key():
+    """没配 key 就明确报错，不要让调用方拿着空 Authorization 头去撞服务端。"""
+    if not KEY:
+        raise RuntimeError(
+            "未配置 MCP_APIFOOTBALL_API_KEY（apifootball.com 的 key）。"
+            "注意 API_FOOTBALL_KEY 是 api-sports.io 的 key，属于另一家供应商，不能替代。"
+        )
+    return KEY
 
 def make_conn():
     return http.client.HTTPSConnection(HOST, timeout=180, context=ssl.create_default_context())
 
 def call(payload, session=None, retries=4):
+    require_key()   # 空 key 直接报错，别重试 4 次再收一堆无意义的服务端拒绝
     last = None
     for i in range(retries):
         conn = make_conn()
