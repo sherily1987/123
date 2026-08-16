@@ -4,8 +4,8 @@
     "fusion_version":  "1.5.0",
     "core_version":  "3.4.4",
     "fusion_schema_version":  "1.4.0",
-    "model_version":  "m2",
-    "model_version_note":  "语义版本主锚：只有改变概率数值输出的变更才 bump（改市场权重/Dixon-Coles系数/校准系数/去水方法/市场锚逻辑）。改框架代码/日志/注释/字段解析不 bump。见 40_模型/模型版本管理_打破current死锁.md",
+    "model_version":  "m3",
+    "model_version_note":  "m3：无锚（NO_ANCHOR_FALLBACK）禁止作为生产 1X2。无独立 Elo/λ 且无可用 HAD 时拒绝；有可用市场则钉回 market_only。见 2026-08-16 低依赖 43 场审计。",
     "model_version_aliases":  [
                                   {
                                       "model_version":  "m1",

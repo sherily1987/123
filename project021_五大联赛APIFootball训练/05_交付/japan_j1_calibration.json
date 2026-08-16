@@ -1,0 +1,82 @@
+{
+  "schema": "japan-j1-complete-calibration-1.0",
+  "ran_at": "2026-08-16T14:39:38",
+  "production_unchanged": "MARKET_BASELINE / market_only，未改权重、未 bump m3",
+  "join": {
+    "api_n": 992,
+    "fd_n": 4523,
+    "attached": 992,
+    "unmatched": 0,
+    "ambiguous": 0,
+    "attach_pct": 100.0
+  },
+  "attached_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\标准化\\apisports_japan_j1_league_events_closing_attached.jsonl",
+  "xg_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\标准化\\apisports_japan_j1_league_xg.jsonl",
+  "training": {
+    "status": "trained",
+    "eligibility": {
+      "tier": "independent",
+      "reasons": [],
+      "completed_n": 992,
+      "season_count": 3,
+      "team_id_coverage": 1.0,
+      "team_count": 22,
+      "train_n": 595,
+      "validation_n": 198,
+      "test_n": 199
+    },
+    "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\apisports_japan_j1_league_candidate.json"
+  },
+  "backtests": {
+    "fd_jpn_goals_vs_closing": {
+      "config": "滚动（无 xG 数据）",
+      "baseline": "closing_market",
+      "test_from": 738701,
+      "n_all": 904,
+      "skip": 1,
+      "model_all": 0.652005,
+      "n_subset": 904,
+      "model_subset": 0.652005,
+      "market": 0.634235,
+      "frequency": 0.656478,
+      "accuracy_pct": 44.69,
+      "log_loss": 1.081643,
+      "gap": 0.0178
+    },
+    "apisports_xg_vs_frequency": {
+      "config": "滚动+xG w=0.4",
+      "baseline": "provider_market",
+      "test_from": 739060,
+      "n_all": 192,
+      "skip": 0,
+      "model_all": 0.654151,
+      "n_subset": 192,
+      "model_subset": 0.654151,
+      "market": null,
+      "frequency": 0.661157,
+      "accuracy_pct": 39.06,
+      "log_loss": 1.079582,
+      "gap": -0.007
+    },
+    "apisports_xg_vs_closing_joined": {
+      "config": "滚动+xG w=0.4",
+      "baseline": "closing_market",
+      "test_from": 739060,
+      "n_all": 192,
+      "skip": 0,
+      "model_all": 0.654151,
+      "n_subset": 192,
+      "model_subset": 0.654151,
+      "market": 0.642853,
+      "frequency": 0.661157,
+      "accuracy_pct": 39.06,
+      "log_loss": 1.079582,
+      "gap": 0.0113
+    }
+  },
+  "note": [
+    "fd_jpn 与 apisports 队名字段不同，只按 slug 别名对齐，不对齐的场次不加收盘。",
+    "收盘线组与 provider_market 组不得并表。",
+    "日职与欧洲联赛无共同欧战样本，不能并入 cross_league_calibration 的 s_L。"
+  ]
+}

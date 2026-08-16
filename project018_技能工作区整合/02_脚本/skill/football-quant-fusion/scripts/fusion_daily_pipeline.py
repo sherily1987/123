@@ -168,6 +168,18 @@ def main():
         report['intl_odds'] = {'status': 'skipped',
                                'reason': 'ODDS_API_KEY 未设置，国际盘对照默认不启用'}
 
+    # 3.6) 盘后伤停 + T-75 首发：只写研究库，不并入下面的正式登记 input。
+    if a.dry_run:
+        report['late_info'] = {'status': 'skipped', 'reason': 'dry-run'}
+    else:
+        li = run([HERE / 'collect_late_info.py', '--from-collect', raw,
+                  '--snapshot', a.snapshot, '--work-dir', d])
+        try:
+            report['late_info'] = json.loads(li.stdout.strip().splitlines()[-1])
+        except (ValueError, IndexError, AttributeError):
+            report['late_info'] = {'status': 'error',
+                                   'error': (li.stderr or li.stdout)[-200:]}
+
     if a.dry_run or not batch.exists():
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return

@@ -1,0 +1,107 @@
+{
+  "league": {
+    "id": 89,
+    "slug": "apisports_netherlands_eerste_divisie",
+    "name": "Eerste Divisie"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 1929,
+    "season_count": 6,
+    "team_id_coverage": 1.0,
+    "team_count": 27,
+    "train_n": 1157,
+    "validation_n": 386,
+    "test_n": 386
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\apisports_netherlands_eerste_divisie_candidate.json",
+  "validation": {
+    "n": 383,
+    "skip": 3,
+    "model": {
+      "n": 383,
+      "brier_mean": 0.612322,
+      "log_loss": 1.019079,
+      "accuracy_pct": 47.52
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 383,
+      "brier_mean": 0.635865,
+      "log_loss": 1.052606,
+      "probs": [
+        0.4486,
+        0.2247,
+        0.3267
+      ]
+    },
+    "by_league": {
+      "89": {
+        "n": 383,
+        "model": {
+          "n": 383,
+          "brier_mean": 0.612322,
+          "log_loss": 1.019079,
+          "accuracy_pct": 47.52
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 386,
+    "skip": 0,
+    "model": {
+      "n": 386,
+      "brier_mean": 0.638486,
+      "log_loss": 1.056357,
+      "accuracy_pct": 46.37
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 386,
+      "brier_mean": 0.649716,
+      "log_loss": 1.071562,
+      "probs": [
+        0.453,
+        0.2236,
+        0.3234
+      ]
+    },
+    "by_league": {
+      "89": {
+        "n": 386,
+        "model": {
+          "n": 386,
+          "brier_mean": 0.638486,
+          "log_loss": 1.056357,
+          "accuracy_pct": 46.37
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}

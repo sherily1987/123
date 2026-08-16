@@ -1,35 +1,32 @@
-赛事：葡超（体彩官方场次）
+赛事：葡超
 竞彩编号：周日026
-主队：法马利康（短名法马利康）
-客队：马里迪莫（短名马里迪莫）
+主队：法马利康（FC Famalicão）
+客队：马里迪莫（Marítimo）
 开球：2026-08-17T03:30:00+08:00
-量化模型档位：B (market)
-收集时刻：2026-08-15T15:17:15+08:00
+收集时刻：2026-08-16T12:30:00+08:00
 
 ## 1. 伤停/阵容
-- 体彩官方接口无伤病/大名单字段，赛前官方首发与伤员名单尚未公布 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未做伤停新闻深度搜索；以赛前官方名单为准。
+- Sports Mole：法马利康揭幕战对埃斯托里尔未添新伤，Carvalhal 可能沿用首发；马里迪莫揭幕战胜 Casa Pia 后 Van der Gaag 也可能沿用，门将 Alfonso Pastor 预计继续首发 | source(https://www.sportsmole.co.uk/football/famalicao/preview/famalicao-vs-maritimo-prediction-team-news-lineups_603046.html) | collected_at(2026-08-16T12:30:00+08:00)
+- WhoScored：法马利康无伤停条目；马里迪莫缺 Nathanael Ogbeta、Maxime Dominguez（Out） | source(https://www.whoscored.com/matches/1997566/preview/portugal-liga-portugal-2026-2027-famalicao-maritimo) | collected_at(2026-08-16T12:30:00+08:00)
+> 证据缺口：给出的是预测阵容，非官方首发。
 
 ## 2. 战意/动机
-- 本场为竞彩周日026场次，葡超在售未开球场次之一，开球时间 2026-08-17T03:30:00+08:00 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取教练/球员赛前言论与轮次背景。
+- BetMines：法马利康 2026-08-07 客场 1-1 埃斯托里尔；马里迪莫揭幕战胜 Casa Pia | source(https://betmines.com/match-preview/famalicao-vs-maritimo-prediction-match-preview-and-analysis-liga-portugal-16-08-2026) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 3. 近况/状态
-- 量化 Dixon-Coles 模型覆盖标注：葡超 档位 B (market)（见 full_backtest.json 滚动回测） | source(file://F:/HM足球比赛预测/project021_五大联赛APIFootball训练/05_交付/full_backtest.json) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取双方近 5 场战绩；可上传深度证据覆盖本文件。
+- FOX Sports：法马利康联赛第12、场均1.0球/1.2 xG；马里迪莫第4、场均失球 0.0（样本仅揭幕轮量级） | source(https://www.foxsports.com/soccer/primeria-liga-fc-famalicao-vs-maritimo-aug-16-2026-game-boxscore-912867) | collected_at(2026-08-16T12:30:00+08:00)
+> 证据缺口：n=1 轮的场均/xG 不能外推为赛季强度。
 
 ## 4. 主客/旅行/天气
-- 主队 法马利康 主场作战，客队 马里迪莫 客场远征（体彩官方对阵口径） | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取天气/旅行距离。
+- FOX Sports：场地 Estadio Municipal de Famalicao | source(https://www.foxsports.com/soccer/primeria-liga-fc-famalicao-vs-maritimo-aug-16-2026-game-boxscore-912867) | collected_at(2026-08-16T12:30:00+08:00)
+- wttr.in Famalicao 2026-08-16 预报晴、最高36/最低19 | source(https://wttr.in/Famalicao?format=j1) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 5. 赔率
-- 体彩官方胜平负即时赔率：主1.59/平3.46/客4.75 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-15T15:17:15+08:00)
-- 体彩赔率仅单快照，无初盘→即时异动记录 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：外部盘口（欧赔）未抓取。
+- 体彩官方 HAD：主1.59 / 平3.46 / 客4.75 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 6. 身份核验
-- 体彩官方全名：主队"法马利康"、客队"马里迪莫" | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040911) | collected_at(2026-08-15T15:17:15+08:00)
-- 联赛：葡超（体彩联赛名口径）；开球时间 2026-08-17T03:30:00+08:00 与体彩列表接口一致 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-15T15:17:15+08:00)
+- 体彩 sporttery-2040911 周日026 法马利康 vs 马里迪莫，开球 2026-08-17T03:30:00+08:00 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-16T12:30:00+08:00)
+- WhoScored 场次 1997566 记 Famalicao-Maritimo、Liga Portugal 2026/2027 | source(https://www.whoscored.com/matches/1997566/preview/portugal-liga-portugal-2026-2027-famalicao-maritimo) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 证据缺口
-> 说明：轻量证据自动生成（project023）：①伤停/首发名单未发布且未深度搜索；②双方近况/轮次背景未抓取；③天气/旅行距离未抓取；④外部欧赔未抓取。可上传深度证据覆盖后重跑预测。
+> 官方首发未公布；联赛样本极小。

@@ -75,7 +75,8 @@ def load_fusion_probabilities(match_id, store: Optional[Path] = None) -> Optiona
     返回 None 表示量化轨还没登记这场——调用方应据此 skip，不得回退到投票比例。
     """
     store = Path(store) if store else fusion_store()
-    target = f"sporttery-{match_id}"
+    text = str(match_id).strip()
+    target = text if text.lower().startswith("sporttery-") else f"sporttery-{text}"
 
     best = None
     for entry in _iter_registry(store):

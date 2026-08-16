@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS matches (
 CREATE TABLE IF NOT EXISTS predictions (
     sales_day TEXT NOT NULL,
     match_num TEXT NOT NULL,
+    match_id TEXT,
     direction TEXT, strength REAL,
     single_pick TEXT, sp_conf REAL, sp_skip INTEGER,
     score TEXT, ou25 TEXT, hafu TEXT,
@@ -49,6 +50,7 @@ CREATE TABLE IF NOT EXISTS predictions (
 CREATE TABLE IF NOT EXISTS backtests (
     sales_day TEXT NOT NULL,
     match_num TEXT NOT NULL,
+    match_id TEXT,
     score_90 TEXT,            -- "2-1"
     actual_direction TEXT,    -- 主胜/平局/客胜
     hit_single INTEGER,       -- 单选命中
@@ -75,9 +77,17 @@ def _conn():
     return conn
 
 
+def _ensure_column(conn, table: str, column: str, decl: str):
+    cols = [row[1] for row in conn.execute(f"PRAGMA table_info({table})")]
+    if column not in cols:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+
+
 def init():
     with _lock, _conn() as c:
         c.executescript(SCHEMA)
+        _ensure_column(c, "predictions", "match_id", "TEXT")
+        _ensure_column(c, "backtests", "match_id", "TEXT")
 
 
 def upsert_matches(sales_day: str, rows: list[dict]):
@@ -118,18 +128,19 @@ def upsert_predictions(sales_day: str, parsed: list[dict]):
     with _lock, _conn() as c:
         for p in parsed:
             c.execute(
-                """INSERT INTO predictions (sales_day, match_num, direction, strength, single_pick,
+                """INSERT INTO predictions (sales_day, match_num, match_id, direction, strength, single_pick,
                    sp_conf, sp_skip, score, ou25, hafu, evs, ev_action, ev_reason,
                    collapse_flags, evidence_gap, model_dirs, audit_json, created_at)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                    ON CONFLICT(sales_day, match_num) DO UPDATE SET
+                   match_id=excluded.match_id,
                    direction=excluded.direction, strength=excluded.strength,
                    single_pick=excluded.single_pick, sp_conf=excluded.sp_conf, sp_skip=excluded.sp_skip,
                    score=excluded.score, ou25=excluded.ou25, hafu=excluded.hafu,
                    evs=excluded.evs, ev_action=excluded.ev_action, ev_reason=excluded.ev_reason,
                    collapse_flags=excluded.collapse_flags, evidence_gap=excluded.evidence_gap,
                    model_dirs=excluded.model_dirs, audit_json=excluded.audit_json, created_at=excluded.created_at""",
-                (sales_day, p["num"], p.get("dir"), p.get("strength"), p.get("sp"),
+                (sales_day, p["num"], p.get("match_id"), p.get("dir"), p.get("strength"), p.get("sp"),
                  p.get("sp_conf"), 1 if p.get("sp_skip") else 0, p.get("score"), p.get("ou25"), p.get("hafu"),
                  json.dumps(p.get("evs"), ensure_ascii=False) if p.get("evs") else None,
                  p.get("ev_action"), p.get("ev_reason"),
@@ -156,14 +167,15 @@ def upsert_backtests(sales_day: str, rows: list[dict]):
     with _lock, _conn() as c:
         for r in rows:
             c.execute(
-                """INSERT INTO backtests (sales_day, match_num, score_90, actual_direction,
+                """INSERT INTO backtests (sales_day, match_num, match_id, score_90, actual_direction,
                    hit_single, hit_double, score_hit, settled_at)
-                   VALUES (?,?,?,?,?,?,?,?)
+                   VALUES (?,?,?,?,?,?,?,?,?)
                    ON CONFLICT(sales_day, match_num) DO UPDATE SET
+                   match_id=excluded.match_id,
                    score_90=excluded.score_90, actual_direction=excluded.actual_direction,
                    hit_single=excluded.hit_single, hit_double=excluded.hit_double,
                    score_hit=excluded.score_hit, settled_at=excluded.settled_at""",
-                (sales_day, r["match_num"], r.get("score_90"), r.get("actual_direction"),
+                (sales_day, r["match_num"], r.get("match_id"), r.get("score_90"), r.get("actual_direction"),
                  1 if r.get("hit_single") else 0, 1 if r.get("hit_double") else 0,
                  1 if r.get("score_hit") else 0, now))
 

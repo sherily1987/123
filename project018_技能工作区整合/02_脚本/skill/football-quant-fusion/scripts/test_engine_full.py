@@ -188,6 +188,39 @@ def t_stale():
     return {"ok": True, "details": "陈旧HAD→market_only明确阻断，不静默切换model_first"}
 
 
+def t_no_anchor_refused():
+    r = pred({
+        "home": "尤文图斯", "away": "克雷莫纳", "stage": "意甲",
+        "kickoff": "2026-01-13T03:45:00+08:00",
+        "mode": "market_only", "odds": [1.14, 5.8, 12.5],
+        "field_meta": {"odds": {"observed_at": "2026-01-12T11:37:16+08:00", "freshness": 15}},
+    })
+    if r.get("fusion_status") != "blocked":
+        return {"ok": False, "details": f"应 blocked，实际 {r.get('fusion_status')}"}
+    st = (r.get("core_output") or {}).get("status")
+    if st not in ("market_anchor_unusable", "no_independent_anchor"):
+        return {"ok": False, "details": st}
+    pct = (r.get("forecast") or {}).get("final_1x2_pct")
+    if pct == [37.4, 25.3, 37.4]:
+        return {"ok": False, "details": "无锚仍输出 37.4/25.3/37.4"}
+    return {"ok": True, "details": f"热门陈旧盘口拒绝摊平 ({st})"}
+
+
+def t_no_anchor_with_market_pins():
+    """model_first 且无 Elo/λ，但有可用 HAD：钉回 market_only，不得摊成 37.4。"""
+    d = basic_match(mode="hybrid")
+    # hybrid 无第二锚会在 validate 失败；用未声明 mode + 只有盘口应走 market_only
+    d.pop("mode", None)
+    r = pred(d)
+    if r.get("fusion_status") != "ok":
+        return {"ok": False, "details": r.get("fusion_status")}
+    if r.get("mode") != "market_only":
+        return {"ok": False, "details": f"mode={r.get('mode')}"}
+    if r.get("market_dependency_pct") != 100:
+        return {"ok": False, "details": f"dep={r.get('market_dependency_pct')}"}
+    return {"ok": True, "details": "仅盘口→market_only 依赖 100"}
+
+
 # ---- 8. 两回合晋级 ----
 def t_twoleg():
     r = pred({"home": "TeamA", "away": "TeamB", "stage": "UCL", "kickoff": "2026-08-12T02:00:00+08:00",
@@ -341,6 +374,8 @@ def main():
     check("market_only远期新鲜快照", t_market_only_future_snapshot)
     check("model_first显式λ", t_model_first)
     check("market_only陈旧HAD明确阻断", t_stale)
+    check("无锚拒绝生产1X2", t_no_anchor_refused)
+    check("仅盘口钉回market_only", t_no_anchor_with_market_pins)
     check("两回合晋级", t_twoleg)
     check("极端赔率", t_extreme)
     check("market_only极端λ回退HAD", t_market_only_extreme_lambda_guard)

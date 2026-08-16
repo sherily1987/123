@@ -1,191 +1,164 @@
 # -*- coding: utf-8 -*-
-"""project023 — 流水线调度：采集 → 轻量证据 → LLM 预测(subprocess) → 解析 → 入库。
+"""工作台调度：写操作只走 fusion_cli，登记 market_only。SQLite 只记任务进度。"""
+from __future__ import annotations
 
-所有重活通过 subprocess 调现有 CLI（单一事实源），本模块只负责编排与进度上报。
-后台任务用线程跑，进度写 db.runs 表，前端轮询。
-"""
 import json
-import os
 import subprocess
 import sys
 import threading
-import time
-from datetime import date
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# 2026-08-16：LLM 工程已从 C:/Users/Administrator/football-llm-predictor 迁入仓库。
-# FOOTBALL_LLM_ROOT 可覆盖（例如临时指回 C 盘旧目录做对比）。
-LLM_DIR = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
-    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"))
-PARSE_SCRIPT = LLM_DIR / "parse_predictions.py"
-PREDICT_SCRIPT = LLM_DIR / "predict.py"
-MODELS = ["zhipu/glm-4-flash", "deepseek/deepseek-chat", "ark/doubao-seed-evolving"]
+FUSION_SCRIPTS = (
+    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts"
+)
+if str(FUSION_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(FUSION_SCRIPTS))
+from runtime import resolve_python  # noqa: E402
+from runtime_paths import backtest_store, forward_work_dir  # noqa: E402
 
 import db
-import collector
-import light_evidence
+import store_view as sv
+
+PY = resolve_python()
+CLI = FUSION_SCRIPTS / "fusion_cli.py"
+CST = timezone(timedelta(hours=8))
 
 
 def _no_proxy_env():
+    import os
     env = dict(os.environ)
     for k in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"):
         env.pop(k, None)
     return env
 
 
-def _run(cmd: list, timeout: int = 7200):
-    """subprocess 跑命令，返回 (rc, stdout_tail, stderr_tail)。"""
-    try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=_no_proxy_env(), cwd=str(LLM_DIR))
-        return r.returncode, r.stdout[-800:] if r.stdout else "", r.stderr[-800:] if r.stderr else ""
-    except subprocess.TimeoutExpired:
-        return -1, "", "TIMEOUT"
+def _cli(args: list, timeout: int = 3600) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [PY, str(CLI), *args],
+        capture_output=True, text=True, timeout=timeout,
+        env=_no_proxy_env(), cwd=str(FUSION_SCRIPTS),
+        encoding="utf-8", errors="replace",
+    )
 
 
-def task_collect(sales_day: str, run_id: int):
+def task_collect(kickoff_date: str, run_id: int):
     try:
-        db.run_update(run_id, message="拉取体彩列表…")
-        res = collector.collect(sales_day)
-        db.upsert_matches(sales_day, res["matches"])
-        db.run_update(run_id, done=res["n"], message=f"采集完成 {res['n']} 场", status="done")
+        work = forward_work_dir() / kickoff_date
+        work.mkdir(parents=True, exist_ok=True)
+        db.run_update(run_id, message=f"采集 {kickoff_date} 开球场次…")
+        r = _cli([
+            "collect", "--kickoff-date", kickoff_date,
+            "--output", str(work / "sporttery_prematch.json"),
+            "--emit-input", str(work / "inputs_prematch.json"),
+        ], timeout=900)
+        if r.returncode != 0:
+            db.run_update(run_id, status="error", message=(r.stderr or r.stdout)[-300:])
+            return
+        n = 0
+        inp = work / "inputs_prematch.json"
+        if inp.exists():
+            n = len(json.loads(inp.read_text(encoding="utf-8")).get("matches") or [])
+        db.run_update(run_id, done=n, total=n, status="done",
+                      message=f"采集完成，可登记 {n} 场（写入 fusion forward，未改生产概率）")
     except Exception as e:
-        db.run_update(run_id, message=f"采集失败: {e}", status="error")
+        db.run_update(run_id, status="error", message=f"采集失败: {e}")
 
 
-def task_predict(sales_day: str, run_id: int, models=None):
+def _record_one(match: dict, work: Path) -> str:
+    num = (match.get("sporttery_meta") or {}).get("match_num") or "unknown"
+    ip = work / f"{num}_input.json"
+    op = work / f"{num}_output.json"
+    ip.write_text(json.dumps(match, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    r = _cli(["record", "--input", str(ip), "--output", str(op), "--snapshot", "prematch"], timeout=180)
+    if r.returncode != 0:
+        raise RuntimeError((r.stderr or r.stdout)[-240:])
+    payload = json.loads(r.stdout)
+    if payload.get("status") not in ("recorded", "skipped_duplicate_snapshot"):
+        raise RuntimeError(payload.get("status") or "record failed")
+    return payload.get("status")
+
+
+def task_predict(run_id: int, kickoff_date: str | None = None):
+    """只登记看板里「有盘未预测」的场次，mode 固定 market_only。"""
     try:
-        models = models or MODELS
-        raw_path = LLM_DIR / "data" / f"raw_{sales_day}.json"
-        if not raw_path.exists():
-            db.run_update(run_id, message="未找到 raw 数据，请先采集", status="error")
+        board = sv.board()
+        missing = board.get("missing") or []
+        if kickoff_date:
+            missing = [m for m in missing if (m.get("kickoff") or "").startswith(kickoff_date)]
+        if not missing:
+            db.run_update(run_id, status="done", message="没有待补登记的有盘场次")
             return
-        ev_dir = LLM_DIR / "data" / f"evidence_{sales_day}"
-        # 1) 轻量证据（不覆盖已存在的深度证据文件）
-        db.run_update(run_id, message="生成轻量证据…")
-        ev_dir.mkdir(parents=True, exist_ok=True)
-        raw = json.loads(raw_path.read_text(encoding="utf-8"))
-        tiers = collector.league_tiers()
-        existing = {p.name for p in ev_dir.glob("evidence_*.md")} if ev_dir.exists() else set()
-        for i, m in enumerate(raw["matches"], 1):
-            fname = f"evidence_{i:03d}_{m.get('home', '')}_{m.get('away', '')}.md"
-            if fname in existing:
-                continue  # 已有证据（可能是深度证据），不覆盖
-            tier = collector.quant_annotation(m.get("league", ""), tiers)
-            (ev_dir / fname).write_text(light_evidence.build_one(i, m, tier), encoding="utf-8")
-        # 2) 跑 predict.py
-        n = len(raw["matches"])
-        db.run_update(run_id, total=n, message=f"开始预测 {n} 场 × {len(models)} 模型…")
-        out_txt = LLM_DIR / "data" / f"predictions_web_{sales_day}.txt"
-        cmd = [sys.executable, str(PREDICT_SCRIPT), "--input", str(raw_path),
-               "--evidence-dir", str(ev_dir), "--models"] + list(models)
-        with open(out_txt, "w", encoding="utf-8") as f:
-            proc = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT,
-                                    env=_no_proxy_env(), cwd=str(LLM_DIR), text=True)
-            # 进度轮询：统计输出里完成的场次数
-            last = 0
-            while proc.poll() is None:
-                time.sleep(8)
-                if out_txt.exists():
-                    done = out_txt.read_text(encoding="utf-8", errors="ignore").count("⚽ 第")
-                    done = min(done, n)
-                    if done != last:
-                        last = done
-                        db.run_update(run_id, done=done, message=f"预测中 {done}/{n} 场…")
-            rc = proc.returncode
-        if rc != 0:
-            db.run_update(run_id, message="predict.py 退出码非 0，见日志", status="error")
-            return
-        # 3) 解析
-        db.run_update(run_id, done=n, message="解析结果…")
-        rc, out, err = _run([sys.executable, str(PARSE_SCRIPT), str(out_txt),
-                             "--raw", str(raw_path), "--start-index", "1",
-                             "--out", str(LLM_DIR / "data" / f"parsed_web_{sales_day}.json")])
-        if rc != 0:
-            db.run_update(run_id, message=f"解析失败: {err[-200:]}", status="error")
-            return
-        parsed = json.loads((LLM_DIR / "data" / f"parsed_web_{sales_day}.json").read_text(encoding="utf-8"))
-        # 补 quant_tier 到 parsed（展示用）
-        m_by_num = {m["match_num"]: m for m in raw["matches"]}
-        for p in parsed:
-            m = m_by_num.get(p["num"], {})
-            p["quant_tier"] = collector.quant_annotation(m.get("league", ""), tiers)
-            p["league"] = p.get("league") or m.get("league", "")
-        db.upsert_predictions(sales_day, parsed)
-        db.run_update(run_id, done=n, message=f"预测完成 {len(parsed)} 场", status="done")
-    except Exception as e:
-        db.run_update(run_id, message=f"预测失败: {e}", status="error")
-
-
-def task_backtest(sales_day: str, run_id: int):
-    """采赛果 + 回测：体彩 result 接口拿 sectionsNo999 比分，对比预测方向。"""
-    try:
-        import re
-        import urllib.parse
-        import urllib.request
-        preds = {p["match_num"]: p for p in db.list_predictions(sales_day)}
-        if not preds:
-            db.run_update(run_id, message="该日无预测记录", status="error")
-            return
-        UA = {"User-Agent": "Mozilla/5.0 (Linux; Android 14)",
-              "Referer": "https://m.sporttery.cn/mjc/zqsj/?tab=concern"}
-        rows = []
-        settled = []
-        for d in (sales_day, (date.fromisoformat(sales_day) + date.resolution).isoformat()):
-            url = ("https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry?"
-                   + urllib.parse.urlencode({"method": "result", "matchDate": d}))
-            try:
-                data = json.load(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30))
-            except Exception:
+        days = sorted({(m.get("kickoff") or "")[:10] for m in missing if m.get("kickoff")})
+        want = {m["match_id"] for m in missing}
+        db.run_update(run_id, total=len(want), message=f"补登记 {len(want)} 场 market_only…")
+        done = 0
+        notes = []
+        for day in days:
+            work = forward_work_dir() / day
+            work.mkdir(parents=True, exist_ok=True)
+            r = _cli([
+                "collect", "--kickoff-date", day,
+                "--output", str(work / "sporttery_prematch.json"),
+                "--emit-input", str(work / "inputs_prematch.json"),
+            ], timeout=900)
+            if r.returncode != 0:
+                notes.append(f"{day} 采集失败")
                 continue
-            for day in data.get("value", {}).get("matchInfoList", []):
-                for r in day.get("subMatchList", []):
-                    num = r.get("matchNumStr") or ""
-                    if num not in preds:
-                        continue
-                    s999 = r.get("sectionsNo999") or ""
-                    m = re.match(r"(\d+):(\d+)", str(s999))
-                    if not m:
-                        continue
-                    hg, ag = int(m.group(1)), int(m.group(2))
-                    actual = "主胜" if hg > ag else ("客胜" if hg < ag else "平局")
-                    p = preds[num]
-                    dir_ = p["direction"]
-                    sp = p["single_pick"] or ""
-                    hit1 = 1 if dir_ == actual else 0
-                    hit2 = 1 if (dir_ == actual or sp == actual or actual in sp) else 0
-                    sh = 1 if (p["score"] or "") == f"{hg}-{ag}" else 0
-                    settled.append({
-                        "match_num": num, "score_90": f"{hg}-{ag}", "actual_direction": actual,
-                        "hit_single": hit1, "hit_double": hit2, "score_hit": sh,
-                    })
-        if not settled:
-            db.run_update(run_id, message="未取到赛果（场次可能未结束）", status="error")
-            return
-        db.upsert_backtests(sales_day, settled)
-        n = len(settled)
-        hs = sum(r["hit_single"] for r in settled)
-        hd = sum(r["hit_double"] for r in settled)
-        sh = sum(r["score_hit"] for r in settled)
-        db.run_update(run_id, done=n, status="done",
-                      message=f"回测完成：方向 {hs}/{n}={hs/n:.0%}，含双选 {hd}/{n}，比分 {sh}/{n}")
+            inp = work / "inputs_prematch.json"
+            if not inp.exists():
+                continue
+            batch = json.loads(inp.read_text(encoding="utf-8")).get("matches") or []
+            for match in batch:
+                if match.get("mode") != "market_only":
+                    continue
+                mid = sv.sporttery_id((match.get("sporttery_meta") or {}).get("match_id"))
+                if mid not in want:
+                    continue
+                st = _record_one(match, work)
+                done += 1
+                notes.append(f"{mid} {st}")
+                db.run_update(run_id, done=done, message=f"已登记 {done}/{len(want)}")
+        db.run_update(run_id, done=done, status="done",
+                      message=f"补登记完成 {done} 场（market_only）")
     except Exception as e:
-        db.run_update(run_id, message=f"回测失败: {e}", status="error")
+        db.run_update(run_id, status="error", message=f"登记失败: {e}")
 
 
-def start_collect(sales_day: str) -> int:
+def task_settle(run_id: int, date: str | None = None):
+    try:
+        db.run_update(run_id, message="手动结算（fusion_cli settle）…")
+        args = ["settle", "--store", str(backtest_store())]
+        if date:
+            args += ["--date", date]
+        r = _cli(args, timeout=600)
+        tail = (r.stdout or r.stderr or "")[-400:]
+        if r.returncode != 0:
+            db.run_update(run_id, status="error", message=tail or "settle 失败")
+            return
+        db.run_update(run_id, status="done", message="结算完成，看板将读 results/")
+    except Exception as e:
+        db.run_update(run_id, status="error", message=f"结算失败: {e}")
+
+
+def start_collect(kickoff_date: str) -> int:
     rid = db.run_start("collect", message="启动采集")
-    threading.Thread(target=task_collect, args=(sales_day, rid), daemon=True).start()
+    threading.Thread(target=task_collect, args=(kickoff_date, rid), daemon=True).start()
     return rid
 
 
-def start_predict(sales_day: str, models=None) -> int:
-    rid = db.run_start("predict", message="启动预测")
-    threading.Thread(target=task_predict, args=(sales_day, rid, models), daemon=True).start()
+def start_predict(kickoff_date: str | None = None) -> int:
+    rid = db.run_start("predict", message="启动补登记")
+    threading.Thread(target=task_predict, args=(rid, kickoff_date), daemon=True).start()
     return rid
 
 
-def start_backtest(sales_day: str) -> int:
-    rid = db.run_start("backtest", message="启动回测")
-    threading.Thread(target=task_backtest, args=(sales_day, rid), daemon=True).start()
+def start_settle(date: str | None = None) -> int:
+    rid = db.run_start("settle", message="启动手动结算")
+    threading.Thread(target=task_settle, args=(rid, date), daemon=True).start()
     return rid
+
+
+# 旧名留给 app 兼容
+start_backtest = start_settle

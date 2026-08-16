@@ -40,6 +40,10 @@ def forward_work_dir() -> Path:
     return data_root() / "forward"
 
 
+def late_info_store() -> Path:
+    return data_root() / "late_info"
+
+
 def is_legacy_suite_path(path: Path) -> bool:
     normalized = str(Path(path).resolve()).replace("\\", "/").lower()
     return "/.codex/skills/football-quant-fusion-suite/" in normalized

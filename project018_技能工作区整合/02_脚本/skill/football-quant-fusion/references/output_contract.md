@@ -2,6 +2,8 @@
 
 > ⚠️ REBUILT 2026-08-02：原文件损坏后基于 SKILL.md 输出节与 fusion_predict 实际输出 schema（model_output_full.json）恢复。
 
+工单层：融合输出根字段必须含 `match_id`（`sporttery-<id>`）与 `match_num`。这是身份，不是概率。双轨对照走 `jobs/` 工单，不在本模板里合并两轨数字。
+
 ## 1. 报告结构
 
 先给总表，再逐场展开。总表列：编号 / 对阵 / 主平客概率 / 方向 / 数据质量 / 不确定性 / 决策状态。

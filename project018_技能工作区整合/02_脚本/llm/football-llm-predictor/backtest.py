@@ -133,7 +133,7 @@ def evaluate_date(date_str, verbose=False):
         actual_crs = fp.map_score_to_crs(h, a)
         score_hit = sp == actual_crs
 
-        rawm = raw.get(r["match_id"], {})
+        rawm = raw.get(str(r.get("match_id")), {}) or raw.get(r.get("match_id"), {})
         mo = rawm.get("model_odds") or []
         if len(mo) >= 3:
             official_dir = "主胜" if mo[0] == min(mo) else "客胜" if mo[2] == min(mo) else "平局"

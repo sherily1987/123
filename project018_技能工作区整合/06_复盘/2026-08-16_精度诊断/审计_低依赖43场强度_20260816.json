@@ -1,0 +1,2433 @@
+{
+  "schema": "strength-audit-43-1.0",
+  "n_low_dep": 43,
+  "verdict_counts": {
+    "strength_worse": 26,
+    "fusion_overshoot": 1,
+    "signal_helped": 16
+  },
+  "n_no_anchor_or_equal_lambda": 36,
+  "n_has_independent_anchor": 0,
+  "n_real_xg": 0,
+  "matches": [
+    {
+      "match_id": "sporttery-2040741",
+      "home": "坎布尔",
+      "away": "SBV精英",
+      "league": "荷甲",
+      "kickoff": "2026-08-08T02:00:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        2.36,
+        3.5,
+        2.38
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 3.025,
+      "lambda_away": 0.08,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        37.5,
+        25.3,
+        37.2
+      ],
+      "model_1x2": [
+        94.0,
+        5.5,
+        0.5
+      ],
+      "final_1x2": [
+        92.6,
+        6.8,
+        0.6
+      ],
+      "away_shift_pp": -36.7,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-4",
+      "brier_model": 1.8766,
+      "brier_market": 0.5991,
+      "brier_final": 1.8501,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 1.251,
+      "delta_model_vs_market": 1.2775
+    },
+    {
+      "match_id": "sporttery-2039142",
+      "home": "国际米兰",
+      "away": "卡利亚里",
+      "league": "意甲",
+      "kickoff": "2026-04-18T02:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.13,
+        6.2,
+        12.0
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        78.3,
+        14.3,
+        7.4
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 30.0,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.0727,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.5231,
+      "delta_model_vs_market": 0.5231
+    },
+    {
+      "match_id": "sporttery-2037483",
+      "home": "多特蒙德",
+      "away": "海登海姆",
+      "league": "德甲",
+      "kickoff": "2026-02-02T00:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.14,
+        6.35,
+        10.5
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        77.6,
+        13.9,
+        8.4
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 29.0,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.0766,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.5192,
+      "delta_model_vs_market": 0.5192
+    },
+    {
+      "match_id": "sporttery-2039248",
+      "home": "皇家马德里",
+      "away": "阿拉维斯",
+      "league": "西甲",
+      "kickoff": "2026-04-22T03:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.14,
+        6.2,
+        11.0
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        77.7,
+        14.3,
+        8.0
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 29.4,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "2-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.0767,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.5191,
+      "delta_model_vs_market": 0.5191
+    },
+    {
+      "match_id": "sporttery-2036879",
+      "home": "尤文图斯",
+      "away": "克雷莫纳",
+      "league": "意甲",
+      "kickoff": "2026-01-13T03:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.14,
+        5.8,
+        12.5
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        77.7,
+        15.3,
+        7.1
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 30.3,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "5-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.0782,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.5176,
+      "delta_model_vs_market": 0.5176
+    },
+    {
+      "match_id": "sporttery-2037071",
+      "home": "AC米兰",
+      "away": "莱切",
+      "league": "意甲",
+      "kickoff": "2026-01-19T03:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.16,
+        5.25,
+        13.0
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        76.3,
+        16.9,
+        6.8
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 30.6,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "1-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.0891,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.5067,
+      "delta_model_vs_market": 0.5067
+    },
+    {
+      "match_id": "sporttery-2039716",
+      "home": "皇家马德里",
+      "away": "皇家奥维耶多",
+      "league": "西甲",
+      "kickoff": "2026-05-15T03:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.17,
+        5.8,
+        9.75
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        75.7,
+        15.3,
+        9.1
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 28.3,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "2-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.0908,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.505,
+      "delta_model_vs_market": 0.505
+    },
+    {
+      "match_id": "sporttery-2037677",
+      "home": "拜仁慕尼黑",
+      "away": "霍芬海姆",
+      "league": "德甲",
+      "kickoff": "2026-02-09T00:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.19,
+        6.1,
+        8.0
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        74.4,
+        14.5,
+        11.1
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 26.3,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "5-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.0988,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.497,
+      "delta_model_vs_market": 0.497
+    },
+    {
+      "match_id": "sporttery-2039945",
+      "home": "维罗纳",
+      "away": "罗马",
+      "league": "意甲",
+      "kickoff": "2026-05-25T02:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        9.5,
+        4.9,
+        1.22
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        9.3,
+        18.1,
+        72.6
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -35.2,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.1164,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.4794,
+      "delta_model_vs_market": 0.4794
+    },
+    {
+      "match_id": "sporttery-2039297",
+      "home": "莱比锡红牛",
+      "away": "柏林联合",
+      "league": "德甲",
+      "kickoff": "2026-04-25T02:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.3,
+        4.6,
+        7.0
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        68.1,
+        19.2,
+        12.6
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 24.8,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.1548,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.441,
+      "delta_model_vs_market": 0.441
+    },
+    {
+      "match_id": "sporttery-2039914",
+      "home": "皇家马德里",
+      "away": "毕尔巴鄂竞技",
+      "league": "西甲",
+      "kickoff": "2026-05-24T03:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.31,
+        4.8,
+        6.35
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        67.6,
+        18.5,
+        13.9
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 23.5,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "4-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.1584,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.4374,
+      "delta_model_vs_market": 0.4374
+    },
+    {
+      "match_id": "sporttery-2037682",
+      "home": "巴黎圣日尔曼",
+      "away": "马赛",
+      "league": "法甲",
+      "kickoff": "2026-02-09T03:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.31,
+        4.85,
+        6.25
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        67.6,
+        18.3,
+        14.2
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 23.2,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "5-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.1585,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.4373,
+      "delta_model_vs_market": 0.4373
+    },
+    {
+      "match_id": "sporttery-2037689",
+      "home": "罗马",
+      "away": "卡利亚里",
+      "league": "意甲",
+      "kickoff": "2026-02-10T03:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.33,
+        4.05,
+        7.75
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        66.7,
+        21.9,
+        11.4
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 26.0,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "2-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.1721,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.4237,
+      "delta_model_vs_market": 0.4237
+    },
+    {
+      "match_id": "sporttery-2037454",
+      "home": "切尔西",
+      "away": "西汉姆联",
+      "league": "英超",
+      "kickoff": "2026-02-01T01:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.37,
+        4.45,
+        5.75
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        64.7,
+        19.9,
+        15.4
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 22.0,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.1882,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.4076,
+      "delta_model_vs_market": 0.4076
+    },
+    {
+      "match_id": "sporttery-2037968",
+      "home": "阿森纳",
+      "away": "切尔西",
+      "league": "英超",
+      "kickoff": "2026-03-02T00:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.45,
+        4.0,
+        5.3
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        61.1,
+        22.2,
+        16.7
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 20.7,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "2-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.2282,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.3676,
+      "delta_model_vs_market": 0.3676
+    },
+    {
+      "match_id": "sporttery-2037657",
+      "home": "南特",
+      "away": "里昂",
+      "league": "法甲",
+      "kickoff": "2026-02-08T04:05:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        4.74,
+        3.6,
+        1.56
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        18.7,
+        24.6,
+        56.7
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -19.3,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.2825,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.3133,
+      "delta_model_vs_market": 0.3133
+    },
+    {
+      "match_id": "sporttery-2037758",
+      "home": "桑德兰",
+      "away": "利物浦",
+      "league": "英超",
+      "kickoff": "2026-02-12T04:15:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        4.35,
+        3.7,
+        1.59
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        20.4,
+        23.9,
+        55.7
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -18.3,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.295,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.3008,
+      "delta_model_vs_market": 0.3008
+    },
+    {
+      "match_id": "sporttery-2037044",
+      "home": "奥萨苏纳",
+      "away": "皇家奥维耶多",
+      "league": "西甲",
+      "kickoff": "2026-01-18T01:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.65,
+        3.1,
+        5.0
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        53.7,
+        28.6,
+        17.7
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 19.7,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.3275,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.2683,
+      "delta_model_vs_market": 0.2683
+    },
+    {
+      "match_id": "sporttery-2038523",
+      "home": "莱万特",
+      "away": "皇家奥维耶多",
+      "league": "西甲",
+      "kickoff": "2026-03-22T01:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        2.03,
+        3.1,
+        3.18
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        43.6,
+        28.6,
+        27.8
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 9.6,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "4-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.477,
+      "brier_final": 0.5958,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.1188,
+      "delta_model_vs_market": 0.1188
+    },
+    {
+      "match_id": "sporttery-2037675",
+      "home": "欧塞尔",
+      "away": "巴黎FC",
+      "league": "法甲",
+      "kickoff": "2026-02-09T00:15:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        2.32,
+        3.0,
+        2.74
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        38.2,
+        29.5,
+        32.3
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 5.1,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "0-0",
+      "brier_model": 0.8378,
+      "brier_market": 0.7469,
+      "brier_final": 0.8378,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0909,
+      "delta_model_vs_market": 0.0909
+    },
+    {
+      "match_id": "sporttery-2037078",
+      "home": "埃尔切",
+      "away": "塞维利亚",
+      "league": "西甲",
+      "kickoff": "2026-01-20T04:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        2.1,
+        3.05,
+        3.08
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        42.2,
+        29.0,
+        28.8
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 8.6,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "2-2",
+      "brier_model": 0.8378,
+      "brier_market": 0.7641,
+      "brier_final": 0.8378,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0737,
+      "delta_model_vs_market": 0.0737
+    },
+    {
+      "match_id": "sporttery-2040742",
+      "home": "奥斯",
+      "away": "布雷达",
+      "league": "荷乙",
+      "kickoff": "2026-08-08T02:00:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        4.45,
+        4.0,
+        1.53
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.2,
+      "lambda_away": 2.045,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        19.9,
+        22.2,
+        57.9
+      ],
+      "model_1x2": [
+        22.7,
+        19.7,
+        57.6
+      ],
+      "final_1x2": [
+        22.5,
+        22.3,
+        55.2
+      ],
+      "away_shift_pp": -0.3,
+      "market_pick": "A",
+      "model_pick": "A",
+      "final_pick": "A",
+      "actual": "A",
+      "actual_score": "1-2",
+      "brier_model": 0.2701,
+      "brier_market": 0.2658,
+      "brier_final": 0.3011,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0353,
+      "delta_model_vs_market": 0.0043
+    },
+    {
+      "match_id": "sporttery-2040745",
+      "home": "米堡",
+      "away": "雷克斯",
+      "league": "英联赛杯",
+      "kickoff": "2026-08-08T03:00:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        1.5,
+        3.9,
+        4.85
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.96,
+      "lambda_away": 1.07,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        59.0,
+        22.7,
+        18.3
+      ],
+      "model_1x2": [
+        58.9,
+        20.1,
+        21.1
+      ],
+      "final_1x2": [
+        56.3,
+        22.7,
+        21.0
+      ],
+      "away_shift_pp": 2.8,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "1-0",
+      "brier_model": 0.2538,
+      "brier_market": 0.2527,
+      "brier_final": 0.2866,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0339,
+      "delta_model_vs_market": 0.0011
+    },
+    {
+      "match_id": "sporttery-2040696",
+      "home": "奥斯KFUM",
+      "away": "克里斯蒂",
+      "league": "挪超",
+      "kickoff": "2026-08-02T23:00:00+08:00",
+      "snapshot": "2026-08-02_15:1553",
+      "dep_pct": 0,
+      "odds": [
+        1.6,
+        3.75,
+        4.2
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.885,
+      "lambda_away": 1.15,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        55.3,
+        23.6,
+        21.1
+      ],
+      "model_1x2": [
+        55.4,
+        20.8,
+        23.9
+      ],
+      "final_1x2": [
+        53.0,
+        23.4,
+        23.6
+      ],
+      "away_shift_pp": 2.8,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "2-1",
+      "brier_model": 0.2993,
+      "brier_market": 0.2997,
+      "brier_final": 0.3314,
+      "verdict": "fusion_overshoot",
+      "delta_final_vs_market": 0.0317,
+      "delta_model_vs_market": -0.0004
+    },
+    {
+      "match_id": "sporttery-2040746",
+      "home": "埃斯托里",
+      "away": "法马利康",
+      "league": "葡超",
+      "kickoff": "2026-08-08T03:15:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        2.95,
+        3.16,
+        2.11
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.2,
+      "lambda_away": 1.445,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        30.0,
+        28.0,
+        42.0
+      ],
+      "model_1x2": [
+        32.4,
+        23.9,
+        43.7
+      ],
+      "final_1x2": [
+        31.4,
+        26.7,
+        41.9
+      ],
+      "away_shift_pp": 1.7,
+      "market_pick": "A",
+      "model_pick": "A",
+      "final_pick": "A",
+      "actual": "D",
+      "actual_score": "1-1",
+      "brier_model": 0.8751,
+      "brier_market": 0.7843,
+      "brier_final": 0.8114,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0271,
+      "delta_model_vs_market": 0.0908
+    },
+    {
+      "match_id": "sporttery-2037481",
+      "home": "尼斯",
+      "away": "布雷斯特",
+      "league": "法甲",
+      "kickoff": "2026-02-02T00:15:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.94,
+        3.3,
+        3.22
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        45.7,
+        26.8,
+        27.5
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 9.9,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "2-2",
+      "brier_model": 0.8378,
+      "brier_market": 0.8193,
+      "brier_final": 0.8378,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0185,
+      "delta_model_vs_market": 0.0185
+    },
+    {
+      "match_id": "sporttery-2039373",
+      "home": "西班牙人",
+      "away": "莱万特",
+      "league": "西甲",
+      "kickoff": "2026-04-28T03:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.85,
+        3.3,
+        3.5
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        47.9,
+        26.8,
+        25.3
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 12.1,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "0-0",
+      "brier_model": 0.8378,
+      "brier_market": 0.8285,
+      "brier_final": 0.8378,
+      "verdict": "strength_worse",
+      "delta_final_vs_market": 0.0093,
+      "delta_model_vs_market": 0.0093
+    },
+    {
+      "match_id": "sporttery-2038830",
+      "home": "拉齐奥",
+      "away": "帕尔马",
+      "league": "意甲",
+      "kickoff": "2026-04-05T02:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.63,
+        3.25,
+        4.8
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        54.3,
+        27.2,
+        18.4
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 19.0,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "1-1",
+      "brier_model": 0.8378,
+      "brier_market": 0.8584,
+      "brier_final": 0.8378,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.0206,
+      "delta_model_vs_market": -0.0206
+    },
+    {
+      "match_id": "sporttery-2037480",
+      "home": "图卢兹",
+      "away": "欧塞尔",
+      "league": "法甲",
+      "kickoff": "2026-02-02T00:15:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.58,
+        3.35,
+        5.05
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        56.0,
+        26.4,
+        17.5
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 19.9,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "0-0",
+      "brier_model": 0.8378,
+      "brier_market": 0.886,
+      "brier_final": 0.8378,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.0482,
+      "delta_model_vs_market": -0.0482
+    },
+    {
+      "match_id": "sporttery-2040744",
+      "home": "波鸿",
+      "away": "柏林赫塔",
+      "league": "德乙",
+      "kickoff": "2026-08-08T02:30:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        2.15,
+        3.4,
+        2.7
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        41.2,
+        26.0,
+        32.8
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        36.0,
+        28.0,
+        36.0
+      ],
+      "away_shift_pp": 4.6,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-1",
+      "brier_model": 0.5958,
+      "brier_market": 0.6891,
+      "brier_final": 0.6176,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.0715,
+      "delta_model_vs_market": -0.0933
+    },
+    {
+      "match_id": "sporttery-2039911",
+      "home": "赫罗纳",
+      "away": "埃尔切",
+      "league": "西甲",
+      "kickoff": "2026-05-24T03:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.65,
+        3.65,
+        4.02
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        53.7,
+        24.3,
+        22.0
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 15.4,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "1-1",
+      "brier_model": 0.8378,
+      "brier_market": 0.9103,
+      "brier_final": 0.8378,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.0725,
+      "delta_model_vs_market": -0.0725
+    },
+    {
+      "match_id": "sporttery-2040740",
+      "home": "桑纳菲",
+      "away": "奥斯KFUM",
+      "league": "挪超",
+      "kickoff": "2026-08-08T01:00:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        1.92,
+        3.5,
+        3.1
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.625,
+      "lambda_away": 1.36,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        46.1,
+        25.3,
+        28.6
+      ],
+      "model_1x2": [
+        44.6,
+        22.4,
+        33.0
+      ],
+      "final_1x2": [
+        42.9,
+        25.0,
+        32.1
+      ],
+      "away_shift_pp": 4.4,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-1",
+      "brier_model": 0.698,
+      "brier_market": 0.787,
+      "brier_final": 0.7076,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.0794,
+      "delta_model_vs_market": -0.089
+    },
+    {
+      "match_id": "sporttery-2037482",
+      "home": "托特纳姆热刺",
+      "away": "曼彻斯特城",
+      "league": "英超",
+      "kickoff": "2026-02-02T00:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        4.2,
+        4.0,
+        1.56
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        21.1,
+        22.1,
+        56.8
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -19.4,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "2-2",
+      "brier_model": 0.8378,
+      "brier_market": 0.973,
+      "brier_final": 0.8378,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.1352,
+      "delta_model_vs_market": -0.1352
+    },
+    {
+      "match_id": "sporttery-2038371",
+      "home": "布伦特福德",
+      "away": "狼队",
+      "league": "英超",
+      "kickoff": "2026-03-17T04:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.48,
+        3.9,
+        5.1
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        59.9,
+        22.7,
+        17.4
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 20.0,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "2-2",
+      "brier_model": 0.8378,
+      "brier_market": 0.986,
+      "brier_final": 0.8378,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.1482,
+      "delta_model_vs_market": -0.1482
+    },
+    {
+      "match_id": "sporttery-2037981",
+      "home": "乌迪内斯",
+      "away": "佛罗伦萨",
+      "league": "意甲",
+      "kickoff": "2026-03-03T03:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        3.2,
+        3.11,
+        2.02
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        27.7,
+        28.5,
+        43.8
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -6.4,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.7964,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.2006,
+      "delta_model_vs_market": -0.2006
+    },
+    {
+      "match_id": "sporttery-2039708",
+      "home": "阿拉维斯",
+      "away": "巴塞罗那",
+      "league": "西甲",
+      "kickoff": "2026-05-14T03:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        3.2,
+        3.75,
+        1.82
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        27.7,
+        23.6,
+        48.7
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -11.3,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "1-0",
+      "brier_model": 0.5958,
+      "brier_market": 0.8157,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.2199,
+      "delta_model_vs_market": -0.2199
+    },
+    {
+      "match_id": "sporttery-2037002",
+      "home": "西班牙人",
+      "away": "赫罗纳",
+      "league": "西甲",
+      "kickoff": "2026-01-17T04:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.67,
+        3.3,
+        4.4
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        53.0,
+        26.8,
+        20.1
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 17.3,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "0-2",
+      "brier_model": 0.5958,
+      "brier_market": 0.9912,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.3954,
+      "delta_model_vs_market": -0.3954
+    },
+    {
+      "match_id": "sporttery-2037455",
+      "home": "汉堡",
+      "away": "拜仁慕尼黑",
+      "league": "德甲",
+      "kickoff": "2026-02-01T01:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        9.0,
+        6.4,
+        1.16
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        9.8,
+        13.8,
+        76.3
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -38.9,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "D",
+      "actual_score": "2-2",
+      "brier_model": 0.8378,
+      "brier_market": 1.3347,
+      "brier_final": 0.8378,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.4969,
+      "delta_model_vs_market": -0.4969
+    },
+    {
+      "match_id": "sporttery-2040743",
+      "home": "埃门",
+      "away": "罗达JC",
+      "league": "荷乙",
+      "kickoff": "2026-08-08T02:00:00+08:00",
+      "snapshot": "prematch",
+      "dep_pct": 0,
+      "odds": [
+        2.25,
+        3.5,
+        2.52
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 3.27,
+      "lambda_away": 0.075,
+      "lambda_equal": false,
+      "goal_rate_kind": "proxy_lambda",
+      "source_tags": [
+        "MULTI_MARKET_XG"
+      ],
+      "no_anchor_fallback": false,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        39.4,
+        25.4,
+        35.2
+      ],
+      "model_1x2": [
+        95.3,
+        4.3,
+        0.4
+      ],
+      "final_1x2": [
+        94.1,
+        5.5,
+        0.5
+      ],
+      "away_shift_pp": -34.8,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "1-0",
+      "brier_model": 0.0041,
+      "brier_market": 0.555,
+      "brier_final": 0.0065,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.5485,
+      "delta_model_vs_market": -0.5509
+    },
+    {
+      "match_id": "sporttery-2037752",
+      "home": "水晶宫",
+      "away": "伯恩利",
+      "league": "英超",
+      "kickoff": "2026-02-12T03:30:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.43,
+        3.85,
+        5.9
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        62.0,
+        23.0,
+        15.0
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 22.4,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "2-3",
+      "brier_model": 0.5958,
+      "brier_market": 1.1591,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.5633,
+      "delta_model_vs_market": -0.5633
+    },
+    {
+      "match_id": "sporttery-2037799",
+      "home": "雷恩",
+      "away": "巴黎圣日尔曼",
+      "league": "法甲",
+      "kickoff": "2026-02-14T02:00:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        6.5,
+        5.15,
+        1.28
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        13.6,
+        17.2,
+        69.2
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": -31.8,
+      "market_pick": "A",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "H",
+      "actual_score": "3-1",
+      "brier_model": 0.5958,
+      "brier_market": 1.2543,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.6585,
+      "delta_model_vs_market": -0.6585
+    },
+    {
+      "match_id": "sporttery-2038098",
+      "home": "巴黎圣日尔曼",
+      "away": "摩纳哥",
+      "league": "法甲",
+      "kickoff": "2026-03-07T03:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.22,
+        5.6,
+        7.6
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        72.5,
+        15.8,
+        11.6
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 25.8,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "1-3",
+      "brier_model": 0.5958,
+      "brier_market": 1.332,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.7362,
+      "delta_model_vs_market": -0.7362
+    },
+    {
+      "match_id": "sporttery-2039948",
+      "home": "AC米兰",
+      "away": "卡利亚里",
+      "league": "意甲",
+      "kickoff": "2026-05-25T02:45:00+08:00",
+      "snapshot": "closing",
+      "dep_pct": 0,
+      "odds": [
+        1.15,
+        5.7,
+        11.8
+      ],
+      "input_mode": "market_only",
+      "output_mode": "model_first",
+      "lambda_home": 1.225,
+      "lambda_away": 1.225,
+      "lambda_equal": true,
+      "goal_rate_kind": "model_goal_rate",
+      "source_tags": [
+        "NO_ANCHOR_FALLBACK"
+      ],
+      "no_anchor_fallback": true,
+      "has_lambda_prior": false,
+      "has_elo": false,
+      "real_event_xg": null,
+      "api_history_matches": null,
+      "market_1x2": [
+        77.0,
+        15.5,
+        7.5
+      ],
+      "model_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "final_1x2": [
+        37.4,
+        25.3,
+        37.4
+      ],
+      "away_shift_pp": 29.9,
+      "market_pick": "H",
+      "model_pick": "H",
+      "final_pick": "H",
+      "actual": "A",
+      "actual_score": "1-2",
+      "brier_model": 0.5958,
+      "brier_market": 1.4722,
+      "brier_final": 0.5958,
+      "verdict": "signal_helped",
+      "delta_final_vs_market": -0.8764,
+      "delta_model_vs_market": -0.8764
+    }
+  ],
+  "shadow_sevilla": {
+    "match_id": "sporttery-2040884",
+    "home": "塞维利亚",
+    "away": "巴列卡诺",
+    "league": "西甲",
+    "kickoff": "2026-08-16T03:30:00+08:00",
+    "snapshot": "prematch",
+    "dep_pct": 100,
+    "odds": [
+      2.2,
+      2.84,
+      3.1
+    ],
+    "input_mode": "market_only",
+    "output_mode": "market_only",
+    "lambda_home": 1.12,
+    "lambda_away": 0.94,
+    "lambda_equal": false,
+    "goal_rate_kind": "proxy_lambda",
+    "source_tags": [
+      "MULTI_MARKET_XG"
+    ],
+    "no_anchor_fallback": false,
+    "has_lambda_prior": false,
+    "has_elo": false,
+    "real_event_xg": null,
+    "api_history_matches": null,
+    "market_1x2": [
+      41.2,
+      30.9,
+      28.0
+    ],
+    "model_1x2": [
+      40.7,
+      28.0,
+      31.4
+    ],
+    "final_1x2": [
+      41.2,
+      30.9,
+      28.0
+    ],
+    "away_shift_pp": 3.4,
+    "market_pick": "H",
+    "model_pick": "H",
+    "final_pick": "H",
+    "actual": null,
+    "actual_score": null,
+    "brier_model": null,
+    "brier_market": null,
+    "brier_final": null,
+    "verdict": "unscored",
+    "note": "未结算。market_only 影子 model_1x2，不属于 43 场低依赖样本。"
+  }
+}

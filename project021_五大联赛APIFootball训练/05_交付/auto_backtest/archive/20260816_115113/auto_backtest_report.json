@@ -1,0 +1,80 @@
+{
+  "schema": "auto-backtest-1.1",
+  "ran_at": "2026-08-16T11:51:13.926807+08:00",
+  "run_id": "20260816_115113",
+  "archive_dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260816_115113",
+  "latest_entry": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\latest",
+  "workspace": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练",
+  "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+  "settle": {
+    "error": "\",\n      \"score_90\": \"3-2\",\n      \"status\": \"settled\",\n      \"err\": null\n    },\n    {\n      \"match_id\": \"sporttery-2040887\",\n      \"match\": \"盐湖城 vs 明尼苏达\",\n      \"matched_by\": \"fixed_by_id\",\n      \"score_90\": \"1-1\",\n      \"status\": \"settled\",\n      \"err\": null\n    },\n    {\n      \"match_id\": \"sporttery-2040888\",\n      \"status\": \"no_result_yet\",\n      \"match\": \"德岛漩涡 vs 鸟栖沙岩\"\n    },\n    {\n      \"match",
+    "ok": true
+  },
+  "store_backtest": {
+    "ok": true,
+    "rc": 0,
+    "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260816_115113\\store_backtest.json",
+    "tail": "      \"accuracy_pct\": 51.882,\n      \"brier_mean\": 0.61145163,\n      \"brier_sum\": 227.460007,\n      \"log_loss\": 1.01986852,\n      \"ece\": 0.033411,\n      \"score\": {\n        \"top1_accuracy_pct\": 11.83,\n        \"top3_accuracy_pct\": 31.18,\n        \"top5_accuracy_pct\": 48.92,\n        \"score_log_loss\": 6.4393\n      },\n      \"ou_2_5_brier\": 0.260912,\n      \"btts_brier\": 0.254829,\n      \"clv_mean_pp\": -0.029,\n      \"clv_n\": 369\n    },\n    \"fusion-1.4.0+core-3.4.4\": {\n      \"n\": 2,\n      \"accuracy_pct\": 0.0,\n      \"brier_mean\": 0.965633,\n      \"brier_sum\": 1.931266,\n      \"log_loss\": 1.4538607,\n      \"ece\": 0.469333,\n      \"ou_2_5_brier\": 0.227299,\n      \"btts_brier\": 0.306952\n    },\n    \"fusion-1.4.0-core-3.4.4\": {\n      \"n\": 90,\n      \"accuracy_pct\": 46.667,\n      \"brier_mean\": 0.63845443,\n      \"brier_sum\": 57.460899,\n      \"log_loss\": 1.07480237,\n      \"ece\": 0.062019,\n      \"score\": {\n        \"top1_accuracy_pct\": 17.78,\n        \"top3_accuracy_pct\": 37.78,\n        \"top5_accuracy_pct\": 56.67,\n        \"score_log_loss\": 5.07859\n      },\n      \"ou_2_5_brier\": 0.244356,\n      \"btts_brier\": 0.240745\n    },\n    \"fusion-1.5.0-core-3.4.4\": {\n      \"n\": 1,\n      \"accuracy_pct\": 100.0,\n      \"brier_mean\": 0.519625,\n      \"brier_sum\": 0.519625,\n      \"log_loss\": 0.88673193,\n      \"ece\": 0.392333,\n      \"ou_2_5_brier\": 0.430336,\n      \"btts_brier\": 0.314721\n    }\n  },\n  \"output\": \"F:\\\\HM足球比赛预测\\\\project021_五大联赛APIFootball训练\\\\05_交付\\\\auto_backtest\\\\archive\\\\20260816_115113\\\\store_backtest.json\"\n}\n"
+  },
+  "dual_track_dates": [],
+  "summary": {
+    "record_dirs_found": 2,
+    "official_settled_total": 0,
+    "cross_validation_total": 0,
+    "quant_1x2_total": {
+      "n": 0,
+      "hit": 0,
+      "hit_rate_pct": null
+    },
+    "llm_double_total": {
+      "n": 0,
+      "hit": 0,
+      "hit_rate_pct": null
+    },
+    "caveat": "样本少时命中率不具结论性；SKILL 纪律：>=100 场评估、>=200 场做结论。"
+  },
+  "primary_selection": {
+    "selected": [],
+    "dropped": [
+      {
+        "match_id": "sporttery-2040831",
+        "prediction_as_of": "2026-08-12T07:39:09.422367+00:00",
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
+        "reason": "missing_kickoff"
+      },
+      {
+        "match_id": "sporttery-2040819",
+        "prediction_as_of": "2026-08-12T07:39:09.422367+00:00",
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
+        "reason": "missing_kickoff"
+      },
+      {
+        "match_id": "sporttery-2040820",
+        "prediction_as_of": "2026-08-12T07:39:09.422367+00:00",
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
+        "reason": "missing_kickoff"
+      },
+      {
+        "match_id": "sporttery-2040881",
+        "prediction_as_of": null,
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-16\\待回测记录\\2026-08-16",
+        "reason": "missing_prediction_as_of"
+      }
+    ]
+  },
+  "provenance": {
+    "input_indexes": {
+      "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12\\index.json": "b2099c0e47b4973064557bac7412852fe48e5216960273e7c8a7929b566970c1",
+      "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-16\\待回测记录\\2026-08-16\\index.json": "1534896a2da22ed3c83f745538f6b36d86a27a8196192e5496295e6f2bb6c2e1"
+    },
+    "scripts": {
+      "auto_backtest.py": "ca22d30f17734e0aa7bc467e77376fd002898b8160fcc8e2e6f7786271c7271c",
+      "backtest_dual_track.py": "c05dfdb4925da6d93769a61f0ed5aafad3b28d7cbb540c4ba90c53923224e02f"
+    },
+    "result_hashes": {}
+  }
+}

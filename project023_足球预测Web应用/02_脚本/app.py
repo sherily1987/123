@@ -1,103 +1,89 @@
 # -*- coding: utf-8 -*-
-"""project023 足球预测 Web 应用 — FastAPI 后端。
-
-启动：python app.py  →  http://127.0.0.1:8765
-仅绑定本机回环地址，单机单用户，无鉴权。
-"""
-import json
-from datetime import date, datetime, timezone
+"""project023 工作台：只读融合库看板；写操作走 fusion_cli market_only。"""
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 HERE = Path(__file__).resolve().parent
 import db
 import runner
+import store_view as sv
 
 db.init()
-
-app = FastAPI(title="足球预测工作台", version="0.1.0")
-
-
-class TaskReq(BaseModel):
-    sales_day: str
+app = FastAPI(title="足球预测工作台", version="0.2.0")
 
 
-class PredictReq(BaseModel):
-    sales_day: str
-    models: list[str] | None = None
+class DayReq(BaseModel):
+    kickoff_date: str | None = None
+    sales_day: str | None = None
+
+    def day(self) -> str | None:
+        return self.kickoff_date or self.sales_day
 
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "now": datetime.now(timezone.utc).isoformat()}
+    root = sv.store_root()
+    return {
+        "ok": True,
+        "now": datetime.now(timezone.utc).isoformat(),
+        "store": str(root),
+        "read_only_store": True,
+        "manual_backtest": True,
+        "quant_mode": "market_only",
+    }
+
+
+@app.get("/api/board")
+def board():
+    try:
+        return sv.board()
+    except Exception as exc:
+        raise HTTPException(500, f"看板失败: {exc}") from exc
 
 
 @app.get("/api/matches")
 def matches(sales_day: str | None = None):
-    rows = db.list_matches(sales_day)
-    if not rows and sales_day:
-        return {"sales_day": sales_day, "matches": [], "empty": True}
-    # 合并预测
-    preds = {}
+    """兼容旧前端：转成看板子集。"""
+    data = sv.board()
+    rows = data["matches"]
     if sales_day:
-        for p in db.list_predictions(sales_day):
-            preds[p["match_num"]] = p
-    out = []
-    for r in rows:
-        p = preds.get(r["match_num"])
-        out.append({
-            "match_num": r["match_num"], "league": r["league"], "home": r["home"], "away": r["away"],
-            "kickoff": r["kickoff"], "odds_1x2": r["odds_1x2"], "quant_tier": r["quant_tier"],
-            "status_name": r["status_name"],
-            "prediction": {
-                "direction": p["direction"], "strength": p["strength"], "single_pick": p["single_pick"],
-                "sp_conf": p["sp_conf"], "sp_skip": p["sp_skip"], "score": p["score"],
-                "ou25": p["ou25"], "evs": p["evs"], "evidence_gap": p["evidence_gap"],
-                "collapse_flags": p["collapse_flags"],
-            } if p else None,
-        })
-    return {"sales_day": sales_day, "matches": out}
+        rows = [r for r in rows if (r.get("kickoff") or "").startswith(sales_day)]
+    return {"sales_day": sales_day, "matches": rows, "summary": data["summary"]}
 
 
-@app.get("/api/predictions")
-def predictions(sales_day: str):
-    rows = db.list_predictions(sales_day)
-    return {"sales_day": sales_day, "predictions": rows}
-
-
-@app.get("/api/backtests")
-def backtests(sales_day: str | None = None):
-    rows = db.list_backtests(sales_day)
-    n = len(rows)
-    if not n:
-        return {"sales_day": sales_day, "rows": [], "summary": None}
-    hs = sum(r["hit_single"] for r in rows)
-    hd = sum(r["hit_double"] for r in rows)
-    sh = sum(r["score_hit"] for r in rows)
-    return {"sales_day": sales_day, "rows": rows,
-            "summary": {"n": n, "hit_single": hs, "hit_double": hd, "score_hit": sh}}
+@app.get("/api/late-info")
+def late_info():
+    _, summary = sv.load_late_info()
+    return summary
 
 
 @app.post("/api/collect")
-def collect(req: TaskReq):
-    rid = runner.start_collect(req.sales_day)
-    return {"run_id": rid, "status": "started"}
+def collect(req: DayReq):
+    day = req.day()
+    if not day:
+        raise HTTPException(400, "kickoff_date required")
+    return {"run_id": runner.start_collect(day), "status": "started"}
 
 
 @app.post("/api/predict")
-def predict(req: PredictReq):
-    rid = runner.start_predict(req.sales_day, req.models)
-    return {"run_id": rid, "status": "started"}
+def predict(req: DayReq):
+    return {"run_id": runner.start_predict(req.day()), "status": "started"}
+
+
+@app.post("/api/settle")
+def settle(req: DayReq):
+    return {"run_id": runner.start_settle(req.day()), "status": "started"}
 
 
 @app.post("/api/backtest")
-def backtest(req: TaskReq):
-    rid = runner.start_backtest(req.sales_day)
-    return {"run_id": rid, "status": "started"}
+def backtest(req: DayReq):
+    """手动结算。没有自动回测任务。"""
+    return settle(req)
 
 
 @app.get("/api/run/{run_id}")
@@ -108,59 +94,55 @@ def run_status(run_id: int):
     return r
 
 
-@app.get("/api/export/report")
-def export_report(sales_day: str):
-    """生成预测报告 markdown，返回下载。"""
-    preds = db.list_predictions(sales_day)
-    if not preds:
-        raise HTTPException(404, "该日无预测记录")
-    L = [f"# {sales_day} 开售预测报告（project023 Web 导出）", ""]
-    n = len(preds)
-    nh = sum(1 for p in preds if p["direction"] == "主胜")
-    ng = sum(1 for p in preds if p["evidence_gap"])
-    L += [f"- 场次 {n}，主胜 {nh}（{nh/n:.0%}），证据缺口 {ng} 场", ""]
-    L += ["| 场次 | 比赛 | 联赛 | 方向 | 强度 | 下注建议 | 比分 | EV |", "|---|---|---|---|---|---|---|---|"]
-    for p in sorted(preds, key=lambda x: x["match_num"]):
-        evs = p["evs"] or {}
-        best = max(evs.items(), key=lambda kv: abs(kv[1])) if evs else None
-        evtxt = f"{best[0]} {best[1]*100:+.0f}%" if best else "-"
-        L.append(f"| {p['match_num']} | {p.get('home','')} vs {p.get('away','')} | {p.get('league','')} "
-                 f"| {p['direction']} | {p['strength']}% | {p['single_pick'] or '-'} | {p['score'] or '-'} | {evtxt} |")
-    out = HERE / "data" / f"report_{sales_day}.md"
-    out.write_text("\n".join(L), encoding="utf-8")
-    return FileResponse(out, filename=f"{sales_day}_预测报告.md")
-
-
-@app.get("/api/export/ppt")
-def export_ppt(sales_day: str):
-    """从 DB 生成 parsed 格式数据 → subprocess node 生成 PPT → 返回下载。"""
-    import subprocess
+@app.get("/api/job")
+def job(match_id: str):
     import sys
-    preds = db.list_predictions(sales_day)
-    if not preds:
-        raise HTTPException(404, "该日无预测记录")
-    rows = db.list_matches(sales_day)
-    m_by_num = {r["match_num"]: r for r in rows}
-    parsed = []
-    for p in sorted(preds, key=lambda x: x["match_num"]):
-        m = m_by_num.get(p["match_num"], {})
-        parsed.append({
-            "num": p["match_num"], "home": m.get("home"), "away": m.get("away"),
-            "league": m.get("league"), "dir": p["direction"], "strength": p["strength"],
-            "sp": p["single_pick"], "sp_skip": bool(p["sp_skip"]), "score": p["score"],
-            "ou25": p["ou25"], "evs": p["evs"], "ev_reason": p["ev_reason"],
-            "evidence_gap": bool(p["evidence_gap"]), "collapse_flags": p["collapse_flags"],
-        })
-    data_file = HERE / "data" / f"ppt_data_{sales_day}.json"
-    data_file.write_text(json.dumps(parsed, ensure_ascii=False), encoding="utf-8")
-    out_file = HERE / "data" / f"预测PPT_{sales_day}.pptx"
-    # 2026-08-16：LLM 工程已迁入仓库；复用 runner 解析好的 LLM_DIR，不再硬编码 C 盘
-    r = subprocess.run(["node", str(runner.LLM_DIR / "build_ppt_web.js"),
-                        "--parsed", str(data_file), "--out", str(out_file), "--title", sales_day],
-                       capture_output=True, text=True, timeout=300, cwd=str(HERE))
-    if r.returncode != 0 or not out_file.exists():
-        raise HTTPException(500, f"PPT 生成失败: {r.stderr[-300:]}")
-    return FileResponse(out_file, filename=f"LLM证据轨预测_{sales_day}销售日.pptx")
+    scripts = HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from job_ticket import jobs_root, load_job
+
+    mid = sv.sporttery_id(match_id)
+    disk = load_job(jobs_root(), mid)
+    if not disk:
+        raise HTTPException(404, "job not found")
+    return disk
+
+
+@app.get("/api/export/report")
+def export_report():
+    data = sv.board()
+    L = [
+        f"# 体彩看板 {data['as_of'][:16]}",
+        "",
+        f"事实源：`{data['store']}`。量化 = 正式登记 market_only。LLM 只列证据方向。回测手动。",
+        "",
+        f"- 已开售 {data['summary']['on_sale']}，未开球有盘 {data['summary']['has_odds']}，"
+        f"已预测 {data['summary']['predicted']}，未预测 {data['summary']['missing_pred']}",
+        "",
+    ]
+    for g in data.get("by_league") or []:
+        L += [
+            f"## {g['league']}（{g['n']} 场，已登记 {g['predicted']}）",
+            "",
+            "| 场次 | 开球 | 比赛 | 盘 | 量化主/平/客 | 状态 | LLM证据 |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for r in g["matches"]:
+            q = r.get("quant") or {}
+            pct = q.get("final_1x2_pct")
+            pcts = "/".join(f"{x:.1f}" for x in pct) if pct else "-"
+            llm = r.get("llm") or {}
+            L.append(
+                f"| {r.get('match_num')} | {(r.get('kickoff') or '')[5:16]} | "
+                f"{r.get('home')} vs {r.get('away')} | "
+                f"{'/'.join(str(x) for x in (r.get('odds') or [])) or '无HAD'} | "
+                f"{pcts} | {r.get('bucket')} | {llm.get('direction') or '-'} |"
+            )
+        L.append("")
+    out = HERE / "data" / "board_report.md"
+    out.write_text("\n".join(L) + "\n", encoding="utf-8")
+    return FileResponse(out, filename="体彩看板.md")
 
 
 app.mount("/", StaticFiles(directory=str(HERE / "static"), html=True), name="static")

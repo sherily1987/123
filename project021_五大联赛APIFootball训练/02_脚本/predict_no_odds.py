@@ -102,11 +102,41 @@ def league_tiers(project: Path) -> dict:
     return out
 
 
+# 有完赛事件但没有 provider_market 文件的联赛（日职 api-sports：有 xG、收盘另挂）。
+# 不得把收盘文件改名为 *_events_provider_market.jsonl。
+EXTRA_EVENT_LEAGUES = (
+    {"id": 98, "slug": "apisports_japan_j1_league"},
+)
+
+
+def event_path(project: Path, slug: str) -> Path:
+    norm = project / "04_素材" / "标准化"
+    market = norm / f"{slug}_events_provider_market.jsonl"
+    if market.exists():
+        return market
+    events = norm / f"{slug}_events.jsonl"
+    if events.exists():
+        return events
+    raise FileNotFoundError(f"no event file for {slug}")
+
+
+def domestic_leagues(project: Path) -> list[dict]:
+    seen = {lg["slug"]: lg for lg in calib.discover_domestic(project)}
+    for lg in EXTRA_EVENT_LEAGUES:
+        if lg["slug"] not in seen:
+            try:
+                event_path(project, lg["slug"])
+            except FileNotFoundError:
+                continue
+            seen[lg["slug"]] = lg
+    return list(seen.values())
+
+
 def index_teams(project: Path) -> dict:
     """显示名 -> [(联赛 slug, league_id, 主键)]，重名会返回多个候选。"""
     out: dict[str, list] = {}
-    for lg in calib.discover_domestic(project):
-        src = project / "04_素材" / "标准化" / f"{lg['slug']}_events_provider_market.jsonl"
+    for lg in domestic_leagues(project):
+        src = event_path(project, lg["slug"])
         for m in strength.load_matches(src, league_id=lg["id"], require_odds=False):
             for side in ("home", "away"):
                 out.setdefault(m[f"{side}_name"], [])
@@ -128,7 +158,7 @@ def resolve(index: dict, query: str):
 
 
 def fit_league(project: Path, slug: str, league_id, use_xg: bool, shrinkage_k: float):
-    src = project / "04_素材" / "标准化" / f"{slug}_events_provider_market.jsonl"
+    src = event_path(project, slug)
     goals = strength.load_matches(src, league_id=league_id, require_odds=False)
     model = strength.fit_model(goals, half_life=HALF_LIFE)
     if shrinkage_k:
@@ -153,6 +183,35 @@ def xg_enabled(project: Path, slug: str) -> bool:
     return bool((plan.get(slug) or {}).get("basis"))
 
 
+SCORE_LAMBDA3 = 0.05
+SCORE_TEMPERATURE = 1.30
+
+
+def bp_score_matrix(lam_h, lam_a, lam3=SCORE_LAMBDA3, size=11):
+    """无赔率比分：用已有 λ（可含代理 xG）摊双变量泊松，再温度缩放。"""
+    ph = [math.exp(-lam_h) * lam_h ** i / math.factorial(i) for i in range(size)]
+    pa = [math.exp(-lam_a) * lam_a ** j / math.factorial(j) for j in range(size)]
+    s_ph, s_pa = sum(ph), sum(pa)
+    ph = [x / s_ph for x in ph]
+    pa = [x / s_pa for x in pa]
+    denom = max(lam_h * lam_a, 1e-12)
+    raw = []
+    for i, x in enumerate(ph):
+        row = []
+        for j, y in enumerate(pa):
+            acc = 0.0
+            for k in range(min(i, j) + 1):
+                acc += math.comb(i, k) * math.comb(j, k) * math.factorial(k) * (lam3 / denom) ** k
+            row.append(x * y * math.exp(-lam3) * acc)
+        raw.append(row)
+    tot = sum(sum(r) for r in raw) or 1.0
+    m = [[v / tot for v in r] for r in raw]
+    inv = 1.0 / SCORE_TEMPERATURE
+    scaled = [[max(v, 0.0) ** inv for v in r] for r in m]
+    st = sum(sum(r) for r in scaled) or 1.0
+    return [[v / st for v in r] for r in scaled]
+
+
 def dc_matrix(lam_h, lam_a, rho, size=11):
     ph = [math.exp(-lam_h) * lam_h ** i / math.factorial(i) for i in range(size)]
     pa = [math.exp(-lam_a) * lam_a ** j / math.factorial(j) for j in range(size)]
@@ -167,6 +226,7 @@ def dc_matrix(lam_h, lam_a, rho, size=11):
 
 def summarize(lam_h, lam_a, rho):
     m = dc_matrix(lam_h, lam_a, rho)
+    scores = bp_score_matrix(lam_h, lam_a)
     n = len(m)
     home = sum(m[i][j] for i in range(n) for j in range(n) if i > j)
     draw = sum(m[i][i] for i in range(n))
@@ -176,8 +236,15 @@ def summarize(lam_h, lam_a, rho):
         "over25": round(sum(m[i][j] for i in range(n) for j in range(n) if i + j >= 3), 4),
         "btts": round(sum(m[i][j] for i in range(1, n) for j in range(1, n)), 4),
         "top_scores": [{"score": f"{i}-{j}", "p": round(p, 4)}
-                       for p, i, j in sorted(((m[i][j], i, j) for i in range(6) for j in range(6)),
+                       for p, i, j in sorted(((scores[i][j], i, j) for i in range(6) for j in range(6)),
                                              reverse=True)[:5]],
+        "score_model": {
+            "family": "bivariate_poisson",
+            "lambda3": SCORE_LAMBDA3,
+            "temperature": SCORE_TEMPERATURE,
+            "lambda_source": "team_strength_optional_proxy_xg",
+            "note": "1X2 仍用 DC 矩阵；比分格子用 BP+T。生产 market_only 比分未改。",
+        },
     }
 
 

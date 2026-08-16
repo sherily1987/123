@@ -13,6 +13,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from runtime_paths import core_scripts_dir, data_root
+from job_ticket import (
+    identity_from,
+    jobs_root,
+    normalize_match_id,
+    quant_from_fusion_output,
+    upsert_job,
+)
 
 sys.path.insert(0, str(core_scripts_dir()))
 from backtest_lib import slug, sha, atomic_json, load_jsonl, append_jsonl
@@ -101,9 +108,8 @@ def main():
         sys.exit('kickoff already passed; refuse retrospective prediction')
 
     sm = inp.get('sporttery_meta') or {}
-    if sm.get('match_id'):
-        mid = f"sporttery-{sm['match_id']}"
-    else:
+    mid = normalize_match_id(sm.get('match_id') or inp.get('match_id') or out.get('match_id'))
+    if not mid:
         comp = slug(inp.get('competition', inp.get('stage', 'match')))
         season = slug(inp.get('season', 'na'))
         ds = kd.strftime('%Y%m%dT%H%MZ')
@@ -231,8 +237,20 @@ def main():
              'created_at': rec['created_at']}
     entry['entry_hash'] = sha(prevhash + entry['record_hash'])
     append_jsonl(reg, entry)
+    job_file = None
+    try:
+        ident = identity_from(inp, out)
+        ident['match_id'] = mid
+        job_file = str(upsert_job(
+            jobs_root(Path(a.store)),
+            ident,
+            input_obj=inp,
+            quant=quant_from_fusion_output(out, prediction_id=pid),
+        ))
+    except Exception as exc:
+        job_file = f"job_upsert_failed:{exc}"
     print(json.dumps({'status': 'recorded', 'prediction_id': pid, 'match_id': mid,
-                      'path': str(p)}, ensure_ascii=False, indent=2))
+                      'path': str(p), 'job': job_file}, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':

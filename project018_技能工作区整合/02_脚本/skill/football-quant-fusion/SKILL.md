@@ -28,6 +28,9 @@ python $cli --help
 | LLM赛前证据采集 | `llm-evidence` |
 | 结算与回测 | `settle` / `backtest` |
 | 当前版本还差多少样本 | `version-progress` |
+| 统一工单读写 | `job` |
+| 影子 hybrid（不登记） | `hybrid-shadow` |
+| 盘后伤停 / T-75 首发（只写研究库） | `late-info` |
 | 赛事模拟 | `tournament`，仅在赛制和输入已核验时 |
 | 双回合晋级 | 先分别计算每场90分钟，再显式处理总比分、加时和点球；没有统一 CLI 时不得声称已自动完成 |
 
@@ -107,6 +110,12 @@ current cohort 以 `model_version + probability_signature` 识别。概率算法
 100场、200场等数量只能作为复审触发点，不是统计证明。任何效果结论都要同时报告赛事范围、时间切分、版本、样本量、基线、指标点估计和不确定性；样本外结果不优于基线时不得推广。
 
 ```powershell
+python $cli late-info --from-collect raw.json
+python $cli late-info --from-collect raw.json --watch
+python $cli hybrid-shadow --input raw.json --sales-day YYYY-MM-DD
+python $cli hybrid-shadow --score --sales-day YYYY-MM-DD
+python $cli job --input match.json --quant model_output.json --out job.json
+python $cli job --match-id sporttery-2040898
 python $cli version-progress
 python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\probability_replay_check.py --model-version m1
 python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\release_lock.py

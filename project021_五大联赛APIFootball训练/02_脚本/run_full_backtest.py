@@ -138,10 +138,14 @@ def main() -> None:
     ap.add_argument("--project", type=Path, required=True)
     ap.add_argument("--report", type=Path, required=True)
     ap.add_argument("--min-test", type=int, default=60, help="测试集少于该场次的联赛只记录不参与汇总")
+    ap.add_argument("--only", nargs="*", help="只回测这些 slug（如 fd_d2 fd_usa apisports_netherlands_eerste_divisie）")
     a = ap.parse_args()
 
     catalogs = sorted((HERE).glob("*catalog*.json")) + sorted(HERE.glob("all_leagues_batch*.json"))
     leagues = discover(a.project, catalogs)
+    if a.only:
+        allow = set(a.only)
+        leagues = [row for row in leagues if row[0] in allow]
     print(f"自动发现 {len(leagues)} 个可回测联赛\n")
 
     results = {}

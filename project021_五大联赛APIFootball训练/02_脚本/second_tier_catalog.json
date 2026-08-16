@@ -1,0 +1,10 @@
+{
+  "window": {"from": "2021-07-01", "to": "2026-06-30"},
+  "report_name": "second_tier_pipeline_report.json",
+  "note": "德乙/美职：football-data.co.uk 收盘线，不得与 provider_market 并表。荷乙：api-sports.io 无历史赔率，只比频率基线。",
+  "leagues": [
+    {"id": "D2", "slug": "fd_d2", "name": "Germany 2. Bundesliga", "country": "Germany", "kind": "domestic_league", "source": "football-data.co.uk"},
+    {"id": "USA", "slug": "fd_usa", "name": "Major League Soccer", "country": "USA", "kind": "domestic_league", "source": "football-data.co.uk"},
+    {"id": 89, "slug": "apisports_netherlands_eerste_divisie", "name": "Eerste Divisie", "country": "Netherlands", "kind": "domestic_league", "source": "api-sports.io"}
+  ]
+}

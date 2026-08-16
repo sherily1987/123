@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from scipy.optimize import minimize
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -116,6 +115,8 @@ def build_samples(stats_paths: list[Path], events_paths: list[Path], train_until
 
 def fit_coefficients(inside, outside, scored):
     """泊松似然下拟合 λ = a*inside + b*outside，a、b 均为正。"""
+    from scipy.optimize import minimize
+
     def neg_ll(params):
         lam = np.maximum(params[0] * inside + params[1] * outside, 1e-9)
         return float(-np.sum(scored * np.log(lam) - lam))

@@ -43,9 +43,10 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; football-quant-fusion/football-dat
 NEW_FORMAT = {
     "BRA": "Brazil Serie A", "ARG": "Argentina Liga Profesional",
     "JPN": "Japan J1 League", "KOR": "South Korea K League 1",
+    "USA": "Major League Soccer",
 }
 MMZ_FORMAT = {"E1": "England Championship", "E0": "England Premier League",
-              "F2": "France Ligue 2"}
+              "F2": "France Ligue 2", "D2": "Germany 2. Bundesliga"}
 
 
 def fetch_csv(url: str, retries: int = 2, delay: float = 1.0) -> list[dict[str, str]]:

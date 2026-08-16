@@ -72,7 +72,13 @@
 
 衍生市场必须使用独立状态：`VALID` / `UNAVAILABLE` / `UNFITTED` / `NOT_OFFERED`。其中 `UNFITTED` 允许保留研究值但禁止生产推荐；`NOT_OFFERED` 表示该市场未开售或不适用。人工复核写入 `manual_check`，不得覆盖脚本生产字段。
 
-## 7. APIfootball赛前特征
+## 7. 统一工单身份（2026-08-16）
+
+多智能体只认 `sporttery-<体彩match_id>`。融合输出根上必须带 `match_id` / `match_num`（由 `sporttery_meta` 盖章，不参与概率计算）。LLM audit / parsed / Web 表用同一把钥匙对齐，禁止再靠数组顺序对场。
+
+工单落盘：`04_素材/shared-data/football-quant-fusion/jobs/<sales_day>/sporttery-<id>.json`。量化与 LLM 各写 `outputs[]` 一条，禁止合并为单一「更准」。入口：`fusion_cli.py job`。
+
+## 8. APIfootball赛前特征
 
 适配器原始数据统一放在`api_football`，经过
 `apifootball_model_features.py`后生成`api_features`：

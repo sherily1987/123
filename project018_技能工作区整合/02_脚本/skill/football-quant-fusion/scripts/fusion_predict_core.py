@@ -16,8 +16,8 @@ import os
 import sys
 from pathlib import Path
 
-from production_router import route_matches
-
+from production_router import load_event_rows, route_matches
+from job_ticket import stamp_identity
 
 from runtime_paths import core_scripts_dir, data_root
 
@@ -489,13 +489,27 @@ def predict_one(core, version, data):
                 "snapshot, or supply a second independent anchor (elo or explicit lambda)."
             ),
         }
-        return {
+        return stamp_identity({
             "fusion_schema_version": build["fusion_schema_version"],
             "fusion_status": "blocked",
             "core_engine_version": version,
             "build_identity": build,
             "core_output": core_output,
-        }
+        }, data)
+    if out.get("status") == "ok":
+        tags = out.get("xg_tags") or []
+        dep = float(out.get("market_dependency_pct") or 0)
+        if "NO_ANCHOR_FALLBACK" in tags and dep < 80:
+            out = {
+                "status": "no_independent_anchor",
+                "mode": out.get("mode"),
+                "requested_mode": data.get("mode"),
+                "xg_tags": tags,
+                "errors": [
+                    "NO_ANCHOR_FALLBACK cannot be used as production 1X2; "
+                    "need paired Elo/lambda or a usable HAD"
+                ],
+            }
     if out.get("status") == "ok":
         out = apply_multi_market_adjustments(core, data, out)
         out.setdefault("reliability_flags", []).append(
@@ -506,13 +520,13 @@ def predict_one(core, version, data):
                 "AUTO_MARKET_WEIGHTS: 已自动加载 config/market_weights.json（UNFITTED，仅用于可复现，不代表最优权重）。"
             )
     if out.get("status") != "ok":
-        return {
+        return stamp_identity({
             "fusion_schema_version": build["fusion_schema_version"],
             "fusion_status": "blocked",
             "core_engine_version": version,
             "build_identity": build,
             "core_output": out,
-        }
+        }, data)
     ledger = ledger_audit(data)
     if ledger["unledgered_adjustments"]:
         out.setdefault("reliability_flags", []).append(
@@ -717,7 +731,7 @@ def predict_one(core, version, data):
         "core_output": out,
         "disclaimer": "概率模型输出，非投注建议。",
     }
-    return result
+    return stamp_identity(result, data)
 
 
 def main():
@@ -740,23 +754,10 @@ def main():
     if args.production_route and args.research_route:
         parser.error("--production-route and --research-route are mutually exclusive")
     if args.production_route or args.research_route:
-        def load_rows(path):
-            if not path or not Path(path).exists():
-                return []
-            text = Path(path).read_text(encoding="utf-8-sig")
-            try:
-                value = json.loads(text)
-                if isinstance(value, list):
-                    return value
-                if isinstance(value, dict):
-                    return value.get("events") or value.get("matches") or []
-            except json.JSONDecodeError:
-                return [json.loads(line) for line in text.splitlines() if line.strip()]
-            return []
         raw = route_matches(
             raw,
-            load_rows(args.understat_store),
-            load_rows(args.apifootball_events),
+            load_event_rows(args.understat_store),
+            load_event_rows(args.apifootball_events),
             min_history=args.router_min_history,
             enable_experimental=args.research_route,
         )

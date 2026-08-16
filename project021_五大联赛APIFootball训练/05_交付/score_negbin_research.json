@@ -1,0 +1,221 @@
+{
+  "schema": "score-negbin-research-1.0",
+  "research_only": true,
+  "production_unchanged": "SCORE_MODEL=bp SCORE_LAMBDA3=0.05 SCORE_TEMPERATURE_FT=1.30",
+  "ran_at": "2026-08-16T15:19:20",
+  "grid": {
+    "r": [
+      3.0,
+      4.0,
+      6.0,
+      8.0,
+      12.0,
+      16.0
+    ],
+    "temperature": [
+      1.0,
+      1.1,
+      1.2,
+      1.3,
+      1.4,
+      1.5
+    ]
+  },
+  "groups": {
+    "big5": {
+      "files": [
+        "premier_league_events_provider_market.jsonl",
+        "la_liga_events_provider_market.jsonl",
+        "bundesliga_events_provider_market.jsonl",
+        "serie_a_events_provider_market.jsonl",
+        "ligue_1_events_provider_market.jsonl"
+      ],
+      "loaded_with_market": 5984,
+      "status": "ok",
+      "n": 5984,
+      "train_n": 4188,
+      "test_n": 1796,
+      "first_day": "2022-10-01",
+      "last_day": "2026-05-25",
+      "split_day": "2025-05-04",
+      "bp_default": {
+        "family": "bivariate_poisson",
+        "lambda3": 0.05,
+        "temperature": 1.3,
+        "test": {
+          "n": 1796,
+          "score_log_loss": 2.89489,
+          "top1_acc_pct": 11.92,
+          "top3_acc_pct": 33.52,
+          "zero_zero": {
+            "n": 111,
+            "score_log_loss": 2.22189,
+            "mean_p00": 0.1115
+          },
+          "blowout_3plus": {
+            "n": 565,
+            "score_log_loss": 3.77458,
+            "mean_p00": null
+          }
+        }
+      },
+      "nb_train_best": {
+        "family": "negbin",
+        "r": 16.0,
+        "temperature": 1.3,
+        "train": {
+          "n": 4188,
+          "score_log_loss": 2.94486,
+          "top1_acc_pct": 11.01,
+          "top3_acc_pct": 29.8
+        },
+        "test": {
+          "n": 1796,
+          "score_log_loss": 2.91893,
+          "top1_acc_pct": 11.3,
+          "top3_acc_pct": 32.35,
+          "zero_zero": {
+            "n": 111,
+            "score_log_loss": 2.12721,
+            "mean_p00": 0.1222
+          },
+          "blowout_3plus": {
+            "n": 565,
+            "score_log_loss": 3.82655,
+            "mean_p00": null
+          }
+        }
+      },
+      "adopt_over_bp": false,
+      "adopt_reason": "keep_bp_default"
+    },
+    "nordic": {
+      "files": [
+        "norway_eliteserien_events_provider_market.jsonl",
+        "sweden_allsvenskan_events_provider_market.jsonl",
+        "finland_veikkausliiga_events_provider_market.jsonl"
+      ],
+      "loaded_with_market": 2177,
+      "status": "ok",
+      "n": 2177,
+      "train_n": 1523,
+      "test_n": 654,
+      "first_day": "2022-11-14",
+      "last_day": "2026-06-28",
+      "split_day": "2025-06-15",
+      "bp_default": {
+        "family": "bivariate_poisson",
+        "lambda3": 0.05,
+        "temperature": 1.3,
+        "test": {
+          "n": 654,
+          "score_log_loss": 3.03815,
+          "top1_acc_pct": 10.24,
+          "top3_acc_pct": 29.66,
+          "zero_zero": {
+            "n": 30,
+            "score_log_loss": 2.42413,
+            "mean_p00": 0.0901
+          },
+          "blowout_3plus": {
+            "n": 256,
+            "score_log_loss": 3.82376,
+            "mean_p00": null
+          }
+        }
+      },
+      "nb_train_best": {
+        "family": "negbin",
+        "r": 16.0,
+        "temperature": 1.3,
+        "train": {
+          "n": 1523,
+          "score_log_loss": 2.98906,
+          "top1_acc_pct": 10.24,
+          "top3_acc_pct": 27.71
+        },
+        "test": {
+          "n": 654,
+          "score_log_loss": 3.05773,
+          "top1_acc_pct": 9.02,
+          "top3_acc_pct": 26.45,
+          "zero_zero": {
+            "n": 30,
+            "score_log_loss": 2.32105,
+            "mean_p00": 0.0997
+          },
+          "blowout_3plus": {
+            "n": 256,
+            "score_log_loss": 3.85827,
+            "mean_p00": null
+          }
+        }
+      },
+      "adopt_over_bp": false,
+      "adopt_reason": "keep_bp_default"
+    },
+    "j1": {
+      "files": [
+        "apisports_japan_j1_league_events_closing_attached.jsonl"
+      ],
+      "loaded_with_market": 992,
+      "status": "ok",
+      "n": 992,
+      "train_n": 694,
+      "test_n": 298,
+      "first_day": "2022-02-18",
+      "last_day": "2024-12-08",
+      "split_day": "2024-04-20",
+      "bp_default": {
+        "family": "bivariate_poisson",
+        "lambda3": 0.05,
+        "temperature": 1.3,
+        "test": {
+          "n": 298,
+          "score_log_loss": 2.98496,
+          "top1_acc_pct": 9.73,
+          "top3_acc_pct": 32.55,
+          "zero_zero": {
+            "n": 26,
+            "score_log_loss": 2.18228,
+            "mean_p00": 0.1151
+          },
+          "blowout_3plus": {
+            "n": 93,
+            "score_log_loss": 4.08891,
+            "mean_p00": null
+          }
+        }
+      },
+      "nb_train_best": {
+        "family": "negbin",
+        "r": 16.0,
+        "temperature": 1.2,
+        "train": {
+          "n": 694,
+          "score_log_loss": 2.85762,
+          "top1_acc_pct": 11.38,
+          "top3_acc_pct": 32.85
+        },
+        "test": {
+          "n": 298,
+          "score_log_loss": 3.01618,
+          "top1_acc_pct": 9.4,
+          "top3_acc_pct": 31.88,
+          "zero_zero": {
+            "n": 26,
+            "score_log_loss": 2.03176,
+            "mean_p00": 0.1337
+          },
+          "blowout_3plus": {
+            "n": 93,
+            "score_log_loss": 4.24513,
+            "mean_p00": null
+          }
+        }
+      },
+      "adopt_over_bp": false,
+      "adopt_reason": "keep_bp_default"
+    }
+  }
+}

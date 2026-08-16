@@ -774,6 +774,23 @@
       "log_loss": 1.081643,
       "no_market": false,
       "thin": false
+    },
+    "apisports_japan_j1_league": {
+      "config": "滚动+xG w=0.4",
+      "baseline": "closing_market",
+      "test_from": 739060,
+      "n_all": 192,
+      "skip": 0,
+      "model_all": 0.654151,
+      "n_subset": 192,
+      "model_subset": 0.654151,
+      "market": 0.642853,
+      "frequency": 0.661157,
+      "accuracy_pct": 39.06,
+      "log_loss": 1.079582,
+      "no_market": false,
+      "thin": false,
+      "note": "体彩日职映射到此 slug；收盘来自 fd_jpn 对齐，不与 provider_market 并表"
     }
   },
   "summary_by_baseline": {

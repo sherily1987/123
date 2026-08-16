@@ -28,7 +28,7 @@ UA = {"User-Agent": "Mozilla/5.0 (Linux; Android 14)",
 # 体彩联赛名 → project021 slug（与 08-15 已验证映射一致）
 LEAGUE_SLUG = {
     "荷甲": "eredivisie", "瑞超": "sweden_allsvenskan", "挪超": "norway_eliteserien",
-    "英冠": "fd_e1", "葡超": "portugal_primeira_liga", "日职": "fd_jpn",
+    "英冠": "fd_e1", "葡超": "portugal_primeira_liga", "日职": "apisports_japan_j1_league",
     "沙职": "saudi_pro_league", "西甲": "la_liga", "芬超": "finland_veikkausliiga",
     "巴甲": "fd_bra", "韩职": "apisports_korea_k_league_1",
 }

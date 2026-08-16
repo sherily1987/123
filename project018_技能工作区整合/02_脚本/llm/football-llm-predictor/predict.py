@@ -831,12 +831,33 @@ def _stable_sha256(value):
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def _normalize_match_id(value):
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if text.lower().startswith("sporttery-"):
+        rest = text.split("-", 1)[1].strip()
+        return f"sporttery-{rest}" if rest else None
+    if text.isdigit():
+        return f"sporttery-{text}"
+    return None
+
+
 def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_recommendation=None,
-                       single_pick=None, evidence_audit=None, consensus_gate=None):
+                       single_pick=None, evidence_audit=None, consensus_gate=None, match=None):
     """Build the successful per-match JSON audit payload without calling an LLM."""
     if aggregation.get("error"):
         raise ValueError("cannot audit a failed aggregation")
     record = dict(aggregation)
+    if match:
+        record["match_id"] = _normalize_match_id(match.get("match_id"))
+        record["match_num"] = match.get("match_num")
+        record["home"] = match.get("home")
+        record["away"] = match.get("away")
+        record["kickoff"] = match.get("kickoff_iso") or match.get("kickoff")
+        record["league"] = match.get("league")
     record.update({
         "individual": fp.standardize_individual_predictions(
             aggregation.get("individual", {}), models_used
@@ -1076,6 +1097,7 @@ def main():
             agg, voter_models, voter_prompt, evidence_status,
             ev_recommendation=ev_rec, single_pick=sp,
             evidence_audit=evidence_audit, consensus_gate=consensus_gate,
+            match=m,
         ), ensure_ascii=False))
         print()
 

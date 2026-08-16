@@ -8,3 +8,4 @@ def test_daily_pipeline_has_no_legacy_suite_write_defaults():
     assert "backtest_store()" in text
     assert "odds_store()" in text
     assert "forward_work_dir()" in text
+    assert "collect_late_info.py" in text

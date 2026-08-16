@@ -16,13 +16,84 @@ from statistics import mean
 from typing import Any
 
 BIG5 = {"英超": "EPL", "西甲": "La_liga", "意甲": "Serie_A", "德甲": "Bundesliga", "法甲": "Ligue_1"}
+# 值可以是 league_id，或带 provider/league_name 的字典。
+# 沙职 api-sports 307 与瑞超 apifootball 307 撞号，必须用 provider/联赛名拆开。
 GOALS_ONLY = {
     "荷甲": 244, "Eredivisie": 244,
     "葡超": 266, "Primeira Liga": 266,
     "土超": 322, "Super Lig": 322, "Süper Lig": 322,
-    "苏格兰超": 279, "苏格兰 Premiership": 279, "Scottish Premiership": 279,
+    "苏格兰超": 279, "苏超": 279, "苏格兰 Premiership": 279, "Scottish Premiership": 279,
     "瑞士超": 308, "瑞士 Super League": 308, "Swiss Super League": 308,
-    "挪超": 253, "Eliteserien": 253,
+    "挪超": {"league_id": 253, "provider": "apifootball.com", "league_name_contains": "Eliteserien"},
+    "Eliteserien": {"league_id": 253, "provider": "apifootball.com", "league_name_contains": "Eliteserien"},
+    "芬超": 352, "Veikkausliiga": 352,
+    "瑞超": {"league_id": 307, "provider": "apifootball.com", "league_name_contains": "Allsvenskan"},
+    "Allsvenskan": {"league_id": 307, "provider": "apifootball.com", "league_name_contains": "Allsvenskan"},
+    "沙职": {"league_id": 307, "provider": "api-sports.io", "league_name_contains": "Pro League"},
+    "韩职": 292, "K League 1": 292,
+    "日职": 98, "J1 League": 98,
+    "巴甲": "BRA", "巴西甲": "BRA",
+    "英冠": "E1", "Championship": "E1",
+    "法乙": "F2", "Ligue 2": "F2",
+    "比甲": 63, "First Division A": 63,
+    "奥超": 56,
+    "波甲": 259, "Ekstraklasa": 259,
+    "丹超": 135, "Superliga": 135,
+    "希超": 178,
+    "欧冠": 3, "欧冠杯": 3, "UEFA Champions League": 3, "Champions League": 3,
+    "欧罗巴": 4, "欧联": 4, "欧罗巴联赛": 4, "UEFA Europa League": 4, "Europa League": 4,
+    "欧协联": 683, "欧协": 683, "UEFA Europa Conference League": 683,
+    "UEFA Conference League": 683, "Conference League": 683,
+    "欧超杯": {"league_ids": [372, 531], "league_name_contains": "Super Cup"},
+    "UEFA Super Cup": {"league_ids": [372, 531], "league_name_contains": "Super Cup"},
+    "世界杯": 28, "World Cup": 28,
+    "世预赛": {"league_ids": [24, 32], "league_name_contains": "World Cup - Qualification"},
+    "解放者杯": 13, "CONMEBOL Libertadores": 13, "Copa Libertadores": 13,
+    "南美杯": 11, "CONMEBOL Sudamericana": 11,
+    "亚冠精英": 17, "亚冠": 17, "AFC Champions League Elite": 17, "AFC Champions League": 17,
+    "亚冠乙": 18, "AFC Champions League Two": 18,
+    "阿甲": "ARG", "阿根廷甲": "ARG", "Liga Profesional Argentina": "ARG",
+    "美职": {"league_ids": [253, "USA"], "league_name_contains": "Major League Soccer"},
+    "MLS": {"league_ids": [253, "USA"], "league_name_contains": "Major League Soccer"},
+    "荷乙": {"league_ids": [89, 245], "league_name_contains": "Eerste"},
+    "Eerste Divisie": {"league_ids": [89, 245], "league_name_contains": "Eerste"},
+    "日乙": 99, "J2 League": 99,
+    "德乙": {"league_ids": [79, 176, "D2"], "league_name_contains": "2. Bundesliga"},
+    "澳超": 188, "A-League": 188,
+    "英甲": {"league_ids": [41, "E2"]},
+    "英社区盾": 528, "Community Shield": 528,
+    "中超": 169,
+    "捷甲": 134, "捷克甲": 134,
+    "克亚": 124, "克罗地亚甲": 124,
+    "匈甲": 191,
+    "罗甲": 272,
+    "俄超": 344,
+    "白俄超": 61,
+    "波黑甲": 71,
+    "保超": {"league_ids": [111, 172]}, "保甲": {"league_ids": [111, 172]},
+    "塞浦甲": {"league_ids": [130, 318]},
+    "塞超": {"league_ids": [288, 286]},
+    "乌超": {"league_ids": [325, 333]},
+    "爱沙超": 156,
+    "冰岛甲": 395,
+    "以超": 202,
+    "以甲": 201,
+    "爱超": 200,
+    "拉脱维亚甲": 222,
+    "立甲": 226,
+    "卢森堡甲": 228,
+    "摩超": 237,
+    "黑山甲": 398,
+    "斯洛伐克超": 293,
+    "斯洛文尼亚甲": 296,
+    "英足总杯": {"league_ids": [45, 146]},
+    "英联赛杯": 48,
+    "西国王杯": 143,
+    "意大利杯": 137,
+    "德国杯": 81,
+    "法国杯": {"league_ids": [66, 147]},
+    "荷兰杯": {"league_ids": [90, 246]},
+    "非洲杯": 6,
 }
 
 _ALIAS_CONFIG = Path(__file__).resolve().parent.parent / "config" / "intl_odds_sources.json"
@@ -130,21 +201,109 @@ def _event_time(row: dict) -> datetime | None:
     return _dt(row.get("kickoff") or row.get("date"))
 
 
-def _rolling_goals(events: list[dict], home: str, away: str, kickoff: datetime, league_id: int, min_history: int) -> dict | None:
+def _event_score(row: dict) -> tuple[int, int] | None:
+    actual = row.get("actual")
+    if isinstance(actual, (list, tuple)) and len(actual) == 2:
+        try:
+            return int(actual[0]), int(actual[1])
+        except (TypeError, ValueError):
+            return None
+    for home_key, away_key in (
+        ("score_home", "score_away"),
+        ("home_goals", "away_goals"),
+        ("gh", "ga"),
+    ):
+        if row.get(home_key) is None or row.get(away_key) is None:
+            continue
+        try:
+            return int(row[home_key]), int(row[away_key])
+        except (TypeError, ValueError):
+            return None
+    return None
+
+
+def _league_spec(spec: Any) -> dict:
+    if isinstance(spec, dict):
+        return spec
+    return {"league_id": spec}
+
+
+def _event_in_league(row: dict, spec: Any) -> bool:
+    cfg = _league_spec(spec)
+    targets = cfg.get("league_ids")
+    if targets is None and cfg.get("league_id") is not None:
+        targets = [cfg["league_id"]]
+    row_id = row.get("league_id")
+    if targets is not None and row_id is not None:
+        allowed = {str(item).strip() for item in targets}
+        if str(row_id).strip() not in allowed:
+            return False
+    provider = cfg.get("provider")
+    needle = str(cfg.get("league_name_contains") or "").casefold()
+    if provider:
+        row_provider = str(row.get("provider") or "")
+        row_name = str(row.get("league_name") or row.get("league") or "")
+        if row_provider:
+            if row_provider != provider:
+                return False
+        elif needle:
+            if needle not in row_name.casefold():
+                return False
+        else:
+            return False
+    elif needle:
+        row_name = str(row.get("league_name") or row.get("league") or "")
+        if needle not in row_name.casefold():
+            return False
+    return True
+
+
+def load_event_rows(path: str | Path | None) -> list[dict]:
+    """Load Finished-capable event rows from a JSON/JSONL file or a directory of *_events.jsonl."""
+    if not path:
+        return []
+    text = str(path)
+    candidate = Path(text)
+    if ("," in text) and not candidate.exists():
+        rows: list[dict] = []
+        for part in text.split(","):
+            rows.extend(load_event_rows(part.strip()))
+        return rows
+    if not candidate.exists():
+        return []
+    if candidate.is_dir():
+        rows = []
+        files = sorted(candidate.glob("*_events.jsonl")) + sorted(candidate.glob("*_events.json"))
+        for file_path in files:
+            rows.extend(load_event_rows(file_path))
+        return rows
+    raw = candidate.read_text(encoding="utf-8-sig")
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError:
+        return [json.loads(line) for line in raw.splitlines() if line.strip()]
+    if isinstance(value, list):
+        return value
+    if isinstance(value, dict):
+        return value.get("events") or value.get("matches") or []
+    return []
+
+
+def _rolling_goals(events: list[dict], home: str, away: str, kickoff: datetime, spec: Any, min_history: int) -> dict | None:
     eligible = []
     for row in events:
         when = _event_time(row)
         if not when or when >= kickoff:
             continue
-        if row.get("league_id") is not None and int(row["league_id"]) != int(league_id):
+        if not _event_in_league(row, spec):
             continue
         if str(row.get("status", "")).lower() != "finished":
             continue
         if any(_same_team(row.get(side), target) for side in ("home", "away") for target in (home, away)):
-            try:
-                hs, aws = int(row["score_home"]), int(row["score_away"])
-            except (KeyError, TypeError, ValueError):
+            score = _event_score(row)
+            if score is None:
                 continue
+            hs, aws = score
             eligible.append((row, hs, aws))
     home_for, home_against, away_for, away_against = [], [], [], []
     for row, hs, aws in eligible:

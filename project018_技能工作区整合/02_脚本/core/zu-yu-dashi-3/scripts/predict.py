@@ -1008,6 +1008,27 @@ def predict(d):
         # multi_fit λ 已由盘口联合拟合得到，不得再打 PROXY_XG（那是启发式 market_lam 路径标签）。
     else:
         lh, la, tags = build_lambdas(d, total, market, elo, explicit, mode)
+    # 无独立锚不得把中性 λ=1.23/1.23 写成生产 1X2（43 场低依赖审计：36 场是这条回退）。
+    # 有可用市场就钉回 market_only；没有可用市场就拒绝，不输出 37.4/25.3/37.4。
+    forced_market_from_no_anchor = False
+    if "NO_ANCHOR_FALLBACK" in tags:
+        if market:
+            mode = "market_only"
+            forced_market_from_no_anchor = True
+        else:
+            return {
+                "status": "no_independent_anchor",
+                "schema_version": "3.3",
+                "engine_version": ENGINE_VERSION,
+                "match": f"{d['home']} vs {d['away']}",
+                "mode": requested_mode or mode,
+                "requested_mode": requested_mode,
+                "xg_tags": tags,
+                "errors": [
+                    "NO_ANCHOR_FALLBACK cannot be used as production 1X2; "
+                    "need paired Elo/lambda or a usable HAD"
+                ],
+            }
     m = matrix(lh, la, rho)
     pure = one(m)
 
@@ -1042,6 +1063,10 @@ def predict(d):
     goal_total_used = not (multi_fit or market_solver_used)
 
     flags = []
+    if forced_market_from_no_anchor:
+        flags.append(
+            "NO_ANCHOR_FORCE_MARKET: 无独立强度锚，禁止 model_first 无锚 1X2；已钉回 market_only。"
+        )
     lambda_audit = audit_lambda_and_clean_sheet(lh, la, m)
     if lambda_guard:
         flags.append(

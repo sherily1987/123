@@ -6,7 +6,20 @@
     "索列夫": "Levski Sofia",
     "索菲亚列夫斯基": "Levski Sofia",
     "巴黎圣日尔曼": "PSG",
-    "巴黎圣曼": "PSG"
+    "巴黎圣曼": "PSG",
+    "吉达联合": "Al-Ittihad FC",
+    "拉斯永恒": "Al Kholood",
+    "拉斯决心": "Al-Hazm",
+    "穆拜征服": "Al-Fateh",
+    "穆拜赖兹征服": "Al-Fateh",
+    "达曼协定": "Al-Ettifaq",
+    "迈季宽广": "Al-Fayha",
+    "迈季迈阿宽广": "Al-Fayha",
+    "利雅胜利": "Al-Nassr",
+    "利雅得胜利": "Al-Nassr",
+    "布赖合作": "Al Taawon",
+    "布赖代合作": "Al Taawon",
+    "赛哈海湾": "Al Khaleej Saihat"
   },
   "evidence": [
     {
@@ -31,6 +44,21 @@
       "provider_home": "PSG",
       "provider_league": "ligue_1",
       "note": "体彩全称与简称均指向同一场欧超杯对阵；本地 ligue_1 模型球队名为 PSG，别名表原有 slug parissg 归一化后不等于 psg，故显式登记"
+    },
+    {
+      "verified_at": "2026-08-16",
+      "source": "sporttery_all_leagues_history_2026.json kickoff == saudi_pro_league_events.jsonl kickoff",
+      "pairs": [
+        ["吉达联合", "Al-Ittihad FC"],
+        ["拉斯永恒", "Al Kholood"],
+        ["拉斯决心", "Al-Hazm"],
+        ["穆拜征服", "Al-Fateh"],
+        ["达曼协定", "Al-Ettifaq"],
+        ["迈季宽广", "Al-Fayha"],
+        ["利雅胜利", "Al-Nassr"],
+        ["布赖合作", "Al Taawon"],
+        ["赛哈海湾", "Al Khaleej Saihat"]
+      ]
     }
   ],
   "rule": "Only verified aliases may be added; fuzzy names never auto-settle."

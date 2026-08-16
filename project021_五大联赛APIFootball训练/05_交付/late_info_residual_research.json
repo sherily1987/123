@@ -1,0 +1,207 @@
+{
+  "schema": "late-info-residual-1.0",
+  "research_only": true,
+  "production_unchanged": "MARKET_BASELINE market_only; SCORE_MODEL=bp; no fusion retune",
+  "ran_at": "2026-08-16T15:43:37",
+  "protocol": {
+    "gate": "odds_snapshot < injury_fetched_at < kickoff",
+    "injury_source": "sporttery getInjurySuspensionV1 preview",
+    "lineup_source": "fusion api_features.lineups_status",
+    "adjustment": "predict.apply_fact_adjustments on market-inverted lambda",
+    "min_test": 200,
+    "coefficients": "UNFITTED position_and_start_rate_heuristic"
+  },
+  "inventory": {
+    "preview_files": [
+      "F:\\HM足球比赛预测\\project001_足球预测\\05_交付\\2026-08-04_4场\\preview.json",
+      "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\forward\\2026-08-02\\preview.json",
+      "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\forward\\2026-08-02\\hybrid_input.json"
+    ],
+    "preview_matches": 12,
+    "with_absence": 4,
+    "lineups": {
+      "files": 66,
+      "VALID": 0,
+      "POST_MATCH_NOT_USABLE": 0,
+      "NOT_ATTACHED": 34,
+      "MISSING": 0,
+      "other": 0
+    }
+  },
+  "skipped": [
+    {
+      "match_id": 2040701,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040702,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040703,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040704,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040706,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040700,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040706,
+      "reason": "zero_absence"
+    },
+    {
+      "match_id": 2040700,
+      "reason": "zero_absence"
+    }
+  ],
+  "residual": {
+    "n": 2,
+    "market": {
+      "n": 2,
+      "brier": 0.352352,
+      "log_loss": 0.662543,
+      "accuracy_pct": 100.0
+    },
+    "adjusted": {
+      "n": 2,
+      "brier": 0.370128,
+      "log_loss": 0.686182,
+      "accuracy_pct": 100.0
+    },
+    "delta_log_loss": -0.023639,
+    "delta_brier": -0.017776,
+    "adopt_over_market": false,
+    "adopt_reason": "too_small",
+    "later_market": {
+      "n": 2,
+      "brier": 0.377715,
+      "log_loss": 0.695997,
+      "accuracy_pct": 100.0
+    },
+    "clv_n": 2
+  },
+  "ungated_contrast": {
+    "n": 0,
+    "adopt_over_market": false,
+    "adopt_reason": "too_small"
+  },
+  "residual_matches": [
+    {
+      "match_id": 2040688,
+      "home": "蔚山现代",
+      "away": "安养FC",
+      "actual": [
+        3,
+        1
+      ],
+      "y": 0,
+      "info_at": "2026-08-02T03:42:37.123700+00:00",
+      "odds_at": "2026-08-02T02:44:44+00:00",
+      "kickoff": "2026-08-02T10:30:00+00:00",
+      "hours_after_odds": 0.96,
+      "absence": {
+        "attack_absence_home": 0.0375,
+        "attack_absence_away": 0.0,
+        "defense_absence_home": 0.0225,
+        "defense_absence_away": 0.0,
+        "gk_absence_home": 0.0,
+        "gk_absence_away": 0.0
+      },
+      "late": true,
+      "market": {
+        "p": [
+          0.50479,
+          0.246382,
+          0.248828
+        ],
+        "brier": 0.367853,
+        "log_loss": 0.683613,
+        "pick": 0
+      },
+      "adjusted": {
+        "p": [
+          0.485214,
+          0.251433,
+          0.263354
+        ],
+        "brier": 0.397579,
+        "log_loss": 0.723166,
+        "pick": 0
+      },
+      "later": {
+        "p": [
+          0.495825,
+          0.246616,
+          0.25756
+        ],
+        "brier": 0.381349,
+        "log_loss": 0.701533,
+        "pick": 0
+      },
+      "later_at": "2026-08-02T04:31:05+00:00"
+    },
+    {
+      "match_id": 2040699,
+      "home": "布兰",
+      "away": "罗森博格",
+      "actual": [
+        3,
+        2
+      ],
+      "y": 0,
+      "info_at": "2026-08-02T03:42:37.123700+00:00",
+      "odds_at": "2026-08-01T01:41:45+00:00",
+      "kickoff": "2026-08-02T17:15:00+00:00",
+      "hours_after_odds": 26.01,
+      "absence": {
+        "attack_absence_home": 0.01,
+        "attack_absence_away": 0.0,
+        "defense_absence_home": 0.0,
+        "defense_absence_away": 0.0,
+        "gk_absence_home": 0.0,
+        "gk_absence_away": 0.0
+      },
+      "late": true,
+      "market": {
+        "p": [
+          0.526517,
+          0.219841,
+          0.253642
+        ],
+        "brier": 0.336851,
+        "log_loss": 0.641472,
+        "pick": 0
+      },
+      "adjusted": {
+        "p": [
+          0.522464,
+          0.221209,
+          0.256327
+        ],
+        "brier": 0.342677,
+        "log_loss": 0.649198,
+        "pick": 0
+      },
+      "later": {
+        "p": [
+          0.501345,
+          0.225919,
+          0.272737
+        ],
+        "brier": 0.374082,
+        "log_loss": 0.690461,
+        "pick": 0
+      },
+      "later_at": "2026-08-02T08:24:18+00:00"
+    }
+  ],
+  "ungated_matches": []
+}

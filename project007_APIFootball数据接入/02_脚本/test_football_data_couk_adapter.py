@@ -119,3 +119,10 @@ def test_download_league_writes_prematch_safe_events(tmp_path, monkeypatch):
 def test_download_league_rejects_unknown_code(tmp_path):
     with pytest.raises(SystemExit):
         fd.download_league("ZZZ", tmp_path)
+
+
+def test_second_tier_codes_are_registered():
+    assert "D2" in fd.MMZ_FORMAT
+    assert fd.MMZ_FORMAT["D2"] == "Germany 2. Bundesliga"
+    assert "USA" in fd.NEW_FORMAT
+    assert fd.NEW_FORMAT["USA"] == "Major League Soccer"

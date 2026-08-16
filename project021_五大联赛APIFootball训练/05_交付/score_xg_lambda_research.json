@@ -1,0 +1,802 @@
+{
+  "schema": "score-xg-lambda-research-1.0",
+  "research_only": true,
+  "production_unchanged": "SCORE_MODEL=bp SCORE_LAMBDA3=0.05 SCORE_TEMPERATURE_FT=1.30",
+  "ran_at": "2026-08-16T15:31:34",
+  "protocol": {
+    "lambda_market": "1X2 invert",
+    "lambda_xg": "walk_forward proxy_xg team_strength",
+    "step_days": 30,
+    "half_life": 500.0,
+    "min_train": 200,
+    "blend_weight": 0.4,
+    "scale_grid": [
+      0.8,
+      0.9,
+      1.0,
+      1.1,
+      1.2
+    ],
+    "real_xg": "unavailable_in_project021",
+    "same_match_xg": "oracle_leaked_only"
+  },
+  "groups": {
+    "big5": {
+      "slugs": [
+        "premier_league",
+        "la_liga",
+        "bundesliga",
+        "serie_a",
+        "ligue_1"
+      ],
+      "files": [
+        "premier_league_events_provider_market.jsonl",
+        "la_liga_events_provider_market.jsonl",
+        "bundesliga_events_provider_market.jsonl",
+        "serie_a_events_provider_market.jsonl",
+        "ligue_1_events_provider_market.jsonl"
+      ],
+      "status": "ok",
+      "n_market_eval": 5984,
+      "paired_n": 5944,
+      "train_n": 4149,
+      "test_n": 1795,
+      "first_day": "2022-10-01",
+      "last_day": "2026-05-25",
+      "split_day": "2025-05-04",
+      "coverage": [
+        {
+          "slug": "premier_league",
+          "status": "ok",
+          "finished": 1908,
+          "market": 1329,
+          "xg_rows": 1795,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9418,
+          "walked": 1319,
+          "refits": 36
+        },
+        {
+          "slug": "la_liga",
+          "status": "ok",
+          "finished": 1912,
+          "market": 1273,
+          "xg_rows": 1792,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9372,
+          "walked": 1270,
+          "refits": 39
+        },
+        {
+          "slug": "bundesliga",
+          "status": "ok",
+          "finished": 1553,
+          "market": 1062,
+          "xg_rows": 1432,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9227,
+          "walked": 1051,
+          "refits": 37
+        },
+        {
+          "slug": "serie_a",
+          "status": "ok",
+          "finished": 1901,
+          "market": 1289,
+          "xg_rows": 1790,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9416,
+          "walked": 1280,
+          "refits": 39
+        },
+        {
+          "slug": "ligue_1",
+          "status": "ok",
+          "finished": 1682,
+          "market": 1031,
+          "xg_rows": 1591,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9465,
+          "walked": 1024,
+          "refits": 37
+        }
+      ],
+      "refits": 188,
+      "sources": {
+        "market": {
+          "scale": 1.0,
+          "scale_selected_on": "fixed_1",
+          "train_scale_pick": null,
+          "train": {
+            "n": 4149,
+            "score_log_loss": 2.92367,
+            "top1_acc_pct": 11.88,
+            "top3_acc_pct": 31.91,
+            "zero_zero": {
+              "n": 256,
+              "score_log_loss": 2.28774,
+              "mean_p00": 0.1049
+            },
+            "blowout_3plus": {
+              "n": 1339,
+              "score_log_loss": 3.82452,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 1795,
+            "score_log_loss": 2.89616,
+            "top1_acc_pct": 11.92,
+            "top3_acc_pct": 33.54,
+            "zero_zero": {
+              "n": 111,
+              "score_log_loss": 2.22189,
+              "mean_p00": 0.1115
+            },
+            "blowout_3plus": {
+              "n": 567,
+              "score_log_loss": 3.77154,
+              "mean_p00": null
+            }
+          }
+        },
+        "goals": {
+          "scale": 1.0,
+          "scale_selected_on": "fixed_1",
+          "train_scale_pick": null,
+          "train": {
+            "n": 4149,
+            "score_log_loss": 2.96473,
+            "top1_acc_pct": 12.56,
+            "top3_acc_pct": 33.26,
+            "zero_zero": {
+              "n": 256,
+              "score_log_loss": 2.69143,
+              "mean_p00": 0.0734
+            },
+            "blowout_3plus": {
+              "n": 1339,
+              "score_log_loss": 3.66488,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 1795,
+            "score_log_loss": 2.93875,
+            "top1_acc_pct": 12.48,
+            "top3_acc_pct": 32.31,
+            "zero_zero": {
+              "n": 111,
+              "score_log_loss": 2.62326,
+              "mean_p00": 0.0792
+            },
+            "blowout_3plus": {
+              "n": 567,
+              "score_log_loss": 3.61878,
+              "mean_p00": null
+            }
+          }
+        },
+        "xg": {
+          "scale": 0.9,
+          "scale_selected_on": "train",
+          "train_scale_pick": {
+            "scale": 0.9,
+            "n": 4149,
+            "score_log_loss": 2.967,
+            "top1_acc_pct": 13.14,
+            "top3_acc_pct": 31.53
+          },
+          "train": {
+            "n": 4149,
+            "score_log_loss": 2.967,
+            "top1_acc_pct": 13.14,
+            "top3_acc_pct": 31.53,
+            "zero_zero": {
+              "n": 256,
+              "score_log_loss": 2.584,
+              "mean_p00": 0.0776
+            },
+            "blowout_3plus": {
+              "n": 1339,
+              "score_log_loss": 3.80994,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 1795,
+            "score_log_loss": 2.93235,
+            "top1_acc_pct": 12.42,
+            "top3_acc_pct": 32.48,
+            "zero_zero": {
+              "n": 111,
+              "score_log_loss": 2.55551,
+              "mean_p00": 0.0791
+            },
+            "blowout_3plus": {
+              "n": 567,
+              "score_log_loss": 3.73779,
+              "mean_p00": null
+            }
+          }
+        },
+        "blend": {
+          "scale": 0.9,
+          "scale_selected_on": "train",
+          "train_scale_pick": {
+            "scale": 0.9,
+            "n": 4149,
+            "score_log_loss": 2.94705,
+            "top1_acc_pct": 12.56,
+            "top3_acc_pct": 32.22
+          },
+          "train": {
+            "n": 4149,
+            "score_log_loss": 2.94705,
+            "top1_acc_pct": 12.56,
+            "top3_acc_pct": 32.22,
+            "zero_zero": {
+              "n": 256,
+              "score_log_loss": 2.50377,
+              "mean_p00": 0.0854
+            },
+            "blowout_3plus": {
+              "n": 1339,
+              "score_log_loss": 3.78021,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 1795,
+            "score_log_loss": 2.91772,
+            "top1_acc_pct": 12.76,
+            "top3_acc_pct": 32.14,
+            "zero_zero": {
+              "n": 111,
+              "score_log_loss": 2.45577,
+              "mean_p00": 0.0895
+            },
+            "blowout_3plus": {
+              "n": 567,
+              "score_log_loss": 3.7211,
+              "mean_p00": null
+            }
+          }
+        },
+        "oracle_same_match_xg": {
+          "leaked": true,
+          "scale": 1.0,
+          "n_train": 3979,
+          "n_test": 1769,
+          "train": {
+            "n": 3979,
+            "score_log_loss": 3.00414,
+            "top1_acc_pct": 11.31,
+            "top3_acc_pct": 31.14,
+            "zero_zero": {
+              "n": 249,
+              "score_log_loss": 2.6314,
+              "mean_p00": 0.0927
+            },
+            "blowout_3plus": {
+              "n": 1270,
+              "score_log_loss": 3.63538,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 1769,
+            "score_log_loss": 2.96439,
+            "top1_acc_pct": 12.21,
+            "top3_acc_pct": 32.28,
+            "zero_zero": {
+              "n": 106,
+              "score_log_loss": 2.61167,
+              "mean_p00": 0.0881
+            },
+            "blowout_3plus": {
+              "n": 558,
+              "score_log_loss": 3.53854,
+              "mean_p00": null
+            }
+          }
+        }
+      },
+      "best_honest": "blend",
+      "adopt_over_market": false,
+      "adopt_reason": "keep_market_lambda"
+    },
+    "nordic": {
+      "slugs": [
+        "norway_eliteserien",
+        "sweden_allsvenskan",
+        "finland_veikkausliiga"
+      ],
+      "files": [
+        "norway_eliteserien_events_provider_market.jsonl",
+        "sweden_allsvenskan_events_provider_market.jsonl",
+        "finland_veikkausliiga_events_provider_market.jsonl"
+      ],
+      "status": "ok",
+      "n_market_eval": 2177,
+      "paired_n": 1957,
+      "train_n": 1355,
+      "test_n": 602,
+      "first_day": "2022-11-14",
+      "last_day": "2026-06-28",
+      "split_day": "2025-06-15",
+      "coverage": [
+        {
+          "slug": "norway_eliteserien",
+          "status": "ok",
+          "finished": 1226,
+          "market": 795,
+          "xg_rows": 1162,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9478,
+          "walked": 781,
+          "refits": 31
+        },
+        {
+          "slug": "sweden_allsvenskan",
+          "status": "ok",
+          "finished": 1226,
+          "market": 796,
+          "xg_rows": 1154,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 0.9413,
+          "walked": 785,
+          "refits": 30
+        },
+        {
+          "slug": "finland_veikkausliiga",
+          "status": "ok",
+          "finished": 867,
+          "market": 586,
+          "xg_rows": 316,
+          "xg_basis": "shots_on_target",
+          "xg_plan_share": 0.3645,
+          "walked": 577,
+          "refits": 28
+        }
+      ],
+      "refits": 89,
+      "sources": {
+        "market": {
+          "scale": 1.0,
+          "scale_selected_on": "fixed_1",
+          "train_scale_pick": null,
+          "train": {
+            "n": 1355,
+            "score_log_loss": 2.98462,
+            "top1_acc_pct": 10.7,
+            "top3_acc_pct": 28.63,
+            "zero_zero": {
+              "n": 75,
+              "score_log_loss": 2.37075,
+              "mean_p00": 0.0952
+            },
+            "blowout_3plus": {
+              "n": 469,
+              "score_log_loss": 3.83477,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 602,
+            "score_log_loss": 3.05105,
+            "top1_acc_pct": 10.13,
+            "top3_acc_pct": 30.07,
+            "zero_zero": {
+              "n": 27,
+              "score_log_loss": 2.42101,
+              "mean_p00": 0.0904
+            },
+            "blowout_3plus": {
+              "n": 240,
+              "score_log_loss": 3.8331,
+              "mean_p00": null
+            }
+          }
+        },
+        "goals": {
+          "scale": 1.0,
+          "scale_selected_on": "fixed_1",
+          "train_scale_pick": null,
+          "train": {
+            "n": 1355,
+            "score_log_loss": 3.05876,
+            "top1_acc_pct": 9.89,
+            "top3_acc_pct": 28.93,
+            "zero_zero": {
+              "n": 75,
+              "score_log_loss": 2.75443,
+              "mean_p00": 0.0679
+            },
+            "blowout_3plus": {
+              "n": 469,
+              "score_log_loss": 3.72236,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 602,
+            "score_log_loss": 3.16051,
+            "top1_acc_pct": 10.8,
+            "top3_acc_pct": 29.57,
+            "zero_zero": {
+              "n": 27,
+              "score_log_loss": 2.90265,
+              "mean_p00": 0.0578
+            },
+            "blowout_3plus": {
+              "n": 240,
+              "score_log_loss": 3.82366,
+              "mean_p00": null
+            }
+          }
+        },
+        "xg": {
+          "scale": 0.9,
+          "scale_selected_on": "train",
+          "train_scale_pick": {
+            "scale": 0.9,
+            "n": 1355,
+            "score_log_loss": 3.04138,
+            "top1_acc_pct": 10.41,
+            "top3_acc_pct": 28.12
+          },
+          "train": {
+            "n": 1355,
+            "score_log_loss": 3.04138,
+            "top1_acc_pct": 10.41,
+            "top3_acc_pct": 28.12,
+            "zero_zero": {
+              "n": 75,
+              "score_log_loss": 2.5482,
+              "mean_p00": 0.081
+            },
+            "blowout_3plus": {
+              "n": 469,
+              "score_log_loss": 3.85459,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 602,
+            "score_log_loss": 3.20204,
+            "top1_acc_pct": 10.96,
+            "top3_acc_pct": 28.9,
+            "zero_zero": {
+              "n": 27,
+              "score_log_loss": 2.5345,
+              "mean_p00": 0.0893
+            },
+            "blowout_3plus": {
+              "n": 240,
+              "score_log_loss": 4.07995,
+              "mean_p00": null
+            }
+          }
+        },
+        "blend": {
+          "scale": 0.9,
+          "scale_selected_on": "train",
+          "train_scale_pick": {
+            "scale": 0.9,
+            "n": 1355,
+            "score_log_loss": 3.02533,
+            "top1_acc_pct": 10.26,
+            "top3_acc_pct": 27.82
+          },
+          "train": {
+            "n": 1355,
+            "score_log_loss": 3.02533,
+            "top1_acc_pct": 10.26,
+            "top3_acc_pct": 27.82,
+            "zero_zero": {
+              "n": 75,
+              "score_log_loss": 2.51971,
+              "mean_p00": 0.083
+            },
+            "blowout_3plus": {
+              "n": 469,
+              "score_log_loss": 3.82503,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 602,
+            "score_log_loss": 3.16333,
+            "top1_acc_pct": 9.47,
+            "top3_acc_pct": 28.57,
+            "zero_zero": {
+              "n": 27,
+              "score_log_loss": 2.56886,
+              "mean_p00": 0.08
+            },
+            "blowout_3plus": {
+              "n": 240,
+              "score_log_loss": 4.00611,
+              "mean_p00": null
+            }
+          }
+        },
+        "oracle_same_match_xg": {
+          "leaked": true,
+          "scale": 1.0,
+          "n_train": 1184,
+          "n_test": 452,
+          "train": {
+            "n": 1184,
+            "score_log_loss": 3.03792,
+            "top1_acc_pct": 10.64,
+            "top3_acc_pct": 28.46,
+            "zero_zero": {
+              "n": 66,
+              "score_log_loss": 2.54907,
+              "mean_p00": 0.0966
+            },
+            "blowout_3plus": {
+              "n": 405,
+              "score_log_loss": 3.70629,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 452,
+            "score_log_loss": 3.1384,
+            "top1_acc_pct": 9.29,
+            "top3_acc_pct": 26.55,
+            "zero_zero": {
+              "n": 19,
+              "score_log_loss": 3.00788,
+              "mean_p00": 0.072
+            },
+            "blowout_3plus": {
+              "n": 175,
+              "score_log_loss": 3.60395,
+              "mean_p00": null
+            }
+          }
+        }
+      },
+      "best_honest": "blend",
+      "adopt_over_market": false,
+      "adopt_reason": "keep_market_lambda"
+    },
+    "j1": {
+      "slugs": [
+        "apisports_japan_j1_league"
+      ],
+      "files": [
+        "apisports_japan_j1_league_events_closing_attached.jsonl"
+      ],
+      "status": "ok",
+      "n_market_eval": 992,
+      "paired_n": 777,
+      "train_n": 477,
+      "test_n": 300,
+      "first_day": "2022-07-31",
+      "last_day": "2024-12-08",
+      "split_day": "2024-04-20",
+      "coverage": [
+        {
+          "slug": "apisports_japan_j1_league",
+          "status": "ok",
+          "finished": 992,
+          "market": 992,
+          "xg_rows": 992,
+          "xg_basis": "inside_outside",
+          "xg_plan_share": 1.0,
+          "walked": 777,
+          "refits": 25
+        }
+      ],
+      "refits": 25,
+      "sources": {
+        "market": {
+          "scale": 1.0,
+          "scale_selected_on": "fixed_1",
+          "train_scale_pick": null,
+          "train": {
+            "n": 477,
+            "score_log_loss": 2.86358,
+            "top1_acc_pct": 11.95,
+            "top3_acc_pct": 30.82,
+            "zero_zero": {
+              "n": 41,
+              "score_log_loss": 2.24408,
+              "mean_p00": 0.1095
+            },
+            "blowout_3plus": {
+              "n": 117,
+              "score_log_loss": 3.99927,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 300,
+            "score_log_loss": 2.97976,
+            "top1_acc_pct": 9.67,
+            "top3_acc_pct": 33.0,
+            "zero_zero": {
+              "n": 26,
+              "score_log_loss": 2.18228,
+              "mean_p00": 0.1151
+            },
+            "blowout_3plus": {
+              "n": 93,
+              "score_log_loss": 4.08891,
+              "mean_p00": null
+            }
+          }
+        },
+        "goals": {
+          "scale": 1.0,
+          "scale_selected_on": "fixed_1",
+          "train_scale_pick": null,
+          "train": {
+            "n": 477,
+            "score_log_loss": 2.92375,
+            "top1_acc_pct": 12.37,
+            "top3_acc_pct": 33.33,
+            "zero_zero": {
+              "n": 41,
+              "score_log_loss": 2.56516,
+              "mean_p00": 0.0844
+            },
+            "blowout_3plus": {
+              "n": 117,
+              "score_log_loss": 3.8845,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 300,
+            "score_log_loss": 3.00524,
+            "top1_acc_pct": 13.0,
+            "top3_acc_pct": 28.0,
+            "zero_zero": {
+              "n": 26,
+              "score_log_loss": 2.58703,
+              "mean_p00": 0.0794
+            },
+            "blowout_3plus": {
+              "n": 93,
+              "score_log_loss": 3.8667,
+              "mean_p00": null
+            }
+          }
+        },
+        "xg": {
+          "scale": 0.8,
+          "scale_selected_on": "train",
+          "train_scale_pick": {
+            "scale": 0.8,
+            "n": 477,
+            "score_log_loss": 2.88919,
+            "top1_acc_pct": 9.64,
+            "top3_acc_pct": 29.56
+          },
+          "train": {
+            "n": 477,
+            "score_log_loss": 2.88919,
+            "top1_acc_pct": 9.64,
+            "top3_acc_pct": 29.56,
+            "zero_zero": {
+              "n": 41,
+              "score_log_loss": 2.2295,
+              "mean_p00": 0.1104
+            },
+            "blowout_3plus": {
+              "n": 117,
+              "score_log_loss": 4.15722,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 300,
+            "score_log_loss": 2.98948,
+            "top1_acc_pct": 10.33,
+            "top3_acc_pct": 31.33,
+            "zero_zero": {
+              "n": 26,
+              "score_log_loss": 2.20882,
+              "mean_p00": 0.1113
+            },
+            "blowout_3plus": {
+              "n": 93,
+              "score_log_loss": 4.11996,
+              "mean_p00": null
+            }
+          }
+        },
+        "blend": {
+          "scale": 0.8,
+          "scale_selected_on": "train",
+          "train_scale_pick": {
+            "scale": 0.8,
+            "n": 477,
+            "score_log_loss": 2.88631,
+            "top1_acc_pct": 9.22,
+            "top3_acc_pct": 30.82
+          },
+          "train": {
+            "n": 477,
+            "score_log_loss": 2.88631,
+            "top1_acc_pct": 9.22,
+            "top3_acc_pct": 30.82,
+            "zero_zero": {
+              "n": 41,
+              "score_log_loss": 2.16514,
+              "mean_p00": 0.1194
+            },
+            "blowout_3plus": {
+              "n": 117,
+              "score_log_loss": 4.15235,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 300,
+            "score_log_loss": 2.99699,
+            "top1_acc_pct": 8.67,
+            "top3_acc_pct": 31.33,
+            "zero_zero": {
+              "n": 26,
+              "score_log_loss": 2.16997,
+              "mean_p00": 0.1165
+            },
+            "blowout_3plus": {
+              "n": 93,
+              "score_log_loss": 4.14159,
+              "mean_p00": null
+            }
+          }
+        },
+        "oracle_same_match_xg": {
+          "leaked": true,
+          "scale": 1.0,
+          "n_train": 477,
+          "n_test": 300,
+          "train": {
+            "n": 477,
+            "score_log_loss": 2.88845,
+            "top1_acc_pct": 10.48,
+            "top3_acc_pct": 32.91,
+            "zero_zero": {
+              "n": 41,
+              "score_log_loss": 2.53486,
+              "mean_p00": 0.0918
+            },
+            "blowout_3plus": {
+              "n": 117,
+              "score_log_loss": 3.64286,
+              "mean_p00": null
+            }
+          },
+          "test": {
+            "n": 300,
+            "score_log_loss": 3.00699,
+            "top1_acc_pct": 10.67,
+            "top3_acc_pct": 31.67,
+            "zero_zero": {
+              "n": 26,
+              "score_log_loss": 2.53509,
+              "mean_p00": 0.0939
+            },
+            "blowout_3plus": {
+              "n": 93,
+              "score_log_loss": 3.64898,
+              "mean_p00": null
+            }
+          }
+        }
+      },
+      "best_honest": "xg",
+      "adopt_over_market": false,
+      "adopt_reason": "keep_market_lambda"
+    }
+  }
+}

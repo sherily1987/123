@@ -82,6 +82,14 @@
   应按今日双轨实测同样的方式登记验证。世界杯因赛事间隔过大（每4年一届，两次赛事
   中间3年半空窗）无法用现有滚动重拟合方法论训练，标 `not_trained`，非数据问题。
 
+**统一工单（2026-08-16）**：多智能体只交接 `sporttery-<体彩id>`，不靠数组顺序、不靠销售日+编号。
+量化输出根上带 `match_id`；LLM audit/parsed 带同一 ID；Web 表与 `/api/job` 用同一把钥匙。
+工单文件在 `project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/jobs/<sales_day>/`。
+读写：`python fusion_cli.py job --input match.json --quant out.json` 或 `--match-id sporttery-2040898`。
+影子 hybrid（不开 m4、不登记）：`python fusion_cli.py hybrid-shadow --input raw.json --sales-day YYYY-MM-DD`；赛后 `--score`。结果在工单 `research.hybrid`，`research_only=true`。
+两轨各写 `outputs[]` 一条；`strength` 必须标 `vote_share`，禁止和 `final_1x2_pct` 混列。
+PPT / txt / SQLite 是投影。实现：`scripts/job_ticket.py`。
+
 这三个的内部目录结构（尤其 `02_脚本/core/zu-yu-dashi-3/`、`02_脚本/skill/football-quant-fusion/`）
 被至少 40 处硬编码路径/动态 `importlib` 依赖，**不要改名、不要挪动内部子目录**。
 project018 内部还有一个指向自身 `02_脚本/skill/football-quant-fusion` 的 junction
@@ -93,7 +101,7 @@ project018 内部还有一个指向自身 `02_脚本/skill/football-quant-fusion
   市场锚逻辑）才需要 bump `config/version_manifest.json` 的 `model_version`。
 - 生产预测批次前跑 `python release_lock.py` 锁定发布快照；改概率文件后跑
   `python audit_version_consistency.py` 检测「改了概率但忘了 bump 版本」的违规（非 0 即违规）。
-- **当前 `model_version=m2`**（概率签名 `ceab23711523`，发布锁 2026-08-15T15:33Z）。
+- **当前 `model_version=m3`**（2026-08-16：无锚禁止当生产 1X2）。m2 窗口内登记的样本不并入 m3，除非重放判 equivalent。
   m1 只存活了约两小时：08-15 13:32 UTC 登记的 08-16 那批 34 场签的是 m1，两小时后
   「融合门控与契约一致性修订」改动了 `production_router.py`/`fusion_predict_core.py`
   触发 bump，**m2 的样本从 0 起算，那 34 场 m1 结算后进的是一个不会再增长的队列**。

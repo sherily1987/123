@@ -1,35 +1,34 @@
-赛事：巴甲（体彩官方场次）
+赛事：巴甲
 竞彩编号：周日025
-主队：瓦斯科达伽马（短名达伽马）
-客队：桑托斯（短名桑托斯）
+主队：达伽马（Vasco da Gama）
+客队：桑托斯（Santos FC）
 开球：2026-08-17T03:00:00+08:00
-量化模型档位：B (market)
-收集时刻：2026-08-15T15:17:15+08:00
+收集时刻：2026-08-16T12:30:00+08:00
 
 ## 1. 伤停/阵容
-- 体彩官方接口无伤病/大名单字段，赛前官方首发与伤员名单尚未公布 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未做伤停新闻深度搜索；以赛前官方名单为准。
+- Sports Mole：达伽马缺 Mateus Carvalho（膝）、Carlos Cuesta（肌肉）、Brenner 等，文中称主队缺阵约5人 | source(https://www.sportsmole.co.uk/football/vasco/preview/vasco-vs-santos-prediction-team-news-lineups_603083.html) | collected_at(2026-08-16T12:30:00+08:00)
+- OneFootball：达伽马缺 Brenner、Mateus Carvalho，左闸 Cuiabano 停赛 | source(https://onefootball.com/en/news/vasco-da-gama-v-santos-level-on-points-strugglers-target-lift-from-the-drop-43282639) | collected_at(2026-08-16T12:30:00+08:00)
+- FotMob：达伽马不可用 Cuiabano（停赛）、Carlos Cuesta、Andrés Gómez、Brenner；桑托斯列出 Gabriel Bontempo、Gabriel Menino、Igor Vinícius、Lucas Veríssimo、Moisés、Gustavo Henrique、Vinicius Lira | source(https://www.fotmob.com/matches/santos-fc-vs-vasco-da-gama/2x42tj) | collected_at(2026-08-16T12:30:00+08:00)
+- SportsGambler 伤停表仅列达伽马 Mateus Cocao（膝），桑托斯写“当前无伤停/停赛”——与 FotMob 冲突 | source(https://www.sportsgambler.com/betting-tips/football/vasco-da-gama-vs-santos-prediction-lineups-odds-2026-08-16/) | collected_at(2026-08-16T12:30:00+08:00)
+> 证据缺口：桑托斯伤停两源冲突，不得当作“客队无人缺阵”；官方首发未公布。
 
 ## 2. 战意/动机
-- 本场为竞彩周日025场次，巴甲在售未开球场次之一，开球时间 2026-08-17T03:00:00+08:00 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取教练/球员赛前言论与轮次背景。
+- OneFootball：两队积分接近、处于保级带，本场被写成抢分战 | source(https://onefootball.com/en/news/vasco-da-gama-v-santos-level-on-points-strugglers-target-lift-from-the-drop-43282639) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 3. 近况/状态
-- 量化 Dixon-Coles 模型覆盖标注：巴甲 档位 B (market)（见 full_backtest.json 滚动回测） | source(file://F:/HM足球比赛预测/project021_五大联赛APIFootball训练/05_交付/full_backtest.json) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取双方近 5 场战绩；可上传深度证据覆盖本文件。
+- OneFootball 将双方描述为同分附近的下游球队，需本场提振 | source(https://onefootball.com/en/news/vasco-da-gama-v-santos-level-on-points-strugglers-target-lift-from-the-drop-43282639) | collected_at(2026-08-16T12:30:00+08:00)
+> 证据缺口：近5场比分与 xG 未做官方表列。
 
 ## 4. 主客/旅行/天气
-- 主队 达伽马 主场作战，客队 桑托斯 客场远征（体彩官方对阵口径） | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取天气/旅行距离。
+- 体彩口径达伽马主场 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-16T12:30:00+08:00)
+- wttr.in 里约 2026-08-16 预报多云/局部雨，最高26/最低19 | source(https://wttr.in/Rio+de+Janeiro?format=j1) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 5. 赔率
-- 体彩官方胜平负即时赔率：主1.74/平3.35/客3.9 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-15T15:17:15+08:00)
-- 体彩赔率仅单快照，无初盘→即时异动记录 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：外部盘口（欧赔）未抓取。
+- 体彩官方 HAD：主1.77 / 平3.28 / 客3.85 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 6. 身份核验
-- 体彩官方全名：主队"瓦斯科达伽马"、客队"桑托斯" | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040910) | collected_at(2026-08-15T15:17:15+08:00)
-- 联赛：巴甲（体彩联赛名口径）；开球时间 2026-08-17T03:00:00+08:00 与体彩列表接口一致 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-15T15:17:15+08:00)
+- 体彩 sporttery-2040910 周日025 达伽马 vs 桑托斯，开球 2026-08-17T03:00:00+08:00 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-16T12:30:00+08:00)
+- FotMob 记 Vasco da Gama vs Santos FC | source(https://www.fotmob.com/matches/santos-fc-vs-vasco-da-gama/2x42tj) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 证据缺口
-> 说明：轻量证据自动生成（project023）：①伤停/首发名单未发布且未深度搜索；②双方近况/轮次背景未抓取；③天气/旅行距离未抓取；④外部欧赔未抓取。可上传深度证据覆盖后重跑预测。
+> 桑托斯伤停源冲突；官方首发未公布。

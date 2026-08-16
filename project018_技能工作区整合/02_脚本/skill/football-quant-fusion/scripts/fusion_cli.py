@@ -37,6 +37,9 @@ Supported commands:
   odds-add | odds-drift | odds-intl | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
   version-progress
+  job
+  hybrid-shadow
+  late-info
 """
 
 
@@ -158,6 +161,10 @@ def record_fusion(rest):
     # engine_bundle/prediction_code/config 三个哈希全部落 'unknown'，
     # 导致同版本样本永远无法归入 current cohort（P1-1 根因）。
     core["build_identity"] = wrapped.get("build_identity")
+    if wrapped.get("match_id"):
+        core["match_id"] = wrapped["match_id"]
+    if wrapped.get("match_num"):
+        core["match_num"] = wrapped["match_num"]
     if odds_report is not None:
         core["odds_movement_capture"] = odds_report
     core_path = fusion_output.with_suffix(fusion_output.suffix + ".registry-core.json")
@@ -211,6 +218,21 @@ def main():
         return
     if cmd == "daily-pipeline":
         run_script("fusion_daily_pipeline.py", rest)
+        return
+    if cmd == "job":
+        run_script("job_ticket.py", rest)
+        return
+    if cmd == "hybrid-shadow":
+        # 影子 hybrid：不登记、不开 m4。用法：
+        #   fusion_cli.py hybrid-shadow --input raw.json --sales-day YYYY-MM-DD
+        #   fusion_cli.py hybrid-shadow --score --sales-day YYYY-MM-DD
+        run_script("hybrid_shadow.py", rest)
+        return
+    if cmd == "late-info":
+        # 盘后伤停 + T-75 首发，只写研究库。
+        #   fusion_cli.py late-info --from-collect raw.json
+        #   fusion_cli.py late-info --from-collect raw.json --watch
+        run_script("collect_late_info.py", rest)
         return
     if cmd == "version-progress":
         # 发布窗口期盯样本累积：当前 model_version 已结算/在途场次与门槛距离。

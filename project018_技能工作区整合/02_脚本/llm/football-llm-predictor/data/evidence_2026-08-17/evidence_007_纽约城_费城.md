@@ -1,35 +1,34 @@
-赛事：美职（体彩官方场次）
+赛事：美职
 竞彩编号：周日028
-主队：纽约城（短名纽约城）
-客队：费城联合（短名费城）
+主队：纽约城（New York City FC）
+客队：费城（Philadelphia Union）
 开球：2026-08-17T06:00:00+08:00
-量化模型档位：无模型
-收集时刻：2026-08-15T15:17:15+08:00
+收集时刻：2026-08-16T12:30:00+08:00
 
 ## 1. 伤停/阵容
-- 体彩官方接口无伤病/大名单字段，赛前官方首发与伤员名单尚未公布 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未做伤停新闻深度搜索；以赛前官方名单为准。
+- Philly Soccer Page（2026-08-15）：NYCFC 伤停列出 Maclean Learned、Drew Baiera、Kai Trewin、Aiden O'Neill、Maxi Moralez、Arnau Farnós、Alonso Martinez（均 OUT，腿伤/长伤）；文中写 Trewin 腿伤不打本场、Moralez 伤缺；费城俱乐部伤停栏写 N/A，但同文写 Kai Trewin 是纽约城球员 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
+- SportsGambler：NYCFC 列 Maxi Moralez（十字韧带）、Drew Baiera（膝）、Alonso Martinez（十字韧带）、Jacob Arroyave；费城写无伤停 | source(https://www.sportsgambler.com/betting-tips/football/new-york-city-vs-philadelphia-union-prediction-lineups-odds-2026-08-16/) | collected_at(2026-08-16T12:30:00+08:00)
+- Squawka 预览写双方“未标出缺阵、预期全员”，与上两源冲突，不采用该全员结论 | source(https://www.squawka.com/us/news/mls/match-preview-new-york-city-fc-vs-philadelphia-union-08-16-26-mls/) | collected_at(2026-08-16T12:30:00+08:00)
+> 证据缺口：官方 MLS 伤停报告未直接打开；预测阵容不是官方首发。
 
 ## 2. 战意/动机
-- 本场为竞彩周日028场次，美职在售未开球场次之一，开球时间 2026-08-17T06:00:00+08:00 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取教练/球员赛前言论与轮次背景。
+- Philly Soccer Page：费城东区第13、18场16分，距季后赛区7分，近3个 MLS 场次连胜；NYCFC 东区第5、26分 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
+- 同文：MLS 因联赛杯间歇归来，费城间歇期联赛杯轮换明显 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 3. 近况/状态
-- 量化 Dixon-Coles 模型覆盖标注：美职 档位 无模型（见 full_backtest.json 滚动回测） | source(file://F:/HM足球比赛预测/project021_五大联赛APIFootball训练/05_交付/full_backtest.json) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取双方近 5 场战绩；可上传深度证据覆盖本文件。
+- Philly Soccer Page：3月1日纽约城 2-1 费城（Tayvon Gray 99分钟）；本十年纽约城主场对费城仅1负；近12次交手无平局 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
+- 同文：Nicolás Fernández 本季 18 场首发 13 球，近4个 MLS 场次连续进球；费城本季失 33 球、Blake 17 场 3 零封 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 4. 主客/旅行/天气
-- 主队 纽约城 主场作战，客队 费城 客场远征（体彩官方对阵口径） | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：轻量证据未抓取天气/旅行距离。
+- Ticketmaster / Philly Soccer Page：场地 Yankee Stadium，纽约，当地 8月16日 18:00 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
+- wttr.in New York 2026-08-16 预报晴、最高27/最低23 | source(https://wttr.in/New+York?format=j1) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 5. 赔率
-- 体彩官方胜平负即时赔率：主2.1/平3.45/客2.75 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-15T15:17:15+08:00)
-- 体彩赔率仅单快照，无初盘→即时异动记录 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-15T15:17:15+08:00)
-> 说明：外部盘口（欧赔）未抓取。
+- 体彩官方 HAD：主2.10 / 平3.45 / 客2.75 | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 6. 身份核验
-- 体彩官方全名：主队"纽约城"、客队"费城联合" | source(http://webapi.sporttery.cn/gateway/uniform/fb/getFixedBonusV1.qry?clientCode=3001&matchId=2040913) | collected_at(2026-08-15T15:17:15+08:00)
-- 联赛：美职（体彩联赛名口径）；开球时间 2026-08-17T06:00:00+08:00 与体彩列表接口一致 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-15T15:17:15+08:00)
+- 体彩 sporttery-2040913 周日028 纽约城 vs 费城，开球 2026-08-17T06:00:00+08:00 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at(2026-08-16T12:30:00+08:00)
+- Philly Soccer Page 与 Ticketmaster 均记 NYCFC vs Philadelphia Union、Yankee Stadium、2026-08-16 | source(https://www.ticketmaster.com/new-york-city-fc-vs-philadelphia-bronx-new-york-08-16-2026/event/1D006378DF785067) | collected_at(2026-08-16T12:30:00+08:00)
 
 ## 证据缺口
-> 说明：轻量证据自动生成（project023）：①伤停/首发名单未发布且未深度搜索；②双方近况/轮次背景未抓取；③天气/旅行距离未抓取；④外部欧赔未抓取。可上传深度证据覆盖后重跑预测。
+> 官方首发未公布；NYCFC 伤停媒体名单长度不一致。

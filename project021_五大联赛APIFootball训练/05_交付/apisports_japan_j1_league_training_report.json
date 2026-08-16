@@ -1,0 +1,110 @@
+{
+  "league": {
+    "id": 98,
+    "slug": "apisports_japan_j1_league",
+    "name": "J1 League",
+    "country": "Japan",
+    "kind": "domestic_league",
+    "source": "api-sports.io"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 992,
+    "season_count": 3,
+    "team_id_coverage": 1.0,
+    "team_count": 22,
+    "train_n": 595,
+    "validation_n": 198,
+    "test_n": 199
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\03_模型\\apisports_japan_j1_league_candidate.json",
+  "validation": {
+    "n": 167,
+    "skip": 37,
+    "model": {
+      "n": 167,
+      "brier_mean": 0.652326,
+      "log_loss": 1.079191,
+      "accuracy_pct": 44.91
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 167,
+      "brier_mean": 0.660885,
+      "log_loss": 1.090018,
+      "probs": [
+        0.4128,
+        0.2903,
+        0.297
+      ]
+    },
+    "by_league": {
+      "98": {
+        "n": 167,
+        "model": {
+          "n": 167,
+          "brier_mean": 0.652326,
+          "log_loss": 1.079191,
+          "accuracy_pct": 44.91
+        },
+        "frequency": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 192,
+    "skip": 0,
+    "model": {
+      "n": 192,
+      "brier_mean": 0.665016,
+      "log_loss": 1.095116,
+      "accuracy_pct": 38.02
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 192,
+      "brier_mean": 0.661157,
+      "log_loss": 1.090104,
+      "probs": [
+        0.4037,
+        0.2863,
+        0.31
+      ]
+    },
+    "by_league": {
+      "98": {
+        "n": 192,
+        "model": {
+          "n": 192,
+          "brier_mean": 0.665016,
+          "log_loss": 1.095116,
+          "accuracy_pct": 38.02
+        },
+        "frequency": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}

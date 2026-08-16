@@ -21,7 +21,8 @@
 - **经验**：核心引擎3.4.x 仍有此 bug；fusion 层必须继续兜底，直到核心修复。
 
 ### 1.1b 核心引擎根治（2026-08-02，predict.py）
-- **ZeroDivisionError 根治**：`build_lambdas()` 空锚（市场被新鲜度剔除且无 Elo/显式λ/多市场池）时不再对空 pairs 求和除零，回退中性 λ=GOAL_TOTAL_FALLBACK/2 并打 `NO_ANCHOR_FALLBACK` 标签，交给下游 AVOID_DATA_RISK 处理。
+- **无锚不得当生产 1X2（m3）**：`NO_ANCHOR_FALLBACK` 仍用于避免除零，但 1X2 不得输出 37.4/25.3/37.4。有可用 HAD 钉回 `market_only`；否则 `status=no_independent_anchor`，融合层 `blocked`。43 场低依赖里 36 场是这条回退。
+- **ZeroDivisionError 根治**：`build_lambdas()` 空锚时回退中性 λ 并打 `NO_ANCHOR_FALLBACK`；m3 起该标签不能再进入生产概率。
 - **TypeError 根治**：`multi_fit` 可能为 None（全盘口 OUTDATED/UNKNOWN）时不再无条件解包，改为 None 走 `build_lambdas()` 兜底。
 - 验证：crash1/crash2 复现用例由崩溃改为 `fusion_status=ok + AVOID_DATA_RISK + xg_tags=[NO_ANCHOR_FALLBACK]`；4 场批量输出与修复前**逐字节一致**（149016 字符）；无盘口冒烟一致。核心 py_compile 通过。
 - 融合层 try/except 降级为纯安全网（正常路径不再触发），不删除（保留对未来未知异常的最后防线）。

@@ -1,0 +1,38 @@
+{
+  "schema": "llm-track-index-1.0",
+  "kickoff_date": "2026-08-17",
+  "snapshot": "prematch",
+  "track": "llm",
+  "models": ["zhipu/glm-4-flash", "ark/doubao-seed-evolving"],
+  "auditor": "deepseek/deepseek-chat",
+  "evidence_mode": "agent_web_search_then_predict",
+  "note": "仅登记形成共识方向的场次。其余 7 场审计失败或一票弃权，不写入方向。strength 是票比不是概率。",
+  "records": [
+    {
+      "match_num": "周日024",
+      "match_id": "sporttery-2040909",
+      "match": "腓特烈 vs 克里斯蒂",
+      "league": "挪超",
+      "kickoff": "2026-08-17T01:15:00+08:00",
+      "llm_pick_raw": "主胜/平局",
+      "llm_pick": "双选 主胜/平局（H/D）",
+      "llm_score_picks": [],
+      "strength_pct": 1.0,
+      "caution": true,
+      "action": "skip",
+      "reason": "证据缺口（无官方首发）；比分/大小/半全场弃权；EV 因 market_only 同源不构成推荐",
+      "evidence_file": "llm_evidence/evidence_003_腓特烈_克里斯蒂.md",
+      "llm_log": "project018_技能工作区整合/02_脚本/llm/football-llm-predictor/data/predictions_agent_2026-08-17.log",
+      "result": null
+    }
+  ],
+  "not_registered": [
+    {"match_id": "sporttery-2040907", "match_num": "周日022", "reason": "evidence_audit_failed: audit_unavailable_status_mismatch"},
+    {"match_id": "sporttery-2040908", "match_num": "周日023", "reason": "voter_abstained_or_failed"},
+    {"match_id": "sporttery-2040910", "match_num": "周日025", "reason": "evidence_audit_failed: audit_unavailable_status_mismatch"},
+    {"match_id": "sporttery-2040911", "match_num": "周日026", "reason": "voter_abstained_or_failed"},
+    {"match_id": "sporttery-2040912", "match_num": "周日027", "reason": "voter_abstained_or_failed"},
+    {"match_id": "sporttery-2040913", "match_num": "周日028", "reason": "evidence_audit_failed: audit_unavailable_status_mismatch"},
+    {"match_id": "sporttery-2040914", "match_num": "周一001", "reason": "evidence_audit_failed: audit_unavailable_status_mismatch"}
+  ]
+}

@@ -48,6 +48,8 @@ def test_loads_probabilities_and_marks_market_derived(tmp_path):
                                             [36.3, 30.1, 33.6])])
     got = fps.load_fusion_probabilities(2040898, store=store)
     assert got["probabilities"] == {"主胜": 0.363, "平局": 0.301, "客胜": 0.336}
+    also = fps.load_fusion_probabilities("sporttery-2040898", store=store)
+    assert also["probabilities"] == got["probabilities"]
     assert got["source"] == "fusion-m2-final_1x2_pct"
     assert got["calibration_status"] == "VALID"
     assert got["market_derived"] is True
