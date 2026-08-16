@@ -49,9 +49,99 @@ apifootball.com   → APIkey query 参数（当前会员key）
 ### ⚠️ 韩职/日职数据源真相（2026-08-12 查明）
 
 - **fd_kor_events.jsonl 是坏数据，已隔离**：31 支"球队"全是挪威联赛队名（Molde/Rosenborg/Aalesund…）。根因：football-data.co.uk 的 `new/KOR.csv` 请求被服务器**重定向到 NOR.csv**（该站根本没有韩职文件），当初下载时把挪威数据当韩职入库。已移至 `project021/04_素材/corrupt_data_quarantine/`，README 记录了根因。此前"韩 K1 695 场 +0.0290"回测成绩实为挪威数据，**无效**。
-- **韩职当前无任何可行数据源**：football-data.co.uk 无韩职（KOR.csv→NOR.csv、K1.csv 300 Multiple Choices）；apifootball 套餐无韩职（count=0）；fbref 有 K League 1（comps/55）但 Cloudflare 拦截不可爬（curl/Crawl4AI/Playwright 4 种方式实测全失败）。
+- ~~**韩职当前无任何可行数据源**~~ **已推翻（2026-08-16）**——原结论只排除了三条路：
+  football-data.co.uk 无韩职（KOR.csv→NOR.csv、K1.csv 300 Multiple Choices）；apifootball
+  套餐无韩职（count=0）；fbref 有 K League 1（comps/55）但 Cloudflare 拦截不可爬
+  （2026-08-16 用无头 Chromium 复验仍为 403 人机验证页，**这条不变，且不绕过**）。
+  但另有两条路实测可用，见下「韩职可用源（2026-08-16 实测）」。**注意区分口径**：
+  新增的是赛果/阵容/伤停类证据源，**不是训练数据源**——韩职仍无 xG、无历史赔率整档，
+  训练轨的空缺没有被填上，量化轨口径不变。
 - **日职 fd_jpn 数据正确**：真实 J1 球队（浦和/鹿岛/大阪钢巴等），4523 场 2012-2025，赛果+收盘赔率，与 football-data `new/JPN.csv` 逐场一致；无 xG（走"无 xG"训练路径，实测 +0.0178 跑赢收盘线）。
 - 其余 fd_* 已核验无污染：fd_e1=英冠、fd_f2=法乙、fd_bra=巴甲、fd_arg=阿甲。
+
+### 韩职可用源（2026-08-16 实测）
+
+| 源 | 拿到什么 | 取法 | 实测 |
+|---|---|---|---|
+| `transfermarkt.com/k-league-1/verletztespieler/wettbewerb/RSK1` | **球员级伤停**：伤情类型 + 身价 | 纯 HTTP | ✅ 徐永在踝伤、河昌来肌肉伤、石田雅俊椎体伤、Erick Farias 跟腱手术… |
+| `transfermarkt.com/k-league-1/startseite/wettbewerb/RSK1` | 球队、阵容、身价 | 纯 HTTP | ✅ 9666 字符 |
+| `kleague.com/api/recentMatchResult.do` | **赛程/赛果 + gameId + 队代码 + endYn** | 纯 HTTP POST | ✅ 已接入 `kleague_portal.py fixtures` |
+| `kleague.com/api/clubRank.do` | **积分榜 + 近6场走势**（赛前可用） | 纯 HTTP POST | ✅ 已接入 `kleague_portal.py standings` |
+| `portal.kleague.com/data/matc/matchPlayerPosInfo.do` | 单场 40 人球员数据（号码/位置/队长/出场/进球/助攻） | 纯 HTTP POST | ✅ 已接入 `kleague_portal.py` |
+| `portal.kleague.com/data/matc/scoreInfoForMain.do` | 比分信息 | 同上 | ✅ 200 |
+
+门户接口参数（2026-08-16 抓包确定）：
+
+```text
+POST /data/matc/matchPlayerPosInfo.do
+     meetYear=2026&meetSeq=1&gameId=133&homeTeam=K22&awayTeam=K03
+POST /data/matc/scoreInfoForMain.do
+     meetYear=2026&meetSeq=1&gameId=133
+```
+
+`meetSeq` 1=K League 1、2=K League 2；队代码形如 `K22`/`K03`。响应是 HTML 片段，
+但球员数组以 JSON 内嵌在 `log([...])` 里，`kleague_portal.extract_players()` 解析
+的是 JSON 而非 DOM 属性。
+
+另有**官网 API 层**（2026-08-16 抓包），返回规范 JSON 信封 `{resultCode,resultMsg,data}`：
+
+```text
+POST https://www.kleague.com/api/recentMatchResult.do   近期赛程/赛果
+POST https://www.kleague.com/api/clubRank.do            积分榜 + 近6场走势
+```
+
+`recentMatchResult.do` **就是 gameId 与队代码的来源**，含 `endYn`（Y=已完赛）、
+`gameDate`/`gameTime`、比分、球场、轮次，K1/K2 一起返回（`leagueId` 区分）。
+**gameId 缺口已解决**，三个接口现由 `kleague_portal.py` 的 `fixtures` /
+`standings` / `players` 三个子命令统一封装。
+
+**三条硬约束，接入前必读**：
+
+1. **官方门户没有赛前首发**（2026-08-16 实测确认，别再找了）。`matchPlayerPosInfo.do`
+   对已完赛场次返回 40 人（含 goalQty/workTime 等赛后字段），对未开赛场次
+   （`endYn=N`）**返回 0 人**。它只能用于赛果、回测、历史库；按 `collected_at < kickoff`
+   对赛前证据是 **POST_MATCH_NOT_USABLE**，`looks_post_match()` 自动标记。
+   韩职**赛前可用**的是赛程（开球时刻/对阵）与积分榜/近6场走势。
+2. **未开赛场次的比分是占位 0-0**，不能当比分透出；`parse_fixtures()` 已置为 `None`。
+3. **开球时刻不带时区 offset**。韩职在韩国办，KST(+09:00) 是显然读法，但接口没声明，
+   模块不替调用方假设——默认只给 `kickoff_naive`，要带时区须显式传 `--assume-offset +09:00`。
+
+**交叉验证（2026-08-16）**：`evidence_2026-08-15/evidence_005` 当时从 Wikipedia 取到
+「首尔 22 轮 44 分领跑、领先蔚山 7 分」；官方 API 现示首尔 23 轮 47 分、蔚山 37 分，
+与 08-15 主场 4-2 胜大田（gameId=135）完全对得上。**这条链可以把韩职的战意/近况类
+证据从 Wikipedia 换成权威结构化源。**
+
+这直接补上了 `evidence_2026-08-15` 里「韩职官方伤停名单未公布，球员级伤停检索
+（web_search + Transfermarkt 队页）均未取到」那条缺口——**队页本来就取得到**，
+当初失败是抽取问题不是封锁，同 [[30_数据/网页源可达性矩阵]] 的头号结论。
+
+`portal.kleague.com` 两个 `.do` 端点是数据门户页面自身发出的公开请求，无鉴权、
+无验证码；未带参数时返回通用片段，接入前需先确定比赛参数。
+
+### xG 来源（2026-08-16 实测）
+
+`api-sports数据能力实测.md` 里「xG 仍缺，fbref 是唯一来源」**已过期**：
+`understat.com/league/<联赛>` 免费、无验证，覆盖五大联赛，提供
+
+- 球队级 xG/xGA/xPTS（实测巴萨 38 场 xG 99.67 / xGA 50.71 / xPTS 79.06）
+- 单场 xG（实测比亚雷亚尔 5-1 马竞，2.80 vs 1.58）
+
+**取法已升级为公开 JSON 接口，不再需要渲染**（2026-08-16 抓包）：
+
+```text
+GET https://understat.com/getLeagueData/<联赛代号>/<赛季起始年>
+必须带 X-Requested-With: XMLHttpRequest，否则返回的不是 JSON
+```
+
+返回全联赛逐场 `xG/npxG/xGA/npxGA/xpts/ppda/deep/scored/missed`，实测西甲 20 队 ×38 场
+共 530KB。已接入 `understat_xg.py`（`--league 西甲 --season 2025 --team X --cutoff ...`）。
+
+**时间口径**：understat 的 `date` 是**无时区裸时间**（"2025-08-16 11:30:00"）。按本契约
+「无 offset 不猜测」，`understat_xg.py` 不给它假设时区，而是按最坏情况 ±14h 过滤——
+一场比赛只有在任何时区解释下都早于 cutoff 才计入赛前统计。代价是 cutoff 前 14h 内的
+比赛被保守丢弃，换来赛后数据绝不混进赛前证据。
+
+覆盖范围限五大联赛——**韩职、日职、沙职仍无 xG**，那几条的「无 xG 训练路径」不变。
 
 ### 洲际/无源赛事矩阵
 
@@ -73,6 +163,29 @@ apifootball.com   → APIkey query 参数（当前会员key）
 - MCP 是第三方结构化数据，只能作主证据独立过门禁后的补充；sidecar 需 `match_identity(...)` 与体彩ID、主客队一致。
 - Crawl4AI（`project018_技能工作区整合/02_脚本/llm/football-llm-predictor/crawl_evidence.py`，2026-08-16 从 C 盘迁入仓库）只采官方/已知可信 JS 网页快照，`url`/`final_url` 同 hostname（仅容忍 www.），每类实质事实至少2个独立域名，默认不覆盖已有主证据。详见同目录 `CRAWL4AI_EVIDENCE.md`。
 - 网页全文只存快照，禁止整页投给 LLM。
+
+### 无数据源时的取数阶梯（2026-08-16 定）
+
+某项数据「没有源」时，按代价从低到高逐级尝试，**不要停在第一次失败上**——
+08-15 那批缺口就是停早了造成的：
+
+1. **API**：apifootball / 体彩 / open-meteo 等既有契约接口；
+2. **纯 HTTP**（带普通桌面 UA）：Transfermarkt 伤停、OddsPortal 1X2、jleague 赛程、
+   K League 官网实测都在这一层拿到。**页面 HTML 常达 128KB～764KB，必须确认关键字段
+   真的在正文里，别被 `web_extract` 的截断骗成「未取到」**；
+3. **真浏览器渲染**（`playwright_fetch.py`，无头 Chromium）：数据只存在于 JS 变量或
+   XHR 的站点，实测 fotmob、understat 属此类；
+4. **抓站点自身的公开接口**：用浏览器记录页面发出的 XHR/fetch，再直接调（K League
+   的 `portal.kleague.com/data/matc/*.do` 即由此得来）；
+5. **换源**：同一事实找别的域名，这也是六类证据「每类两个独立 hostname」的本意；
+6. **记缺口**。
+
+阶梯到第 6 级为止。**命中人机验证、登录墙、付费墙的站点（fbref / forebet /
+whoscored / besoccer）一律停在这里如实记缺口，不做绕过**——这是 `CRAWL4AI_EVIDENCE.md`
+的既有边界，也是工具层的硬限制：`fetch_http_first` 不会把 403 自动换客户端重试。
+fbref 有会员的话，人工登录后导出、再交给解析脚本，是合规路径。
+
+各源实测状态见 [[30_数据/网页源可达性矩阵]]。
 
 ## 事实源
 

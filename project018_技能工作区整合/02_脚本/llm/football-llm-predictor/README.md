@@ -107,6 +107,30 @@ watcher 对每场只刷新一次；旧 canonical 证据归档至 `snapshots/`，
 `predict.py` 会把官方赔率（胜平负/让球/总进球/比分/半全场）+ 六类证据拼进每个模型的提示词，
 模型参考赔率但保留独立判断；输出综合预测 + 官方赔率隐含概率对照。
 
+## 证据源采集（2026-08-16 新增）
+
+三个取数脚本，都**只采集不预测**，产出仍须走 `crawl_evidence.py` 门禁才能进主证据。
+
+```bash
+# 通用取页：先纯 HTTP，取不到才开浏览器；遇人机验证记缺口不绕过
+.venv/Scripts/python.exe playwright_fetch.py --out-dir data/crawl_snapshots/manual \
+    --url "https://www.transfermarkt.com/laliga/verletztespieler/wettbewerb/ES1"
+
+# understat xG（五大联赛）。cutoff 必须带时区 offset
+.venv/Scripts/python.exe understat_xg.py --league 西甲 --season 2025 \
+    --team Espanyol --team Levante --cutoff "2026-08-17T02:00:00+08:00" \
+    --out-dir data/xg_snapshots
+
+# K League 官方数据：赛程（gameId 与队代码的来源）/ 积分榜 / 单场球员
+.venv/Scripts/python.exe kleague_portal.py fixtures
+.venv/Scripts/python.exe kleague_portal.py standings
+.venv/Scripts/python.exe kleague_portal.py players --meet-year 2026 --meet-seq 1 \
+    --game-id 133 --home-team K22 --away-team K03   # ⚠️ 赛后数据
+```
+
+各源可达性与封锁状态见仓库 `30_数据/网页源可达性矩阵.md`；
+fbref / forebet / whoscored / besoccer 确认被人机验证挡住，按缺口记录，不绕过。
+
 ## 玩法预测（4 大玩法全覆盖）
 
 | 玩法 | 预测方式 | 官方对照 |

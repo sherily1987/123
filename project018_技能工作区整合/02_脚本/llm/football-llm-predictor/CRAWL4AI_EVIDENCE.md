@@ -98,10 +98,24 @@ data/crawl_snapshots/YYYY-MM-DD/<体彩match_id>/<url_hash>.json
 
 因此，`insufficient_independent_sources:N` 是预期的安全拒绝，不是网络失败。补齐来源清单后重新运行即可；不得通过删减栏目、复用同域页面或降低关键词条件来绕过。
 
+## 取页路径选择（2026-08-16 实测）
+
+`playwright_fetch.py` 是取页诊断/兜底工具，**不写主证据**，快照仍须走本文上面的门槛。
+
+取页按代价从低到高：
+
+1. **纯 HTTP**（带普通桌面 UA）——Transfermarkt 伤停、OddsPortal 1X2、jleague 赛程
+   实测都在服务端 HTML 里。历史证据里这几项记的「未取到」是抽取/截断问题（页面
+   128KB～764KB），不是封锁；
+2. **真浏览器渲染**——仅对 HTTP 只得骨架的 JS-only 页，目前实测只有 fotmob 属此类；
+3. **记缺口**——命中人机验证或服务端拒绝（fbref / forebet / whoscored / besoccer）。
+
+`playwright_fetch.py` 默认按 1→2 自动升级，且**不把 403 自动升级到浏览器重试**。
+完整矩阵见仓库 `30_数据/网页源可达性矩阵.md`。
+
 ## 来源优先级与边界
 
 1. 俱乐部、赛事、联赛官方页面：Crawl4AI 的首选目标；
 2. 第三方媒体：仅作交叉验证，必须明确 `source_level`；
 3. 体彩赔率：继续使用 raw/API，不用网页爬虫替代；
 4. 结构化首发、交锋、外盘：继续走 `mcp_evidence.py` / apifootball，并保持第三方数据标签；
-5. 验证码、登录、付费墙或赛后更新：不得绕过；记录失败或缺口。
