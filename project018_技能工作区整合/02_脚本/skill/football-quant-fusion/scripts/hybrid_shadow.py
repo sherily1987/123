@@ -14,6 +14,7 @@ from pathlib import Path
 
 from fusion_predict_core import load_core, predict_one
 from intl_kelly_index import intl_kelly_for_match
+from odds_movement_features import movement_feature
 from job_ticket import (
     hybrid_from_fusion_output,
     identity_from,
@@ -28,6 +29,22 @@ from sales_day_collect import build_field_meta
 
 def intl_store() -> Path:
     return data_root() / "odds" / "intl_production.jsonl"
+
+
+def movement_store() -> Path:
+    return data_root() / "odds" / "production_movement.jsonl"
+
+
+def load_jsonl(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    rows = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            rows.append(json.loads(line))
+        except ValueError:
+            continue
+    return rows
 
 
 def default_events_path() -> str | None:
@@ -111,10 +128,11 @@ def actual_idx(score_90) -> int | None:
 
 
 def _research_blob(match: dict, hybrid: dict) -> dict:
-    """hybrid 数字与 intl_kelly 侧车打包；凯利不进 predict 输入。"""
+    """hybrid 数字与研究侧车打包；侧车不进 predict 输入。"""
     blob = dict(hybrid)
     blob["research_only"] = True
     blob["intl_kelly"] = intl_kelly_for_match(match, intl_store())
+    blob["odds_movement"] = movement_feature(match, load_jsonl(movement_store()))
     return blob
 
 

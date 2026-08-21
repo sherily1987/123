@@ -163,7 +163,8 @@ class OddsApiAdapter:
             return None, "no_intl_event"
         return best, "ok"
 
-    def run(self, match_file, out_path, store_dir, sport_keys, markets, dry_run):
+    def run(self, match_file, out_path, store_dir, sport_keys, markets, dry_run,
+            capture_label=None, matches_override=None):
         report = {
             "schema": "intl-odds-snapshot-1.0",
             "provider": "the-odds-api",
@@ -174,6 +175,7 @@ class OddsApiAdapter:
             "unmatched": [],
             "store_file": None,
             "dry_run": dry_run,
+            "capture_label": capture_label,
         }
         if not self.key:
             report.update(status="skipped", reason="ODDS_API_KEY 未设置，国际盘对照默认不启用")
@@ -186,8 +188,8 @@ class OddsApiAdapter:
             report.update(status="error", reason="没有可用的 sport key（config/intl_odds_sources.json）")
             return report
 
-        matches = []
-        if match_file:
+        matches = list(matches_override or [])
+        if match_file and matches_override is None:
             try:
                 raw = json.loads(Path(match_file).read_text(encoding="utf-8"))
                 matches = raw.get("matches", [])
@@ -251,7 +253,8 @@ class OddsApiAdapter:
             store = Path(store_dir)
             store.mkdir(parents=True, exist_ok=True)
             line = {"schema": report["schema"], "provider": report["provider"],
-                    "ran_at": report["ran_at"], "matches": report["matches"]}
+                    "ran_at": report["ran_at"], "capture_label": capture_label,
+                    "matches": report["matches"]}
             with open(store / "intl_production.jsonl", "a", encoding="utf-8") as f:
                 f.write(json.dumps(line, ensure_ascii=False) + "\n")
             report["store_file"] = str((store / "intl_production.jsonl").resolve())
@@ -280,6 +283,8 @@ def main():
     ap.add_argument("--config", default=str(DEFAULT_CONFIG), help="配置文件路径")
     ap.add_argument("--provider", choices=["the-odds-api", "apifootball"], default=None,
                     help="数据源；默认取配置文件的 provider 字段")
+    ap.add_argument("--capture-label", choices=["T-24h", "T-6h", "T-75m"],
+                    help="可选：分时采集窗口标签，仅作研究快照审计")
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不发起网络请求")
     ap.add_argument("--check-sports", action="store_true", help="拉取 sports 列表校验配置")
     a = ap.parse_args()
@@ -321,7 +326,8 @@ def main():
 
     keys = [k.strip() for k in (a.sport_keys or "").split(",") if k.strip()] or None
     markets = [k.strip() for k in (a.markets or "").split(",") if k.strip()] or config.get("default_markets", ["h2h"])
-    report = adapter.run(a.match_file, a.out, a.store, keys, markets, a.dry_run)
+    report = adapter.run(a.match_file, a.out, a.store, keys, markets, a.dry_run,
+                         capture_label=a.capture_label)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

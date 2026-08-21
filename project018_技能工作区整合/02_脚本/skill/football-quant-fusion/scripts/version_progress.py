@@ -104,7 +104,9 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
             bucket["settled"] += 1
             current_settled += counts_as_current
         # 同版本但概率签名不同 = 改了概率文件却没 bump 版本，这些样本会被静默排除出 current
-        if row["model_version"] == cur_mv and cur_sig and row["probability_signature"] != cur_sig:
+        if (row["model_version"] == cur_mv and cur_sig
+                and row["probability_signature"] != cur_sig
+                and (row["model_version"], row["probability_signature"]) not in aliases):
             signature_drift.append({
                 "prediction_id": row["prediction_id"],
                 "match_id": row["match_id"],

@@ -16,7 +16,7 @@ from typing import Any
 SCHEMA = "football-job-1.0"
 DIR_TO_CODE = {"主胜": "H", "平局": "D", "客胜": "A"}
 CODE_TO_DIR = {"H": "主胜", "D": "平局", "A": "客胜"}
-RESEARCH_SIDECARS = ("intl_kelly",)
+RESEARCH_SIDECARS = ("intl_kelly", "odds_movement")
 _STAKE_KEYS = ("kelly_fraction", "f_star", "f*", "stake", "recommended_stake")
 
 

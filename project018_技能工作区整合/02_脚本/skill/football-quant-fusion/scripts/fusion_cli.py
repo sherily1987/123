@@ -34,11 +34,11 @@ HELP = """\
 Supported commands:
   collect | sales-day-collect | kickoff-date-collect
   record | daily-pipeline | preview | merge-preview | settle | backtest
-  odds-add | odds-drift | odds-intl | tournament
+  odds-add | odds-drift | odds-intl | odds-intl-capture | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
   version-progress
   job
-  hybrid-shadow
+  hybrid-shadow | hybrid-evaluate | hybrid-admission
   late-info
 """
 
@@ -228,6 +228,14 @@ def main():
         #   fusion_cli.py hybrid-shadow --score --sales-day YYYY-MM-DD
         run_script("hybrid_shadow.py", rest)
         return
+    if cmd == "hybrid-evaluate":
+        # 只读评测同场 independent hybrid 相对市场的 OOS 指标；不登记、不改 m3。
+        run_script("hybrid_evaluation.py", rest)
+        return
+    if cmd == "hybrid-admission":
+        # 只读上线资格判定；任何结果均不得切换生产概率或推荐开关。
+        run_script("hybrid_admission.py", rest)
+        return
     if cmd == "late-info":
         # 盘后伤停 + T-75 首发，只写研究库。
         #   fusion_cli.py late-info --from-collect raw.json
@@ -246,6 +254,10 @@ def main():
         # 国际盘对照（可选，The Odds API）：仅 CLV/edge 研究，不参与概率建模。
         # 用法：fusion_cli.py odds-intl --match-file raw.json --out intl_snapshot.json [--dry-run]
         run_script("odds_api_adapter.py", rest)
+        return
+    if cmd == "odds-intl-capture":
+        # 只在 T-24h/T-6h/T-75m 窗口采集国际盘研究快照；不改变生产概率。
+        run_script("intl_snapshot_capture.py", rest)
         return
     if cmd == "tournament":
         # 赛事级 Monte Carlo（新版欧冠 36 队赛制，2026-08-04 收编自 project005）

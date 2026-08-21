@@ -124,6 +124,19 @@ class VersionProgressTests(unittest.TestCase):
         # 分版本明细仍按原始 model_version 展示，不把 m1 改写成 m2
         self.assertEqual(with_alias["by_model_version"]["m1"]["settled"], 1)
 
+    def test_verified_same_version_alias_is_not_signature_drift(self):
+        """重放确认数值等价的旧 m2 签名应计入 current，不能再告警为未 bump。"""
+        alias = {"model_version": "m2", "probability_signature": OTHER_SIG}
+        report = self._report(
+            [prediction("m-current", "2026-08-10T00:00:00Z", "m2", CURRENT_SIG),
+             prediction("m-alias", "2026-08-11T00:00:00Z", "m2", OTHER_SIG)],
+            [{"match_id": "m-current"}, {"match_id": "m-alias"}],
+            aliases=[alias],
+        )
+
+        self.assertEqual(report["current"]["settled"], 2)
+        self.assertEqual(report["signature_drift"], [])
+
     def test_cli_help_lists_version_progress(self):
         self.assertIn("version-progress", fusion_cli.HELP)
 

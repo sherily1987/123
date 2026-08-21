@@ -20,6 +20,19 @@ def test_job_research_hybrid_is_sidecar_not_output_track():
     assert job["research"]["hybrid"]["final_1x2_pct"][0] == 40.0
 
 
+def test_odds_movement_is_a_separate_research_sidecar():
+    job = jt.assemble_job(
+        identity={"match_id": 2040884, "sales_day": "2026-08-16"},
+        research={
+            "final_1x2_pct": [40.0, 30.0, 30.0], "mode": "hybrid",
+            "odds_movement": {"status": "VALID", "prob_shift_pp": [1.0, 0.0, -1.0]},
+        },
+    )
+
+    assert job["research"]["odds_movement"]["research_only"] is True
+    assert "odds_movement" not in job["research"]["hybrid"]
+
+
 def test_research_hybrid_must_be_research_only():
     job = {
         "schema": jt.SCHEMA,

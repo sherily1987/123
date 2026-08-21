@@ -13,3 +13,5 @@ def test_top_level_help_lists_supported_commands():
     assert completed.returncode == 0
     assert "record" in completed.stdout
     assert "backtest" in completed.stdout
+    assert "hybrid-evaluate" in completed.stdout
+    assert "odds-intl-capture" in completed.stdout

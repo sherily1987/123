@@ -25,6 +25,8 @@ def _load(name: str, path: Path):
 
 strength = _load("team_strength", ROOT / "project018_技能工作区整合" / "02_脚本" / "core" / "zu-yu-dashi-3" / "scripts" / "team_strength.py")
 audit = _load("league_training_audit", ROOT / "project007_APIFootball数据接入" / "02_脚本" / "league_training_audit.py")
+training_quality = _load("training_quality", Path(__file__).with_name("training_quality.py"))
+training_policy = _load("strength_training_policy", Path(__file__).with_name("strength_training_policy.py"))
 
 
 def time_cutoffs(rows: list[dict]) -> tuple[int, int]:
@@ -53,9 +55,8 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_
     # kind 由 catalog 提供：洲际赛事（UCL/UEL）不是国内联赛，审计会判 excluded。
     # 硬编码 "domestic_league" 会把洲际赛事误当联赛训练，绕过该规则。
     eligibility = audit.classify(raw_rows, league.get("kind", "domestic_league"))
-    # lifecycle 反映"是否实际训练出了模型"，不代表单场质量判断——弱联赛（未跑赢频率
-    # 基线等）仍标 production，因为质量分级是 predict_no_odds.py 的分档裁决（tier
-    # A/B/C/D + 可用/降级/拒绝）的职责，两套机制不重叠，不在这里重复编码。
+    # 训练完成不等于可生产使用：先通过数值/收敛门槛，随后仍须由 OOS 分档和人工审核
+    # 决定是否升级。这里永久只写候选，不会自动放行生产。
     result = {"league": league, "eligibility": eligibility, "lifecycle": "candidate"}
     if eligibility["tier"] != "independent":
         result["status"] = "not_trained"
@@ -64,10 +65,21 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_
     matches = strength.load_matches(input_path, league_id=league["id"], require_odds=False)
     validation_model = strength.fit_model([m for m in matches if m["day"] < first])
     final_model = strength.fit_model([m for m in matches if m["day"] < second])
+    quality = {
+        "validation_fit": training_quality.assess(validation_model),
+        "final_fit": training_quality.assess(final_model),
+    }
+    if not all(item["eligible_for_candidate"] for item in quality.values()):
+        result.update({
+            "status": "training_rejected",
+            "training_quality": quality,
+            "reason": "fit_quality_gate_failed",
+        })
+        return result
     final_model.update({
         "schema_version": "team-strength-apifootball-1.0",
         "source": "apifootball.com_event_results",
-        "lifecycle": "production",
+        "lifecycle": "candidate",
         "league_id": league["id"],
         "league_name": league["name"],
         "split": {"validation_from_day": first, "test_from_day": second},
@@ -78,6 +90,7 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_
     result.update({
         "status": "trained",
         "model_path": str(model_path),
+        "training_quality": quality,
         "validation": strength.validate(matches, validation_model, first, to_day=second, baseline_key=baseline_key, baseline_label=baseline_label),
         "test": strength.validate(matches, final_model, second, baseline_key=baseline_key, baseline_label=baseline_label),
     })
