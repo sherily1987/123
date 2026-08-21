@@ -95,6 +95,7 @@ def _eligible(job: dict, jobs_root: Path) -> tuple[dict | None, str | None]:
         "actual_idx": actual,
         "hybrid_probs": hybrid_probs,
         "market_probs": market_probs,
+        "weight_sweep": hybrid.get("weight_sweep"),
     }, None
 
 
@@ -116,11 +117,36 @@ def _bootstrap_ci(rows: list[dict], key: str, samples: int, seed: int) -> list[f
     return [round(lower, 6), round(upper, 6)]
 
 
+def _weight_key(value: float) -> str:
+    return f"{value:.2f}".rstrip("0").rstrip(".")
+
+
+def _weight_sweep_metrics(rows: list[dict], samples: int, seed: int) -> dict:
+    """Same-match paired metrics for one explicit market-weight candidate."""
+    return {
+        "brier": {
+            "candidate": round(_mean(rows, "brier_candidate"), 6),
+            "market": round(_mean(rows, "brier_market"), 6),
+            "delta_candidate_minus_market": round(_mean(rows, "brier_delta_candidate_minus_market"), 6),
+            "paired_bootstrap_95_ci": _bootstrap_ci(
+                rows, "brier_delta_candidate_minus_market", samples, seed),
+        },
+        "logloss": {
+            "candidate": round(_mean(rows, "logloss_candidate"), 6),
+            "market": round(_mean(rows, "logloss_market"), 6),
+            "delta_candidate_minus_market": round(_mean(rows, "logloss_delta_candidate_minus_market"), 6),
+            "paired_bootstrap_95_ci": _bootstrap_ci(
+                rows, "logloss_delta_candidate_minus_market", samples, seed),
+        },
+    }
+
+
 def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
                   bootstrap_seed: int = 20260821) -> dict:
     """评测所有 sales_day 工单；只统计可验证的独立赛前 hybrid 概率。"""
     root = Path(jobs_root)
     rows: list[dict] = []
+    sweep_rows: dict[str, list[dict]] = {}
     excluded: dict[str, int] = {}
     for path in sorted(root.rglob("sporttery-*.json")):
         try:
@@ -135,6 +161,7 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
         assert row is not None
         actual = row.pop("actual_idx")
         hybrid_probs, market_probs = row.pop("hybrid_probs"), row.pop("market_probs")
+        sweep = row.pop("weight_sweep", [])
         row["brier_hybrid"] = _brier(hybrid_probs, actual)
         row["brier_market"] = _brier(market_probs, actual)
         row["logloss_hybrid"] = _logloss(hybrid_probs, actual)
@@ -142,6 +169,39 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
         row["brier_delta_hybrid_minus_market"] = row["brier_hybrid"] - row["brier_market"]
         row["logloss_delta_hybrid_minus_market"] = row["logloss_hybrid"] - row["logloss_market"]
         rows.append(row)
+        if not isinstance(sweep, list):
+            continue
+        for variant in sweep:
+            if not isinstance(variant, dict) or variant.get("research_only") is not True:
+                continue
+            if variant.get("status") != "ok":
+                continue
+            try:
+                weight = float(variant["market_weight"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if not 0.0 <= weight <= 1.0:
+                continue
+            candidate_probs = _probabilities(variant.get("final_1x2_pct"))
+            variant_market = _probabilities(variant.get("market_1x2_pct"))
+            if candidate_probs is None or variant_market is None:
+                continue
+            # One sweep must hold the market snapshot fixed.  Otherwise its
+            # comparison would conflate blend weight with a different price.
+            if any(abs(left - right) > 1e-9 for left, right in zip(market_probs, variant_market)):
+                continue
+            variant_row = {
+                "match_id": row["match_id"],
+                "brier_candidate": _brier(candidate_probs, actual),
+                "brier_market": row["brier_market"],
+                "logloss_candidate": _logloss(candidate_probs, actual),
+                "logloss_market": row["logloss_market"],
+            }
+            variant_row["brier_delta_candidate_minus_market"] = (
+                variant_row["brier_candidate"] - variant_row["brier_market"])
+            variant_row["logloss_delta_candidate_minus_market"] = (
+                variant_row["logloss_candidate"] - variant_row["logloss_market"])
+            sweep_rows.setdefault(_weight_key(weight), []).append(variant_row)
     report = {
         "schema_version": "hybrid-oos-evaluation-1.0",
         "research_only": True,
@@ -169,6 +229,16 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
         }
     else:
         report["metrics"] = None
+    report["weight_sweep"] = {
+        "research_only": True,
+        "n": sum(len(group) for group in sweep_rows.values()),
+        "by_market_weight": {
+            weight: {"n": len(group), "metrics": _weight_sweep_metrics(
+                group, bootstrap_samples, bootstrap_seed)}
+            for weight, group in sorted(sweep_rows.items(), key=lambda item: float(item[0]))
+        },
+        "note": "每个权重仅与同一场、同一盘口快照配对；不改变生产market_only输出。",
+    }
     return report
 
 

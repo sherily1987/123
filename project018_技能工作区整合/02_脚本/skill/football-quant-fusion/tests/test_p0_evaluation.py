@@ -34,7 +34,7 @@ class BuildIdentityTests(unittest.TestCase):
         self.assertEqual(manifest["record_schema_version"], "fusion-1.1")
         self.assertEqual(manifest["backtest_schema_version"], "fusion-backtest-2.0")
         self.assertEqual(manifest["sample_audit_schema_version"], "sample-audit-2.0")
-        self.assertEqual(manifest["model_version"], "m3")
+        self.assertEqual(manifest["model_version"], "m4")
         self.assertIn("scripts/production_router.py", manifest["probability_files"])
         self.assertNotIn("config/recommendation_policy.json", manifest["probability_files"])
         self.assertIn("config/recommendation_policy.json", manifest["decision_policy_files"])

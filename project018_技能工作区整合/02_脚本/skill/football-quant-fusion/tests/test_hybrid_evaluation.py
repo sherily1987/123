@@ -91,3 +91,25 @@ def test_cli_creates_parent_directory_for_report(tmp_path):
 
     assert evaluation.main(["--jobs-root", str(tmp_path), "--output", str(output)]) == 0
     assert json.loads(output.read_text(encoding="utf-8"))["n"] == 0
+
+
+def test_weight_sweep_is_scored_as_separate_research_candidates(tmp_path):
+    hybrid = {
+        "research_only": True, "status": "ok", "mode": "hybrid",
+        "final_1x2_pct": [60, 25, 15], "market_1x2_pct": [50, 30, 20],
+        "lambda_prior": {"source": "independent_strength"},
+        "weight_sweep": [
+            {"research_only": True, "status": "ok", "market_weight": 0.4,
+             "final_1x2_pct": [65, 20, 15], "market_1x2_pct": [50, 30, 20]},
+            {"research_only": True, "status": "ok", "market_weight": 0.8,
+             "final_1x2_pct": [55, 30, 15], "market_1x2_pct": [50, 30, 20]},
+        ],
+    }
+    _write_job(tmp_path, "sweep", _job("sporttery-sweep", hybrid))
+
+    report = evaluation.evaluate_jobs(tmp_path)
+
+    sweep = report["weight_sweep"]["by_market_weight"]
+    assert sweep["0.4"]["n"] == 1
+    assert sweep["0.8"]["n"] == 1
+    assert sweep["0.4"]["metrics"]["brier"]["candidate"] < sweep["0.8"]["metrics"]["brier"]["candidate"]

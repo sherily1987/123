@@ -1,0 +1,113 @@
+{
+  "schema": "sporttery-score-lambda3-1.0",
+  "research_only": true,
+  "production_unchanged": true,
+  "status": "ok",
+  "n": 1350,
+  "train_n": 949,
+  "test_n": 401,
+  "train_end": "2026-05-17",
+  "test_start": "2026-05-18",
+  "test_end": "2026-08-01",
+  "selection_metric": "train_raw_score_matrix_log_loss",
+  "baseline": {
+    "lambda3": 0.05,
+    "score_matrix_temperature": 1.0
+  },
+  "candidate": {
+    "lambda3": 0.2,
+    "score_matrix_temperature": 1.0,
+    "top_scores_temperature": null
+  },
+  "train": {
+    "baseline": {
+      "n": 949,
+      "score_log_loss": 2.935679,
+      "top1_accuracy_pct": 10.85,
+      "top3_accuracy_pct": 32.56,
+      "ou_2_5": {
+        "n": 949,
+        "brier": 0.252874,
+        "log_loss": 0.700648,
+        "accuracy_pct": 55.22
+      },
+      "ou_3_5": {
+        "n": 949,
+        "brier": 0.216202,
+        "log_loss": 0.629397,
+        "accuracy_pct": 68.7
+      }
+    },
+    "candidate": {
+      "n": 949,
+      "score_log_loss": 2.915497,
+      "top1_accuracy_pct": 12.54,
+      "top3_accuracy_pct": 32.35,
+      "ou_2_5": {
+        "n": 949,
+        "brier": 0.242508,
+        "log_loss": 0.678216,
+        "accuracy_pct": 57.22
+      },
+      "ou_3_5": {
+        "n": 949,
+        "brier": 0.209496,
+        "log_loss": 0.608281,
+        "accuracy_pct": 68.07
+      }
+    }
+  },
+  "test": {
+    "baseline": {
+      "score_matrix": {
+        "n": 401,
+        "score_log_loss": 2.838031,
+        "top1_accuracy_pct": 13.72,
+        "top3_accuracy_pct": 36.41
+      },
+      "ou_2_5": {
+        "n": 401,
+        "brier": 0.244689,
+        "log_loss": 0.684911,
+        "accuracy_pct": 57.11
+      },
+      "ou_3_5": {
+        "n": 401,
+        "brier": 0.202731,
+        "log_loss": 0.602979,
+        "accuracy_pct": 71.82
+      }
+    },
+    "candidate": {
+      "score_matrix": {
+        "n": 401,
+        "score_log_loss": 2.81295,
+        "top1_accuracy_pct": 13.97,
+        "top3_accuracy_pct": 39.4
+      },
+      "ou_2_5": {
+        "n": 401,
+        "brier": 0.236798,
+        "log_loss": 0.666705,
+        "accuracy_pct": 62.09
+      },
+      "ou_3_5": {
+        "n": 401,
+        "brier": 0.198775,
+        "log_loss": 0.586544,
+        "accuracy_pct": 71.32
+      }
+    },
+    "delta_log_loss_candidate_minus_baseline": -0.025081,
+    "delta_ou_brier_candidate_minus_baseline": {
+      "ou_2_5": -0.007891,
+      "ou_3_5": -0.003956
+    },
+    "ou_non_regression_required": true,
+    "ou_non_regression_passed": true
+  },
+  "adopt_for_research": true,
+  "adopt_reason": "same_source_time_split_score_gain_without_ou_brier_regression",
+  "note": "Temperature is excluded from the score-matrix comparison because the current production score_matrix is raw; temperature cannot change Top-N ranking.",
+  "input": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest\\snapshots\\sporttery_all_leagues_2026.jsonl"
+}

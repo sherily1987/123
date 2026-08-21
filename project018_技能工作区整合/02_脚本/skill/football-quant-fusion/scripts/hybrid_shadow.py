@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""影子 hybrid：不开 m4，不登记，不改生产概率。
+"""影子 hybrid：不登记，不改当前生产概率。
 
 对每场：生产保持 market_only；若路由器能给出 λ prior，另跑 --research-route，
 结果写入工单 research.hybrid（research_only=true）。
@@ -25,6 +25,9 @@ from job_ticket import (
 from production_router import BIG5, GOALS_ONLY, load_event_rows, route_match
 from runtime_paths import backtest_store, data_root, workspace_root
 from sales_day_collect import build_field_meta
+
+
+WEIGHT_SWEEP = (0.40, 0.50, 0.60, 0.70, 0.80)
 
 
 def intl_store() -> Path:
@@ -136,6 +139,30 @@ def _research_blob(match: dict, hybrid: dict) -> dict:
     return blob
 
 
+def weight_sweep(core, version, routed: dict, prior: dict, *, weights=WEIGHT_SWEEP) -> list[dict]:
+    """Record alternative hybrid blends without mutating the primary route.
+
+    Every candidate uses exactly the same independent prior, market snapshot
+    and pre-match input; only ``market_weight`` differs.  They remain sidecar
+    research rows until a time-separated, paired evaluation admits one.
+    """
+    variants: list[dict] = []
+    for weight in weights:
+        try:
+            market_weight = float(weight)
+        except (TypeError, ValueError):
+            continue
+        if not 0.0 <= market_weight <= 1.0:
+            continue
+        candidate = dict(routed)
+        candidate["market_weight"] = market_weight
+        out = predict_one(core, version, candidate)
+        blob = hybrid_from_fusion_output(out, prior=prior)
+        blob.update({"research_only": True, "market_weight": market_weight})
+        variants.append(blob)
+    return variants
+
+
 def run_one(core, version, match: dict, understat, events, min_history: int, sales_day: str | None) -> dict:
     ident = identity_from(match)
     if sales_day:
@@ -158,6 +185,7 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
     if out.get("research_only") is not True:
         out["research_only"] = True
     blob = _research_blob(match, hybrid_from_fusion_output(out, prior=prior))
+    blob["weight_sweep"] = weight_sweep(core, version, routed, prior)
     path = upsert_job(jobs_root(), ident, input_obj=match, research=blob)
     return {
         "match_id": ident.get("match_id"),
@@ -214,7 +242,7 @@ def score_day(sales_day: str) -> dict:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="影子 hybrid（research_only，不登记，不开 m4）")
+    ap = argparse.ArgumentParser(description="影子 hybrid（research_only，不登记，不改生产概率）")
     ap.add_argument("--input", help="单场融合裸 dict / 批量 / 体彩 raw")
     ap.add_argument("--sales-day", help="工单日期；--score 时必填")
     ap.add_argument("--score", action="store_true", help="只评已落盘的 hybrid，不跑预测")
@@ -252,7 +280,7 @@ def main(argv=None) -> int:
         results.append(run_one(core, version, match, understat, events, args.min_history, sales_day))
     report = {
         "research_only": True,
-        "model_version_window": "m3 (production unchanged)",
+        "model_version_window": "current production unchanged",
         "n": len(results),
         "ok": sum(1 for r in results if r.get("status") == "ok"),
         "skipped": sum(1 for r in results if r.get("status") == "skipped"),

@@ -99,12 +99,13 @@ def test_truncated_hash_is_not_accepted_as_identity():
 
 ALIAS_SHA = "5b608c3debf8d1de2659d552e5569f84e684e7e86105255e5de76f03a7d5b633"
 CURRENT_IDENTITY = {"model_version": "m2", "probability_signature": SHA_B}
-ALIAS_ENTRY = {"model_version": "m1", "probability_signature": ALIAS_SHA}
+ALIAS_ENTRY = {"model_version": "m1", "probability_signature": ALIAS_SHA,
+               "equivalent_to_model_version": "m2"}
 
 
 def test_verified_equivalent_alias_counts_as_current(monkeypatch):
     """m1→m2 的 bump 数值中性时，m1 样本不该被迫从零重攒。"""
-    monkeypatch.setattr(fb, "load_version_aliases", lambda: [ALIAS_ENTRY])
+    monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
     row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
                version="fusion-1.4.0-core-3.4.4")
     assert fb.version_cohort(row, CURRENT_IDENTITY) == "current"
@@ -112,14 +113,14 @@ def test_verified_equivalent_alias_counts_as_current(monkeypatch):
 
 def test_alias_requires_exact_signature_pair(monkeypatch):
     """同为 m1 但签名不是登记的那个 → 不享受别名，仍归 legacy。"""
-    monkeypatch.setattr(fb, "load_version_aliases", lambda: [ALIAS_ENTRY])
+    monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
     row = _row({"model_version": "m1", "probability_signature": SHA_A},
                version="fusion-1.4.0-core-3.4.4")
     assert fb.version_cohort(row, CURRENT_IDENTITY) == "legacy"
 
 
 def test_no_alias_configured_keeps_old_version_legacy(monkeypatch):
-    monkeypatch.setattr(fb, "load_version_aliases", lambda: [])
+    monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [])
     row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
                version="fusion-1.4.0-core-3.4.4")
     assert fb.version_cohort(row, CURRENT_IDENTITY) == "legacy"
@@ -130,3 +131,13 @@ def test_manifest_aliases_reject_malformed_entries():
     for alias in fb.load_version_aliases():
         assert alias["model_version"]
         assert len(alias["probability_signature"]) == 64
+        assert alias["equivalent_to_model_version"]
+
+
+def test_alias_is_not_carried_into_a_new_probability_version(monkeypatch):
+    """m1→m2 1X2 equivalence cannot make score/O-U-changing m4 look current."""
+    monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
+    row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
+               version="fusion-1.4.0-core-3.4.4")
+    current = {"model_version": "m4", "probability_signature": SHA_B}
+    assert fb.version_cohort(row, current) == "legacy"

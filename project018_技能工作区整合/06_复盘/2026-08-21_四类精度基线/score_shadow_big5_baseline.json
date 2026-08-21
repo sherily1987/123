@@ -1,0 +1,35 @@
+{
+  "schema": "score-shadow-compare-1.0",
+  "research_only": true,
+  "production_unchanged": true,
+  "source_holdout": "project021/05_交付/score_params_by_league.json: big5 adopt_for_research=true",
+  "big5_candidate": {
+    "params": {
+      "lambda3": 0.15,
+      "temperature": 1.1
+    },
+    "n": 7,
+    "default": {
+      "params": {
+        "lambda3": 0.05,
+        "temperature": 1.3
+      },
+      "n": 7,
+      "score_log_loss": 2.572136,
+      "top1_accuracy_pct": 28.57,
+      "top3_accuracy_pct": 42.86
+    },
+    "candidate": {
+      "n": 7,
+      "score_log_loss": 2.567926,
+      "top1_accuracy_pct": 28.57,
+      "top3_accuracy_pct": 42.86
+    },
+    "delta_score_log_loss_candidate_minus_default": -0.00421,
+    "admission": "insufficient_n",
+    "minimum_admission_n": 120
+  },
+  "store": "project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/backtest",
+  "snapshot_policy": "latest_before_kickoff",
+  "registered_primary_rows": 167
+}

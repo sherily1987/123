@@ -36,7 +36,8 @@ Supported commands:
   record | daily-pipeline | preview | merge-preview | settle | backtest
   odds-add | odds-drift | odds-intl | odds-intl-capture | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
-  version-progress
+  version-progress | derivative-diagnostics | half-time-enrichment | score-shadow-compare
+  half-time-collect | four-market-admission
   job
   hybrid-shadow | hybrid-evaluate | hybrid-admission
   late-info
@@ -246,6 +247,26 @@ def main():
         # 发布窗口期盯样本累积：当前 model_version 已结算/在途场次与门槛距离。
         # 用法：fusion_cli.py version-progress [--store DIR] [--json] [--output FILE]
         run_script("version_progress.py", rest)
+        return
+    if cmd == "half-time-enrichment":
+        # 离线核验半场比分，只写 research evidence，绝不反写 90 分钟正式赛果。
+        run_script("half_time_enrichment.py", rest)
+        return
+    if cmd == "half-time-collect":
+        # 仅抓取并归档 provider 半场原始响应，后续仍须三重匹配才可作为研究证据。
+        run_script("collect_half_time_apifootball.py", rest)
+        return
+    if cmd == "derivative-diagnostics":
+        # 大小球/半全场独立分母评测；HAFU 必须同时有已核验半场证据与非 UNFITTED 概率。
+        run_script("derivative_diagnostics.py", rest)
+        return
+    if cmd == "score-shadow-compare":
+        # 仅比较已验证的 Big5 比分参数候选；不触碰 m3 与生产比分矩阵。
+        run_script("score_shadow_compare.py", rest)
+        return
+    if cmd == "four-market-admission":
+        # 四类输出分别准入；只输出 hold/review，不自动改任何生产参数。
+        run_script("four_market_admission.py", rest)
         return
     if cmd == "llm-evidence":
         run_llm_evidence(rest)

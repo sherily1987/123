@@ -120,7 +120,7 @@ def engine_build_key(row):
     return ""
 
 
-def load_version_aliases():
+def load_version_aliases(target_model_version=None):
     """读取 manifest 里经重放验证的等价旧版本清单。
 
     2026-08-16 新增。`probability_signature` 是概率文件的**字节**哈希，所以对
@@ -129,8 +129,9 @@ def load_version_aliases():
 
     别名的唯一合法来源是 `probability_replay_check.py` 的 `equivalent` 判定：
     用旧样本登记时保存的 input 重跑当前代码，概率逐场一致才可写进 manifest。
-    匹配要求 (model_version, probability_signature) **精确成对**，避免把该版本
-    其他签名的样本一起放进来。
+    匹配要求 (model_version, probability_signature, equivalent_to_model_version)
+    **精确成对**：别名只属于当时已重放验证的目标版本，不能跨越之后的
+    概率变更（例如 m3 的1X2等价不能把 m4 的比分/O-U样本也算作已验证）。
     """
     path = Path(__file__).resolve().parent.parent / "config" / "version_manifest.json"
     if not path.exists():
@@ -140,8 +141,12 @@ def load_version_aliases():
     except Exception:
         return []
     aliases = manifest.get("model_version_aliases") or []
-    return [a for a in aliases if isinstance(a, dict)
-            and a.get("model_version") and _is_sha256(a.get("probability_signature"))]
+    valid = [a for a in aliases if isinstance(a, dict)
+             and a.get("model_version") and _is_sha256(a.get("probability_signature"))
+             and a.get("equivalent_to_model_version")]
+    if target_model_version is None:
+        return valid
+    return [a for a in valid if str(a["equivalent_to_model_version"]) == str(target_model_version)]
 
 
 def version_cohort(row, current_identity):
@@ -162,8 +167,10 @@ def version_cohort(row, current_identity):
     if cur_mv and cur_mv != "unknown" and cur_ps and _is_sha256(cur_ps):
         if row_mv == cur_mv and row_ps == cur_ps:
             return "current"
-        for alias in load_version_aliases():
-            if row_mv == alias["model_version"] and row_ps == alias["probability_signature"]:
+        for alias in load_version_aliases(cur_mv):
+            if (str(alias.get("equivalent_to_model_version")) == cur_mv
+                    and row_mv == alias["model_version"]
+                    and row_ps == alias["probability_signature"]):
                 return "current"
     version = str(row.get("version") or "").strip().lower()
     identifiable = version and version not in {"unknown", "offline", "none"} and "unknown" not in version
@@ -298,9 +305,12 @@ def ece_from_obs(obs):
 # [中文功能] 汇总一组样本的指标
 def summarize(rows):
     obs, bs, ls, hit = [], [], [], []
-    top1 = top3 = top5 = sll = 0
-    n_ou = n_bt = 0
-    ou_b = bt_b = 0.0
+    top1 = top3 = top5 = score_n = 0
+    full_score_n = 0
+    sll = 0.0
+    n_ou = n_ou35 = n_bt = 0
+    ou_b = ou35_b = bt_b = 0.0
+    ou_hit = ou35_hit = 0
     clv = []
     for r in rows:
         probs, idx = r["probs"], r["actual_idx"]
@@ -309,13 +319,24 @@ def summarize(rows):
         ls.append(logloss(probs, idx))
         hit.append(int(max(range(3), key=lambda i: probs[i]) == idx))
         if r.get("top_scores") is not None and r.get("actual_score") is not None:
+            score_n += 1
             top1 += int(r["top_scores"].get("top1"))
             top3 += int(r["top_scores"].get("top3"))
             top5 += int(r["top_scores"].get("top5"))
-            sll += r["top_scores"].get("log_loss", 0.0)
+        matrix = r.get("score_matrix")
+        if isinstance(matrix, dict) and r.get("actual_score") is not None:
+            probability = matrix.get(r["actual_score"])
+            if isinstance(probability, (int, float)) and not isinstance(probability, bool) and probability > 0:
+                full_score_n += 1
+                sll += -math.log(max(1e-12, min(1 - 1e-12, float(probability))))
         if r.get("ou25") is not None:
             n_ou += 1
             ou_b += (r["ou25"]["over"] - r["ou25"]["actual"]) ** 2
+            ou_hit += int((r["ou25"]["over"] >= 0.5) == bool(r["ou25"]["actual"]))
+        if r.get("ou35") is not None:
+            n_ou35 += 1
+            ou35_b += (r["ou35"]["over"] - r["ou35"]["actual"]) ** 2
+            ou35_hit += int((r["ou35"]["over"] >= 0.5) == bool(r["ou35"]["actual"]))
         if r.get("btts") is not None:
             n_bt += 1
             bt_b += (r["btts"]["yes"] - r["btts"]["actual"]) ** 2
@@ -332,15 +353,21 @@ def summarize(rows):
         "ece": ece,
         "calibration_bins": bins,
     }
-    if top1:
+    if score_n:
         out["score"] = {
-            "top1_accuracy_pct": round(top1 / n * 100, 2),
-            "top3_accuracy_pct": round(top3 / n * 100, 2),
-            "top5_accuracy_pct": round(top5 / n * 100, 2),
-            "score_log_loss": round(sll / n, 5),
+            "top1_accuracy_pct": round(top1 / score_n * 100, 2),
+            "top3_accuracy_pct": round(top3 / score_n * 100, 2),
+            "top5_accuracy_pct": round(top5 / score_n * 100, 2),
+            "full_matrix_n": full_score_n,
+            "score_log_loss": round(sll / full_score_n, 5) if full_score_n else None,
         }
     if n_ou:
         out["ou_2_5_brier"] = round(ou_b / n_ou, 6)
+        out["ou_2_5"] = {"n": n_ou, "brier": round(ou_b / n_ou, 6),
+                          "accuracy_pct": round(ou_hit / n_ou * 100, 2)}
+    if n_ou35:
+        out["ou_3_5"] = {"n": n_ou35, "brier": round(ou35_b / n_ou35, 6),
+                          "accuracy_pct": round(ou35_hit / n_ou35 * 100, 2)}
     if n_bt:
         out["btts_brier"] = round(bt_b / n_bt, 6)
     if clv:
@@ -430,21 +457,32 @@ def score_record(rec, root):
     idx = actual_1x2(h, a)
     top_list = fc.get("top_scores") or core.get("top_scores") or []
     score_view = None
+    score_matrix = None
     actual_score = f"{h}-{a}"
     if top_list:
-        pm = {str(x.get("score")): float(x.get("prob_pct", 0)) / 100.0 for x in top_list if x.get("score") is not None}
         ranked = [x.get("score") for x in sorted(top_list, key=lambda x: x.get("prob_pct", 0), reverse=True)]
-        p_actual = pm.get(actual_score, 1e-6)
         score_view = {
             "top1": int(ranked and ranked[0] == actual_score),
             "top3": int(actual_score in ranked[:3]),
             "top5": int(actual_score in ranked[:5]),
-            "log_loss": -math.log(max(1e-6, p_actual)),
         }
+    raw_matrix = fc.get("score_matrix") or core.get("score_matrix")
+    if isinstance(raw_matrix, dict):
+        parsed = {}
+        for score, probability in raw_matrix.items():
+            if (isinstance(probability, (int, float)) and not isinstance(probability, bool)
+                    and 0.0 <= float(probability) <= 1.0):
+                parsed[str(score)] = float(probability)
+        if parsed and 0.99 <= sum(parsed.values()) <= 1.01:
+            score_matrix = parsed
     ou = fc.get("ou_2_5") or core.get("ou_2_5") or {}
     ou_view = None
     if ou.get("over_pct") is not None:
         ou_view = {"over": float(ou["over_pct"]) / 100.0, "actual": 1 if h + a > 2.5 else 0}
+    ou35 = fc.get("ou_3_5") or core.get("ou_3_5") or {}
+    ou35_view = None
+    if ou35.get("over_pct") is not None:
+        ou35_view = {"over": float(ou35["over_pct"]) / 100.0, "actual": 1 if h + a > 3.5 else 0}
     bt = fc.get("btts") or core.get("btts") or {}
     bt_view = None
     if bt.get("yes_pct") is not None:
@@ -465,7 +503,9 @@ def score_record(rec, root):
         "actual_idx": idx,
         "actual_score": actual_score,
         "top_scores": score_view,
+        "score_matrix": score_matrix,
         "ou25": ou_view,
+        "ou35": ou35_view,
         "btts": bt_view,
         "clv_pp": None,
         "snapshot_odds": (rec.get("input") or {}).get("odds"),

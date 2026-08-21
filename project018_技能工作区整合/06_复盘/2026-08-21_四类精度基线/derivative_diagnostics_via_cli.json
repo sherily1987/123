@@ -1,0 +1,29 @@
+{
+  "schema": "derivative-diagnostics-1.0",
+  "research_only": true,
+  "store": "project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/backtest",
+  "snapshot_policy": "latest_before_kickoff",
+  "record_sample_size": 167,
+  "metrics": {
+    "ou_2_5": {
+      "n": 167,
+      "brier": 0.242056,
+      "accuracy_pct": 55.69
+    },
+    "ou_3_5": {
+      "n": 167,
+      "brier": 0.164241,
+      "accuracy_pct": 79.04
+    },
+    "hafu": {
+      "n": 0,
+      "accuracy_pct": null,
+      "brier": null,
+      "log_loss": null,
+      "excluded_unverified_evidence": 0,
+      "excluded_unfitted_prediction": 157
+    }
+  },
+  "half_time_evidence_input": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/half_time_enrichment_local_probe.json",
+  "note": "半全场只在status=verified的独立半场证据上评分；UNFITTED输出不进入分母。"
+}

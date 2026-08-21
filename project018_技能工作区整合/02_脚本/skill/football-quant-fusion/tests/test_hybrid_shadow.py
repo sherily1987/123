@@ -73,3 +73,26 @@ def test_score_day_empty(tmp_path, monkeypatch):
     monkeypatch.setattr(hs, "backtest_store", lambda: tmp_path / "backtest")
     (tmp_path / "backtest" / "results").mkdir(parents=True)
     assert hs.score_day("2026-08-16")["n"] == 0
+
+
+def test_weight_sweep_is_research_only_and_does_not_mutate_primary_route(monkeypatch):
+    routed = {"mode": "hybrid", "market_weight": 0.6, "lambda_prior": {"lambda_home": 1.2}}
+    seen = []
+
+    def fake_predict(_core, _version, payload):
+        seen.append(payload["market_weight"])
+        return {
+            "fusion_status": "ok", "mode": "hybrid",
+            "forecast": {
+                "final_1x2_pct": [payload["market_weight"] * 100, 20, 80 - payload["market_weight"] * 100],
+                "model_1x2_pct": [30, 30, 40], "market_prob_pct": [40, 25, 35],
+            },
+        }
+
+    monkeypatch.setattr(hs, "predict_one", fake_predict)
+    sweep = hs.weight_sweep(None, {}, routed, routed["lambda_prior"], weights=(0.4, 0.7))
+
+    assert seen == [0.4, 0.7]
+    assert routed["market_weight"] == 0.6
+    assert [item["market_weight"] for item in sweep] == [0.4, 0.7]
+    assert all(item["research_only"] is True for item in sweep)

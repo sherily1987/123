@@ -110,7 +110,8 @@ class VersionProgressTests(unittest.TestCase):
         self.assertEqual(report["current"]["settled"], 1)
 
     def test_verified_alias_versions_count_toward_current(self):
-        alias = {"model_version": "m1", "probability_signature": OTHER_SIG}
+        alias = {"model_version": "m1", "probability_signature": OTHER_SIG,
+                 "equivalent_to_model_version": "m2"}
         predictions = [prediction("m-1", "2026-08-10T00:00:00Z", "m1", OTHER_SIG),
                        prediction("m-2", "2026-08-16T00:00:00Z", "m1", OTHER_SIG)]
         results = [{"match_id": "m-1"}]
@@ -126,7 +127,8 @@ class VersionProgressTests(unittest.TestCase):
 
     def test_verified_same_version_alias_is_not_signature_drift(self):
         """重放确认数值等价的旧 m2 签名应计入 current，不能再告警为未 bump。"""
-        alias = {"model_version": "m2", "probability_signature": OTHER_SIG}
+        alias = {"model_version": "m2", "probability_signature": OTHER_SIG,
+                 "equivalent_to_model_version": "m2"}
         report = self._report(
             [prediction("m-current", "2026-08-10T00:00:00Z", "m2", CURRENT_SIG),
              prediction("m-alias", "2026-08-11T00:00:00Z", "m2", OTHER_SIG)],
@@ -136,6 +138,16 @@ class VersionProgressTests(unittest.TestCase):
 
         self.assertEqual(report["current"]["settled"], 2)
         self.assertEqual(report["signature_drift"], [])
+
+    def test_alias_targeting_an_older_version_does_not_count_for_new_version(self):
+        alias = {"model_version": "m1", "probability_signature": OTHER_SIG,
+                 "equivalent_to_model_version": "m2"}
+        report = self._report(
+            [prediction("m-old", "2026-08-10T00:00:00Z", "m1", OTHER_SIG)],
+            [{"match_id": "m-old"}], model_version="m4", aliases=[alias],
+        )
+        self.assertEqual(report["current"]["settled"], 0)
+        self.assertEqual(report["counted_as_current_aliases"], [])
 
     def test_cli_help_lists_version_progress(self):
         self.assertIn("version-progress", fusion_cli.HELP)

@@ -1,0 +1,40 @@
+{
+  "schema": "four-market-admission-1.0",
+  "research_only": true,
+  "production_change_allowed": false,
+  "families": {
+    "wdl": {
+      "decision": "hold",
+      "reason": "current_version_sample_below_minimum",
+      "n": 64,
+      "minimum_n": 100
+    },
+    "score": {
+      "decision": "review_required",
+      "reason": "same_source_time_split_score_and_ou_passed",
+      "n": 401,
+      "lambda3": 0.2,
+      "observed_delta": -0.025081
+    },
+    "ou": {
+      "decision": "review_required",
+      "reason": "same_source_lambda3_ou_non_regression_passed",
+      "n": 401,
+      "minimum_n": 200
+    },
+    "hafu": {
+      "decision": "hold",
+      "reason": "hafu_predictions_unfitted",
+      "n": 0,
+      "excluded_unfitted_prediction": 157,
+      "minimum_n": 200
+    }
+  },
+  "note": "review_required 也不是自动上线；任何概率变化仍须版本升级、独立复核与发布锁。当前脚本不会写入生产配置。",
+  "inputs": {
+    "backtest": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/fusion_backtest_four_output_baseline.json",
+    "derivatives": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/derivative_diagnostics_hafu_shadow.json",
+    "score_shadow": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/score_shadow_big5_matrix_semantics_corrected.json",
+    "score_time_split": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/sporttery_score_lambda3_time_split.json"
+  }
+}

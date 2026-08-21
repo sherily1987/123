@@ -33,7 +33,7 @@ import argparse
 import json
 import math
 
-ENGINE_VERSION = '3.4.4'
+ENGINE_VERSION = '3.4.5'
 # 去水默认 [FITTED 2026-08-02]：proportional → power
 # 依据（三源独立回测，时间切分）：
 #   - 独立集 devig_backtest_400（Pinnacle 收盘，芬/瑞/挪/美×100）：power Brier 0.5660 < proportional 0.5670
@@ -76,16 +76,21 @@ DEFAULT_CALIBRATION = {'draw_k': DRAW_CALIBRATION_K, 'temperature': CALIBRATION_
                        'key': 'OTHER'}
 
 # ---- 比分模型与分布校准 [FITTED 2026-08-02] ----
-# 双变量泊松（λ3=0.05）在 football-data 46696 场 OOS（train 16343/test 7005）全面优于
-# 独立泊松+DC：比分LL 2.914 vs 2.925、Top1 11.56% vs 10.92%、OU/BTTS Brier 均更优（goal_model_ensemble）。
-# 1X2 路径（λ反解/one/sensitivity）保留 DC 矩阵，保证无损复现市场不受影响；衍生市场用 BP。
-#   半场比分 7×7：T=1.22 —— test LogLoss 2.029→2.009、ECE 0.00322→0.00067
+# 双变量泊松共享项 λ3=0.20 [FITTED 2026-08-21]：中国体彩 2026 全联赛收盘 HAD，
+# 严格按比赛日 70/30 切分（训练949 / 测试401；训练≤05-17，测试≥05-18）。
+# 测试集：完整比分 LL 2.838031→2.812950、Top1 13.72%→13.97%、Top3 36.41%→39.40%；
+# O/U2.5 Brier 0.244689→0.236798，O/U3.5 Brier 0.202731→0.198775。
+# 1X2 路径（λ反解/one/sensitivity）保留 DC 矩阵，保证胜平负概率不受此项改变；衍生市场用 BP。
+# 温度 T=1.30 仅缩放 Top 比分的展示概率，单调变换不改变 Top-N 排名，不能被表述为命中率提升。
+# 半场比分 7×7：T=1.22 —— test LogLoss 2.029→2.009、ECE 0.00322→0.00067
 SCORE_MODEL = 'bp'
-SCORE_LAMBDA3 = 0.05
+SCORE_LAMBDA3 = 0.20
 SCORE_TEMPERATURE_FT = 1.30
 SCORE_TEMPERATURE_HT = 1.22
-SCORE_CALIBRATION_BASIS = ('football-data五大联赛46696场 时间切分(训练16343/测试7005) '
-                           '双变量泊松λ3=0.05 + 温度T=1.30 按比分LogLoss网格选优')
+SCORE_CALIBRATION_BASIS = ('中国体彩2026全联赛收盘HAD 严格比赛日时间切分(训练949/测试401)：'
+                           '双变量泊松原始比分矩阵λ3=0.20，测试比分LL 2.838031→2.812950；'
+                           'O/U2.5/3.5 Brier 0.244689→0.236798、0.202731→0.198775。'
+                           'Top比分展示温度T=1.30仅校准概率大小，不改变排名。')
 
 # 五大联赛识别映射（精确 key 匹配，避免把英冠/西乙/德乙/意乙/法乙等次级联赛误判）
 _BIG5_ALIASES = {
@@ -1170,7 +1175,7 @@ def predict(d):
     flags.append('DEVIG_METHOD: 使用'+devig_method+'去水；不同方法须按时间切分回测，不能默认视为更准。')
     flags.append('PARTIALLY_FITTED_CONSTANTS: 拟合状态按盘口区分，见 derived_market_status 字段。'
                  '已拟合/已验证：1X2校准层、星级区间、O/U2.5、O/U3.5、BTTS(验证后不校准)、'
-                 'rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.05, T=1.30)。'
+                 'rho、FIRST_HALF_SHARE、比分模型(双变量泊松λ3=0.20；Top比分展示T=1.30)。'
                  '仍未独立拟合：亚洲盘、晋级/加时/点球、半场1X2聚合。'
                  '未拟合项的绝对概率仅可用于相对比较。')
     flags.append('DRAW_ARGMAX_RARE: 平局几乎不会成为三项中的最大概率——'
@@ -1299,7 +1304,7 @@ def predict(d):
             'ht_temperature': SCORE_TEMPERATURE_HT,
             'status': 'FITTED-CALIBRATED',
             'basis': SCORE_CALIBRATION_BASIS,
-            'note': '衍生市场（比分/O-U/BTTS/HHAD/AH/晋级）使用双变量泊松矩阵（λ3=0.05, T=1.30）；1X2 路径维持 DC 矩阵与已拟合校准层。'},
+            'note': '衍生市场（比分/O-U/BTTS/HHAD/AH/晋级）使用双变量泊松原始矩阵（λ3=0.20）；Top比分显示概率另用T=1.30缩放，1X2路径维持DC矩阵与已拟合校准层。'},
         'hafu_model': hafu_model,
         'ou_2_5': ou(m_derived, 2.5),
         'ou_3_5': ou(m_derived, 3.5),
@@ -1318,7 +1323,7 @@ def predict(d):
             'btts': 'VALIDATED_NO_CHANGE — 已验证原始输出ECE 0.0213良好，校准无效故不施加',
             'rho_dixon_coles': 'FITTED-CONFIRMED — 测试集验证 -0.08 优于拟合值 -0.07，维持默认',
             'first_half_share': 'FITTED-CONFIRMED — 1348场实测0.444/0.450，维持0.45',
-            'top_scores': 'CALIBRATED — 双变量泊松λ3=0.05+T=1.30（46696场OOS：比分LL 2.914 vs DC 2.925、Top1 11.56% vs 10.92%）',
+            'top_scores': 'FITTED — 体彩2026严格比赛日OOS（n=401）：BP λ3=0.20，完整比分LL 2.838031→2.812950，Top1 13.72%→13.97%，Top3 36.41%→39.40%；展示T=1.30不改变排名',
             'asian_handicap': 'UNFITTED — 由比分矩阵推导，未做独立盘口回测',
             'advancement': 'FITTED-SMALL — 点球主队概率0.38(n=24, CI 0.21-0.57)、加时倍率0.83(n=31, CI 0.63-1.02)；样本仍小，绝对概率谨慎解读',
             'hafu_half_time': 'PARTIALLY-CALIBRATED — 半场比分温度T=1.22（test ECE 0.00322→0.00067）；半场1X2聚合仍由矩阵推导，未做独立盘口回测'},

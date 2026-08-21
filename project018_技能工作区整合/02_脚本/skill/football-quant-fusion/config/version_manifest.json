@@ -2,14 +2,15 @@
   "schema_version": "football-quant-fusion-version-manifest-1.0",
   "skill_version": "1.5.0",
   "fusion_version": "1.5.0",
-  "core_version": "3.4.4",
+  "core_version": "3.4.5",
   "fusion_schema_version": "1.4.0",
-  "model_version": "m3",
-  "model_version_note": "m3：无锚（NO_ANCHOR_FALLBACK）禁止作为生产 1X2。无独立 Elo/λ 且无可用 HAD 时拒绝；有可用市场则钉回 market_only。见 2026-08-16 低依赖 43 场审计。",
+  "model_version": "m4",
+  "model_version_note": "m4：保留m3的无锚生产1X2禁令；仅将双变量泊松衍生市场共享项λ3由0.05更新为0.20。依据为体彩2026严格比赛日时间切分（训练949/测试401）：完整比分LL 2.838031→2.812950、Top3 36.41%→39.40%，O/U2.5/3.5 Brier均改善。胜平负概率路径未变；半全场仍UNFITTED。",
   "model_version_aliases": [
     {
       "model_version": "m1",
       "probability_signature": "5b608c3debf8d1de2659d552e5569f84e684e7e86105255e5de76f03a7d5b633",
+      "equivalent_to_model_version": "m2",
       "verified_at": "2026-08-16",
       "verified_by": "scripts/probability_replay_check.py --model-version m1",
       "verified_scope": [
@@ -21,6 +22,7 @@
     {
       "model_version": "m3",
       "probability_signature": "18c92711c9b13c0dac19edfb3611d64950b82bdb4f632f64e42d001631a485a0",
+      "equivalent_to_model_version": "m3",
       "verified_at": "2026-08-20",
       "verified_by": "scripts/probability_replay_check.py --model-version m3",
       "verified_scope": [

@@ -1,0 +1,49 @@
+{
+  "schema": "hafu-temperature-calibration-1.0",
+  "research_only": true,
+  "production_unchanged": true,
+  "source": "Football-Data.co.uk Big5 historical closing 1X2 + HT/FT results",
+  "market_isolation": "International closing odds are research calibration only; Sporttery remains production input.",
+  "period": {
+    "start_year": 2018,
+    "end_year": 2025
+  },
+  "raw_rows": 14283,
+  "solver_rows": 14283,
+  "result": {
+    "status": "ok",
+    "n": 14283,
+    "train_n": 9998,
+    "test_n": 4285,
+    "train_end": "2024-01-28",
+    "test_start": "2024-01-28",
+    "test_end": "2026-05-24",
+    "production_default": {
+      "temperature": 1.0,
+      "test": {
+        "n": 4285,
+        "log_loss": 1.870997,
+        "brier": 0.798527,
+        "accuracy_pct": 33.61
+      }
+    },
+    "train_best": {
+      "temperature": 1.2,
+      "train": {
+        "n": 9998,
+        "log_loss": 1.864777,
+        "brier": 0.800449,
+        "accuracy_pct": 32.48
+      },
+      "test": {
+        "n": 4285,
+        "log_loss": 1.865572,
+        "brier": 0.799911,
+        "accuracy_pct": 33.61
+      }
+    },
+    "test_log_loss_improvement": 0.005425,
+    "adopt_for_research": true,
+    "adopt_reason": "time_split_logloss_gain"
+  }
+}

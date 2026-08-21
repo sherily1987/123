@@ -78,7 +78,9 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
     primary = select_primary_rows(rows, snapshot_policy)
     status = settled_status(root)
     # 经重放验证等价的旧版本按 current 计（与 fusion_backtest.version_cohort 同一口径）
-    aliases = {(a["model_version"], a["probability_signature"]) for a in load_version_aliases()}
+    aliases = {(a["model_version"], a["probability_signature"])
+               for a in load_version_aliases(cur_mv)
+               if str(a.get("equivalent_to_model_version")) == cur_mv}
     alias_versions = sorted({mv for mv, _ in aliases})
 
     by_version: dict[str, dict] = {}

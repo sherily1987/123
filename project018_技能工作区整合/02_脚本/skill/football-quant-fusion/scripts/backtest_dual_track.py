@@ -87,15 +87,42 @@ def validate_90min_settlement(result):
     return {"eligible": True, "reason": None}
 
 
-def official_half_time_score(result):
-    """Only expose an official half-time score; never infer it from full time."""
-    score = result.get("score_ht")
+def official_half_time_score(result, evidence=None):
+    """Expose HT only with independently verified match/time/source evidence.
+
+    A bare ``result.score_ht`` used to be labeled "official" despite carrying
+    no provenance for its half-time value.  It is now intentionally ignored:
+    a verified enrichment row must identify the source fixture, both kickoff
+    timestamps, and an identical 90-minute score.
+    """
+    if not isinstance(evidence, dict) or evidence.get("status") != "verified":
+        return None
+    if evidence.get("matched_by") != "team_time_fulltime":
+        return None
+    if not all(isinstance(evidence.get(key), str) and evidence[key].strip()
+               for key in ("provider", "provider_fixture_id", "record_kickoff", "provider_kickoff")):
+        return None
+    if evidence.get("score_90") != result.get("score_90"):
+        return None
+    score = evidence.get("score_ht")
     if not isinstance(score, dict) or any(
         not isinstance(score.get(side), int) or isinstance(score.get(side), bool) or score[side] < 0
         for side in ("home", "away")
     ):
         return None
     return score
+
+
+def load_half_time_evidence(path):
+    """Read research evidence rows keyed by the shared sporttery match id."""
+    if not path:
+        return {}
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    rows = raw.get("rows", []) if isinstance(raw, dict) else raw
+    if not isinstance(rows, list):
+        raise ValueError("half-time evidence must be a JSON list or {rows: [...]}")
+    return {str(row.get("match_id")): row for row in rows
+            if isinstance(row, dict) and row.get("match_id") is not None}
 
 
 def parse_pick_letters(s):
@@ -236,6 +263,8 @@ def main():
     ap.add_argument("--date", default=None, help="待回测目录日期，如 20260803")
     ap.add_argument("--records-dir", default=None)
     ap.add_argument("--results-dir", default=str(RESULTS))
+    ap.add_argument("--half-time-evidence", default=None,
+                    help="half_time_enrichment.py 输出；无已核验证据时半全场不评分")
     ap.add_argument("--output", default=None)
     ap.add_argument("--report", default=None)
     ap.add_argument("--match-id", action="append", default=None,
@@ -249,6 +278,7 @@ def main():
     if not records_dir.exists():
         raise SystemExit(f"待回测记录目录不存在：{records_dir}")
     quant = load_quant(records_dir)
+    half_time_evidence = load_half_time_evidence(a.half_time_evidence)
     llm_index_exists = (records_dir / "index_llm.json").exists()
     llm = load_llm(records_dir)
     match_ids = sorted(set(quant) | set(llm))
@@ -293,13 +323,14 @@ def main():
             "status": "settled",
             "source_provenance_class": provenance["source_provenance_class"],
         }
-        if official_half_time_score(res) is None:
-            row["half_time_status"] = "unresolved_missing_official_halftime_score"
+        verified_ht = official_half_time_score(res, half_time_evidence.get(str(mid)))
+        if verified_ht is None:
+            row["half_time_status"] = "unresolved_missing_verified_halftime_evidence"
             row["half_time_scored"] = False
         else:
-            row["half_time_status"] = "settled_official_halftime_score"
+            row["half_time_status"] = "settled_verified_halftime_score"
             row["half_time_scored"] = True
-            row["actual_ht"] = f"{res['score_ht']['home']}-{res['score_ht']['away']}"
+            row["actual_ht"] = f"{verified_ht['home']}-{verified_ht['away']}"
         if not llm_index_exists:
             row["llm_track_status"] = "missing_index"
         if q:
@@ -423,6 +454,7 @@ def main():
         "schema": "dual-track-backtest-1.0",
         "date": a.date,
         "records_dir": str(records_dir),
+        "half_time_evidence_input": a.half_time_evidence,
         "generated_at": None,
         "summary": {
             "settled": len([d for d in detail if d.get("status") == "settled"]),

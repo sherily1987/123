@@ -1,0 +1,40 @@
+{
+  "schema": "four-market-admission-1.0",
+  "research_only": true,
+  "production_change_allowed": false,
+  "families": {
+    "wdl": {
+      "decision": "hold",
+      "reason": "current_version_sample_below_minimum",
+      "n": 64,
+      "minimum_n": 100
+    },
+    "score": {
+      "decision": "hold",
+      "reason": "same_family_oos_sample_below_minimum",
+      "n": 7,
+      "minimum_n": 120
+    },
+    "ou": {
+      "decision": "hold",
+      "reason": "both_ou_lines_need_same_family_samples",
+      "n": 167,
+      "minimum_n": 200,
+      "ou_2_5_n": 167,
+      "ou_3_5_n": 167
+    },
+    "hafu": {
+      "decision": "hold",
+      "reason": "hafu_predictions_unfitted",
+      "n": 0,
+      "excluded_unfitted_prediction": 157,
+      "minimum_n": 200
+    }
+  },
+  "note": "review_required 也不是自动上线；任何概率变化仍须版本升级、独立复核与发布锁。当前脚本不会写入生产配置。",
+  "inputs": {
+    "backtest": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/fusion_backtest_four_output_baseline.json",
+    "derivatives": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/derivative_diagnostics_hafu_shadow.json",
+    "score_shadow": "project018_技能工作区整合/06_复盘/2026-08-21_四类精度基线/score_shadow_big5_baseline.json"
+  }
+}
