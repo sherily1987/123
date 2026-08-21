@@ -1,35 +1,35 @@
 {
   "threshold": 0.7,
-  "train_until": "2025-04-28",
+  "train_until": "2025-08-08",
   "coefficients": {
     "inside_outside": {
-      "path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\模型\\proxy_xg_coeffs_inside_outside_all.json",
-      "a": 0.155772,
-      "b": 0.033864,
-      "n_matches": 23149,
+      "path": "..\\04_素材\\模型\\proxy_xg_coeffs_inside_outside_all.json",
+      "a": 0.156133,
+      "b": 0.033545,
+      "n_matches": 24147,
       "leagues": 26,
       "self_check": {
-        "total_predicted": 64796.0,
-        "total_actual": 64827.0,
-        "total_deviation_pct": -0.048,
+        "total_predicted": 67766.0,
+        "total_actual": 67797.0,
+        "total_deviation_pct": -0.046,
         "total_conserved": true,
         "primary_gt_secondary": true,
-        "primary_secondary_ratio": 4.6
+        "primary_secondary_ratio": 4.65
       }
     },
     "shots_on_target": {
-      "path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\模型\\proxy_xg_coeffs_shots_on_target_all.json",
-      "a": 0.304959,
-      "b": 0.00486,
-      "n_matches": 7920,
-      "leagues": 9,
+      "path": "..\\04_素材\\模型\\proxy_xg_coeffs_shots_on_target_all.json",
+      "a": 0.307672,
+      "b": 0.004356,
+      "n_matches": 11017,
+      "leagues": 10,
       "self_check": {
-        "total_predicted": 20088.0,
-        "total_actual": 20108.0,
-        "total_deviation_pct": -0.099,
+        "total_predicted": 28554.0,
+        "total_actual": 28574.0,
+        "total_deviation_pct": -0.07,
         "total_conserved": true,
         "primary_gt_secondary": true,
-        "primary_secondary_ratio": 62.75
+        "primary_secondary_ratio": 70.64
       }
     }
   },
@@ -287,18 +287,31 @@
       "match_share": 0.4946,
       "skipped_reason": "xG 可用场次仅占完赛 49.5%，低于 60%"
     },
-    "fd_e1": {
+    "fd_d2": {
       "coverage": {
-        "n": 2760,
+        "n": 1530,
         "box": 0.0,
         "sot": 1.0,
         "box_n": 0,
-        "sot_n": 2760,
-        "finished": 2760
+        "sot_n": 1530,
+        "finished": 1530
       },
       "basis": "shots_on_target",
       "match_share": 1.0,
-      "xg_rows": 2760
+      "xg_rows": 1530
+    },
+    "fd_e1": {
+      "coverage": {
+        "n": 4415,
+        "box": 0.0,
+        "sot": 1.0,
+        "box_n": 0,
+        "sot_n": 4415,
+        "finished": 4416
+      },
+      "basis": "shots_on_target",
+      "match_share": 0.9998,
+      "xg_rows": 4415
     },
     "fd_f2": {
       "coverage": {
@@ -741,19 +754,6 @@
       "basis": "inside_outside",
       "match_share": 1.0,
       "xg_rows": 162
-    },
-    "fd_d2": {
-      "coverage": {
-        "n": 1530,
-        "box": 0.0,
-        "sot": 1.0,
-        "box_n": 0,
-        "sot_n": 1530,
-        "finished": 1530
-      },
-      "basis": "shots_on_target",
-      "match_share": 1.0,
-      "note": "沿用已拟合 shots_on_target 合并系数，不重训全库"
     }
   }
 }

@@ -61,11 +61,12 @@ SEARCH_KEYWORDS = {
     },
     "近况": {
         "required": [
-            "last 5", "form", "recent results", "近5场", "状态",
+            "last 5", "form", "recent results", "近5场", "双方近5场", "状态",
         ],
         "optional": [
             "home form", "away form", "winning streak", "losing streak", "undefeated",
             "xG", "xG for", "xG against", "clean sheet", "走势",
+            "last five matches", "recent form",
         ],
     },
     "战意": {
@@ -150,6 +151,57 @@ def normalize_ou25(raw) -> Optional[str]:
     return None
 
 
+def normalize_probs_1x2(raw) -> Optional[list]:
+    """主/平/客 三位，合计 100。接受百分数或 0-1 小数。"""
+    if raw is None:
+        return None
+    if isinstance(raw, dict):
+        raw = [
+            raw.get("主胜", raw.get("H", raw.get("h"))),
+            raw.get("平局", raw.get("D", raw.get("d"))),
+            raw.get("客胜", raw.get("A", raw.get("a"))),
+        ]
+    if not isinstance(raw, (list, tuple)) or len(raw) < 3:
+        return None
+    try:
+        vals = [float(raw[0]), float(raw[1]), float(raw[2])]
+    except (TypeError, ValueError):
+        return None
+    if any(v < 0 for v in vals):
+        return None
+    total = sum(vals)
+    if total <= 0:
+        return None
+    if total <= 1.5:
+        vals = [v * 100.0 for v in vals]
+        total = sum(vals)
+    vals = [round(v / total * 100.0, 1) for v in vals]
+    vals[2] = round(100.0 - vals[0] - vals[1], 1)
+    if vals[2] < 0:
+        return None
+    return vals
+
+
+def normalize_top_scores(raw) -> Optional[list]:
+    """恰好 3 个不重复竞彩比分，按给定顺序。"""
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        raw = [raw]
+    if not isinstance(raw, (list, tuple)):
+        return None
+    out = []
+    for item in raw:
+        if isinstance(item, dict):
+            item = item.get("score") or item.get("score_pref")
+        pref = normalize_score_pref(item)
+        if pref and pref not in out:
+            out.append(pref)
+        if len(out) == 3:
+            return out
+    return None
+
+
 def normalize_hafu(raw) -> Optional[str]:
     if not raw:
         return None
@@ -201,29 +253,36 @@ def role_prompt_for(model: str, models_used: Optional[Sequence[str]] = None) -> 
 
 # ---------- JSON 规则：证据轨（direction） ----------
 JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外文字。
-证据不足示例:
-{"decision":"abstain","direction":null,"alt_direction":null,"score_pref":null,"ou25":null,"hafu":null,"evidence_gap":true,"evidence_ids":["E1"],"unsupported_assumptions":[],"reason_codes":["LINEUP_UNAVAILABLE"],"summary":"证据不足以形成独立方向。"}
-有足够证据示例:
-{"decision":"opinion","direction":"主胜","alt_direction":null,"score_pref":null,"ou25":null,"hafu":null,"evidence_gap":false,"evidence_ids":["E2","E4"],"unsupported_assumptions":[],"reason_codes":[],"summary":"E2 与 E4 支持主队方向；进球与半场证据不足，其他市场弃权。"}
+证据不足示例（仅当可用维只剩赔率、或身份对不上）:
+{"decision":"abstain","direction":null,"alt_direction":null,"probs_1x2":null,"top_scores":null,"ou25":null,"hafu":null,"evidence_gap":true,"evidence_ids":["E1"],"unsupported_assumptions":[],"reason_codes":["ONLY_ODDS"],"summary":"除赔率外无可用基本面，弃权。"}
+有足够证据示例（阵容有缺口仍须给方向）:
+{"decision":"opinion","direction":"主胜","alt_direction":"平局","probs_1x2":[48.0,28.0,24.0],"top_scores":["1-0","2-0","1-1"],"ou25":"小","hafu":"平胜","evidence_gap":true,"evidence_ids":["E2","E4"],"unsupported_assumptions":[],"reason_codes":["LINEUP_UNAVAILABLE"],"summary":"E2近况与E4主场支持主胜；官方首发未出，已标缺口。"}
 
 规则:
-1. decision 只能是 opinion 或 abstain。abstain 时 direction 必须为 null。
-2. direction/alt_direction 只能是主胜/平局/客胜或 null。score_pref/ou25/hafu 均可单独为 null；缺少对应证据时必须为 null，不得猜测。
+1. decision 只能是 opinion 或 abstain。abstain 时 direction 与四个市场字段必须为 null。
+2. opinion 时必须同时给出：direction（主胜/平局/客胜）、probs_1x2（主/平/客三位合计100）、top_scores（恰好3个比分）、ou25（大或小）、hafu（九宫格）。这五项禁止 null。
 3. evidence_ids 只能引用提示词中存在的 E 编号。UNAVAILABLE 和 SOURCE_CONFLICT 只能证明缺口/冲突，不能支持 opinion。
-4. 不得使用未在证据中出现的事实。任何必须假设的内容写入 unsupported_assumptions；存在影响结论的未支持假设时应 abstain。
-5. 禁止伪概率、伪 xG、常见比分模板和人设先验。赔率只是一类证据，不得冒充独立基本面。
-6. 比分、大小球、半全场必须各自有直接证据；无直接证据则对应字段为 null。
-7. 口径仅为90分钟含补时，不含加时和点球。summary 限两句。"""
+4. 不得编造伤停、赛果或队名事实。必须假设的内容写入 unsupported_assumptions。官方首发未出、用上季近5场，不算必须弃权的未支持假设。
+5. probs_1x2 由第9条多维加权换算，一位小数，argmax 必须等于 direction。这是本模型的判断概率，不是量化轨校准概率，禁止冒充 xG 或精确到多位小数。
+6. top_scores 按可能性从高到低恰好3个竞彩比分；第1个必须与 direction 同向（主胜则主>客，客胜则客>主，平局则平局比分）。ou25 只能大/小。hafu 必须是胜胜/胜平/胜负/平胜/平平/平负/负胜/负平/负负之一。
+7. 口径仅为90分钟含补时，不含加时和点球。summary 限两句。
+8. 近5场：用证据里 20 源投票得票最高的最近最多5场正式赛，必须引用【近况】。揭幕战/该队本季第一场取对其他对手的上季或最近正式赛，不得当「无近5场」。热身票数低于正式赛则不采用。完全检索不到正式赛果才删近况权重，仍须 opinion。
+9. 多维加权（只给目录里可用的维打分；缺维删除该权后重标定，不得把缺维当 0 分中性或默认主队）:
+   近况0.30 / 阵容0.22 / 战意0.15 / 赔率0.15 / 主客环境0.13。身份核验是门禁不是权重。
+   各维对主队打 -2..+2，只能引用 E 编号事实。近况内部近5场按新到旧 5>4>3>2>1 加权（Dixon-Coles 1997 时间衰减的短窗近似）。
+   将加权和换算为 probs_1x2 并必须输出。仅赔率一维可用时必须 abstain。
+10. 不再等俱乐部官宣。20 源投票得票最高的名单直接当可用首发。伤停同样用 20 源投票得票最高的缺阵名单，不再等官方。两个独立媒体对同一位置一致即可写入。LINEUP_UNAVAILABLE / FORM_UNAVAILABLE 只能进 reason_codes 并 evidence_gap=true，不得单独弃权。"""
 
 EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据可用性，不做比赛预测。
 不得输出胜平负、比分、大小球或半全场的任何方向。
 只输出一个 JSON 对象:
-{"usable_evidence_ids":["E2"],"unusable_evidence_ids":["E1"],"conflict_evidence_ids":[],"gaps":["LINEUP_UNAVAILABLE"],"market_readiness":{"one_x_two":true,"score":false,"ou25":false,"hafu":false},"summary":"E2可用；阵容信息不可用。"}
+{"usable_evidence_ids":["E2"],"unusable_evidence_ids":["E1"],"conflict_evidence_ids":[],"gaps":["LINEUP_POSITION_CONFLICT"],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"E2可用；仅个别位置两源对不上，不得整维标阵容或近况不可用。"}
 规则:
 1. 所有 ID 必须存在于输入证据目录。
-2. UNAVAILABLE 只能放入 unusable_evidence_ids；SOURCE_CONFLICT 只能放入 conflict_evidence_ids。
+2. unusable_evidence_ids 必须且只能填目录里 status=UNAVAILABLE 的编号。SINGLE_SOURCE / VERIFIED_MULTI_SOURCE 一律放入 usable_evidence_ids，即使该行没写出完整十一人。SOURCE_CONFLICT 只能放入 conflict_evidence_ids。
 3. market_readiness 只评估证据是否足以供下游判断，不暗示任何结果。
-4. 不得补充输入中没有的事实。summary 限两句。"""
+4. 不得补充输入中没有的事实。summary 限两句。
+5. 20 源投票得票最高的名单视为可用首发，不得把整维阵容标不可用。揭幕战用该队对其他对手的上季正式近5场或投票近5场，不得把整维近况标不可用。不得因官方未出整维弃权。"""
 
 
 def system_prompt_evidence_audit() -> str:
@@ -247,7 +306,9 @@ JSON_RULES_FOUR_MARKET = """你是专业足球分析师。只输出一个 JSON �
 10. reasoning 必须含【伤停|阵容|首发|缺阵|近况|战意|主客|身份|交锋 : 事实】至少一类; 有 get_lineups 名单时必须引用; 禁止纯赔率; 禁止编造伤员。
 11. 比分由攻防强度推导, reasoning 写进球逻辑; **禁止**套"常见比分"模板, **禁止**机械默认(主胜配1-0/平局配1-1); 比分须与 result、ou25 自洽。
 12. 官方赔率只参考不盲从; 90分钟口径。
-13. 不得因常见比分统计而选 2-1。"""
+13. 不得因常见比分统计而选 2-1。
+14. 证据中有双方近5场正式赛果时，reasoning 必须写【近况:主队…；客队…】并用近况推本场方向与进球倾向；热身赛不算正式近5场。缺近5场不得编造，evidence_gap=true。
+15. 择向按近况0.30/阵容0.22/战意0.15/赔率0.15/主客0.13 加权；缺维删权再标定。近5场新到旧 5>4>3>2>1。加权和换算为 probs_1x2 必须输出。"""
 
 
 EVIDENCE_SYSTEM_PROMPT = (

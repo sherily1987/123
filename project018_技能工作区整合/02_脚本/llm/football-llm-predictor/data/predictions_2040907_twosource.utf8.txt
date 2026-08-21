@@ -1,0 +1,33 @@
+📁 证据文件: 1 个
+   - evidence_001_西班牙人_莱万特.md
+🎯 共 1 场比赛待预测, glm-4-flash 证据审计 + 2 个投票模型
+
+================================================================
+⚽ 第1/1场 [周日022] 西班牙人 VS 莱万特 | 西甲 | 2026-08-17 01:00
+   证据: evidence_001_西班牙人_莱万特.md
+================================================================
+     ✓ [deepseek-chat     ] -> 主胜 / 平局 比分偏好:1-0
+     ✓ [kimi-k3           ] -> 主胜 / 平局 比分偏好:1-0
+
+  📊 综合方向: 主胜  (0.9/1.4票, 强度67%)
+  🚨 谨慎(证据存在缺口): 建议双选 主胜/平局
+  📈 1X2概率: 主45.5 / 平28.5 / 客26.0（LLM加权换算，非量化校准）
+  🎯 比分Top3: 1-0, 2-1, 1-1
+  📦 大小球2.5: 小2.5
+  ⏱️ 半全场: 平胜
+  ⚠️ 坍缩标记: SCORE_COLLAPSE:1-0x2, OU_COLLAPSE:小2.5x2
+
+  💰 下注推荐:
+     🚫 不下注 — 概率来源为市场去水反解（market_only），对同一盘口算 EV 量到的是庄家水位而非独立信息 edge，不构成推荐
+     
+     EV 分析（概率来源：fusion-m3-final_1x2_pct，校准状态 VALID，市场去水反解）:
+       主胜: 概率 49.9% × 赔率 1.85 = EV -7.7% ❌
+       平局: 概率 27.0% × 赔率 3.18 = EV -14.1% ❌
+       客胜: 概率 23.1% × 赔率 3.65 = EV -15.7% ❌
+  🎯 下注建议: 主胜 (信心83%) | EV 主胜+0.0% vs 平局+0.0%; 票数 主胜0.9 vs 平局0.5
+  🗳️ 投票分布: 主胜:0.9 | 平局:0.5
+  🤖 各模型判断:
+     [deepseek-chat       ] 主胜 (备选:平局) 比分:1-0 — 西班牙人主场且历史交锋占优，莱万特客场防守不稳；赔率支持主胜但平局有拉力。官方首发未出，个别位置媒体有分歧，已标缺口。
+     [kimi-k3             ] 主胜 (备选:平局) 比分:1-0 — 多维加权：赔率主优(E20)、交锋六年不败且主场对莱万特不败(E10/E13)、近况近3场不败(E9/E11)支持主胜；
+{"direction": "主胜", "votes": 0.935, "total_votes": 1.4025, "strength": 0.6666666666666666, "all_votes": {"主胜": 0.935, "平局": 0.4675}, "probs_1x2": [45.5, 28.5, 26.0], "top_score_pref": "1-0", "top_scores": ["1-0", "2-1", "1-1"], "score_prefs": {"1-0": 2.8049999999999997, "2-1": 1.445, "1-1": 1.3599999999999999}, "top_ou25": "小2.5", "all_ou25": {"小2.5": 0.935}, "top_hafu": "平胜", "all_hafu": {"平胜": 0.935}, "alt_direction": "平局", "caution": true, "valid_model_count": 2, "minimum_valid_models": 2, "collapse_flags": ["SCORE_COLLAPSE:1-0x2", "OU_COLLAPSE:小2.5x2"], "individual": {"deepseek/deepseek-chat": {"model_id": "deepseek/deepseek-chat", "provider": "deepseek", "decision": "opinion", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "top_scores": ["1-0", "2-1", "1-1"], "probs_1x2": [45.0, 29.0, 26.0], "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "evidence_ids": ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17", "E18", "E19", "E20", "E21", "E22", "E23", "E24", "E25"], "invalid_evidence_ids": [], "unsupported_assumptions": ["双方首发基于媒体预测，官方未公布", "近5场为2025-26赛季末段，非本季"], "reason_codes": ["LINEUP_POSITION_CONFLICT"], "reasoning": "西班牙人主场且历史交锋占优，莱万特客场防守不稳；赔率支持主胜但平局有拉力。官方首发未出，个别位置媒体有分歧，已标缺口。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": false, "tags": ["首发", "交锋"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}, "moonshot/kimi-k3": {"model_id": "moonshot/kimi-k3", "provider": "moonshot", "decision": "opinion", "direction": "主胜", "alt_direction": "平局", "score_pref": "1-0", "top_scores": ["1-0", "1-1", "2-1"], "probs_1x2": [46.0, 28.0, 26.0], "ou25": "小2.5", "hafu": "平胜", "evidence_gap": true, "evidence_ids": ["E1", "E2", "E3", "E4", "E5", "E6", "E9", "E10", "E11", "E12", "E13", "E15", "E20"], "invalid_evidence_ids": [], "unsupported_assumptions": [], "reason_codes": ["LINEUP_POSITION_CONFLICT"], "reasoning": "多维加权：赔率主优(E20)、交锋六年不败且主场对莱万特不败(E10/E13)、近况近3场不败(E9/E11)支持主胜；但Puado与Kike García伤缺(E1-E3)削弱主队进攻，莱万特近况与xG不弱(E9/E12)，优势有限，备选平局。官方首发未出且个别位置两源未完全对齐，已标缺口。", "reasoning_ok": true, "reasoning_flags": {"ok": true, "has_bracket": false, "tags": ["首发", "近况", "交锋"], "odds_only": false, "invalid_reason": null}, "collapse_score": false, "status": "success"}}, "evidence_gap": true, "match_id": "sporttery-2040907", "match_num": "周日022", "home": "西班牙人", "away": "莱万特", "kickoff": "2026-08-17T01:00:00+08:00", "league": "西甲", "llm_model_pool_sha256": "bba2765f465ee28b19f7b6fdcaff0edb99c214caad018287f765c361856e22e8", "aggregation_rule_version": "evidence-direction-v1", "aggregation_rule_sha256": "fde41788042657c793ad2bf8d7a0db81bc90b2fd70724ac40acb7712c6de1614", "prompt_sha256": "5953c5a08cda4dd58cc978c37dac5463652bedd4fd32c8d273459ef5bcd7ce4f", "evidence_file_sha256": "4220a9b3ed83de065f5b5b806d2ec51cd7d1aff5267e99519d683076f67d7362", "evidence_collected_at_min": "2026-08-16T12:30:00+08:00", "evidence_collected_at_max": "2026-08-16T22:20:00+08:00", "ev_recommendation": {"recommended_bets": [], "ev_analysis": {"主胜": {"predicted_prob": 0.499, "odds": 1.85, "ev": -0.07684999999999997}, "平局": {"predicted_prob": 0.27, "odds": 3.18, "ev": -0.14139999999999986}, "客胜": {"predicted_prob": 0.231, "odds": 3.65, "ev": -0.15684999999999993}}, "vote_share_analysis": {"主胜": {"vote_share": 0.6666666666666666, "odds": 1.85}, "平局": {"vote_share": 0.3333333333333333, "odds": 3.18}, "客胜": {"vote_share": 0.0, "odds": 3.65}}, "probability_source": "fusion-m3-final_1x2_pct", "probability_calibration_status": "VALID", "market_derived": true, "action": "skip", "reason": "概率来源为市场去水反解（market_only），对同一盘口算 EV 量到的是庄家水位而非独立信息 edge，不构成推荐", "fusion_reference": {"prediction_id": "sporttery-2040907__vfusion-1-5-0-core-3-4-4__20260816T040746Z__prematch", "model_version": "m3", "snapshot_type": "prematch", "mode": "market_only", "market_dependency_pct": 100, "calibration_basis": "football-data五大联赛46696场 时间外推test验证 无额外校准最优"}}, "single_pick": {"pick": "主胜", "confidence": 0.8333333333333333, "reason": "EV 主胜+0.0% vs 平局+0.0%; 票数 主胜0.9 vs 平局0.5", "skip": false}, "evidence_audit": {"status": "ok", "usable_evidence_ids": ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17", "E18", "E19", "E20", "E21", "E22", "E23", "E24", "E25"], "unusable_evidence_ids": [], "conflict_evidence_ids": [], "gaps": ["LINEUP_POSITION_CONFLICT"], "market_readiness": {"one_x_two": true, "score": true, "ou25": true, "hafu": true}, "summary": "E2可用；仅个别位置两源对不上，不得整维标阵容或近况不可用。"}, "consensus_gate": {"status": "consensus", "action": "research_opinion", "direction": "主胜", "voter_models": ["deepseek/deepseek-chat", "moonshot/kimi-k3"]}}
+

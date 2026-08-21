@@ -99,6 +99,60 @@ def calculate_all_ev(
     return result
 
 
+# 浮点尘埃不当作正 EV，避免 market_only 抽水在 1e-16 上误报。
+_SAME_BOOK_EV_EPS = 1e-9
+
+
+def implied_payout(model_odds: List[float]) -> Optional[float]:
+    """十进制赔率返还率 = 1 / Σ(1/o_i)。赔率不可用时返回 None。"""
+    if not model_odds or len(model_odds) < 3:
+        return None
+    try:
+        triple = [float(o) for o in model_odds[:3]]
+    except (TypeError, ValueError):
+        return None
+    if any(o <= 1.0 for o in triple):
+        return None
+    overround = sum(1.0 / o for o in triple)
+    if overround <= 0:
+        return None
+    return 1.0 / overround
+
+
+def same_book_ev_audit(
+    probabilities: Dict[str, float],
+    model_odds: List[float],
+    *,
+    market_derived: bool = False,
+) -> Dict[str, Any]:
+    """同一盘口 EV 卫生检查。研究字段，不算 Kelly 仓位。
+
+    `kelly_sign`：三个方向 EV 是否全部 ≤ 0。
+    `ev_vs_payout`：比例去水恒等式（返还率 − 1），作对照基准，不是仓位。
+    `KELLY_SANITY_FAIL` 只在 `market_derived` 且某方向 EV > 0 时出现——
+    那是去水/校准把同一盘口算成假 edge，不是价值投注。
+    """
+    payout = implied_payout(model_odds)
+    evs: Dict[str, Optional[float]] = {}
+    if model_odds and len(model_odds) >= 3 and probabilities:
+        for i, direction in enumerate(DIRECTIONS):
+            evs[direction] = calculate_ev(
+                float(probabilities.get(direction, 0.0)), float(model_odds[i]))
+    present = [v for v in evs.values() if v is not None]
+    any_positive = any(v > _SAME_BOOK_EV_EPS for v in present)
+    flags: List[str] = []
+    if market_derived and any_positive:
+        flags.append("KELLY_SANITY_FAIL")
+    return {
+        "research_only": True,
+        "payout": payout,
+        "ev_same_book": evs,
+        "ev_vs_payout": (payout - 1.0) if payout is not None else None,
+        "kelly_sign": bool(present) and not any_positive,
+        "flags": flags,
+    }
+
+
 def vote_share_table(
     votes: Dict[str, float],
     model_odds: List[float],
@@ -181,6 +235,7 @@ def generate_betting_recommendation(
         "recommended_bets": [],
         "ev_analysis": {},
         "vote_share_analysis": {},
+        "same_book_audit": {},
         "probability_source": prob_source,
         "probability_calibration_status": prob_calibration_status,
         "market_derived": bool(market_derived),
@@ -204,6 +259,8 @@ def generate_betting_recommendation(
         return {**base, "action": "skip", "reason": "校准概率为空，无法计算 EV"}
     base["ev_analysis"] = ev_results
     base["vote_share_analysis"] = vote_share_table(votes, model_odds)
+    base["same_book_audit"] = same_book_ev_audit(
+        calibrated_probs, model_odds, market_derived=bool(market_derived))
 
     # 概率来源本身未校准 → 出数字供研究，但不得出胆
     if str(prob_calibration_status).upper() != "VALID":
@@ -213,9 +270,11 @@ def generate_betting_recommendation(
 
     # 概率由同一个盘口去水而来 → EV 量的是水位不是 edge，同样不得出胆
     if market_derived:
-        return {**base, "action": "skip",
-                "reason": "概率来源为市场去水反解（market_only），对同一盘口算 EV 量到的是"
-                          "庄家水位而非独立信息 edge，不构成推荐"}
+        reason = ("概率来源为市场去水反解（market_only），对同一盘口算 EV 量到的是"
+                  "庄家水位而非独立信息 edge，不构成推荐")
+        if "KELLY_SANITY_FAIL" in (base["same_book_audit"].get("flags") or []):
+            reason += "；KELLY_SANITY_FAIL：校准/去水把同一盘口算成正 EV"
+        return {**base, "action": "skip", "reason": reason}
 
     if evidence_gap:
         return {**base, "action": "skip", "reason": "证据存在缺口，风险过高"}
@@ -255,6 +314,20 @@ def format_betting_advice(recommendation: Dict[str, Any]) -> str:
                 symbol = "✅" if ev >= 0 else "❌"
                 lines.append(f"  {direction}: 概率 {data.get('predicted_prob', 0):.1%}"
                              f" × 赔率 {data.get('odds', 0):.2f} = EV {ev:+.1%} {symbol}")
+            audit = recommendation.get("same_book_audit") or {}
+            if audit.get("research_only"):
+                payout = audit.get("payout")
+                bench = audit.get("ev_vs_payout")
+                sign = "全负" if audit.get("kelly_sign") else "未全负"
+                payout_txt = f"{payout:.1%}" if isinstance(payout, (int, float)) else "?"
+                bench_txt = f"{bench:+.1%}" if isinstance(bench, (int, float)) else "?"
+                lines.append("")
+                lines.append(
+                    f"同一盘口卫生（研究字段，非仓位）: 返还率 {payout_txt} | "
+                    f"比例去水基准 EV {bench_txt} | kelly_sign {sign}")
+                flags = audit.get("flags") or []
+                if flags:
+                    lines.append(f"  标记: {', '.join(flags)}")
         elif vote_shares:
             lines.append("投票比例（非概率，不可用于 EV）:")
             for direction, data in vote_shares.items():

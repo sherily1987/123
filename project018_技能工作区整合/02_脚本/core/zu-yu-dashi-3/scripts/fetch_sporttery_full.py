@@ -101,17 +101,25 @@ def parse_list(data):
 
 # [中文功能] 从赛程列表提取赛果（半场/全场比分）
 def parse_results(data, date=None):
-    """从赛程列表提取赛果。sectionsNo1=半场，sectionsNo999=全场。"""
+    """从赛程列表提取赛果。sectionsNo1=半场，sectionsNo999=全场。
+
+    sectionsNo999 除真实比分外还会出现占位字符串（"无效场次"、"-1:-1"、"0:0:0"），
+    与 fetch_fixed_by_id() 的直查路径保持同一套排除名单，否则会把占位值当真实比分
+    传给下游 settle_result.py，导致 --score-90 解析失败（实测 2026-08-20 布拉加 vs
+    吉维森特命中此坑）。
+    """
+    INVALID_SCORE_90 = ("无效场次", "-1:-1", "0:0:0")
     out=[]
     for m in parse_list(data):
         if date and m.get("businessDate")!=date and m.get("matchDate")!=date: continue
         ft=(m.get("sectionsNo999") or "").strip(); ht=(m.get("sectionsNo1") or "").strip()
+        ft_valid = ft and ft not in INVALID_SCORE_90
         out.append({"match_id":m.get("matchId"),"match_num":m.get("matchNumStr"),
           "business_date":m.get("businessDate"),"kickoff_local":f"{m.get('matchDate')} {m.get('matchTime')}",
           "league":m.get("leagueAbbName"),"home":m.get("homeTeamAbbName"),"away":m.get("awayTeamAbbName"),
           "status_name":m.get("matchStatusName"),
-          "finished":m.get("matchStatusName")=="已完成" and bool(ft),
-          "score_ht":ht.replace(":","-") or None,"score_90":ft.replace(":","-") or None})
+          "finished":m.get("matchStatusName")=="已完成" and bool(ft_valid),
+          "score_ht":ht.replace(":","-") or None,"score_90":ft.replace(":","-") if ft_valid else None})
     return out
 
 # [中文功能] 把原始采集转成模型输入JSON

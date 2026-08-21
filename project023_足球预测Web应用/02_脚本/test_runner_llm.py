@@ -1,0 +1,123 @@
+# -*- coding: utf-8 -*-
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import runner
+
+N8N_LLM = Path(__file__).resolve().parent / "n8n" / "工作流_LLM轨预测.json"
+
+CST = timezone(timedelta(hours=8))
+
+
+def test_start_backtest_is_not_aliased_to_settle():
+    assert runner.start_backtest is not runner.start_settle
+    assert callable(runner.task_backtest)
+
+
+def test_fusion_to_llm_match_maps_sporttery_meta():
+    got = runner.fusion_to_llm_match({
+        "home": "赫根",
+        "away": "哈尔姆斯",
+        "competition": "瑞超",
+        "kickoff": "2026-08-18T01:00:00+08:00",
+        "mode": "market_only",
+        "odds": [1.21, 5.6, 8.05],
+        "sporttery_meta": {
+            "match_id": 2040915,
+            "match_num": "周一002",
+            "home_full": "赫根",
+            "away_full": "哈尔姆斯塔德",
+        },
+        "hhad": {"line": -1.0, "odds": [1.71, 4.0, 3.4]},
+    })
+    assert got["match_id"] == 2040915
+    assert got["match_num"] == "周一002"
+    assert got["league"] == "瑞超"
+    assert got["model_odds"] == [1.21, 5.6, 8.05]
+    assert got["kickoff_iso"] == "2026-08-18T01:00:00+08:00"
+    assert got["team_ids"]["away_full"] == "哈尔姆斯塔德"
+
+
+def test_future_llm_matches_skips_kicked_off():
+    now = datetime(2026, 8, 18, 2, 0, tzinfo=CST)
+    rows = runner._future_llm_matches([
+        {"home": "甲", "away": "乙", "kickoff": "2026-08-18T01:00:00+08:00",
+         "mode": "market_only", "odds": [2, 3, 4],
+         "sporttery_meta": {"match_id": 1, "match_num": "周一001"}},
+        {"home": "丙", "away": "丁", "kickoff": "2026-08-18T20:00:00+08:00",
+         "mode": "market_only", "odds": [2, 3, 4],
+         "sporttery_meta": {"match_id": 2, "match_num": "周一002"}},
+    ], now)
+    assert [m["match_id"] for m in rows] == [2]
+
+
+def test_parse_llm_log_extracts_direction_and_skips():
+    text = """
+⚽ 第1/2场 [周一002] 赫根 VS 哈尔姆斯 | 瑞超 | 2026-08-18 01:00
+   证据: evidence_001_赫根_哈尔姆斯.md
+  📊 综合方向: 主胜  (2.0/2.0票, 强度100%)
+  🎯 比分偏好: 2-0
+{"match_index": 2, "status": "evidence_insufficient", "reason": "missing_evidence_file"}
+"""
+    got = runner.parse_llm_log(text)
+    assert got["ok"] == 1
+    assert got["skipped"] == 1
+    row = got["rows"][0]
+    assert row["num"] == "周一002"
+    assert row["dir"] == "主胜"
+    assert row["strength"] == 100
+    assert row["score"] == "2-0"
+
+
+def test_parse_llm_log_reads_top3_scores():
+    text = """
+⚽ 第1/1场 [周一004] 拉科 VS 埃尔切 | 西甲 | 2026-08-18 03:00
+  📊 综合方向: 主胜  (0.9/1.4票, 强度67%)
+  🎯 比分Top3: 1-0, 2-1, 1-1
+  🚨 谨慎(证据存在缺口): 建议双选 主胜/平局
+"""
+    got = runner.parse_llm_log(text)
+    row = got["rows"][0]
+    assert row["dir"] == "主胜"
+    assert row["score"] == "1-0"
+    assert row["top_scores"] == ["1-0", "2-1", "1-1"]
+    assert row["alt"] == "平局"
+
+
+def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeypatch):
+    src = tmp_path / "src"
+    src.mkdir()
+    deep = src / "evidence_030_赫根_哈尔姆斯.md"
+    deep.write_text("深度证据 sporttery-2040915\n", encoding="utf-8")
+    (src / "evidence_030_赫根_哈尔姆斯_mcp.md").write_text("mcp\n", encoding="utf-8")
+    monkeypatch.setattr(
+        runner, "existing_evidence_index",
+        lambda exclude=None: {"sporttery-2040915": deep},
+    )
+    dest = tmp_path / "llm_evidence"
+    done = runner.prepare_llm_evidence([
+        {"match_id": 2040915, "home": "赫根", "away": "哈尔姆斯",
+         "league": "瑞超", "kickoff_iso": "2026-08-20T01:00:00+08:00",
+         "model_odds": [1.21, 5.6, 8.05], "hhad": {},
+         "team_ids": {"home_full": "赫根", "away_full": "哈尔姆斯塔德"}},
+        {"match_id": 2999777, "home": "甲", "away": "乙",
+         "league": "瑞超", "kickoff_iso": "2026-08-20T03:00:00+08:00",
+         "model_odds": [2.1, 3.3, 3.4], "hhad": {},
+         "team_ids": {"home_full": "甲", "away_full": "乙"}},
+    ], dest)
+    assert [x["source"] for x in done] == ["reuse", "light"]
+    assert "深度证据" in (dest / "evidence_001_赫根_哈尔姆斯.md").read_text(encoding="utf-8")
+    assert (dest / "evidence_001_赫根_哈尔姆斯_mcp.md").read_text(encoding="utf-8") == "mcp\n"
+    light = (dest / "evidence_002_甲_乙.md").read_text(encoding="utf-8")
+    assert "## 1. 伤停/阵容" in light
+    assert "matchId=2999777" in light
+
+
+def test_n8n_llm_workflow_posts_to_api_llm():
+    wf = json.loads(N8N_LLM.read_text(encoding="utf-8"))
+    assert wf["id"] == "hmQuantLlm0001"
+    urls = [n["parameters"].get("url", "") for n in wf["nodes"]]
+    assert any("/api/llm" in u for u in urls)
+    assert any("/api/run/" in u for u in urls)
+    assert "readWriteFile" not in {n["type"] for n in wf["nodes"]}

@@ -1,4 +1,6 @@
+import asyncio
 import hashlib
+import json
 
 import crawl_evidence as ce
 
@@ -144,3 +146,71 @@ def test_primary_writer_refuses_to_overwrite_existing_primary_evidence(tmp_path)
 
     assert result == {"ok": False, "reason": "existing_primary_evidence"}
     assert existing.read_text(encoding="utf-8") == "人工审核的主证据"
+
+
+def test_playwright_engine_persists_snapshot_and_runs_existing_verifier(tmp_path):
+    upcoming = {**RAW_MATCH, "kickoff_iso": "2026-08-20T23:00:00+08:00"}
+
+    async def fake_fetch(url):
+        return {
+            "ok": True,
+            "title": "Kairat Almaty vs Levski Sofia",
+            "markdown": "Third qualifying round\n2nd leg\n1st leg: 0-1",
+            "final_url": url,
+        }
+
+    facts, statuses = asyncio.run(ce.crawl_manifest(
+        [upcoming], [SOURCE], tmp_path, engine="playwright", fetch_page=fake_fetch,
+    ))
+
+    assert statuses[0]["ok"] is True
+    assert statuses[0]["engine"] == "playwright"
+    assert statuses[0]["verified_fact_count"] == 1
+    assert facts["2040829"][0]["text"].startswith("官方页面确认本场")
+    snapshots = list(tmp_path.rglob("*.json"))
+    assert len(snapshots) == 1
+    payload = json.loads(snapshots[0].read_text(encoding="utf-8"))
+    assert payload["canonical_home"] == "Kairat Almaty"
+    assert "Third qualifying round" in payload["markdown"]
+
+
+def test_playwright_adapter_uses_browser_fetcher_when_browser_only(monkeypatch):
+    called = []
+
+    def fake_browser(urls, **_kwargs):
+        called.extend(urls)
+        return [{
+            "verdict": "ok",
+            "title": "Espanyol vs Levante",
+            "text": "RCDE Stadium",
+            "final_url": urls[0],
+        }]
+
+    monkeypatch.setattr("playwright_fetch.fetch_urls", fake_browser)
+
+    page = asyncio.run(ce.fetch_page_via_playwright(
+        "https://www.espn.com/soccer/match", browser_only=True,
+    ))
+
+    assert called == ["https://www.espn.com/soccer/match"]
+    assert page["ok"] is True
+    assert page["markdown"] == "RCDE Stadium"
+
+
+def test_playwright_engine_records_blocked_page_without_writing_facts(tmp_path):
+    async def fake_fetch(_url):
+        return {"ok": False, "reason": "playwright:challenge"}
+
+    facts, statuses = asyncio.run(ce.crawl_manifest(
+        [RAW_MATCH], [SOURCE], tmp_path, engine="playwright", fetch_page=fake_fetch,
+    ))
+
+    assert statuses == [{
+        "match_id": "2040829",
+        "url": SOURCE["url"],
+        "ok": False,
+        "engine": "playwright",
+        "reason": "playwright:challenge",
+    }]
+    assert facts == {}
+    assert list(tmp_path.rglob("*.json")) == []

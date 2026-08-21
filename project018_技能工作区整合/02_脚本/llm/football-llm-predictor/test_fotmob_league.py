@@ -20,7 +20,28 @@ SAMPLE_LEAGUE = {
 
 def test_resolve_and_parse_utc():
     assert fm.resolve_league("日职") == 223
+    assert fm.resolve_league("韩职") == 9080
+    assert fm.resolve_league("芬超") == 51
+    assert fm.resolve_league("沙职") == 536
+    assert fm.resolve_league("日乙") == 8974
     assert fm.parse_utc("2026-08-07T10:25:00Z").tzinfo is not None
+
+
+def test_unknown_league_is_rejected_rather_than_guessed():
+    try:
+        fm.resolve_league("中超")
+    except ValueError as exc:
+        assert "未知联赛" in str(exc)
+    else:
+        raise AssertionError("unknown league must fail")
+
+
+def test_table_xg_coverage_is_explicit():
+    assert 223 in fm.TABLE_XG_IDS
+    assert 536 in fm.TABLE_XG_IDS
+    assert 9080 in fm.NO_TABLE_XG_IDS
+    assert 51 in fm.NO_TABLE_XG_IDS
+    assert fm.TABLE_XG_IDS.isdisjoint(fm.NO_TABLE_XG_IDS)
 
 
 def test_cutoff_rejects_naive():
@@ -64,3 +85,13 @@ def test_extract_match_xg_and_post_match_flag():
     assert got["xg_home"] == 1.46
     assert got["xg_away"] == 3.44
     assert got["looks_post_match"] is True
+
+
+def test_missing_match_xg_is_empty_not_invented():
+    got = fm.extract_match_xg({"general": {"matchId": 1, "finished": False}, "content": {}})
+    assert got["xg_home"] is None and got["xg_away"] is None
+    assert got["looks_post_match"] is False
+
+
+def test_naive_utc_time_is_rejected():
+    assert fm.parse_utc("2026-08-07T10:25:00") is None

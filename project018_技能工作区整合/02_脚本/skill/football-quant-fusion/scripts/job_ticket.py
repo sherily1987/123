@@ -16,6 +16,8 @@ from typing import Any
 SCHEMA = "football-job-1.0"
 DIR_TO_CODE = {"主胜": "H", "平局": "D", "客胜": "A"}
 CODE_TO_DIR = {"H": "主胜", "D": "平局", "A": "客胜"}
+RESEARCH_SIDECARS = ("intl_kelly",)
+_STAKE_KEYS = ("kelly_fraction", "f_star", "f*", "stake", "recommended_stake")
 
 
 def normalize_match_id(value) -> str | None:
@@ -110,9 +112,19 @@ def assemble_job(
         outputs = _upsert_track(outputs, _normalize_llm(llm))
     research_obj = dict((existing or {}).get("research") or {})
     if research:
-        blob = dict(research)
-        blob["research_only"] = True
-        research_obj["hybrid"] = blob
+        hybrid_src = dict(research)
+        sidecars = {}
+        for key in RESEARCH_SIDECARS:
+            if key in hybrid_src:
+                sidecars[key] = hybrid_src.pop(key)
+        if hybrid_src:
+            blob = hybrid_src
+            blob["research_only"] = True
+            research_obj["hybrid"] = blob
+        for key, value in sidecars.items():
+            item = dict(value) if isinstance(value, dict) else {"value": value}
+            item["research_only"] = True
+            research_obj[key] = item
     job = {
         "schema": SCHEMA,
         "job_id": _job_id(ident),
@@ -176,6 +188,15 @@ def validate_job(job: dict) -> list[str]:
         pct = hybrid.get("final_1x2_pct")
         if pct is not None and not _is_pct_triple(pct):
             errors.append("research.hybrid.final_1x2_pct must be [H,D,A]")
+    intl = ((job.get("research") or {}).get("intl_kelly")) if job.get("research") else None
+    if intl:
+        if intl.get("research_only") is not True:
+            errors.append("research.intl_kelly must set research_only=true")
+        cal = intl.get("calibration")
+        if cal is not None and str(cal).upper() != "UNFITTED":
+            errors.append("research.intl_kelly.calibration must be UNFITTED")
+        if any(k in intl for k in _STAKE_KEYS):
+            errors.append("research.intl_kelly must not carry stake fields")
     return errors
 
 

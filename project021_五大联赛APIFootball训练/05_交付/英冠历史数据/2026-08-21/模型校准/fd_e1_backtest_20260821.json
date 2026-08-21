@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step_days": 30,
+    "half_life": 500.0,
+    "xg_weight": 0.4,
+    "shrinkage": "off",
+    "metric_basis": "model_on_baseline_subset"
+  },
+  "leagues": {
+    "fd_e1": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "closing_market",
+      "test_from": 739228,
+      "n_all": 877,
+      "skip": 4,
+      "model_all": 0.632191,
+      "n_subset": 877,
+      "model_subset": 0.632191,
+      "market": 0.622279,
+      "frequency": 0.64962,
+      "accuracy_pct": 45.95,
+      "log_loss": 1.048216,
+      "no_market": false,
+      "thin": false
+    }
+  },
+  "summary_by_baseline": {
+    "closing_market": {
+      "leagues": [
+        "fd_e1"
+      ],
+      "n": 877,
+      "model": 0.6322,
+      "market": 0.6223,
+      "frequency": 0.6496,
+      "gap": 0.0099
+    }
+  }
+}

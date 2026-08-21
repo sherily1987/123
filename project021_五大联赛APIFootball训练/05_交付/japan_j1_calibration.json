@@ -1,6 +1,6 @@
 {
   "schema": "japan-j1-complete-calibration-1.0",
-  "ran_at": "2026-08-16T14:39:38",
+  "ran_at": "2026-08-20T21:12:08",
   "production_unchanged": "MARKET_BASELINE / market_only，未改权重、未 bump m3",
   "join": {
     "api_n": 992,
@@ -29,7 +29,7 @@
   },
   "backtests": {
     "fd_jpn_goals_vs_closing": {
-      "config": "滚动（无 xG 数据）",
+      "config": "滚动（无 xG 数据）hl=500",
       "baseline": "closing_market",
       "test_from": 738701,
       "n_all": 904,
@@ -44,33 +44,33 @@
       "gap": 0.0178
     },
     "apisports_xg_vs_frequency": {
-      "config": "滚动+xG w=0.4",
+      "config": "滚动+xG w=0.4 hl=500",
       "baseline": "provider_market",
       "test_from": 739060,
       "n_all": 192,
       "skip": 0,
-      "model_all": 0.654151,
+      "model_all": 0.654172,
       "n_subset": 192,
-      "model_subset": 0.654151,
+      "model_subset": 0.654172,
       "market": null,
       "frequency": 0.661157,
       "accuracy_pct": 39.06,
-      "log_loss": 1.079582,
+      "log_loss": 1.079611,
       "gap": -0.007
     },
     "apisports_xg_vs_closing_joined": {
-      "config": "滚动+xG w=0.4",
+      "config": "滚动+xG w=0.4 hl=500",
       "baseline": "closing_market",
       "test_from": 739060,
       "n_all": 192,
       "skip": 0,
-      "model_all": 0.654151,
+      "model_all": 0.654172,
       "n_subset": 192,
-      "model_subset": 0.654151,
+      "model_subset": 0.654172,
       "market": 0.642853,
       "frequency": 0.661157,
       "accuracy_pct": 39.06,
-      "log_loss": 1.079582,
+      "log_loss": 1.079611,
       "gap": 0.0113
     }
   },

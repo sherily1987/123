@@ -11,13 +11,18 @@ evidence_gap=true 但门禁 ok=true）。
 import json
 import os
 import re
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 # 2026-08-16：LLM 工程已从 C:/Users/Administrator/football-llm-predictor 迁入仓库
-LLM_DATA = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
-    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor")) / "data"
+LLM_ROOT = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
+    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"))
+LLM_DATA = LLM_ROOT / "data"
+if str(LLM_ROOT) not in sys.path:
+    sys.path.insert(0, str(LLM_ROOT))
+import evidence_collect_defaults as ecd
 
 NOW_STR = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%dT%H:%M:%S+08:00")
 
@@ -52,12 +57,11 @@ def build_one(idx: int, m: dict, quant_tier: str) -> str:
     ]
     if odds:
         lines.append(
-            f"- 体彩官方接口无伤病/大名单字段，赛前官方首发与伤员名单尚未公布 | source({src_tc}) | collected_at({collected})")
-        lines.append("> 说明：轻量证据未做伤停新闻深度搜索；以赛前官方名单为准。")
+            f"- 体彩官方接口无伤病/大名单字段 | source({src_tc}) | collected_at({collected})")
     else:
         lines.append(
             f"- 体彩官方接口无伤病/大名单字段，本场亦未开胜平负盘 | source({src_tc}) | collected_at({collected})")
-        lines.append("> 说明：轻量证据未做伤停新闻深度搜索；以赛前官方名单为准。")
+    lines.extend(ecd.lineup_lines(collected, league=league))
     lines += ["", "## 2. 战意/动机"]
     lines.append(
         f"- 本场为竞彩{num}场次，{league}在售未开球场次之一，开球时间 {kick} | source({src_tc}) | collected_at({collected})")
@@ -68,7 +72,7 @@ def build_one(idx: int, m: dict, quant_tier: str) -> str:
     lines += ["", "## 3. 近况/状态"]
     lines.append(
         f"- 量化 Dixon-Coles 模型覆盖标注：{league} 档位 {quant_tier}（见 full_backtest.json 滚动回测） | source(file://F:/HM足球比赛预测/project021_五大联赛APIFootball训练/05_交付/full_backtest.json) | collected_at({collected})")
-    lines.append("> 说明：轻量证据未抓取双方近 5 场战绩；可上传深度证据覆盖本文件。")
+    lines.extend(ecd.form_lines(league, collected))
     lines += ["", "## 4. 主客/旅行/天气"]
     lines.append(
         f"- 主队 {home} 主场作战，客队 {away} 客场远征（体彩官方对阵口径） | source({src_tc}) | collected_at({collected})")

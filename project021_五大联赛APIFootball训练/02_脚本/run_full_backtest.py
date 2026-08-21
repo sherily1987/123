@@ -45,6 +45,17 @@ blend = _load("tune_xg_blend", HERE / "tune_xg_blend.py")
 
 STEP_DAYS, HALF_LIFE, XG_WEIGHT = 30, 500.0, 0.4
 
+# ⚠️ 2026-08-19 步骤4 实测结论：strength_config_tuning.json 的「英超 walk_forward/120」
+# 是在**无 xG 纯进球口径**下扫出来的（test -0.0435）；而 full_backtest 英超走
+# 「滚动+xG w=0.4」blend 路径，half_life 被 xG 混合稀释——实测 hl=120 vs hl=500：
+# model Brier 0.6214 vs 0.6202（+0.0012，噪声级，无收益）。**tunning 结论不可直接
+# 搬到带 xG 的生产口径**，需要时应在 xG 口径下重扫。故英超保持 hl=500，不覆盖。
+LEAGUE_HALF_LIFE: dict[str, float] = {}
+
+
+def league_hl(slug: str) -> float:
+    return LEAGUE_HALF_LIFE.get(slug, HALF_LIFE)
+
 # 联赛清单由 04_素材/标准化 自动发现，不再硬编码——规模到 40+ 个联赛后手工维护不现实。
 # 规则：
 #   <slug>_events_provider_market.jsonl  -> apifootball 源，基线 provider_market
@@ -98,19 +109,21 @@ def backtest_league(project: Path, league_id, events_file: str, xg_file: str | N
     src = project / "04_素材" / "标准化" / events_file
     raw = [json.loads(l) for l in src.read_text(encoding="utf-8").splitlines() if l.strip()]
     _, test_from = training.time_cutoffs(raw)
+    slug = events_file.replace("_events_provider_market.jsonl", "").replace("_events.jsonl", "")
+    hl = league_hl(slug)
     goals = strength.load_matches(src, league_id=league_id, require_odds=False)
 
     if xg_file:
         xg_matches = strength.load_matches(src, league_id=league_id, require_odds=False,
                                            xg_input=project / "04_素材" / "标准化" / xg_file)
         blend.BASELINE = (baseline, baseline)
-        blend.STEP_DAYS, blend.HALF_LIFE = STEP_DAYS, HALF_LIFE
+        blend.STEP_DAYS, blend.HALF_LIFE = STEP_DAYS, hl
         rep = blend.walk_forward_blend(goals, xg_matches, test_from, None, [XG_WEIGHT])[XG_WEIGHT]
-        config = f"滚动+xG w={XG_WEIGHT}"
+        config = f"滚动+xG w={XG_WEIGHT} hl={hl:g}"
     else:
-        rep = strength.walk_forward_validate(goals, test_from, step_days=STEP_DAYS, half_life=HALF_LIFE,
+        rep = strength.walk_forward_validate(goals, test_from, step_days=STEP_DAYS, half_life=hl,
                                              baseline_key=baseline, baseline_label=baseline)
-        config = "滚动（无 xG 数据）"
+        config = f"滚动（无 xG 数据）hl={hl:g}"
 
     sub = rep.get("model_on_baseline_subset") or {}
     mkt = rep.get(baseline) or {}

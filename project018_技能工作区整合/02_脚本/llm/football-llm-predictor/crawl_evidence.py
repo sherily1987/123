@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Crawl4AI 网页快照的赛前事实验证。
+"""网页快照的赛前事实验证。
 
 本模块将网页抓取与事实写入分离：只有来源清单声明的事实，且页面身份、
 抓取时间和关键词均通过验证，才能进入现有 evidence_NNN_*.md 主证据。
-Crawl4AI 的可选导入仅在实际抓取命令中发生，纯验证函数不依赖浏览器。
+取页引擎（Crawl4AI / Playwright）可替换；纯验证函数不依赖浏览器。
 """
 
 from __future__ import annotations
@@ -156,7 +156,7 @@ def render_primary_evidence(
             return None, {"ok": False, "reason": f"insufficient_independent_sources:{section}"}
 
     lines = [
-        f"# {raw_match.get('match_num', '')} {raw_match.get('home', '')} vs {raw_match.get('away', '')}｜Crawl4AI 已核验证据",
+        f"# {raw_match.get('match_num', '')} {raw_match.get('home', '')} vs {raw_match.get('away', '')}｜已核验证据",
         "",
         "> 所有事实均由抓取快照的页面关键词、比赛身份和赛前时间门禁验证；网页全文不直接进入 LLM。",
         "",
@@ -213,24 +213,11 @@ def _snapshot_path(snapshot_dir: Path, raw_match: dict[str, Any], source_url: st
     return snapshot_dir / date_part / str(raw_match.get("match_id")) / f"{url_hash}.json"
 
 
-async def crawl_manifest(
+def _selected_sources(
     raw_matches: list[dict[str, Any]],
     sources: list[dict[str, Any]],
-    snapshot_dir: Path | str,
-    *,
-    match_ids: set[str] | None = None,
-) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
-    """Crawl manifest URLs, persist snapshots, and return only verified facts.
-
-    The Crawl4AI dependency is deliberately local to this function: prediction and
-    validation can run without a browser runtime, while collection must use the
-    project .venv where Crawl4AI is installed.
-    """
-    try:
-        from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
-    except ImportError as exc:  # pragma: no cover - exercised by CLI environment
-        raise RuntimeError("缺少 Crawl4AI；请使用 .venv/Scripts/python.exe 运行") from exc
-
+    match_ids: set[str] | None,
+) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
     raw_by_id = {str(match.get("match_id")): match for match in raw_matches}
     selected = [
         source for source in sources
@@ -238,53 +225,128 @@ async def crawl_manifest(
         and str(source.get("sporttery_match_id")) in raw_by_id
         and (match_ids is None or str(source.get("sporttery_match_id")) in match_ids)
     ]
+    return raw_by_id, selected
+
+
+async def fetch_page_via_playwright(url: str, *, browser_only: bool = False) -> dict[str, Any]:
+    """Adapter: playwright_fetch record -> title/markdown/final_url payload."""
+    import playwright_fetch as pf
+
+    fetcher = pf.fetch_urls if browser_only else pf.fetch_http_first
+    record = (await asyncio.to_thread(fetcher, [url]))[0]
+    if record.get("verdict") != "ok":
+        return {"ok": False, "reason": f"playwright:{record.get('verdict')}"}
+    return {
+        "ok": True,
+        "title": str(record.get("title") or ""),
+        "markdown": str(record.get("text") or ""),
+        "final_url": str(record.get("final_url") or url),
+    }
+
+
+async def crawl_manifest(
+    raw_matches: list[dict[str, Any]],
+    sources: list[dict[str, Any]],
+    snapshot_dir: Path | str,
+    *,
+    match_ids: set[str] | None = None,
+    engine: str = "crawl4ai",
+    fetch_page: Any = None,
+    browser_only: bool = False,
+) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
+    """Crawl manifest URLs, persist snapshots, and return only verified facts.
+
+    Browser engines are imported only when used. Tests inject ``fetch_page`` so
+    verification can run without Crawl4AI or Playwright installed.
+    """
+    raw_by_id, selected = _selected_sources(raw_matches, sources, match_ids)
     facts_by_match: dict[str, list[dict[str, Any]]] = {}
     statuses: list[dict[str, Any]] = []
     snapshot_root = Path(snapshot_dir)
-    browser_config = BrowserConfig(headless=True)
-    run_config = CrawlerRunConfig(cache_mode=CacheMode.BYPASS)
+    engine_name = str(engine or "crawl4ai").casefold()
 
-    async with AsyncWebCrawler(config=browser_config) as crawler:
+    async def ingest(fetcher: Any) -> None:
         for source in selected:
             match_id = str(source["sporttery_match_id"])
             raw_match = raw_by_id[match_id]
+            url = str(source.get("url", ""))
             try:
-                result = await crawler.arun(url=str(source.get("url", "")), config=run_config)
+                page = await fetcher(url)
             except Exception as exc:
                 statuses.append({"match_id": match_id, "url": source.get("url"), "ok": False,
-                                 "reason": f"crawl_error:{str(exc)[:160]}"})
+                                 "engine": engine_name, "reason": f"crawl_error:{str(exc)[:160]}"})
                 continue
-            if not result.success:
+            if not page.get("ok"):
                 statuses.append({"match_id": match_id, "url": source.get("url"), "ok": False,
-                                 "reason": f"crawl_failed:{str(result.error_message or '')[:160]}"})
+                                 "engine": engine_name,
+                                 "reason": str(page.get("reason") or "crawl_failed")[:160]})
                 continue
-            metadata = result.metadata if isinstance(result.metadata, dict) else {}
             snapshot = build_snapshot(
                 raw_match,
                 source,
-                title=str(metadata.get("title") or ""),
-                markdown=str(result.markdown or ""),
-                final_url=str(result.url or source.get("url", "")),
+                title=str(page.get("title") or ""),
+                markdown=str(page.get("markdown") or ""),
+                final_url=str(page.get("final_url") or url),
                 crawled_at=datetime.now().astimezone().isoformat(timespec="seconds"),
             )
-            output = _snapshot_path(snapshot_root, raw_match, str(source.get("url", "")))
+            output = _snapshot_path(snapshot_root, raw_match, url)
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
             facts = verified_facts_for_snapshot(raw_match, source, snapshot)
             facts_by_match.setdefault(match_id, []).extend(facts)
             statuses.append({"match_id": match_id, "url": source.get("url"), "ok": True,
-                             "snapshot": str(output), "verified_fact_count": len(facts)})
+                             "engine": engine_name, "snapshot": str(output),
+                             "verified_fact_count": len(facts)})
+
+    if fetch_page is not None:
+        await ingest(fetch_page)
+        return facts_by_match, statuses
+    if engine_name == "playwright":
+        async def fetch_playwright(url: str) -> dict[str, Any]:
+            return await fetch_page_via_playwright(url, browser_only=browser_only)
+
+        await ingest(fetch_playwright)
+        return facts_by_match, statuses
+    if engine_name != "crawl4ai":
+        raise ValueError(f"unknown engine: {engine}")
+
+    try:
+        from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
+    except ImportError as exc:  # pragma: no cover - exercised by CLI environment
+        raise RuntimeError("缺少 Crawl4AI；请使用 .venv/Scripts/python.exe 运行") from exc
+
+    browser_config = BrowserConfig(headless=True)
+    run_config = CrawlerRunConfig(cache_mode=CacheMode.BYPASS)
+
+    async with AsyncWebCrawler(config=browser_config) as crawler:
+        async def fetch_crawl4ai(url: str) -> dict[str, Any]:
+            result = await crawler.arun(url=url, config=run_config)
+            if not result.success:
+                return {"ok": False, "reason": f"crawl_failed:{str(result.error_message or '')[:160]}"}
+            metadata = result.metadata if isinstance(result.metadata, dict) else {}
+            return {
+                "ok": True,
+                "title": str(metadata.get("title") or ""),
+                "markdown": str(result.markdown or ""),
+                "final_url": str(result.url or url),
+            }
+
+        await ingest(fetch_crawl4ai)
     return facts_by_match, statuses
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Crawl4AI 赛前网页证据采集与验证")
+    parser = argparse.ArgumentParser(description="赛前网页证据采集与验证")
     parser.add_argument("--input", required=True, help="体彩 raw_YYYY-MM-DD.json")
-    parser.add_argument("--sources", required=True, help="人工审核的 Crawl4AI 来源清单 JSON")
+    parser.add_argument("--sources", required=True, help="人工审核的来源清单 JSON")
     parser.add_argument("--snapshot-dir", default="data/crawl_snapshots", help="快照根目录")
     parser.add_argument("--evidence-dir", help="仅配合 --write-primary 使用")
     parser.add_argument("--match-id", action="append", default=[], help="可重复指定体彩 match_id")
     parser.add_argument("--write-primary", action="store_true", help="双域齐全时创建新主证据；已有主证据拒绝覆盖")
+    parser.add_argument("--engine", choices=("crawl4ai", "playwright"), default="crawl4ai",
+                        help="取页引擎；验证门槛不变")
+    parser.add_argument("--browser-only", action="store_true",
+                        help="Playwright 引擎跳过纯 HTTP，直接渲染")
     args = parser.parse_args()
 
     raw_matches = _load_raw_matches(Path(args.input))
@@ -297,7 +359,8 @@ def main() -> None:
 
     facts_by_match, statuses = asyncio.run(
         crawl_manifest(raw_matches, sources, args.snapshot_dir,
-                       match_ids={str(value) for value in args.match_id} or None)
+                       match_ids={str(value) for value in args.match_id} or None,
+                       engine=args.engine, browser_only=args.browser_only)
     )
     raw_index = {str(match.get("match_id")): (index, match) for index, match in enumerate(raw_matches, 1)}
     for status in statuses:

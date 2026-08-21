@@ -1,0 +1,177 @@
+{
+  "note": "v2 修正版：赛前滚动 xG_l10 作为 lambda，非赛后实际 xG。min_history>=10。",
+  "total_prematch_rows_min_history10": 13551,
+  "joined_n": 5285,
+  "leagues": {
+    "德甲": {
+      "n": 897,
+      "market": {
+        "brier_mean": 0.592106,
+        "log_loss_mean": 0.993722
+      },
+      "xg_l10_fixed_rho_-0.08": {
+        "brier_mean": 0.610598,
+        "log_loss_mean": 1.020682,
+        "accuracy_pct": 50.06
+      },
+      "xg_l10_best_rho": {
+        "rho": -0.08,
+        "brier_mean": 0.610598,
+        "log_loss_mean": 1.020682,
+        "accuracy_pct": 50.06
+      },
+      "delta_fixed_vs_market_brier": {
+        "mean": 0.018492,
+        "ci95": [
+          0.005056,
+          0.032324
+        ],
+        "significant": true
+      },
+      "delta_bestrho_vs_market_brier": {
+        "mean": 0.018492,
+        "ci95": [
+          0.004875,
+          0.033139
+        ],
+        "significant": true
+      }
+    },
+    "意甲": {
+      "n": 1098,
+      "market": {
+        "brier_mean": 0.564822,
+        "log_loss_mean": 0.955215
+      },
+      "xg_l10_fixed_rho_-0.08": {
+        "brier_mean": 0.598756,
+        "log_loss_mean": 1.003656,
+        "accuracy_pct": 52.28
+      },
+      "xg_l10_best_rho": {
+        "rho": -0.01,
+        "brier_mean": 0.598382,
+        "log_loss_mean": 1.003569,
+        "accuracy_pct": 52.19
+      },
+      "delta_fixed_vs_market_brier": {
+        "mean": 0.033933,
+        "ci95": [
+          0.021738,
+          0.046645
+        ],
+        "significant": true
+      },
+      "delta_bestrho_vs_market_brier": {
+        "mean": 0.033559,
+        "ci95": [
+          0.021264,
+          0.045444
+        ],
+        "significant": true
+      }
+    },
+    "法甲": {
+      "n": 1033,
+      "market": {
+        "brier_mean": 0.593632,
+        "log_loss_mean": 0.99559
+      },
+      "xg_l10_fixed_rho_-0.08": {
+        "brier_mean": 0.62996,
+        "log_loss_mean": 1.047445,
+        "accuracy_pct": 45.89
+      },
+      "xg_l10_best_rho": {
+        "rho": 0.02,
+        "brier_mean": 0.629208,
+        "log_loss_mean": 1.046055,
+        "accuracy_pct": 46.47
+      },
+      "delta_fixed_vs_market_brier": {
+        "mean": 0.036328,
+        "ci95": [
+          0.0239,
+          0.048847
+        ],
+        "significant": true
+      },
+      "delta_bestrho_vs_market_brier": {
+        "mean": 0.035576,
+        "ci95": [
+          0.023565,
+          0.047332
+        ],
+        "significant": true
+      }
+    },
+    "英超": {
+      "n": 1128,
+      "market": {
+        "brier_mean": 0.572214,
+        "log_loss_mean": 0.966769
+      },
+      "xg_l10_fixed_rho_-0.08": {
+        "brier_mean": 0.608187,
+        "log_loss_mean": 1.018691,
+        "accuracy_pct": 48.67
+      },
+      "xg_l10_best_rho": {
+        "rho": 0.04,
+        "brier_mean": 0.606656,
+        "log_loss_mean": 1.015929,
+        "accuracy_pct": 49.29
+      },
+      "delta_fixed_vs_market_brier": {
+        "mean": 0.035973,
+        "ci95": [
+          0.023652,
+          0.048352
+        ],
+        "significant": true
+      },
+      "delta_bestrho_vs_market_brier": {
+        "mean": 0.034442,
+        "ci95": [
+          0.022547,
+          0.046234
+        ],
+        "significant": true
+      }
+    },
+    "西甲": {
+      "n": 1129,
+      "market": {
+        "brier_mean": 0.586149,
+        "log_loss_mean": 0.98305
+      },
+      "xg_l10_fixed_rho_-0.08": {
+        "brier_mean": 0.626938,
+        "log_loss_mean": 1.041931,
+        "accuracy_pct": 47.39
+      },
+      "xg_l10_best_rho": {
+        "rho": -0.11,
+        "brier_mean": 0.626883,
+        "log_loss_mean": 1.041766,
+        "accuracy_pct": 47.21
+      },
+      "delta_fixed_vs_market_brier": {
+        "mean": 0.040789,
+        "ci95": [
+          0.02849,
+          0.053551
+        ],
+        "significant": true
+      },
+      "delta_bestrho_vs_market_brier": {
+        "mean": 0.040734,
+        "ci95": [
+          0.028081,
+          0.05416
+        ],
+        "significant": true
+      }
+    }
+  }
+}

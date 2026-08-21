@@ -4,8 +4,10 @@
 
 `crawl_evidence.py` 是网页证据采集器，不是预测器，不替代体彩 raw、apifootball 或 `predict.py`。
 
+**以后每场的首发 / 伤停 / 近 5 场一律走 20 源投票**，标准见 `EVIDENCE_COLLECT.md`。投票结果就是可用数据，不再等官方名单。封锁源占槽不采正文。本文件只约束「怎么取页和验证」，不改计票规则。
+
 ```text
-来源清单 → Crawl4AI 快照 → 身份/时间/关键词验证 → 跨域门槛 → 主证据 → predict.py
+来源清单 → Crawl4AI 或 Playwright 快照 → 身份/时间/关键词验证 → 跨域门槛 → 主证据 → predict.py
 ```
 
 网页全文只保存于快照，**不直接拼入 LLM prompt**。进入 `evidence_NNN_*.md` 的只能是来源清单中人工声明、且确实出现在该网页快照中的事实。
@@ -15,12 +17,9 @@
 Crawl4AI 装在项目虚拟环境：
 
 ```bash
-cd "/f/HM足球比赛预测/project018_技能工作区整合/02_脚本/llm/football-llm-predictor"
+cd /c/Users/Administrator/football-llm-predictor
 .venv/Scripts/python.exe crawl_evidence.py --help
 ```
-
-> 2026-08-16 迁移提示：`.venv` **没有**跟着从 C 盘拷过来（虚拟环境里烧死了绝对路径，
-> 拷贝过来是坏的）。在新位置首次使用 Crawl4AI 前必须重建，见 README「环境重建」。
 
 不要用 Hermes 的 `python` 运行实际抓取；普通 pytest 不依赖 Crawl4AI。
 
@@ -68,6 +67,21 @@ cd "/f/HM足球比赛预测/project018_技能工作区整合/02_脚本/llm/footb
   --match-id <体彩match_id>
 ```
 
+五大联赛官网 / 媒体预览等 JS 页改用 Playwright 取页（验证门槛不变）：
+
+```bash
+.venv/Scripts/python.exe crawl_evidence.py \
+  --engine playwright \
+  --input data/raw_YYYY-MM-DD.json \
+  --sources data/crawl_sources_YYYY-MM-DD.json \
+  --snapshot-dir data/crawl_snapshots \
+  --match-id <体彩match_id>
+```
+
+JS 场次页（如 ESPN match）需要强制渲染时加 `--browser-only`。
+
+`--engine playwright` 调用 `playwright_fetch.py`：默认先纯 HTTP，只有骨架页才开 Chromium。人机验证和 403 记缺口，不绕过。
+
 快照写入：
 
 ```text
@@ -98,24 +112,10 @@ data/crawl_snapshots/YYYY-MM-DD/<体彩match_id>/<url_hash>.json
 
 因此，`insufficient_independent_sources:N` 是预期的安全拒绝，不是网络失败。补齐来源清单后重新运行即可；不得通过删减栏目、复用同域页面或降低关键词条件来绕过。
 
-## 取页路径选择（2026-08-16 实测）
-
-`playwright_fetch.py` 是取页诊断/兜底工具，**不写主证据**，快照仍须走本文上面的门槛。
-
-取页按代价从低到高：
-
-1. **纯 HTTP**（带普通桌面 UA）——Transfermarkt 伤停、OddsPortal 1X2、jleague 赛程
-   实测都在服务端 HTML 里。历史证据里这几项记的「未取到」是抽取/截断问题（页面
-   128KB～764KB），不是封锁；
-2. **真浏览器渲染**——仅对 HTTP 只得骨架的 JS-only 页，目前实测只有 fotmob 属此类；
-3. **记缺口**——命中人机验证或服务端拒绝（fbref / forebet / whoscored / besoccer）。
-
-`playwright_fetch.py` 默认按 1→2 自动升级，且**不把 403 自动升级到浏览器重试**。
-完整矩阵见仓库 `30_数据/网页源可达性矩阵.md`。
-
 ## 来源优先级与边界
 
 1. 俱乐部、赛事、联赛官方页面：Crawl4AI 的首选目标；
 2. 第三方媒体：仅作交叉验证，必须明确 `source_level`；
 3. 体彩赔率：继续使用 raw/API，不用网页爬虫替代；
 4. 结构化首发、交锋、外盘：继续走 `mcp_evidence.py` / apifootball，并保持第三方数据标签；
+5. 验证码、登录、付费墙或赛后更新：不得绕过；记录失败或缺口。

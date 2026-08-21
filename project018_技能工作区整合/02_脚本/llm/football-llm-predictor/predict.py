@@ -74,7 +74,7 @@ AGGREGATION_RULE_SPEC = {
     "weak_strength_threshold": 0.6,
 }
 MIN_VALID_EVIDENCE_MODELS = 2
-EVIDENCE_AUDITOR_MODEL = "deepseek/deepseek-chat"
+EVIDENCE_AUDITOR_MODEL = "zhipu/glm-4-flash"
 # 主胜比例熔断：批内主胜方向占比过高 = 赛季初/主队系统性高估（08-05 回测 4/5 主胜全错，
 # 08-13 官方赔率方向仅 30% 命中）。触发后把"强度最低"的主胜场次改判为次高方向。
 HOME_BIAS_THRESHOLD = 0.65   # 主胜方向占比 >= 65% 触发熔断
@@ -234,6 +234,7 @@ def build_evidence_catalog(evidence_text):
             status = "SOURCE_CONFLICT"
         elif any(marker in lowered for marker in (
             "无记录", "0条", "未获得", "未检索到", "未拿到", "证据缺口",
+            "封锁源占槽", "不采正文", "待采", "无本场逐人", "未取到本场", "按缺口记录",
         )):
             status = "UNAVAILABLE"
         elif any(marker in lowered for marker in ("双源一致", "交叉验证", "verified_multi_source")):
@@ -296,12 +297,16 @@ def build_evidence_prompt(match, evidence_text, match_idx):
     catalog = build_evidence_catalog(evidence_text)
     lines.append(f"\n=== 结构化证据（{evidence_collection_label(evidence_text)}） ===")
     lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
-    lines.append("\n只使用上述 E 编号。每个市场证据不足时单独填 null；整体不足时 decision=abstain。")
+    lines.append(
+        "\n只使用上述 E 编号。decision=opinion 时必须给出 probs_1x2、比分Top3、大小球、半全场，不得留空。"
+        "近5场用证据里 20 源投票得票最高的正式赛果，不再等官方联赛页。揭幕战/该队本季第一场必须用该队对其他对手的最近正式赛，不得当无近5场。"
+        "首发和伤停都用证据里 20 源投票得票最高的名单，不再等官网。两个独立媒体对同一位置一致即可写入，不得因官方未出单独弃权。"
+    )
     return "\n".join(lines)
 
 
 def parse_evidence_audit(content, evidence_catalog):
-    """校验 DeepSeek 的无方向证据审计结果。"""
+    """校验无方向证据审计结果。"""
     text = (content or "").strip()
     text = re.sub(r"^```(json)?\s*|\s*```$", "", text)
     match = re.search(r"\{.*\}", text, re.S)
@@ -344,7 +349,7 @@ def parse_evidence_audit(content, evidence_catalog):
 
 def build_voter_prompt(base_prompt, evidence_audit):
     audit = {key: value for key, value in evidence_audit.items() if key != "status"}
-    return (f"{base_prompt}\n\n=== DeepSeek 证据审计（无预测方向） ===\n"
+    return (f"{base_prompt}\n\n=== 证据审计（无预测方向） ===\n"
             f"{json.dumps(audit, ensure_ascii=False, separators=(',', ':'))}\n"
             "请独立判断；审计结果只说明证据可用性，不是另一个模型的比赛结论。")
 
@@ -390,7 +395,9 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     alt = str(data.get("alt_direction") or "").strip() or None
     if alt not in (None, "主胜", "平局", "客胜"):
         alt = None
-    sp = normalize_score_pref(data.get("score_pref"))
+    top_scores = lpr.normalize_top_scores(data.get("top_scores") or data.get("score_pref"))
+    sp = (top_scores[0] if top_scores else None) or normalize_score_pref(data.get("score_pref"))
+    probs = lpr.normalize_probs_1x2(data.get("probs_1x2") or data.get("probs"))
     reasoning = str(data.get("summary") or data.get("reasoning") or "").strip()[:220]
     ou25 = lpr.normalize_ou25(data.get("ou25"))
     hafu = lpr.normalize_hafu(data.get("hafu"))
@@ -403,11 +410,16 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     usable_ids = [value for value in evidence_ids if catalog_by_id.get(value, {}).get("status") in (
         "SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE",
     )]
-    if decision == "opinion" and evidence_catalog is not None and (invalid_ids or not usable_ids or unsupported):
+    if decision == "opinion" and evidence_catalog is not None and (invalid_ids or not usable_ids):
         decision = "abstain"
         direction = alt = sp = ou25 = hafu = None
+        top_scores = probs = None
         egap = True
         reason_codes.append("INVALID_OR_UNUSABLE_EVIDENCE")
+    elif decision == "opinion" and unsupported:
+        egap = True
+    if decision == "opinion" and (not probs or not top_scores or not ou25 or not hafu):
+        return {"error": "missing_required_markets"}
     rq = lpr.reasoning_quality(reasoning)
     reasoning_ok = bool(reasoning) if is_new_contract else bool(rq.get("ok"))
     if not reasoning_ok:
@@ -420,6 +432,8 @@ def parse_evidence_prediction(content, evidence_catalog=None):
         "direction": direction,
         "alt_direction": alt,
         "score_pref": sp,
+        "top_scores": top_scores,
+        "probs_1x2": probs,
         "ou25": ou25,
         "hafu": hafu,
         "evidence_gap": egap,
@@ -509,12 +523,46 @@ def call_evidence_model(client, model, prompt, models_used=None, evidence_catalo
 
 def call_evidence_auditor(client, prompt, evidence_catalog):
     try:
+        if EVIDENCE_AUDITOR_MODEL.startswith("zhipu/"):
+            prompt = sanitize_for_zhipu(prompt)
+        messages = [
+            {"role": "system", "content": lpr.system_prompt_evidence_audit()},
+            {"role": "user", "content": prompt},
+        ]
         response = client.chat.completions.create(
             model=fp.strip_provider(EVIDENCE_AUDITOR_MODEL),
-            messages=[
-                {"role": "system", "content": lpr.system_prompt_evidence_audit()},
-                {"role": "user", "content": prompt},
-            ],
+            messages=messages,
+            temperature=0.0,
+            max_tokens=768,
+        )
+        raw = response.choices[0].message.content
+        parsed = parse_evidence_audit(raw, evidence_catalog)
+        if parsed.get("error") != "audit_unavailable_status_mismatch":
+            return parsed
+        catalog = {str(item.get("id")): item for item in (evidence_catalog or [])}
+        match = re.search(r"\{.*\}", raw or "", re.S)
+        bad = []
+        if match:
+            try:
+                data = json.loads(match.group(0))
+            except json.JSONDecodeError:
+                data = {}
+            for eid in data.get("unusable_evidence_ids") or []:
+                status = catalog.get(str(eid), {}).get("status")
+                if status != "UNAVAILABLE":
+                    bad.append(f"{eid}={status}")
+        messages.append({"role": "assistant", "content": raw})
+        messages.append({
+            "role": "user",
+            "content": (
+                "审计未通过：unusable_evidence_ids 里有非 UNAVAILABLE 编号 "
+                + (",".join(bad) or "未知")
+                + "。请只把 status=UNAVAILABLE 的编号放入 unusable_evidence_ids，其余 SINGLE_SOURCE/VERIFIED_MULTI_SOURCE 放回 usable_evidence_ids。只输出 JSON。"
+            ),
+        })
+        response = client.chat.completions.create(
+            model=fp.strip_provider(EVIDENCE_AUDITOR_MODEL),
+            messages=messages,
             temperature=0.0,
             max_tokens=768,
         )
@@ -720,6 +768,8 @@ def aggregate_directions(predictions):
     score_prefs = Counter()
     ou_prefs = Counter()
     hafu_prefs = Counter()
+    prob_acc = [0.0, 0.0, 0.0]
+    prob_w = 0.0
     for md, p in valid.items():
         w = model_w.get(md, 0.8)
         if p.get("reasoning_ok") is False:
@@ -731,18 +781,28 @@ def aggregate_directions(predictions):
         votes[p["direction"]] += w
         if p.get("alt_direction"):
             votes[p["alt_direction"]] += 0.5 * w
-        if p.get("score_pref"):
-            score_prefs[p["score_pref"]] += w * (0.5 if p.get("collapse_score") else 1.0)
+        ranked = p.get("top_scores") or ([p["score_pref"]] if p.get("score_pref") else [])
+        for i, score in enumerate(ranked[:3]):
+            score_prefs[score] += w * (3 - i) * (0.5 if p.get("collapse_score") else 1.0)
         if p.get("ou25"):
             ou_prefs[p["ou25"]] += w
         if p.get("hafu"):
             hafu_prefs[p["hafu"]] += w
+        pr = p.get("probs_1x2")
+        if pr:
+            for i in range(3):
+                prob_acc[i] += pr[i] * w
+            prob_w += w
     top_dir, top_votes = votes.most_common(1)[0]
     total_votes = sum(votes.values())
     strength = top_votes / total_votes if total_votes else 0
-    top_score = score_prefs.most_common(1)[0][0] if score_prefs else None
+    top3 = [s for s, _ in score_prefs.most_common(3)]
+    top_score = top3[0] if top3 else None
     top_ou = ou_prefs.most_common(1)[0][0] if ou_prefs else None
     top_hafu = hafu_prefs.most_common(1)[0][0] if hafu_prefs else None
+    avg_probs = lpr.normalize_probs_1x2(
+        [x / prob_w for x in prob_acc]
+    ) if prob_w else None
     alt_dir, caution = lpr.force_dual_if_weak(strength, votes, 0.6)
     if len(valid) < MIN_VALID_EVIDENCE_MODELS:
         caution = True
@@ -755,7 +815,8 @@ def aggregate_directions(predictions):
     return {
         "direction": top_dir, "votes": top_votes, "total_votes": total_votes,
         "strength": strength, "all_votes": dict(votes),
-        "top_score_pref": top_score, "score_prefs": dict(score_prefs),
+        "probs_1x2": avg_probs,
+        "top_score_pref": top_score, "top_scores": top3, "score_prefs": dict(score_prefs),
         "top_ou25": top_ou, "all_ou25": dict(ou_prefs),
         "top_hafu": top_hafu, "all_hafu": dict(hafu_prefs),
         "alt_direction": alt_dir, "caution": caution,
@@ -923,7 +984,7 @@ def main():
         print(f"   - {n}")
 
     voter_models = [model for model in args.models if model != EVIDENCE_AUDITOR_MODEL]
-    print(f"🎯 共 {len(selected_matches)} 场比赛待预测, DeepSeek证据审计 + {len(voter_models)} 个独立投票模型\n")
+    print(f"🎯 共 {len(selected_matches)} 场比赛待预测, glm-4-flash 证据审计 + {len(voter_models)} 个投票模型\n")
 
     # 全局比分坍缩统计：收集每场 top 比分，循环结束后做跨场次分布检测。
     score_prefs_collected = []
@@ -1028,13 +1089,15 @@ def main():
                 caution_reasons.append("证据存在缺口")
             reason_text = "、".join(caution_reasons) or "聚合风控"
             print(f"  🚨 谨慎({reason_text}): 建议双选 {agg['direction']}/{alt_dir}")
-        print(f"  🎯 比分偏好: {agg['top_score_pref'] or '分散'}")
+        if agg.get("probs_1x2"):
+            ph, pd, pa = agg["probs_1x2"]
+            print(f"  📈 1X2概率: 主{ph:.1f} / 平{pd:.1f} / 客{pa:.1f}（LLM加权换算，非量化校准）")
+        top3 = agg.get("top_scores") or ([agg["top_score_pref"]] if agg.get("top_score_pref") else [])
+        print(f"  🎯 比分Top3: {', '.join(top3) if top3 else '分散'}")
         if agg.get("top_score_pref"):
             score_prefs_collected.append(agg["top_score_pref"])
-        if agg.get("top_ou25"):
-            print(f"  📦 大小球2.5: {agg['top_ou25']}")
-        if agg.get("top_hafu"):
-            print(f"  ⏱️ 半全场: {agg['top_hafu']}")
+        print(f"  📦 大小球2.5: {agg.get('top_ou25') or '-'}")
+        print(f"  ⏱️ 半全场: {agg.get('top_hafu') or '-'}")
         if agg.get("collapse_flags"):
             print(f"  ⚠️ 坍缩标记: {', '.join(agg['collapse_flags'])}")
         # ---------- EV 下注推荐 ----------

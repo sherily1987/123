@@ -11,8 +11,7 @@
 ## 1. 伤停/阵容
 - 佐加顿斯缺阵名单（fotmob）：Miro Tenho（停赛）、Peter Langhoff（伤）| source(https://www.fotmob.com/matches/aik-vs-djurgarden/2q34l2) | collected_at(2026-08-15T11:00:00+08:00)
 - AIK缺阵名单（fotmob）：Amel Mujanic（停赛）、Martin Ellingsen（伤）、Sotiris Papagiannopoulos（伤）、Taha Ayari（伤）、Axel Kouame（伤）| source(https://www.fotmob.com/matches/aik-vs-djurgarden/2q34l2) | collected_at(2026-08-15T11:00:00+08:00)
-- 佐加顿斯官方身份（sv.wikipedia）：主场 3Arena（前身 Tele2 Arena，2013 年夏起），主席 Erik Gozzi | source(https://sv.wikipedia.org/w/index.php?title=Djurg%C3%A5rdens_IF_Fotboll&action=raw) | collected_at(2026-08-15T11:00:00+08:00)
-> 说明：双方官方首发未公布；fotmob 缺阵名单为第三方实时口径，具体复出时间未披露。
+> 证据缺口：双方官方首发本轮未核实。fotmob 缺阵是第三方口径，具体复出时间未披露。sv.wikipedia 俱乐部背景（主场 3Arena、主席）不是本场伤停事实，不写入事实行。
 
 ## 2. 战意/动机
 - 斯德哥尔摩同城死敌德比（Djurgården vs AIK），两队同城、对抗历史悠久；德比战平局率低、气氛火爆 | source(https://www.sportsgambler.com/betting-tips/football/aik-vs-djurgarden-prediction-lineups-odds-2026-05-10/) | collected_at(2026-08-15T11:00:00+08:00)

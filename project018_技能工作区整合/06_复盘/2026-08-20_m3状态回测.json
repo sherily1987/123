@@ -1,0 +1,5776 @@
+{
+  "schema_version": "fusion-backtest-2.0",
+  "generated_at": "2026-08-20T15:14:54.553157+00:00",
+  "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+  "evaluation_unit": "match",
+  "snapshot_policy": "latest_before_kickoff",
+  "record_sample_size": 1616,
+  "sample_size": 529,
+  "unique_match_n": 529,
+  "deduped_duplicates": 0,
+  "deduped_detail": [],
+  "overall": {
+    "n": 529,
+    "accuracy_pct": 50.095,
+    "brier_mean": 0.6224652,
+    "brier_sum": 329.284091,
+    "log_loss": 1.03798907,
+    "ece": 0.028114,
+    "calibration_bins": [
+      {
+        "bin": "0.0-0.1",
+        "n": 55,
+        "avg_prob": 0.071091,
+        "actual_rate": 0.090909
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 249,
+        "avg_prob": 0.158606,
+        "actual_rate": 0.212851
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 519,
+        "avg_prob": 0.251459,
+        "actual_rate": 0.262042
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 358,
+        "avg_prob": 0.345187,
+        "actual_rate": 0.343575
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 149,
+        "avg_prob": 0.448322,
+        "actual_rate": 0.463087
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 105,
+        "avg_prob": 0.551171,
+        "actual_rate": 0.533333
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 81,
+        "avg_prob": 0.645074,
+        "actual_rate": 0.469136
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 50,
+        "avg_prob": 0.74228,
+        "actual_rate": 0.68
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 19,
+        "avg_prob": 0.823421,
+        "actual_rate": 0.736842
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 2,
+        "avg_prob": 0.9335,
+        "actual_rate": 0.5
+      }
+    ],
+    "score": {
+      "top1_accuracy_pct": 13.42,
+      "top3_accuracy_pct": 32.89,
+      "top5_accuracy_pct": 50.47,
+      "score_log_loss": 6.15833
+    },
+    "ou_2_5_brier": 0.256947,
+    "btts_brier": 0.252795,
+    "clv_mean_pp": -0.029,
+    "clv_n": 369
+  },
+  "by_version": {
+    "fusion-1.2.0+core-3.4.1": {
+      "n": 12,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.64357567,
+      "brier_sum": 7.722908,
+      "log_loss": 1.07079255,
+      "ece": 0.192111,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 6,
+          "avg_prob": 0.174,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 14,
+          "avg_prob": 0.238429,
+          "actual_rate": 0.428571
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 4,
+          "avg_prob": 0.32625,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 6,
+          "avg_prob": 0.446,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.5545,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 4,
+          "avg_prob": 0.632,
+          "actual_rate": 0.75
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 25.0,
+        "top3_accuracy_pct": 66.67,
+        "top5_accuracy_pct": 66.67,
+        "score_log_loss": 3.3971
+      },
+      "ou_2_5_brier": 0.259101,
+      "btts_brier": 0.231997
+    },
+    "fusion-1.3.0+core-3.4.4": {
+      "n": 10,
+      "accuracy_pct": 70.0,
+      "brier_mean": 0.5855139,
+      "brier_sum": 5.855139,
+      "log_loss": 0.99120687,
+      "ece": 0.213167,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.145,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 14,
+          "avg_prob": 0.254,
+          "actual_rate": 0.071429
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 7,
+          "avg_prob": 0.346,
+          "actual_rate": 0.428571
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.447,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 4,
+          "avg_prob": 0.54925,
+          "actual_rate": 0.75
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.642,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 20.0,
+        "top3_accuracy_pct": 50.0,
+        "top5_accuracy_pct": 60.0,
+        "score_log_loss": 6.84784
+      },
+      "ou_2_5_brier": 0.215662,
+      "btts_brier": 0.220285
+    },
+    "fusion-1.4.0+core-3.4.4": {
+      "n": 2,
+      "accuracy_pct": 0.0,
+      "brier_mean": 0.965633,
+      "brier_sum": 1.931266,
+      "log_loss": 1.4538607,
+      "ece": 0.469333,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.146,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 1,
+          "avg_prob": 0.267,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 1,
+          "avg_prob": 0.3,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.433,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.708,
+          "actual_rate": 0.0
+        }
+      ],
+      "ou_2_5_brier": 0.227299,
+      "btts_brier": 0.306952
+    },
+    "fusion-1.4.0-core-3.4.4": {
+      "n": 111,
+      "accuracy_pct": 43.243,
+      "brier_mean": 0.65867655,
+      "brier_sum": 73.113097,
+      "log_loss": 1.10015283,
+      "ece": 0.080111,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 10,
+          "avg_prob": 0.0558,
+          "actual_rate": 0.1
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 56,
+          "avg_prob": 0.160429,
+          "actual_rate": 0.196429
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 100,
+          "avg_prob": 0.25402,
+          "actual_rate": 0.33
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 80,
+          "avg_prob": 0.338613,
+          "actual_rate": 0.375
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 32,
+          "avg_prob": 0.435531,
+          "actual_rate": 0.3125
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 24,
+          "avg_prob": 0.551,
+          "actual_rate": 0.375
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 17,
+          "avg_prob": 0.648412,
+          "actual_rate": 0.529412
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 10,
+          "avg_prob": 0.729,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 2,
+          "avg_prob": 0.8155,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 2,
+          "avg_prob": 0.9335,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 14.41,
+        "top3_accuracy_pct": 32.43,
+        "top5_accuracy_pct": 51.35,
+        "score_log_loss": 5.62933
+      },
+      "ou_2_5_brier": 0.249154,
+      "btts_brier": 0.252153
+    },
+    "fusion-1.5.0-core-3.4.4": {
+      "n": 22,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.60007609,
+      "brier_sum": 13.201674,
+      "log_loss": 0.9963119,
+      "ece": 0.078182,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.067,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 7,
+          "avg_prob": 0.155143,
+          "actual_rate": 0.142857
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 24,
+          "avg_prob": 0.260125,
+          "actual_rate": 0.291667
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 16,
+          "avg_prob": 0.341437,
+          "actual_rate": 0.25
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 8,
+          "avg_prob": 0.44625,
+          "actual_rate": 0.625
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 6,
+          "avg_prob": 0.546,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.621,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 2,
+          "avg_prob": 0.8035,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 27.27,
+        "top3_accuracy_pct": 40.91,
+        "top5_accuracy_pct": 63.64,
+        "score_log_loss": 5.05794
+      },
+      "ou_2_5_brier": 0.249517,
+      "btts_brier": 0.242835
+    },
+    "unknown": {
+      "n": 372,
+      "accuracy_pct": 51.882,
+      "brier_mean": 0.61145163,
+      "brier_sum": 227.460007,
+      "log_loss": 1.01986852,
+      "ece": 0.033411,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 43,
+          "avg_prob": 0.074837,
+          "actual_rate": 0.093023
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 176,
+          "avg_prob": 0.157938,
+          "actual_rate": 0.221591
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 366,
+          "avg_prob": 0.250549,
+          "actual_rate": 0.243169
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 250,
+          "avg_prob": 0.347992,
+          "actual_rate": 0.34
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 100,
+          "avg_prob": 0.4529,
+          "actual_rate": 0.49
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 69,
+          "avg_prob": 0.551696,
+          "actual_rate": 0.594203
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 58,
+          "avg_prob": 0.645466,
+          "actual_rate": 0.448276
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 39,
+          "avg_prob": 0.746564,
+          "actual_rate": 0.74359
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 15,
+          "avg_prob": 0.827133,
+          "actual_rate": 0.666667
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 11.83,
+        "top3_accuracy_pct": 31.18,
+        "top5_accuracy_pct": 48.92,
+        "score_log_loss": 6.4393
+      },
+      "ou_2_5_brier": 0.260912,
+      "btts_brier": 0.254829,
+      "clv_mean_pp": -0.029,
+      "clv_n": 369
+    }
+  },
+  "by_version_cohort": {
+    "current": {
+      "n": 54,
+      "accuracy_pct": 40.741,
+      "brier_mean": 0.6667193,
+      "brier_sum": 36.002842,
+      "log_loss": 1.09240378,
+      "ece": 0.097457,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 4,
+          "avg_prob": 0.067,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 26,
+          "avg_prob": 0.160731,
+          "actual_rate": 0.230769
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 52,
+          "avg_prob": 0.259712,
+          "actual_rate": 0.365385
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 39,
+          "avg_prob": 0.343308,
+          "actual_rate": 0.307692
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 17,
+          "avg_prob": 0.439765,
+          "actual_rate": 0.352941
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 12,
+          "avg_prob": 0.55225,
+          "actual_rate": 0.416667
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 6,
+          "avg_prob": 0.660333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 3,
+          "avg_prob": 0.724333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 3,
+          "avg_prob": 0.807667,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 16.67,
+        "top3_accuracy_pct": 27.78,
+        "top5_accuracy_pct": 48.15,
+        "score_log_loss": 6.72662
+      },
+      "ou_2_5_brier": 0.264285,
+      "btts_brier": 0.259756
+    },
+    "legacy": {
+      "n": 475,
+      "accuracy_pct": 51.158,
+      "brier_mean": 0.61743421,
+      "brier_sum": 293.281249,
+      "log_loss": 1.03180297,
+      "ece": 0.024631,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 51,
+          "avg_prob": 0.071412,
+          "actual_rate": 0.098039
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 223,
+          "avg_prob": 0.158359,
+          "actual_rate": 0.210762
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 467,
+          "avg_prob": 0.25054,
+          "actual_rate": 0.250535
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 319,
+          "avg_prob": 0.345417,
+          "actual_rate": 0.347962
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 132,
+          "avg_prob": 0.449424,
+          "actual_rate": 0.477273
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 93,
+          "avg_prob": 0.551032,
+          "actual_rate": 0.548387
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 75,
+          "avg_prob": 0.643853,
+          "actual_rate": 0.48
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 47,
+          "avg_prob": 0.743426,
+          "actual_rate": 0.702128
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 16,
+          "avg_prob": 0.826375,
+          "actual_rate": 0.6875
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 2,
+          "avg_prob": 0.9335,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 13.05,
+        "top3_accuracy_pct": 33.47,
+        "top5_accuracy_pct": 50.74,
+        "score_log_loss": 6.09372
+      },
+      "ou_2_5_brier": 0.256113,
+      "btts_brier": 0.252003,
+      "clv_mean_pp": -0.029,
+      "clv_n": 369
+    },
+    "unknown": {
+      "n": 0,
+      "accuracy_pct": null,
+      "brier_mean": null,
+      "brier_sum": null,
+      "log_loss": null,
+      "ece": null,
+      "calibration_bins": []
+    }
+  },
+  "by_engine_build": {
+    "bundle-8dad5beb864e": {
+      "n": 4,
+      "accuracy_pct": 25.0,
+      "brier_mean": 0.6264575,
+      "brier_sum": 2.50583,
+      "log_loss": 1.00629723,
+      "ece": 0.158667,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.1605,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 3,
+          "avg_prob": 0.231,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 4,
+          "avg_prob": 0.33875,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.429,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 2,
+          "avg_prob": 0.601,
+          "actual_rate": 0.5
+        }
+      ],
+      "ou_2_5_brier": 0.159927,
+      "btts_brier": 0.195977
+    },
+    "bundle-8f51cde5a089": {
+      "n": 12,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.64357567,
+      "brier_sum": 7.722908,
+      "log_loss": 1.07079255,
+      "ece": 0.192111,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 6,
+          "avg_prob": 0.174,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 14,
+          "avg_prob": 0.238429,
+          "actual_rate": 0.428571
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 4,
+          "avg_prob": 0.32625,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 6,
+          "avg_prob": 0.446,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.5545,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 4,
+          "avg_prob": 0.632,
+          "actual_rate": 0.75
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 25.0,
+        "top3_accuracy_pct": 66.67,
+        "top5_accuracy_pct": 66.67,
+        "score_log_loss": 3.3971
+      },
+      "ou_2_5_brier": 0.259101,
+      "btts_brier": 0.231997
+    },
+    "bundle-a5c014d0511f": {
+      "n": 21,
+      "accuracy_pct": 47.619,
+      "brier_mean": 0.6039071,
+      "brier_sum": 12.682049,
+      "log_loss": 1.00152999,
+      "ece": 0.072111,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.067,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 7,
+          "avg_prob": 0.155143,
+          "actual_rate": 0.142857
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 23,
+          "avg_prob": 0.259261,
+          "actual_rate": 0.304348
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 15,
+          "avg_prob": 0.3436,
+          "actual_rate": 0.266667
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 7,
+          "avg_prob": 0.451143,
+          "actual_rate": 0.571429
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 6,
+          "avg_prob": 0.546,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.621,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 2,
+          "avg_prob": 0.8035,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 28.57,
+        "top3_accuracy_pct": 42.86,
+        "top5_accuracy_pct": 61.9,
+        "score_log_loss": 5.17448
+      },
+      "ou_2_5_brier": 0.240907,
+      "btts_brier": 0.239411
+    },
+    "bundle-b30608d06d7f": {
+      "n": 31,
+      "accuracy_pct": 48.387,
+      "brier_mean": 0.63497745,
+      "brier_sum": 19.684301,
+      "log_loss": 1.04456442,
+      "ece": 0.087946,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 3,
+          "avg_prob": 0.077333,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 17,
+          "avg_prob": 0.158706,
+          "actual_rate": 0.176471
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 28,
+          "avg_prob": 0.252571,
+          "actual_rate": 0.285714
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 19,
+          "avg_prob": 0.335421,
+          "actual_rate": 0.421053
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 10,
+          "avg_prob": 0.4317,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 7,
+          "avg_prob": 0.562571,
+          "actual_rate": 0.142857
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 4,
+          "avg_prob": 0.6595,
+          "actual_rate": 0.75
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 4,
+          "avg_prob": 0.7305,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.815,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 19.35,
+        "top3_accuracy_pct": 41.94,
+        "top5_accuracy_pct": 51.61,
+        "score_log_loss": 5.14546
+      },
+      "ou_2_5_brier": 0.248497,
+      "btts_brier": 0.259092
+    },
+    "bundle-beac0a555bfa": {
+      "n": 33,
+      "accuracy_pct": 36.364,
+      "brier_mean": 0.7066907,
+      "brier_sum": 23.320793,
+      "log_loss": 1.15023256,
+      "ece": 0.132333,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.067,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 19,
+          "avg_prob": 0.162789,
+          "actual_rate": 0.263158
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 29,
+          "avg_prob": 0.260069,
+          "actual_rate": 0.413793
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 24,
+          "avg_prob": 0.343125,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 10,
+          "avg_prob": 0.4318,
+          "actual_rate": 0.2
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 6,
+          "avg_prob": 0.5585,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 5,
+          "avg_prob": 0.6682,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 3,
+          "avg_prob": 0.724333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.816,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 9.09,
+        "top3_accuracy_pct": 18.18,
+        "top5_accuracy_pct": 39.39,
+        "score_log_loss": 7.71434
+      },
+      "ou_2_5_brier": 0.279162,
+      "btts_brier": 0.272703
+    },
+    "bundle-cf0fb092adc5": {
+      "n": 10,
+      "accuracy_pct": 70.0,
+      "brier_mean": 0.5855139,
+      "brier_sum": 5.855139,
+      "log_loss": 0.99120687,
+      "ece": 0.213167,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.145,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 14,
+          "avg_prob": 0.254,
+          "actual_rate": 0.071429
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 7,
+          "avg_prob": 0.346,
+          "actual_rate": 0.428571
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.447,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 4,
+          "avg_prob": 0.54925,
+          "actual_rate": 0.75
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.642,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 20.0,
+        "top3_accuracy_pct": 50.0,
+        "top5_accuracy_pct": 60.0,
+        "score_log_loss": 6.84784
+      },
+      "ou_2_5_brier": 0.215662,
+      "btts_brier": 0.220285
+    },
+    "bundle-fedfe8dd1d2d": {
+      "n": 1,
+      "accuracy_pct": 100.0,
+      "brier_mean": 0.519625,
+      "brier_sum": 0.519625,
+      "log_loss": 0.88673193,
+      "ece": 0.392333,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 1,
+          "avg_prob": 0.28,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 1,
+          "avg_prob": 0.309,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.412,
+          "actual_rate": 1.0
+        }
+      ],
+      "ou_2_5_brier": 0.430336,
+      "btts_brier": 0.314721
+    },
+    "engine-22b40da0774c+core-3.4.4": {
+      "n": 1,
+      "accuracy_pct": 0.0,
+      "brier_mean": 0.748778,
+      "brier_sum": 0.748778,
+      "log_loss": 1.2039728,
+      "ece": 0.466667,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 1,
+          "avg_prob": 0.267,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 1,
+          "avg_prob": 0.3,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.433,
+          "actual_rate": 0.0
+        }
+      ],
+      "ou_2_5_brier": 0.139876,
+      "btts_brier": 0.4096
+    },
+    "engine-9fe6e8e8a988+core-3.4.4": {
+      "n": 390,
+      "accuracy_pct": 51.026,
+      "brier_mean": 0.6172717,
+      "brier_sum": 240.735963,
+      "log_loss": 1.0341184,
+      "ece": 0.031691,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 47,
+          "avg_prob": 0.071319,
+          "actual_rate": 0.106383
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 178,
+          "avg_prob": 0.157753,
+          "actual_rate": 0.224719
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 387,
+          "avg_prob": 0.250703,
+          "actual_rate": 0.248062
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 263,
+          "avg_prob": 0.347692,
+          "actual_rate": 0.342205
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 108,
+          "avg_prob": 0.452426,
+          "actual_rate": 0.462963
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 71,
+          "avg_prob": 0.551859,
+          "actual_rate": 0.605634
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 60,
+          "avg_prob": 0.645,
+          "actual_rate": 0.433333
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 39,
+          "avg_prob": 0.746564,
+          "actual_rate": 0.74359
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 15,
+          "avg_prob": 0.827133,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 2,
+          "avg_prob": 0.9335,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 11.79,
+        "top3_accuracy_pct": 30.77,
+        "top5_accuracy_pct": 48.46,
+        "score_log_loss": 6.40851
+      },
+      "ou_2_5_brier": 0.261231,
+      "btts_brier": 0.25287,
+      "clv_mean_pp": -0.029,
+      "clv_n": 369
+    },
+    "engine-aef6f9cfb625+core-3.4.4": {
+      "n": 1,
+      "accuracy_pct": 0.0,
+      "brier_mean": 1.182488,
+      "brier_sum": 1.182488,
+      "log_loss": 1.70374859,
+      "ece": 0.472,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.146,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.708,
+          "actual_rate": 0.0
+        }
+      ],
+      "ou_2_5_brier": 0.314721,
+      "btts_brier": 0.204304
+    },
+    "engine-b30608d06d7f+core-3.4.4": {
+      "n": 25,
+      "accuracy_pct": 56.0,
+      "brier_mean": 0.57304868,
+      "brier_sum": 14.326217,
+      "log_loss": 0.95350078,
+      "ece": 0.04436,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1,
+          "avg_prob": 0.058,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 16,
+          "avg_prob": 0.161813,
+          "actual_rate": 0.125
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 19,
+          "avg_prob": 0.251263,
+          "actual_rate": 0.263158
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 20,
+          "avg_prob": 0.33405,
+          "actual_rate": 0.35
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 3,
+          "avg_prob": 0.433667,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 9,
+          "avg_prob": 0.535556,
+          "actual_rate": 0.444444
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 4,
+          "avg_prob": 0.64475,
+          "actual_rate": 0.75
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 3,
+          "avg_prob": 0.731667,
+          "actual_rate": 0.666667
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 20.0,
+        "top3_accuracy_pct": 44.0,
+        "top5_accuracy_pct": 68.0,
+        "score_log_loss": 3.88158
+      },
+      "ou_2_5_brier": 0.211194,
+      "btts_brier": 0.254044
+    }
+  },
+  "by_model_version": {
+    "m1": {
+      "n": 33,
+      "accuracy_pct": 36.364,
+      "brier_mean": 0.7066907,
+      "brier_sum": 23.320793,
+      "log_loss": 1.15023256,
+      "ece": 0.132333,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.067,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 19,
+          "avg_prob": 0.162789,
+          "actual_rate": 0.263158
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 29,
+          "avg_prob": 0.260069,
+          "actual_rate": 0.413793
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 24,
+          "avg_prob": 0.343125,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 10,
+          "avg_prob": 0.4318,
+          "actual_rate": 0.2
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 6,
+          "avg_prob": 0.5585,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 5,
+          "avg_prob": 0.6682,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 3,
+          "avg_prob": 0.724333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.816,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 9.09,
+        "top3_accuracy_pct": 18.18,
+        "top5_accuracy_pct": 39.39,
+        "score_log_loss": 7.71434
+      },
+      "ou_2_5_brier": 0.279162,
+      "btts_brier": 0.272703
+    },
+    "m2": {
+      "n": 1,
+      "accuracy_pct": 100.0,
+      "brier_mean": 0.519625,
+      "brier_sum": 0.519625,
+      "log_loss": 0.88673193,
+      "ece": 0.392333,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 1,
+          "avg_prob": 0.28,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 1,
+          "avg_prob": 0.309,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.412,
+          "actual_rate": 1.0
+        }
+      ],
+      "ou_2_5_brier": 0.430336,
+      "btts_brier": 0.314721
+    },
+    "m3": {
+      "n": 21,
+      "accuracy_pct": 47.619,
+      "brier_mean": 0.6039071,
+      "brier_sum": 12.682049,
+      "log_loss": 1.00152999,
+      "ece": 0.072111,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.067,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 7,
+          "avg_prob": 0.155143,
+          "actual_rate": 0.142857
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 23,
+          "avg_prob": 0.259261,
+          "actual_rate": 0.304348
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 15,
+          "avg_prob": 0.3436,
+          "actual_rate": 0.266667
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 7,
+          "avg_prob": 0.451143,
+          "actual_rate": 0.571429
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 6,
+          "avg_prob": 0.546,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.621,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 2,
+          "avg_prob": 0.8035,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 28.57,
+        "top3_accuracy_pct": 42.86,
+        "top5_accuracy_pct": 61.9,
+        "score_log_loss": 5.17448
+      },
+      "ou_2_5_brier": 0.240907,
+      "btts_brier": 0.239411
+    },
+    "unattributable": {
+      "n": 474,
+      "accuracy_pct": 51.055,
+      "brier_mean": 0.61764056,
+      "brier_sum": 292.761624,
+      "log_loss": 1.03210903,
+      "ece": 0.024681,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 51,
+          "avg_prob": 0.071412,
+          "actual_rate": 0.098039
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 223,
+          "avg_prob": 0.158359,
+          "actual_rate": 0.210762
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 466,
+          "avg_prob": 0.250476,
+          "actual_rate": 0.251073
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 318,
+          "avg_prob": 0.345531,
+          "actual_rate": 0.349057
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 131,
+          "avg_prob": 0.44971,
+          "actual_rate": 0.473282
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 93,
+          "avg_prob": 0.551032,
+          "actual_rate": 0.548387
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 75,
+          "avg_prob": 0.643853,
+          "actual_rate": 0.48
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 47,
+          "avg_prob": 0.743426,
+          "actual_rate": 0.702128
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 16,
+          "avg_prob": 0.826375,
+          "actual_rate": 0.6875
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 2,
+          "avg_prob": 0.9335,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 13.08,
+        "top3_accuracy_pct": 33.54,
+        "top5_accuracy_pct": 50.63,
+        "score_log_loss": 6.10107
+      },
+      "ou_2_5_brier": 0.255745,
+      "btts_brier": 0.251871,
+      "clv_mean_pp": -0.029,
+      "clv_n": 369
+    }
+  },
+  "by_league": {
+    "亚冠精英": {
+      "n": 1,
+      "accuracy_pct": 0.0,
+      "brier_mean": 0.685333,
+      "brier_sum": 0.685333,
+      "log_loss": 1.12701176,
+      "ece": 0.000333,
+      "calibration_bins": [
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.333,
+          "actual_rate": 0.333333
+        }
+      ],
+      "ou_2_5_brier": 0.158404,
+      "btts_brier": 0.236196
+    },
+    "巴甲": {
+      "n": 7,
+      "accuracy_pct": 42.857,
+      "brier_mean": 0.67430943,
+      "brier_sum": 4.720166,
+      "log_loss": 1.09758276,
+      "ece": 0.182286,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1,
+          "avg_prob": 0.052,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.1345,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 5,
+          "avg_prob": 0.2542,
+          "actual_rate": 0.6
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 9,
+          "avg_prob": 0.338889,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.461,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.621,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.815,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 14.29,
+        "top3_accuracy_pct": 42.86,
+        "top5_accuracy_pct": 57.14,
+        "score_log_loss": 5.74367
+      },
+      "ou_2_5_brier": 0.29201,
+      "btts_brier": 0.248321
+    },
+    "巴西杯": {
+      "n": 4,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.74084125,
+      "brier_sum": 2.963365,
+      "log_loss": 1.16339338,
+      "ece": 0.22675,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 1,
+          "avg_prob": 0.152,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 5,
+          "avg_prob": 0.2446,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.353,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.417,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 1,
+          "avg_prob": 0.52,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.63,
+          "actual_rate": 0.0
+        }
+      ],
+      "ou_2_5_brier": 0.212337,
+      "btts_brier": 0.227609
+    },
+    "德乙": {
+      "n": 3,
+      "accuracy_pct": 33.333,
+      "brier_mean": 0.661616,
+      "brier_sum": 1.984848,
+      "log_loss": 1.07461304,
+      "ece": 0.187333,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 5,
+          "avg_prob": 0.2608,
+          "actual_rate": 0.2
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 2,
+          "avg_prob": 0.36,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.437,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 1,
+          "avg_prob": 0.539,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 33.33,
+        "top3_accuracy_pct": 66.67,
+        "top5_accuracy_pct": 66.67,
+        "score_log_loss": 6.25055
+      },
+      "ou_2_5_brier": 0.245922,
+      "btts_brier": 0.262498
+    },
+    "德甲": {
+      "n": 53,
+      "accuracy_pct": 60.377,
+      "brier_mean": 0.52099092,
+      "brier_sum": 27.612519,
+      "log_loss": 0.89702195,
+      "ece": 0.074434,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.0895,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 19,
+          "avg_prob": 0.169579,
+          "actual_rate": 0.052632
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 67,
+          "avg_prob": 0.245836,
+          "actual_rate": 0.238806
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 29,
+          "avg_prob": 0.354276,
+          "actual_rate": 0.275862
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 15,
+          "avg_prob": 0.4518,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 17,
+          "avg_prob": 0.552706,
+          "actual_rate": 0.823529
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 7,
+          "avg_prob": 0.629429,
+          "actual_rate": 0.714286
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 3,
+          "avg_prob": 0.762,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 9.43,
+        "top3_accuracy_pct": 28.3,
+        "top5_accuracy_pct": 50.94,
+        "score_log_loss": 7.35523
+      },
+      "ou_2_5_brier": 0.233697,
+      "btts_brier": 0.251156,
+      "clv_mean_pp": -0.001,
+      "clv_n": 53
+    },
+    "意甲": {
+      "n": 105,
+      "accuracy_pct": 57.143,
+      "brier_mean": 0.59802633,
+      "brier_sum": 62.792765,
+      "log_loss": 0.99951223,
+      "ece": 0.097279,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 22,
+          "avg_prob": 0.071409,
+          "actual_rate": 0.090909
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 57,
+          "avg_prob": 0.153877,
+          "actual_rate": 0.263158
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 87,
+          "avg_prob": 0.252931,
+          "actual_rate": 0.16092
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 66,
+          "avg_prob": 0.342,
+          "actual_rate": 0.363636
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 26,
+          "avg_prob": 0.451,
+          "actual_rate": 0.615385
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 15,
+          "avg_prob": 0.538067,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 19,
+          "avg_prob": 0.657105,
+          "actual_rate": 0.368421
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 16,
+          "avg_prob": 0.748,
+          "actual_rate": 0.8125
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 7,
+          "avg_prob": 0.833143,
+          "actual_rate": 0.571429
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 20.0,
+        "top3_accuracy_pct": 31.43,
+        "top5_accuracy_pct": 44.76,
+        "score_log_loss": 6.52152
+      },
+      "ou_2_5_brier": 0.278753,
+      "btts_brier": 0.255526,
+      "clv_mean_pp": -0.012,
+      "clv_n": 105
+    },
+    "挪超": {
+      "n": 16,
+      "accuracy_pct": 43.75,
+      "brier_mean": 0.62378862,
+      "brier_sum": 9.980618,
+      "log_loss": 1.03282856,
+      "ece": 0.067083,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 8,
+          "avg_prob": 0.163625,
+          "actual_rate": 0.125
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 20,
+          "avg_prob": 0.24855,
+          "actual_rate": 0.3
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 5,
+          "avg_prob": 0.346,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 6,
+          "avg_prob": 0.435333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 5,
+          "avg_prob": 0.538,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 3,
+          "avg_prob": 0.659,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.713,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 18.75,
+        "top3_accuracy_pct": 37.5,
+        "top5_accuracy_pct": 43.75,
+        "score_log_loss": 6.83472
+      },
+      "ou_2_5_brier": 0.233439,
+      "btts_brier": 0.24905
+    },
+    "日乙": {
+      "n": 2,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.6386855,
+      "brier_sum": 1.277371,
+      "log_loss": 1.05639576,
+      "ece": 0.0975,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 1,
+          "avg_prob": 0.293,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 5,
+          "avg_prob": 0.3416,
+          "actual_rate": 0.4
+        }
+      ],
+      "ou_2_5_brier": 0.174205,
+      "btts_brier": 0.249768
+    },
+    "日职": {
+      "n": 4,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.6028605,
+      "brier_sum": 2.411442,
+      "log_loss": 1.00857297,
+      "ece": 0.0185,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 4,
+          "avg_prob": 0.2765,
+          "actual_rate": 0.25
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 6,
+          "avg_prob": 0.334333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.445,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 25.0,
+        "top3_accuracy_pct": 25.0,
+        "top5_accuracy_pct": 25.0,
+        "score_log_loss": 8.14137
+      },
+      "ou_2_5_brier": 0.282672,
+      "btts_brier": 0.246651
+    },
+    "欧冠": {
+      "n": 19,
+      "accuracy_pct": 31.579,
+      "brier_mean": 0.67103779,
+      "brier_sum": 12.749718,
+      "log_loss": 1.08702618,
+      "ece": 0.106,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 10,
+          "avg_prob": 0.1577,
+          "actual_rate": 0.1
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 21,
+          "avg_prob": 0.249857,
+          "actual_rate": 0.380952
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 12,
+          "avg_prob": 0.349083,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 4,
+          "avg_prob": 0.4755,
+          "actual_rate": 0.25
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 5,
+          "avg_prob": 0.5462,
+          "actual_rate": 0.6
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 3,
+          "avg_prob": 0.646333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 2,
+          "avg_prob": 0.7065,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 21.05,
+        "top3_accuracy_pct": 36.84,
+        "top5_accuracy_pct": 47.37,
+        "score_log_loss": 4.42241
+      },
+      "ou_2_5_brier": 0.227445,
+      "btts_brier": 0.228859
+    },
+    "欧罗巴": {
+      "n": 3,
+      "accuracy_pct": 0.0,
+      "brier_mean": 0.889199,
+      "brier_sum": 2.667597,
+      "log_loss": 1.45194735,
+      "ece": 0.323444,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 1,
+          "avg_prob": 0.145,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 3,
+          "avg_prob": 0.265,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 2,
+          "avg_prob": 0.302,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.4195,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.616,
+          "actual_rate": 0.0
+        }
+      ],
+      "ou_2_5_brier": 0.252867,
+      "btts_brier": 0.248526
+    },
+    "欧超杯": {
+      "n": 1,
+      "accuracy_pct": 100.0,
+      "brier_mean": 0.277634,
+      "brier_sum": 0.277634,
+      "log_loss": 0.55686956,
+      "ece": 0.284667,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 1,
+          "avg_prob": 0.168,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 1,
+          "avg_prob": 0.259,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 1,
+          "avg_prob": 0.573,
+          "actual_rate": 1.0
+        }
+      ],
+      "ou_2_5_brier": 0.233289,
+      "btts_brier": 0.2209
+    },
+    "沙职": {
+      "n": 4,
+      "accuracy_pct": 25.0,
+      "brier_mean": 0.7139355,
+      "brier_sum": 2.855742,
+      "log_loss": 1.13716249,
+      "ece": 0.1755,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.154,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 4,
+          "avg_prob": 0.23675,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.333333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.476,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 2,
+          "avg_prob": 0.6345,
+          "actual_rate": 0.5
+        }
+      ],
+      "ou_2_5_brier": 0.266954,
+      "btts_brier": 0.22845
+    },
+    "法乙": {
+      "n": 3,
+      "accuracy_pct": 33.333,
+      "brier_mean": 0.80613267,
+      "brier_sum": 2.418398,
+      "log_loss": 1.29668649,
+      "ece": 0.233333,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.188,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 2,
+          "avg_prob": 0.287,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.333333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.525,
+          "actual_rate": 0.0
+        }
+      ],
+      "ou_2_5_brier": 0.182625,
+      "btts_brier": 0.264929
+    },
+    "法甲": {
+      "n": 56,
+      "accuracy_pct": 44.643,
+      "brier_mean": 0.64867063,
+      "brier_sum": 36.325555,
+      "log_loss": 1.06858171,
+      "ece": 0.094935,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 9,
+          "avg_prob": 0.07,
+          "actual_rate": 0.111111
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 37,
+          "avg_prob": 0.154459,
+          "actual_rate": 0.27027
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 47,
+          "avg_prob": 0.249532,
+          "actual_rate": 0.319149
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 32,
+          "avg_prob": 0.354594,
+          "actual_rate": 0.3125
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 10,
+          "avg_prob": 0.4589,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 12,
+          "avg_prob": 0.557083,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 8,
+          "avg_prob": 0.65225,
+          "actual_rate": 0.25
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 7,
+          "avg_prob": 0.734143,
+          "actual_rate": 0.714286
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 6,
+          "avg_prob": 0.826,
+          "actual_rate": 0.833333
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 5.36,
+        "top3_accuracy_pct": 28.57,
+        "top5_accuracy_pct": 53.57,
+        "score_log_loss": 6.72804
+      },
+      "ou_2_5_brier": 0.265601,
+      "btts_brier": 0.256984,
+      "clv_mean_pp": -0.308,
+      "clv_n": 56
+    },
+    "瑞超": {
+      "n": 17,
+      "accuracy_pct": 47.059,
+      "brier_mean": 0.68485553,
+      "brier_sum": 11.642544,
+      "log_loss": 1.13144627,
+      "ece": 0.112353,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.0795,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 10,
+          "avg_prob": 0.1565,
+          "actual_rate": 0.3
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 17,
+          "avg_prob": 0.243059,
+          "actual_rate": 0.294118
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 7,
+          "avg_prob": 0.346857,
+          "actual_rate": 0.285714
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 4,
+          "avg_prob": 0.42175,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 5,
+          "avg_prob": 0.5596,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 3,
+          "avg_prob": 0.648667,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 2,
+          "avg_prob": 0.7405,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.806,
+          "actual_rate": 1.0
+        }
+      ],
+      "ou_2_5_brier": 0.269954,
+      "btts_brier": 0.280959
+    },
+    "美职": {
+      "n": 8,
+      "accuracy_pct": 37.5,
+      "brier_mean": 0.72305837,
+      "brier_sum": 5.784467,
+      "log_loss": 1.18801066,
+      "ece": 0.249125,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.1845,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 10,
+          "avg_prob": 0.238,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 4,
+          "avg_prob": 0.3205,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 5,
+          "avg_prob": 0.4446,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.558,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.631,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 50.0,
+        "top3_accuracy_pct": 62.5,
+        "top5_accuracy_pct": 62.5,
+        "score_log_loss": 3.91686
+      },
+      "ou_2_5_brier": 0.266032,
+      "btts_brier": 0.208287
+    },
+    "芬超": {
+      "n": 13,
+      "accuracy_pct": 53.846,
+      "brier_mean": 0.67551777,
+      "brier_sum": 8.781731,
+      "log_loss": 1.10489495,
+      "ece": 0.121718,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 6,
+          "avg_prob": 0.164667,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 13,
+          "avg_prob": 0.250538,
+          "actual_rate": 0.153846
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 9,
+          "avg_prob": 0.331333,
+          "actual_rate": 0.444444
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 6,
+          "avg_prob": 0.4425,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.5645,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 2,
+          "avg_prob": 0.643,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.7,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 15.38,
+        "top3_accuracy_pct": 38.46,
+        "top5_accuracy_pct": 53.85,
+        "score_log_loss": 5.12419
+      },
+      "ou_2_5_brier": 0.255777,
+      "btts_brier": 0.258714
+    },
+    "英冠": {
+      "n": 3,
+      "accuracy_pct": 33.333,
+      "brier_mean": 0.662005,
+      "brier_sum": 1.986015,
+      "log_loss": 1.09595528,
+      "ece": 0.158111,
+      "calibration_bins": [
+        {
+          "bin": "0.2-0.3",
+          "n": 5,
+          "avg_prob": 0.2886,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 2,
+          "avg_prob": 0.3555,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.4225,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 33.33,
+        "top3_accuracy_pct": 66.67,
+        "top5_accuracy_pct": 100.0,
+        "score_log_loss": 2.54989
+      },
+      "ou_2_5_brier": 0.258331,
+      "btts_brier": 0.269456
+    },
+    "英社区盾": {
+      "n": 1,
+      "accuracy_pct": 100.0,
+      "brier_mean": 0.609266,
+      "brier_sum": 0.609266,
+      "log_loss": 1.01335244,
+      "ece": 0.0,
+      "calibration_bins": [
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.333333,
+          "actual_rate": 0.333333
+        }
+      ],
+      "ou_2_5_brier": 0.2704,
+      "btts_brier": 0.301401
+    },
+    "英联赛杯": {
+      "n": 4,
+      "accuracy_pct": 75.0,
+      "brier_mean": 0.4198255,
+      "brier_sum": 1.679302,
+      "log_loss": 0.75297206,
+      "ece": 0.149833,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1,
+          "avg_prob": 0.094,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 1,
+          "avg_prob": 0.176,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 4,
+          "avg_prob": 0.2545,
+          "actual_rate": 0.25
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 2,
+          "avg_prob": 0.306,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.404,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 1,
+          "avg_prob": 0.563,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.731,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 25.0,
+        "top3_accuracy_pct": 75.0,
+        "top5_accuracy_pct": 75.0,
+        "score_log_loss": 2.51463
+      },
+      "ou_2_5_brier": 0.233844,
+      "btts_brier": 0.273845
+    },
+    "英超": {
+      "n": 57,
+      "accuracy_pct": 35.088,
+      "brier_mean": 0.71566958,
+      "brier_sum": 40.793166,
+      "log_loss": 1.16157991,
+      "ece": 0.121825,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 6,
+          "avg_prob": 0.0855,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 31,
+          "avg_prob": 0.153032,
+          "actual_rate": 0.354839
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 57,
+          "avg_prob": 0.244333,
+          "actual_rate": 0.315789
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 31,
+          "avg_prob": 0.352065,
+          "actual_rate": 0.354839
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 15,
+          "avg_prob": 0.445333,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 10,
+          "avg_prob": 0.5578,
+          "actual_rate": 0.3
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 11,
+          "avg_prob": 0.648909,
+          "actual_rate": 0.272727
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 9,
+          "avg_prob": 0.745111,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.802,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 3.51,
+        "top3_accuracy_pct": 26.32,
+        "top5_accuracy_pct": 43.86,
+        "score_log_loss": 6.88375
+      },
+      "ou_2_5_brier": 0.269038,
+      "btts_brier": 0.243464,
+      "clv_mean_pp": -0.025,
+      "clv_n": 57
+    },
+    "荷乙": {
+      "n": 2,
+      "accuracy_pct": 100.0,
+      "brier_mean": 0.1537945,
+      "brier_sum": 0.307589,
+      "log_loss": 0.32750969,
+      "ece": 0.169167,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2,
+          "avg_prob": 0.03,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 2,
+          "avg_prob": 0.224,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 1,
+          "avg_prob": 0.552,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1,
+          "avg_prob": 0.941,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 50.0,
+        "top3_accuracy_pct": 50.0,
+        "top5_accuracy_pct": 100.0,
+        "score_log_loss": 2.41771
+      },
+      "ou_2_5_brier": 0.280633,
+      "btts_brier": 0.076177
+    },
+    "荷甲": {
+      "n": 15,
+      "accuracy_pct": 73.333,
+      "brier_mean": 0.54402173,
+      "brier_sum": 8.160326,
+      "log_loss": 1.08410456,
+      "ece": 0.183733,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 3,
+          "avg_prob": 0.044667,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 15,
+          "avg_prob": 0.156533,
+          "actual_rate": 0.133333
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 8,
+          "avg_prob": 0.250875,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 7,
+          "avg_prob": 0.352714,
+          "actual_rate": 0.571429
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.416,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.575,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 5,
+          "avg_prob": 0.6594,
+          "actual_rate": 0.8
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 2,
+          "avg_prob": 0.7185,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1,
+          "avg_prob": 0.816,
+          "actual_rate": 1.0
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1,
+          "avg_prob": 0.926,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 13.33,
+        "top3_accuracy_pct": 26.67,
+        "top5_accuracy_pct": 53.33,
+        "score_log_loss": 7.13578
+      },
+      "ou_2_5_brier": 0.23658,
+      "btts_brier": 0.236727
+    },
+    "葡超": {
+      "n": 11,
+      "accuracy_pct": 45.455,
+      "brier_mean": 0.66824318,
+      "brier_sum": 7.350675,
+      "log_loss": 1.09919206,
+      "ece": 0.193667,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1,
+          "avg_prob": 0.074,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 4,
+          "avg_prob": 0.1725,
+          "actual_rate": 0.25
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 10,
+          "avg_prob": 0.2609,
+          "actual_rate": 0.4
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 9,
+          "avg_prob": 0.328778,
+          "actual_rate": 0.222222
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 4,
+          "avg_prob": 0.43875,
+          "actual_rate": 0.75
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 4,
+          "avg_prob": 0.54075,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.751,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 27.27,
+        "top3_accuracy_pct": 45.45,
+        "top5_accuracy_pct": 45.45,
+        "score_log_loss": 6.54637
+      },
+      "ou_2_5_brier": 0.252465,
+      "btts_brier": 0.248042
+    },
+    "西甲": {
+      "n": 104,
+      "accuracy_pct": 55.769,
+      "brier_mean": 0.58923322,
+      "brier_sum": 61.280255,
+      "log_loss": 0.99277006,
+      "ece": 0.039337,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 5,
+          "avg_prob": 0.0772,
+          "actual_rate": 0.2
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 33,
+          "avg_prob": 0.166152,
+          "actual_rate": 0.060606
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 111,
+          "avg_prob": 0.256027,
+          "actual_rate": 0.243243
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 93,
+          "avg_prob": 0.346484,
+          "actual_rate": 0.344086
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 37,
+          "avg_prob": 0.455622,
+          "actual_rate": 0.513514
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 14,
+          "avg_prob": 0.558357,
+          "actual_rate": 0.714286
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 13,
+          "avg_prob": 0.63,
+          "actual_rate": 0.692308
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 4,
+          "avg_prob": 0.75425,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 2,
+          "avg_prob": 0.809,
+          "actual_rate": 1.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 14.42,
+        "top3_accuracy_pct": 36.54,
+        "top5_accuracy_pct": 52.88,
+        "score_log_loss": 5.37714
+      },
+      "ou_2_5_brier": 0.256668,
+      "btts_brier": 0.261663,
+      "clv_mean_pp": 0.095,
+      "clv_n": 98
+    },
+    "解放者杯": {
+      "n": 7,
+      "accuracy_pct": 28.571,
+      "brier_mean": 0.77477686,
+      "brier_sum": 5.423438,
+      "log_loss": 1.17120515,
+      "ece": 0.235905,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1,
+          "avg_prob": 0.058,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 5,
+          "avg_prob": 0.1568,
+          "actual_rate": 0.2
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 4,
+          "avg_prob": 0.25775,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 5,
+          "avg_prob": 0.3416,
+          "actual_rate": 0.6
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 1,
+          "avg_prob": 0.429,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 3,
+          "avg_prob": 0.538667,
+          "actual_rate": 0.333333
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 1,
+          "avg_prob": 0.602,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 1,
+          "avg_prob": 0.772,
+          "actual_rate": 0.0
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 14.29,
+        "top3_accuracy_pct": 57.14,
+        "top5_accuracy_pct": 85.71,
+        "score_log_loss": 2.29015
+      },
+      "ou_2_5_brier": 0.133344,
+      "btts_brier": 0.291105
+    },
+    "韩国杯": {
+      "n": 1,
+      "accuracy_pct": 0.0,
+      "brier_mean": 0.685473,
+      "brier_sum": 0.685473,
+      "log_loss": 1.12701176,
+      "ece": 0.000333,
+      "calibration_bins": [
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.333,
+          "actual_rate": 0.333333
+        }
+      ],
+      "ou_2_5_brier": 0.344569,
+      "btts_brier": 0.252004
+    },
+    "韩职": {
+      "n": 5,
+      "accuracy_pct": 40.0,
+      "brier_mean": 0.6153546,
+      "brier_sum": 3.076773,
+      "log_loss": 1.03864559,
+      "ece": 0.237,
+      "calibration_bins": [
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "avg_prob": 0.167,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 6,
+          "avg_prob": 0.273667,
+          "actual_rate": 0.0
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 3,
+          "avg_prob": 0.344,
+          "actual_rate": 0.666667
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 2,
+          "avg_prob": 0.4285,
+          "actual_rate": 0.5
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 2,
+          "avg_prob": 0.568,
+          "actual_rate": 0.5
+        }
+      ],
+      "ou_2_5_brier": 0.24934,
+      "btts_brier": 0.241229
+    }
+  },
+  "snapshot_research": {
+    "record_sample_size": 1616,
+    "by_snapshot": {
+      "2026-08-02_11:40": {
+        "n": 4,
+        "accuracy_pct": 75.0,
+        "brier_mean": 0.563682,
+        "brier_sum": 2.254728,
+        "log_loss": 0.95134528,
+        "ece": 0.1025,
+        "calibration_bins": [
+          {
+            "bin": "0.2-0.3",
+            "n": 6,
+            "avg_prob": 0.263833,
+            "actual_rate": 0.166667
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 3,
+            "avg_prob": 0.344,
+            "actual_rate": 0.333333
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 3,
+            "avg_prob": 0.461667,
+            "actual_rate": 0.666667
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 25.0,
+          "top3_accuracy_pct": 25.0,
+          "top5_accuracy_pct": 25.0,
+          "score_log_loss": 10.90783
+        },
+        "ou_2_5_brier": 0.230816,
+        "btts_brier": 0.219715,
+        "clv_mean_pp": -1.096,
+        "clv_n": 4
+      },
+      "2026-08-02_15:1553": {
+        "n": 10,
+        "accuracy_pct": 70.0,
+        "brier_mean": 0.5855139,
+        "brier_sum": 5.855139,
+        "log_loss": 0.99120687,
+        "ece": 0.213167,
+        "calibration_bins": [
+          {
+            "bin": "0.1-0.2",
+            "n": 2,
+            "avg_prob": 0.145,
+            "actual_rate": 0.5
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 14,
+            "avg_prob": 0.254,
+            "actual_rate": 0.071429
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 7,
+            "avg_prob": 0.346,
+            "actual_rate": 0.428571
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 2,
+            "avg_prob": 0.447,
+            "actual_rate": 1.0
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 4,
+            "avg_prob": 0.54925,
+            "actual_rate": 0.75
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 1,
+            "avg_prob": 0.642,
+            "actual_rate": 0.0
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 20.0,
+          "top3_accuracy_pct": 50.0,
+          "top5_accuracy_pct": 60.0,
+          "score_log_loss": 6.84784
+        },
+        "ou_2_5_brier": 0.215662,
+        "btts_brier": 0.220285
+      },
+      "T-4h": {
+        "n": 12,
+        "accuracy_pct": 50.0,
+        "brier_mean": 0.64357567,
+        "brier_sum": 7.722908,
+        "log_loss": 1.07079255,
+        "ece": 0.192111,
+        "calibration_bins": [
+          {
+            "bin": "0.1-0.2",
+            "n": 6,
+            "avg_prob": 0.174,
+            "actual_rate": 0.0
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 14,
+            "avg_prob": 0.238429,
+            "actual_rate": 0.428571
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 4,
+            "avg_prob": 0.32625,
+            "actual_rate": 0.0
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 6,
+            "avg_prob": 0.446,
+            "actual_rate": 0.5
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 2,
+            "avg_prob": 0.5545,
+            "actual_rate": 0.0
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 4,
+            "avg_prob": 0.632,
+            "actual_rate": 0.75
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 25.0,
+          "top3_accuracy_pct": 66.67,
+          "top5_accuracy_pct": 66.67,
+          "score_log_loss": 3.3971
+        },
+        "ou_2_5_brier": 0.259101,
+        "btts_brier": 0.231997
+      },
+      "T-7h": {
+        "n": 80,
+        "accuracy_pct": 46.25,
+        "brier_mean": 0.6324247,
+        "brier_sum": 50.593976,
+        "log_loss": 1.04087086,
+        "ece": 0.052025,
+        "calibration_bins": [
+          {
+            "bin": "0.0-0.1",
+            "n": 3,
+            "avg_prob": 0.064,
+            "actual_rate": 0.0
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 46,
+            "avg_prob": 0.160609,
+            "actual_rate": 0.173913
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 68,
+            "avg_prob": 0.258147,
+            "actual_rate": 0.294118
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 62,
+            "avg_prob": 0.338694,
+            "actual_rate": 0.387097
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 23,
+            "avg_prob": 0.429435,
+            "actual_rate": 0.347826
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 15,
+            "avg_prob": 0.5512,
+            "actual_rate": 0.466667
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 15,
+            "avg_prob": 0.6554,
+            "actual_rate": 0.6
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 7,
+            "avg_prob": 0.725,
+            "actual_rate": 0.428571
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 1,
+            "avg_prob": 0.816,
+            "actual_rate": 1.0
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 13.75,
+          "top3_accuracy_pct": 31.25,
+          "top5_accuracy_pct": 55.0,
+          "score_log_loss": 5.81432
+        },
+        "ou_2_5_brier": 0.250484,
+        "btts_brier": 0.262299,
+        "clv_mean_pp": 0.248,
+        "clv_n": 12
+      },
+      "closing": {
+        "n": 369,
+        "accuracy_pct": 51.762,
+        "brier_mean": 0.61160791,
+        "brier_sum": 225.683318,
+        "log_loss": 1.02023376,
+        "ece": 0.032598,
+        "calibration_bins": [
+          {
+            "bin": "0.0-0.1",
+            "n": 43,
+            "avg_prob": 0.074837,
+            "actual_rate": 0.093023
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 176,
+            "avg_prob": 0.157938,
+            "actual_rate": 0.221591
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 361,
+            "avg_prob": 0.250465,
+            "actual_rate": 0.243767
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 249,
+            "avg_prob": 0.348112,
+            "actual_rate": 0.341365
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 98,
+            "avg_prob": 0.453163,
+            "actual_rate": 0.479592
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 68,
+            "avg_prob": 0.552162,
+            "actual_rate": 0.602941
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 58,
+            "avg_prob": 0.645466,
+            "actual_rate": 0.448276
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 39,
+            "avg_prob": 0.746564,
+            "actual_rate": 0.74359
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 15,
+            "avg_prob": 0.827133,
+            "actual_rate": 0.666667
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 11.92,
+          "top3_accuracy_pct": 31.17,
+          "top5_accuracy_pct": 48.78,
+          "score_log_loss": 6.44115
+        },
+        "ou_2_5_brier": 0.262032,
+        "btts_brier": 0.255285,
+        "clv_mean_pp": -0.029,
+        "clv_n": 369
+      },
+      "opening": {
+        "n": 369,
+        "accuracy_pct": 42.547,
+        "brier_mean": 0.660032,
+        "brier_sum": 243.551809,
+        "log_loss": 1.08730679,
+        "ece": 0.008722,
+        "calibration_bins": [
+          {
+            "bin": "0.2-0.3",
+            "n": 369,
+            "avg_prob": 0.253,
+            "actual_rate": 0.265583
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 738,
+            "avg_prob": 0.374,
+            "actual_rate": 0.367209
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 11.65,
+          "top3_accuracy_pct": 30.08,
+          "top5_accuracy_pct": 44.99,
+          "score_log_loss": 6.69944
+        },
+        "ou_2_5_brier": 0.255696,
+        "btts_brier": 0.248347,
+        "clv_mean_pp": -0.193,
+        "clv_n": 369
+      },
+      "prematch": {
+        "n": 69,
+        "accuracy_pct": 47.826,
+        "brier_mean": 0.65538543,
+        "brier_sum": 45.221595,
+        "log_loss": 1.11036578,
+        "ece": 0.078942,
+        "calibration_bins": [
+          {
+            "bin": "0.0-0.1",
+            "n": 9,
+            "avg_prob": 0.055556,
+            "actual_rate": 0.111111
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 25,
+            "avg_prob": 0.155,
+            "actual_rate": 0.24
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 70,
+            "avg_prob": 0.254414,
+            "actual_rate": 0.3
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 48,
+            "avg_prob": 0.337833,
+            "actual_rate": 0.3125
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 23,
+            "avg_prob": 0.444609,
+            "actual_rate": 0.521739
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 17,
+            "avg_prob": 0.544471,
+            "actual_rate": 0.352941
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 5,
+            "avg_prob": 0.6372,
+            "actual_rate": 0.2
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 5,
+            "avg_prob": 0.7296,
+            "actual_rate": 0.6
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 3,
+            "avg_prob": 0.807333,
+            "actual_rate": 1.0
+          },
+          {
+            "bin": "0.9-1.0",
+            "n": 2,
+            "avg_prob": 0.9335,
+            "actual_rate": 0.5
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 17.39,
+          "top3_accuracy_pct": 36.23,
+          "top5_accuracy_pct": 50.72,
+          "score_log_loss": 5.50214
+        },
+        "ou_2_5_brier": 0.240396,
+        "btts_brier": 0.233735
+      },
+      "py314test": {
+        "n": 1,
+        "accuracy_pct": 0.0,
+        "brier_mean": 0.748778,
+        "brier_sum": 0.748778,
+        "log_loss": 1.2039728,
+        "ece": 0.466667,
+        "calibration_bins": [
+          {
+            "bin": "0.2-0.3",
+            "n": 1,
+            "avg_prob": 0.267,
+            "actual_rate": 0.0
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 1,
+            "avg_prob": 0.3,
+            "actual_rate": 1.0
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 1,
+            "avg_prob": 0.433,
+            "actual_rate": 0.0
+          }
+        ],
+        "ou_2_5_brier": 0.139876,
+        "btts_brier": 0.4096,
+        "clv_mean_pp": 0.0,
+        "clv_n": 1
+      },
+      "py314test2": {
+        "n": 1,
+        "accuracy_pct": 0.0,
+        "brier_mean": 0.748778,
+        "brier_sum": 0.748778,
+        "log_loss": 1.2039728,
+        "ece": 0.466667,
+        "calibration_bins": [
+          {
+            "bin": "0.2-0.3",
+            "n": 1,
+            "avg_prob": 0.267,
+            "actual_rate": 0.0
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 1,
+            "avg_prob": 0.3,
+            "actual_rate": 1.0
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 1,
+            "avg_prob": 0.433,
+            "actual_rate": 0.0
+          }
+        ],
+        "ou_2_5_brier": 0.139876,
+        "btts_brier": 0.4096
+      },
+      "t_minus_24h": {
+        "n": 332,
+        "accuracy_pct": 43.072,
+        "brier_mean": 0.66136341,
+        "brier_sum": 219.572652,
+        "log_loss": 1.08945722,
+        "ece": 0.01239,
+        "calibration_bins": [
+          {
+            "bin": "0.2-0.3",
+            "n": 332,
+            "avg_prob": 0.253,
+            "actual_rate": 0.271084
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 664,
+            "avg_prob": 0.374,
+            "actual_rate": 0.364458
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 11.75,
+          "top3_accuracy_pct": 30.72,
+          "top5_accuracy_pct": 45.78,
+          "score_log_loss": 6.71921
+        },
+        "ou_2_5_brier": 0.254868,
+        "btts_brier": 0.248589,
+        "clv_mean_pp": -0.208,
+        "clv_n": 332
+      },
+      "t_minus_6h": {
+        "n": 369,
+        "accuracy_pct": 50.407,
+        "brier_mean": 0.61582707,
+        "brier_sum": 227.240189,
+        "log_loss": 1.02538079,
+        "ece": 0.031163,
+        "calibration_bins": [
+          {
+            "bin": "0.0-0.1",
+            "n": 34,
+            "avg_prob": 0.072971,
+            "actual_rate": 0.088235
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 153,
+            "avg_prob": 0.156987,
+            "actual_rate": 0.20915
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 379,
+            "avg_prob": 0.250499,
+            "actual_rate": 0.242744
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 284,
+            "avg_prob": 0.354504,
+            "actual_rate": 0.359155
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 93,
+            "avg_prob": 0.449839,
+            "actual_rate": 0.473118
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 67,
+            "avg_prob": 0.550179,
+            "actual_rate": 0.626866
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 52,
+            "avg_prob": 0.646558,
+            "actual_rate": 0.403846
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 32,
+            "avg_prob": 0.747063,
+            "actual_rate": 0.75
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 13,
+            "avg_prob": 0.824538,
+            "actual_rate": 0.692308
+          }
+        ],
+        "score": {
+          "top1_accuracy_pct": 10.57,
+          "top3_accuracy_pct": 31.98,
+          "top5_accuracy_pct": 48.24,
+          "score_log_loss": 6.36189
+        },
+        "ou_2_5_brier": 0.262077,
+        "btts_brier": 0.255866
+      }
+    }
+  },
+  "paired_market": {
+    "n": 528,
+    "bootstrap_iterations": 2000,
+    "seed": 20260808,
+    "brier_delta_model_minus_market": 0.00522055,
+    "brier_delta_95ci": [
+      -0.00495576,
+      0.01608767
+    ],
+    "log_loss_delta_model_minus_market": 0.01096625,
+    "log_loss_delta_95ci": [
+      -0.0070387,
+      0.03373268
+    ],
+    "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+  },
+  "walk_forward": {
+    "status": "ok",
+    "method": "expanding_window_grouped_by_kickoff_date",
+    "fold_count": 5,
+    "folds": [
+      {
+        "fold": 1,
+        "train_start": "2026-01-13T01:30:00+08:00",
+        "train_end": "2026-02-03T04:00:00+08:00",
+        "test_start": "2026-02-04T03:45:00+08:00",
+        "test_end": "2026-03-07T03:45:00+08:00",
+        "train_n": 80,
+        "test_n": 69,
+        "train_match_ids": [
+          "sporttery-2036878",
+          "sporttery-2036879",
+          "sporttery-2036880",
+          "sporttery-2036929",
+          "sporttery-2036930",
+          "sporttery-2036931",
+          "sporttery-2036943",
+          "sporttery-2036944",
+          "sporttery-2036948",
+          "sporttery-2036949",
+          "sporttery-2036957",
+          "sporttery-2036959",
+          "sporttery-2036960",
+          "sporttery-2036996",
+          "sporttery-2036999",
+          "sporttery-2037000",
+          "sporttery-2037002",
+          "sporttery-2037003",
+          "sporttery-2037038",
+          "sporttery-2037040",
+          "sporttery-2037042",
+          "sporttery-2037043",
+          "sporttery-2037044",
+          "sporttery-2037046",
+          "sporttery-2037047",
+          "sporttery-2037063",
+          "sporttery-2037064",
+          "sporttery-2037065",
+          "sporttery-2037066",
+          "sporttery-2037068",
+          "sporttery-2037071",
+          "sporttery-2037072",
+          "sporttery-2037075",
+          "sporttery-2037076",
+          "sporttery-2037078",
+          "sporttery-2037200",
+          "sporttery-2037205",
+          "sporttery-2037244",
+          "sporttery-2037245",
+          "sporttery-2037247",
+          "sporttery-2037248",
+          "sporttery-2037249",
+          "sporttery-2037250",
+          "sporttery-2037253",
+          "sporttery-2037274",
+          "sporttery-2037275",
+          "sporttery-2037276",
+          "sporttery-2037277",
+          "sporttery-2037278",
+          "sporttery-2037279",
+          "sporttery-2037280",
+          "sporttery-2037282",
+          "sporttery-2037283",
+          "sporttery-2037290",
+          "sporttery-2037292",
+          "sporttery-2037294",
+          "sporttery-2037337",
+          "sporttery-2037338",
+          "sporttery-2037409",
+          "sporttery-2037410",
+          "sporttery-2037452",
+          "sporttery-2037453",
+          "sporttery-2037454",
+          "sporttery-2037455",
+          "sporttery-2037456",
+          "sporttery-2037457",
+          "sporttery-2037459",
+          "sporttery-2037460",
+          "sporttery-2037461",
+          "sporttery-2037479",
+          "sporttery-2037480",
+          "sporttery-2037481",
+          "sporttery-2037482",
+          "sporttery-2037483",
+          "sporttery-2037484",
+          "sporttery-2037486",
+          "sporttery-2037488",
+          "sporttery-2037496",
+          "sporttery-2037497",
+          "sporttery-2037498"
+        ],
+        "test_match_ids": [
+          "sporttery-2037546",
+          "sporttery-2037613",
+          "sporttery-2037614",
+          "sporttery-2037615",
+          "sporttery-2037616",
+          "sporttery-2037650",
+          "sporttery-2037651",
+          "sporttery-2037652",
+          "sporttery-2037655",
+          "sporttery-2037656",
+          "sporttery-2037657",
+          "sporttery-2037673",
+          "sporttery-2037674",
+          "sporttery-2037675",
+          "sporttery-2037676",
+          "sporttery-2037677",
+          "sporttery-2037678",
+          "sporttery-2037679",
+          "sporttery-2037681",
+          "sporttery-2037682",
+          "sporttery-2037688",
+          "sporttery-2037689",
+          "sporttery-2037690",
+          "sporttery-2037738",
+          "sporttery-2037739",
+          "sporttery-2037740",
+          "sporttery-2037745",
+          "sporttery-2037750",
+          "sporttery-2037751",
+          "sporttery-2037752",
+          "sporttery-2037758",
+          "sporttery-2037765",
+          "sporttery-2037799",
+          "sporttery-2037804",
+          "sporttery-2037897",
+          "sporttery-2037898",
+          "sporttery-2037899",
+          "sporttery-2037900",
+          "sporttery-2037944",
+          "sporttery-2037945",
+          "sporttery-2037946",
+          "sporttery-2037947",
+          "sporttery-2037950",
+          "sporttery-2037951",
+          "sporttery-2037952",
+          "sporttery-2037968",
+          "sporttery-2037969",
+          "sporttery-2037970",
+          "sporttery-2037971",
+          "sporttery-2037972",
+          "sporttery-2037973",
+          "sporttery-2037974",
+          "sporttery-2037975",
+          "sporttery-2037979",
+          "sporttery-2037981",
+          "sporttery-2037984",
+          "sporttery-2038033",
+          "sporttery-2038034",
+          "sporttery-2038035",
+          "sporttery-2038040",
+          "sporttery-2038046",
+          "sporttery-2038047",
+          "sporttery-2038048",
+          "sporttery-2038049",
+          "sporttery-2038050",
+          "sporttery-2038054",
+          "sporttery-2038059",
+          "sporttery-2038097",
+          "sporttery-2038098"
+        ],
+        "test_metrics": {
+          "n": 69,
+          "accuracy_pct": 47.826,
+          "brier_mean": 0.63452658,
+          "brier_sum": 43.782334,
+          "log_loss": 1.0524652,
+          "ece": 0.071401,
+          "calibration_bins": [
+            {
+              "bin": "0.0-0.1",
+              "n": 7,
+              "avg_prob": 0.076,
+              "actual_rate": 0.142857
+            },
+            {
+              "bin": "0.1-0.2",
+              "n": 34,
+              "avg_prob": 0.153588,
+              "actual_rate": 0.235294
+            },
+            {
+              "bin": "0.2-0.3",
+              "n": 70,
+              "avg_prob": 0.2475,
+              "actual_rate": 0.214286
+            },
+            {
+              "bin": "0.3-0.4",
+              "n": 43,
+              "avg_prob": 0.354628,
+              "actual_rate": 0.44186
+            },
+            {
+              "bin": "0.4-0.5",
+              "n": 18,
+              "avg_prob": 0.4485,
+              "actual_rate": 0.388889
+            },
+            {
+              "bin": "0.5-0.6",
+              "n": 12,
+              "avg_prob": 0.555,
+              "actual_rate": 0.5
+            },
+            {
+              "bin": "0.6-0.7",
+              "n": 13,
+              "avg_prob": 0.640692,
+              "actual_rate": 0.615385
+            },
+            {
+              "bin": "0.7-0.8",
+              "n": 8,
+              "avg_prob": 0.750875,
+              "actual_rate": 0.375
+            },
+            {
+              "bin": "0.8-0.9",
+              "n": 2,
+              "avg_prob": 0.8055,
+              "actual_rate": 1.0
+            }
+          ],
+          "score": {
+            "top1_accuracy_pct": 14.49,
+            "top3_accuracy_pct": 26.09,
+            "top5_accuracy_pct": 46.38,
+            "score_log_loss": 7.07424
+          },
+          "ou_2_5_brier": 0.265213,
+          "btts_brier": 0.252584,
+          "clv_mean_pp": -0.219,
+          "clv_n": 69
+        },
+        "paired_market": {
+          "n": 69,
+          "bootstrap_iterations": 2000,
+          "seed": 20260808,
+          "brier_delta_model_minus_market": 0.00393695,
+          "brier_delta_95ci": [
+            -0.04058505,
+            0.04561335
+          ],
+          "log_loss_delta_model_minus_market": -0.00104182,
+          "log_loss_delta_95ci": [
+            -0.0685102,
+            0.05974672
+          ],
+          "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+        }
+      },
+      {
+        "fold": 2,
+        "train_start": "2026-01-13T01:30:00+08:00",
+        "train_end": "2026-03-07T03:45:00+08:00",
+        "test_start": "2026-03-08T01:00:00+08:00",
+        "test_end": "2026-04-13T03:00:00+08:00",
+        "train_n": 149,
+        "test_n": 86,
+        "train_match_ids": [
+          "sporttery-2036878",
+          "sporttery-2036879",
+          "sporttery-2036880",
+          "sporttery-2036929",
+          "sporttery-2036930",
+          "sporttery-2036931",
+          "sporttery-2036943",
+          "sporttery-2036944",
+          "sporttery-2036948",
+          "sporttery-2036949",
+          "sporttery-2036957",
+          "sporttery-2036959",
+          "sporttery-2036960",
+          "sporttery-2036996",
+          "sporttery-2036999",
+          "sporttery-2037000",
+          "sporttery-2037002",
+          "sporttery-2037003",
+          "sporttery-2037038",
+          "sporttery-2037040",
+          "sporttery-2037042",
+          "sporttery-2037043",
+          "sporttery-2037044",
+          "sporttery-2037046",
+          "sporttery-2037047",
+          "sporttery-2037063",
+          "sporttery-2037064",
+          "sporttery-2037065",
+          "sporttery-2037066",
+          "sporttery-2037068",
+          "sporttery-2037071",
+          "sporttery-2037072",
+          "sporttery-2037075",
+          "sporttery-2037076",
+          "sporttery-2037078",
+          "sporttery-2037200",
+          "sporttery-2037205",
+          "sporttery-2037244",
+          "sporttery-2037245",
+          "sporttery-2037247",
+          "sporttery-2037248",
+          "sporttery-2037249",
+          "sporttery-2037250",
+          "sporttery-2037253",
+          "sporttery-2037274",
+          "sporttery-2037275",
+          "sporttery-2037276",
+          "sporttery-2037277",
+          "sporttery-2037278",
+          "sporttery-2037279",
+          "sporttery-2037280",
+          "sporttery-2037282",
+          "sporttery-2037283",
+          "sporttery-2037290",
+          "sporttery-2037292",
+          "sporttery-2037294",
+          "sporttery-2037337",
+          "sporttery-2037338",
+          "sporttery-2037409",
+          "sporttery-2037410",
+          "sporttery-2037452",
+          "sporttery-2037453",
+          "sporttery-2037454",
+          "sporttery-2037455",
+          "sporttery-2037456",
+          "sporttery-2037457",
+          "sporttery-2037459",
+          "sporttery-2037460",
+          "sporttery-2037461",
+          "sporttery-2037479",
+          "sporttery-2037480",
+          "sporttery-2037481",
+          "sporttery-2037482",
+          "sporttery-2037483",
+          "sporttery-2037484",
+          "sporttery-2037486",
+          "sporttery-2037488",
+          "sporttery-2037496",
+          "sporttery-2037497",
+          "sporttery-2037498",
+          "sporttery-2037546",
+          "sporttery-2037613",
+          "sporttery-2037614",
+          "sporttery-2037615",
+          "sporttery-2037616",
+          "sporttery-2037650",
+          "sporttery-2037651",
+          "sporttery-2037652",
+          "sporttery-2037655",
+          "sporttery-2037656",
+          "sporttery-2037657",
+          "sporttery-2037673",
+          "sporttery-2037674",
+          "sporttery-2037675",
+          "sporttery-2037676",
+          "sporttery-2037677",
+          "sporttery-2037678",
+          "sporttery-2037679",
+          "sporttery-2037681",
+          "sporttery-2037682",
+          "sporttery-2037688",
+          "sporttery-2037689",
+          "sporttery-2037690",
+          "sporttery-2037738",
+          "sporttery-2037739",
+          "sporttery-2037740",
+          "sporttery-2037745",
+          "sporttery-2037750",
+          "sporttery-2037751",
+          "sporttery-2037752",
+          "sporttery-2037758",
+          "sporttery-2037765",
+          "sporttery-2037799",
+          "sporttery-2037804",
+          "sporttery-2037897",
+          "sporttery-2037898",
+          "sporttery-2037899",
+          "sporttery-2037900",
+          "sporttery-2037944",
+          "sporttery-2037945",
+          "sporttery-2037946",
+          "sporttery-2037947",
+          "sporttery-2037950",
+          "sporttery-2037951",
+          "sporttery-2037952",
+          "sporttery-2037968",
+          "sporttery-2037969",
+          "sporttery-2037970",
+          "sporttery-2037971",
+          "sporttery-2037972",
+          "sporttery-2037973",
+          "sporttery-2037974",
+          "sporttery-2037975",
+          "sporttery-2037979",
+          "sporttery-2037981",
+          "sporttery-2037984",
+          "sporttery-2038033",
+          "sporttery-2038034",
+          "sporttery-2038035",
+          "sporttery-2038040",
+          "sporttery-2038046",
+          "sporttery-2038047",
+          "sporttery-2038048",
+          "sporttery-2038049",
+          "sporttery-2038050",
+          "sporttery-2038054",
+          "sporttery-2038059",
+          "sporttery-2038097",
+          "sporttery-2038098"
+        ],
+        "test_match_ids": [
+          "sporttery-2038139",
+          "sporttery-2038140",
+          "sporttery-2038141",
+          "sporttery-2038146",
+          "sporttery-2038148",
+          "sporttery-2038167",
+          "sporttery-2038170",
+          "sporttery-2038171",
+          "sporttery-2038172",
+          "sporttery-2038174",
+          "sporttery-2038175",
+          "sporttery-2038176",
+          "sporttery-2038181",
+          "sporttery-2038183",
+          "sporttery-2038292",
+          "sporttery-2038293",
+          "sporttery-2038294",
+          "sporttery-2038296",
+          "sporttery-2038325",
+          "sporttery-2038326",
+          "sporttery-2038328",
+          "sporttery-2038329",
+          "sporttery-2038330",
+          "sporttery-2038331",
+          "sporttery-2038334",
+          "sporttery-2038358",
+          "sporttery-2038359",
+          "sporttery-2038360",
+          "sporttery-2038361",
+          "sporttery-2038362",
+          "sporttery-2038363",
+          "sporttery-2038364",
+          "sporttery-2038365",
+          "sporttery-2038369",
+          "sporttery-2038371",
+          "sporttery-2038373",
+          "sporttery-2038477",
+          "sporttery-2038483",
+          "sporttery-2038484",
+          "sporttery-2038517",
+          "sporttery-2038518",
+          "sporttery-2038520",
+          "sporttery-2038521",
+          "sporttery-2038522",
+          "sporttery-2038523",
+          "sporttery-2038525",
+          "sporttery-2038526",
+          "sporttery-2038548",
+          "sporttery-2038550",
+          "sporttery-2038551",
+          "sporttery-2038553",
+          "sporttery-2038554",
+          "sporttery-2038555",
+          "sporttery-2038556",
+          "sporttery-2038791",
+          "sporttery-2038793",
+          "sporttery-2038825",
+          "sporttery-2038827",
+          "sporttery-2038828",
+          "sporttery-2038830",
+          "sporttery-2038832",
+          "sporttery-2038833",
+          "sporttery-2038856",
+          "sporttery-2038857",
+          "sporttery-2038859",
+          "sporttery-2038860",
+          "sporttery-2038861",
+          "sporttery-2038863",
+          "sporttery-2038871",
+          "sporttery-2038873",
+          "sporttery-2038876",
+          "sporttery-2038970",
+          "sporttery-2038976",
+          "sporttery-2038977",
+          "sporttery-2039023",
+          "sporttery-2039024",
+          "sporttery-2039025",
+          "sporttery-2039026",
+          "sporttery-2039027",
+          "sporttery-2039028",
+          "sporttery-2039029",
+          "sporttery-2039055",
+          "sporttery-2039056",
+          "sporttery-2039057",
+          "sporttery-2039058",
+          "sporttery-2039059"
+        ],
+        "test_metrics": {
+          "n": 86,
+          "accuracy_pct": 53.488,
+          "brier_mean": 0.58942928,
+          "brier_sum": 50.690918,
+          "log_loss": 0.98548451,
+          "ece": 0.047977,
+          "calibration_bins": [
+            {
+              "bin": "0.0-0.1",
+              "n": 16,
+              "avg_prob": 0.073063,
+              "actual_rate": 0.0625
+            },
+            {
+              "bin": "0.1-0.2",
+              "n": 42,
+              "avg_prob": 0.157857,
+              "actual_rate": 0.190476
+            },
+            {
+              "bin": "0.2-0.3",
+              "n": 91,
+              "avg_prob": 0.252813,
+              "actual_rate": 0.274725
+            },
+            {
+              "bin": "0.3-0.4",
+              "n": 34,
+              "avg_prob": 0.341382,
+              "actual_rate": 0.294118
+            },
+            {
+              "bin": "0.4-0.5",
+              "n": 26,
+              "avg_prob": 0.450346,
+              "actual_rate": 0.461538
+            },
+            {
+              "bin": "0.5-0.6",
+              "n": 19,
+              "avg_prob": 0.547211,
+              "actual_rate": 0.631579
+            },
+            {
+              "bin": "0.6-0.7",
+              "n": 13,
+              "avg_prob": 0.634923,
+              "actual_rate": 0.384615
+            },
+            {
+              "bin": "0.7-0.8",
+              "n": 12,
+              "avg_prob": 0.755667,
+              "actual_rate": 0.833333
+            },
+            {
+              "bin": "0.8-0.9",
+              "n": 5,
+              "avg_prob": 0.8316,
+              "actual_rate": 0.6
+            }
+          ],
+          "score": {
+            "top1_accuracy_pct": 12.79,
+            "top3_accuracy_pct": 34.88,
+            "top5_accuracy_pct": 53.49,
+            "score_log_loss": 5.98819
+          },
+          "ou_2_5_brier": 0.247576,
+          "btts_brier": 0.256207,
+          "clv_mean_pp": -0.007,
+          "clv_n": 86
+        },
+        "paired_market": {
+          "n": 86,
+          "bootstrap_iterations": 2000,
+          "seed": 20260809,
+          "brier_delta_model_minus_market": -0.00058355,
+          "brier_delta_95ci": [
+            -0.0054114,
+            0.00390092
+          ],
+          "log_loss_delta_model_minus_market": 0.00139841,
+          "log_loss_delta_95ci": [
+            -0.00288014,
+            0.00675479
+          ],
+          "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+        }
+      },
+      {
+        "fold": 3,
+        "train_start": "2026-01-13T01:30:00+08:00",
+        "train_end": "2026-04-13T03:00:00+08:00",
+        "test_start": "2026-04-14T02:45:00+08:00",
+        "test_end": "2026-05-10T03:00:00+08:00",
+        "train_n": 235,
+        "test_n": 76,
+        "train_match_ids": [
+          "sporttery-2036878",
+          "sporttery-2036879",
+          "sporttery-2036880",
+          "sporttery-2036929",
+          "sporttery-2036930",
+          "sporttery-2036931",
+          "sporttery-2036943",
+          "sporttery-2036944",
+          "sporttery-2036948",
+          "sporttery-2036949",
+          "sporttery-2036957",
+          "sporttery-2036959",
+          "sporttery-2036960",
+          "sporttery-2036996",
+          "sporttery-2036999",
+          "sporttery-2037000",
+          "sporttery-2037002",
+          "sporttery-2037003",
+          "sporttery-2037038",
+          "sporttery-2037040",
+          "sporttery-2037042",
+          "sporttery-2037043",
+          "sporttery-2037044",
+          "sporttery-2037046",
+          "sporttery-2037047",
+          "sporttery-2037063",
+          "sporttery-2037064",
+          "sporttery-2037065",
+          "sporttery-2037066",
+          "sporttery-2037068",
+          "sporttery-2037071",
+          "sporttery-2037072",
+          "sporttery-2037075",
+          "sporttery-2037076",
+          "sporttery-2037078",
+          "sporttery-2037200",
+          "sporttery-2037205",
+          "sporttery-2037244",
+          "sporttery-2037245",
+          "sporttery-2037247",
+          "sporttery-2037248",
+          "sporttery-2037249",
+          "sporttery-2037250",
+          "sporttery-2037253",
+          "sporttery-2037274",
+          "sporttery-2037275",
+          "sporttery-2037276",
+          "sporttery-2037277",
+          "sporttery-2037278",
+          "sporttery-2037279",
+          "sporttery-2037280",
+          "sporttery-2037282",
+          "sporttery-2037283",
+          "sporttery-2037290",
+          "sporttery-2037292",
+          "sporttery-2037294",
+          "sporttery-2037337",
+          "sporttery-2037338",
+          "sporttery-2037409",
+          "sporttery-2037410",
+          "sporttery-2037452",
+          "sporttery-2037453",
+          "sporttery-2037454",
+          "sporttery-2037455",
+          "sporttery-2037456",
+          "sporttery-2037457",
+          "sporttery-2037459",
+          "sporttery-2037460",
+          "sporttery-2037461",
+          "sporttery-2037479",
+          "sporttery-2037480",
+          "sporttery-2037481",
+          "sporttery-2037482",
+          "sporttery-2037483",
+          "sporttery-2037484",
+          "sporttery-2037486",
+          "sporttery-2037488",
+          "sporttery-2037496",
+          "sporttery-2037497",
+          "sporttery-2037498",
+          "sporttery-2037546",
+          "sporttery-2037613",
+          "sporttery-2037614",
+          "sporttery-2037615",
+          "sporttery-2037616",
+          "sporttery-2037650",
+          "sporttery-2037651",
+          "sporttery-2037652",
+          "sporttery-2037655",
+          "sporttery-2037656",
+          "sporttery-2037657",
+          "sporttery-2037673",
+          "sporttery-2037674",
+          "sporttery-2037675",
+          "sporttery-2037676",
+          "sporttery-2037677",
+          "sporttery-2037678",
+          "sporttery-2037679",
+          "sporttery-2037681",
+          "sporttery-2037682",
+          "sporttery-2037688",
+          "sporttery-2037689",
+          "sporttery-2037690",
+          "sporttery-2037738",
+          "sporttery-2037739",
+          "sporttery-2037740",
+          "sporttery-2037745",
+          "sporttery-2037750",
+          "sporttery-2037751",
+          "sporttery-2037752",
+          "sporttery-2037758",
+          "sporttery-2037765",
+          "sporttery-2037799",
+          "sporttery-2037804",
+          "sporttery-2037897",
+          "sporttery-2037898",
+          "sporttery-2037899",
+          "sporttery-2037900",
+          "sporttery-2037944",
+          "sporttery-2037945",
+          "sporttery-2037946",
+          "sporttery-2037947",
+          "sporttery-2037950",
+          "sporttery-2037951",
+          "sporttery-2037952",
+          "sporttery-2037968",
+          "sporttery-2037969",
+          "sporttery-2037970",
+          "sporttery-2037971",
+          "sporttery-2037972",
+          "sporttery-2037973",
+          "sporttery-2037974",
+          "sporttery-2037975",
+          "sporttery-2037979",
+          "sporttery-2037981",
+          "sporttery-2037984",
+          "sporttery-2038033",
+          "sporttery-2038034",
+          "sporttery-2038035",
+          "sporttery-2038040",
+          "sporttery-2038046",
+          "sporttery-2038047",
+          "sporttery-2038048",
+          "sporttery-2038049",
+          "sporttery-2038050",
+          "sporttery-2038054",
+          "sporttery-2038059",
+          "sporttery-2038097",
+          "sporttery-2038098",
+          "sporttery-2038139",
+          "sporttery-2038140",
+          "sporttery-2038141",
+          "sporttery-2038146",
+          "sporttery-2038148",
+          "sporttery-2038167",
+          "sporttery-2038170",
+          "sporttery-2038171",
+          "sporttery-2038172",
+          "sporttery-2038174",
+          "sporttery-2038175",
+          "sporttery-2038176",
+          "sporttery-2038181",
+          "sporttery-2038183",
+          "sporttery-2038292",
+          "sporttery-2038293",
+          "sporttery-2038294",
+          "sporttery-2038296",
+          "sporttery-2038325",
+          "sporttery-2038326",
+          "sporttery-2038328",
+          "sporttery-2038329",
+          "sporttery-2038330",
+          "sporttery-2038331",
+          "sporttery-2038334",
+          "sporttery-2038358",
+          "sporttery-2038359",
+          "sporttery-2038360",
+          "sporttery-2038361",
+          "sporttery-2038362",
+          "sporttery-2038363",
+          "sporttery-2038364",
+          "sporttery-2038365",
+          "sporttery-2038369",
+          "sporttery-2038371",
+          "sporttery-2038373",
+          "sporttery-2038477",
+          "sporttery-2038483",
+          "sporttery-2038484",
+          "sporttery-2038517",
+          "sporttery-2038518",
+          "sporttery-2038520",
+          "sporttery-2038521",
+          "sporttery-2038522",
+          "sporttery-2038523",
+          "sporttery-2038525",
+          "sporttery-2038526",
+          "sporttery-2038548",
+          "sporttery-2038550",
+          "sporttery-2038551",
+          "sporttery-2038553",
+          "sporttery-2038554",
+          "sporttery-2038555",
+          "sporttery-2038556",
+          "sporttery-2038791",
+          "sporttery-2038793",
+          "sporttery-2038825",
+          "sporttery-2038827",
+          "sporttery-2038828",
+          "sporttery-2038830",
+          "sporttery-2038832",
+          "sporttery-2038833",
+          "sporttery-2038856",
+          "sporttery-2038857",
+          "sporttery-2038859",
+          "sporttery-2038860",
+          "sporttery-2038861",
+          "sporttery-2038863",
+          "sporttery-2038871",
+          "sporttery-2038873",
+          "sporttery-2038876",
+          "sporttery-2038970",
+          "sporttery-2038976",
+          "sporttery-2038977",
+          "sporttery-2039023",
+          "sporttery-2039024",
+          "sporttery-2039025",
+          "sporttery-2039026",
+          "sporttery-2039027",
+          "sporttery-2039028",
+          "sporttery-2039029",
+          "sporttery-2039055",
+          "sporttery-2039056",
+          "sporttery-2039057",
+          "sporttery-2039058",
+          "sporttery-2039059"
+        ],
+        "test_match_ids": [
+          "sporttery-2039064",
+          "sporttery-2039066",
+          "sporttery-2039067",
+          "sporttery-2039137",
+          "sporttery-2039141",
+          "sporttery-2039142",
+          "sporttery-2039143",
+          "sporttery-2039171",
+          "sporttery-2039172",
+          "sporttery-2039174",
+          "sporttery-2039175",
+          "sporttery-2039177",
+          "sporttery-2039199",
+          "sporttery-2039202",
+          "sporttery-2039203",
+          "sporttery-2039204",
+          "sporttery-2039207",
+          "sporttery-2039209",
+          "sporttery-2039243",
+          "sporttery-2039244",
+          "sporttery-2039248",
+          "sporttery-2039249",
+          "sporttery-2039253",
+          "sporttery-2039256",
+          "sporttery-2039261",
+          "sporttery-2039268",
+          "sporttery-2039270",
+          "sporttery-2039274",
+          "sporttery-2039297",
+          "sporttery-2039298",
+          "sporttery-2039299",
+          "sporttery-2039300",
+          "sporttery-2039326",
+          "sporttery-2039329",
+          "sporttery-2039330",
+          "sporttery-2039331",
+          "sporttery-2039332",
+          "sporttery-2039334",
+          "sporttery-2039335",
+          "sporttery-2039356",
+          "sporttery-2039357",
+          "sporttery-2039361",
+          "sporttery-2039362",
+          "sporttery-2039363",
+          "sporttery-2039366",
+          "sporttery-2039370",
+          "sporttery-2039372",
+          "sporttery-2039373",
+          "sporttery-2039439",
+          "sporttery-2039440",
+          "sporttery-2039441",
+          "sporttery-2039465",
+          "sporttery-2039467",
+          "sporttery-2039468",
+          "sporttery-2039469",
+          "sporttery-2039474",
+          "sporttery-2039496",
+          "sporttery-2039497",
+          "sporttery-2039499",
+          "sporttery-2039501",
+          "sporttery-2039503",
+          "sporttery-2039504",
+          "sporttery-2039509",
+          "sporttery-2039514",
+          "sporttery-2039515",
+          "sporttery-2039516",
+          "sporttery-2039580",
+          "sporttery-2039581",
+          "sporttery-2039582",
+          "sporttery-2039584",
+          "sporttery-2039615",
+          "sporttery-2039616",
+          "sporttery-2039617",
+          "sporttery-2039618",
+          "sporttery-2039622",
+          "sporttery-2039623"
+        ],
+        "test_metrics": {
+          "n": 76,
+          "accuracy_pct": 56.579,
+          "brier_mean": 0.61899546,
+          "brier_sum": 47.043655,
+          "log_loss": 1.03393788,
+          "ece": 0.067189,
+          "calibration_bins": [
+            {
+              "bin": "0.0-0.1",
+              "n": 9,
+              "avg_prob": 0.075,
+              "actual_rate": 0.222222
+            },
+            {
+              "bin": "0.1-0.2",
+              "n": 42,
+              "avg_prob": 0.151714,
+              "actual_rate": 0.238095
+            },
+            {
+              "bin": "0.2-0.3",
+              "n": 64,
+              "avg_prob": 0.253688,
+              "actual_rate": 0.234375
+            },
+            {
+              "bin": "0.3-0.4",
+              "n": 58,
+              "avg_prob": 0.3445,
+              "actual_rate": 0.310345
+            },
+            {
+              "bin": "0.4-0.5",
+              "n": 21,
+              "avg_prob": 0.458333,
+              "actual_rate": 0.47619
+            },
+            {
+              "bin": "0.5-0.6",
+              "n": 7,
+              "avg_prob": 0.545714,
+              "actual_rate": 0.857143
+            },
+            {
+              "bin": "0.6-0.7",
+              "n": 12,
+              "avg_prob": 0.65825,
+              "actual_rate": 0.416667
+            },
+            {
+              "bin": "0.7-0.8",
+              "n": 12,
+              "avg_prob": 0.737667,
+              "actual_rate": 0.75
+            },
+            {
+              "bin": "0.8-0.9",
+              "n": 3,
+              "avg_prob": 0.849,
+              "actual_rate": 0.333333
+            }
+          ],
+          "score": {
+            "top1_accuracy_pct": 11.84,
+            "top3_accuracy_pct": 32.89,
+            "top5_accuracy_pct": 46.05,
+            "score_log_loss": 6.32279
+          },
+          "ou_2_5_brier": 0.260562,
+          "btts_brier": 0.251384,
+          "clv_mean_pp": 0.085,
+          "clv_n": 76
+        },
+        "paired_market": {
+          "n": 76,
+          "bootstrap_iterations": 2000,
+          "seed": 20260810,
+          "brier_delta_model_minus_market": 0.01963618,
+          "brier_delta_95ci": [
+            0.00012247,
+            0.04500555
+          ],
+          "log_loss_delta_model_minus_market": 0.02800612,
+          "log_loss_delta_95ci": [
+            0.00077445,
+            0.06325177
+          ],
+          "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+        }
+      },
+      {
+        "fold": 4,
+        "train_start": "2026-01-13T01:30:00+08:00",
+        "train_end": "2026-05-10T03:00:00+08:00",
+        "test_start": "2026-05-11T00:00:00+08:00",
+        "test_end": "2026-08-02T23:00:00+08:00",
+        "train_n": 311,
+        "test_n": 80,
+        "train_match_ids": [
+          "sporttery-2036878",
+          "sporttery-2036879",
+          "sporttery-2036880",
+          "sporttery-2036929",
+          "sporttery-2036930",
+          "sporttery-2036931",
+          "sporttery-2036943",
+          "sporttery-2036944",
+          "sporttery-2036948",
+          "sporttery-2036949",
+          "sporttery-2036957",
+          "sporttery-2036959",
+          "sporttery-2036960",
+          "sporttery-2036996",
+          "sporttery-2036999",
+          "sporttery-2037000",
+          "sporttery-2037002",
+          "sporttery-2037003",
+          "sporttery-2037038",
+          "sporttery-2037040",
+          "sporttery-2037042",
+          "sporttery-2037043",
+          "sporttery-2037044",
+          "sporttery-2037046",
+          "sporttery-2037047",
+          "sporttery-2037063",
+          "sporttery-2037064",
+          "sporttery-2037065",
+          "sporttery-2037066",
+          "sporttery-2037068",
+          "sporttery-2037071",
+          "sporttery-2037072",
+          "sporttery-2037075",
+          "sporttery-2037076",
+          "sporttery-2037078",
+          "sporttery-2037200",
+          "sporttery-2037205",
+          "sporttery-2037244",
+          "sporttery-2037245",
+          "sporttery-2037247",
+          "sporttery-2037248",
+          "sporttery-2037249",
+          "sporttery-2037250",
+          "sporttery-2037253",
+          "sporttery-2037274",
+          "sporttery-2037275",
+          "sporttery-2037276",
+          "sporttery-2037277",
+          "sporttery-2037278",
+          "sporttery-2037279",
+          "sporttery-2037280",
+          "sporttery-2037282",
+          "sporttery-2037283",
+          "sporttery-2037290",
+          "sporttery-2037292",
+          "sporttery-2037294",
+          "sporttery-2037337",
+          "sporttery-2037338",
+          "sporttery-2037409",
+          "sporttery-2037410",
+          "sporttery-2037452",
+          "sporttery-2037453",
+          "sporttery-2037454",
+          "sporttery-2037455",
+          "sporttery-2037456",
+          "sporttery-2037457",
+          "sporttery-2037459",
+          "sporttery-2037460",
+          "sporttery-2037461",
+          "sporttery-2037479",
+          "sporttery-2037480",
+          "sporttery-2037481",
+          "sporttery-2037482",
+          "sporttery-2037483",
+          "sporttery-2037484",
+          "sporttery-2037486",
+          "sporttery-2037488",
+          "sporttery-2037496",
+          "sporttery-2037497",
+          "sporttery-2037498",
+          "sporttery-2037546",
+          "sporttery-2037613",
+          "sporttery-2037614",
+          "sporttery-2037615",
+          "sporttery-2037616",
+          "sporttery-2037650",
+          "sporttery-2037651",
+          "sporttery-2037652",
+          "sporttery-2037655",
+          "sporttery-2037656",
+          "sporttery-2037657",
+          "sporttery-2037673",
+          "sporttery-2037674",
+          "sporttery-2037675",
+          "sporttery-2037676",
+          "sporttery-2037677",
+          "sporttery-2037678",
+          "sporttery-2037679",
+          "sporttery-2037681",
+          "sporttery-2037682",
+          "sporttery-2037688",
+          "sporttery-2037689",
+          "sporttery-2037690",
+          "sporttery-2037738",
+          "sporttery-2037739",
+          "sporttery-2037740",
+          "sporttery-2037745",
+          "sporttery-2037750",
+          "sporttery-2037751",
+          "sporttery-2037752",
+          "sporttery-2037758",
+          "sporttery-2037765",
+          "sporttery-2037799",
+          "sporttery-2037804",
+          "sporttery-2037897",
+          "sporttery-2037898",
+          "sporttery-2037899",
+          "sporttery-2037900",
+          "sporttery-2037944",
+          "sporttery-2037945",
+          "sporttery-2037946",
+          "sporttery-2037947",
+          "sporttery-2037950",
+          "sporttery-2037951",
+          "sporttery-2037952",
+          "sporttery-2037968",
+          "sporttery-2037969",
+          "sporttery-2037970",
+          "sporttery-2037971",
+          "sporttery-2037972",
+          "sporttery-2037973",
+          "sporttery-2037974",
+          "sporttery-2037975",
+          "sporttery-2037979",
+          "sporttery-2037981",
+          "sporttery-2037984",
+          "sporttery-2038033",
+          "sporttery-2038034",
+          "sporttery-2038035",
+          "sporttery-2038040",
+          "sporttery-2038046",
+          "sporttery-2038047",
+          "sporttery-2038048",
+          "sporttery-2038049",
+          "sporttery-2038050",
+          "sporttery-2038054",
+          "sporttery-2038059",
+          "sporttery-2038097",
+          "sporttery-2038098",
+          "sporttery-2038139",
+          "sporttery-2038140",
+          "sporttery-2038141",
+          "sporttery-2038146",
+          "sporttery-2038148",
+          "sporttery-2038167",
+          "sporttery-2038170",
+          "sporttery-2038171",
+          "sporttery-2038172",
+          "sporttery-2038174",
+          "sporttery-2038175",
+          "sporttery-2038176",
+          "sporttery-2038181",
+          "sporttery-2038183",
+          "sporttery-2038292",
+          "sporttery-2038293",
+          "sporttery-2038294",
+          "sporttery-2038296",
+          "sporttery-2038325",
+          "sporttery-2038326",
+          "sporttery-2038328",
+          "sporttery-2038329",
+          "sporttery-2038330",
+          "sporttery-2038331",
+          "sporttery-2038334",
+          "sporttery-2038358",
+          "sporttery-2038359",
+          "sporttery-2038360",
+          "sporttery-2038361",
+          "sporttery-2038362",
+          "sporttery-2038363",
+          "sporttery-2038364",
+          "sporttery-2038365",
+          "sporttery-2038369",
+          "sporttery-2038371",
+          "sporttery-2038373",
+          "sporttery-2038477",
+          "sporttery-2038483",
+          "sporttery-2038484",
+          "sporttery-2038517",
+          "sporttery-2038518",
+          "sporttery-2038520",
+          "sporttery-2038521",
+          "sporttery-2038522",
+          "sporttery-2038523",
+          "sporttery-2038525",
+          "sporttery-2038526",
+          "sporttery-2038548",
+          "sporttery-2038550",
+          "sporttery-2038551",
+          "sporttery-2038553",
+          "sporttery-2038554",
+          "sporttery-2038555",
+          "sporttery-2038556",
+          "sporttery-2038791",
+          "sporttery-2038793",
+          "sporttery-2038825",
+          "sporttery-2038827",
+          "sporttery-2038828",
+          "sporttery-2038830",
+          "sporttery-2038832",
+          "sporttery-2038833",
+          "sporttery-2038856",
+          "sporttery-2038857",
+          "sporttery-2038859",
+          "sporttery-2038860",
+          "sporttery-2038861",
+          "sporttery-2038863",
+          "sporttery-2038871",
+          "sporttery-2038873",
+          "sporttery-2038876",
+          "sporttery-2038970",
+          "sporttery-2038976",
+          "sporttery-2038977",
+          "sporttery-2039023",
+          "sporttery-2039024",
+          "sporttery-2039025",
+          "sporttery-2039026",
+          "sporttery-2039027",
+          "sporttery-2039028",
+          "sporttery-2039029",
+          "sporttery-2039055",
+          "sporttery-2039056",
+          "sporttery-2039057",
+          "sporttery-2039058",
+          "sporttery-2039059",
+          "sporttery-2039064",
+          "sporttery-2039066",
+          "sporttery-2039067",
+          "sporttery-2039137",
+          "sporttery-2039141",
+          "sporttery-2039142",
+          "sporttery-2039143",
+          "sporttery-2039171",
+          "sporttery-2039172",
+          "sporttery-2039174",
+          "sporttery-2039175",
+          "sporttery-2039177",
+          "sporttery-2039199",
+          "sporttery-2039202",
+          "sporttery-2039203",
+          "sporttery-2039204",
+          "sporttery-2039207",
+          "sporttery-2039209",
+          "sporttery-2039243",
+          "sporttery-2039244",
+          "sporttery-2039248",
+          "sporttery-2039249",
+          "sporttery-2039253",
+          "sporttery-2039256",
+          "sporttery-2039261",
+          "sporttery-2039268",
+          "sporttery-2039270",
+          "sporttery-2039274",
+          "sporttery-2039297",
+          "sporttery-2039298",
+          "sporttery-2039299",
+          "sporttery-2039300",
+          "sporttery-2039326",
+          "sporttery-2039329",
+          "sporttery-2039330",
+          "sporttery-2039331",
+          "sporttery-2039332",
+          "sporttery-2039334",
+          "sporttery-2039335",
+          "sporttery-2039356",
+          "sporttery-2039357",
+          "sporttery-2039361",
+          "sporttery-2039362",
+          "sporttery-2039363",
+          "sporttery-2039366",
+          "sporttery-2039370",
+          "sporttery-2039372",
+          "sporttery-2039373",
+          "sporttery-2039439",
+          "sporttery-2039440",
+          "sporttery-2039441",
+          "sporttery-2039465",
+          "sporttery-2039467",
+          "sporttery-2039468",
+          "sporttery-2039469",
+          "sporttery-2039474",
+          "sporttery-2039496",
+          "sporttery-2039497",
+          "sporttery-2039499",
+          "sporttery-2039501",
+          "sporttery-2039503",
+          "sporttery-2039504",
+          "sporttery-2039509",
+          "sporttery-2039514",
+          "sporttery-2039515",
+          "sporttery-2039516",
+          "sporttery-2039580",
+          "sporttery-2039581",
+          "sporttery-2039582",
+          "sporttery-2039584",
+          "sporttery-2039615",
+          "sporttery-2039616",
+          "sporttery-2039617",
+          "sporttery-2039618",
+          "sporttery-2039622",
+          "sporttery-2039623"
+        ],
+        "test_match_ids": [
+          "sporttery-2039644",
+          "sporttery-2039645",
+          "sporttery-2039646",
+          "sporttery-2039648",
+          "sporttery-2039649",
+          "sporttery-2039650",
+          "sporttery-2039652",
+          "sporttery-2039657",
+          "sporttery-2039658",
+          "sporttery-2039660",
+          "sporttery-2039695",
+          "sporttery-2039697",
+          "sporttery-2039699",
+          "sporttery-2039702",
+          "sporttery-2039703",
+          "sporttery-2039704",
+          "sporttery-2039707",
+          "sporttery-2039708",
+          "sporttery-2039709",
+          "sporttery-2039712",
+          "sporttery-2039715",
+          "sporttery-2039716",
+          "sporttery-2039717",
+          "sporttery-2039744",
+          "sporttery-2039745",
+          "sporttery-2039798",
+          "sporttery-2039799",
+          "sporttery-2039800",
+          "sporttery-2039801",
+          "sporttery-2039802",
+          "sporttery-2039803",
+          "sporttery-2039804",
+          "sporttery-2039805",
+          "sporttery-2039806",
+          "sporttery-2039807",
+          "sporttery-2039843",
+          "sporttery-2039844",
+          "sporttery-2039869",
+          "sporttery-2039884",
+          "sporttery-2039907",
+          "sporttery-2039910",
+          "sporttery-2039911",
+          "sporttery-2039912",
+          "sporttery-2039913",
+          "sporttery-2039914",
+          "sporttery-2039915",
+          "sporttery-2039916",
+          "sporttery-2039917",
+          "sporttery-2039942",
+          "sporttery-2039944",
+          "sporttery-2039945",
+          "sporttery-2039946",
+          "sporttery-2039947",
+          "sporttery-2039948",
+          "sporttery-2039949",
+          "sporttery-2039960",
+          "sporttery-2039986",
+          "sporttery-2040025",
+          "sporttery-2040688",
+          "sporttery-2040689",
+          "sporttery-2040690",
+          "sporttery-2040691",
+          "sporttery-2040692",
+          "sporttery-2040693",
+          "sporttery-2040694",
+          "sporttery-2040695",
+          "sporttery-2040696",
+          "sporttery-2040697",
+          "u-31fc443c17_na_20260801T2200Z_u-5a5a2d7f20__u-21cdfae94a",
+          "u-31fc443c17_na_20260802T0000Z_u-77fdca9076__u-cdc2fad02e",
+          "u-5301467cd3_na_20260802T0800Z_u-8e5fb29724__u-fc297a4e2d",
+          "u-564efa9922_na_20260802T0730Z_u-ab9fe034bf__fc-6658a9f032",
+          "u-564efa9922_na_20260802T0730Z_u-c5ff03cd61__u-18c4acdd4f",
+          "u-564efa9922_na_20260802T0830Z_u-6de99512ac__fc-b187df6269",
+          "u-564efa9922_na_20260802T0830Z_u-f67073dc3c__u-cf44f7ab91",
+          "u-564efa9922_na_20260802T1030Z_u-76575d9107__u-6ecf4fe70d",
+          "u-564efa9922_na_20260802T1045Z_u-973a49806b__u-e9284b63b8",
+          "u-6c72935bf4_na_20260801T2300Z_u-4ab584e8ea__u-17ff6ef727",
+          "u-6c72935bf4_na_20260802T0000Z_u-8e3a6cbbcc__u-351fb3a8b6",
+          "u-7d6efb4c98_na_20260801T2100Z_u-d8bf589c2b__u-ba914fc496"
+        ],
+        "test_metrics": {
+          "n": 80,
+          "accuracy_pct": 50.0,
+          "brier_mean": 0.62430141,
+          "brier_sum": 49.944113,
+          "log_loss": 1.04047654,
+          "ece": 0.029062,
+          "calibration_bins": [
+            {
+              "bin": "0.0-0.1",
+              "n": 2,
+              "avg_prob": 0.091,
+              "actual_rate": 0.0
+            },
+            {
+              "bin": "0.1-0.2",
+              "n": 32,
+              "avg_prob": 0.169312,
+              "actual_rate": 0.1875
+            },
+            {
+              "bin": "0.2-0.3",
+              "n": 88,
+              "avg_prob": 0.251841,
+              "actual_rate": 0.261364
+            },
+            {
+              "bin": "0.3-0.4",
+              "n": 59,
+              "avg_prob": 0.348017,
+              "actual_rate": 0.338983
+            },
+            {
+              "bin": "0.4-0.5",
+              "n": 26,
+              "avg_prob": 0.451615,
+              "actual_rate": 0.5
+            },
+            {
+              "bin": "0.5-0.6",
+              "n": 15,
+              "avg_prob": 0.546933,
+              "actual_rate": 0.466667
+            },
+            {
+              "bin": "0.6-0.7",
+              "n": 15,
+              "avg_prob": 0.638267,
+              "actual_rate": 0.533333
+            },
+            {
+              "bin": "0.7-0.8",
+              "n": 3,
+              "avg_prob": 0.732,
+              "actual_rate": 1.0
+            }
+          ],
+          "score": {
+            "top1_accuracy_pct": 16.25,
+            "top3_accuracy_pct": 43.75,
+            "top5_accuracy_pct": 57.5,
+            "score_log_loss": 5.39047
+          },
+          "ou_2_5_brier": 0.253344,
+          "btts_brier": 0.265261,
+          "clv_mean_pp": 0.064,
+          "clv_n": 58
+        },
+        "paired_market": {
+          "n": 80,
+          "bootstrap_iterations": 2000,
+          "seed": 20260811,
+          "brier_delta_model_minus_market": 0.00464227,
+          "brier_delta_95ci": [
+            -0.02540789,
+            0.03425257
+          ],
+          "log_loss_delta_model_minus_market": 0.00346117,
+          "log_loss_delta_95ci": [
+            -0.04774116,
+            0.04882687
+          ],
+          "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+        }
+      },
+      {
+        "fold": 5,
+        "train_start": "2026-01-13T01:30:00+08:00",
+        "train_end": "2026-08-02T23:00:00+08:00",
+        "test_start": "2026-08-03T01:15:00+08:00",
+        "test_end": "2026-08-20T06:00:00+08:00",
+        "train_n": 391,
+        "test_n": 138,
+        "train_match_ids": [
+          "sporttery-2036878",
+          "sporttery-2036879",
+          "sporttery-2036880",
+          "sporttery-2036929",
+          "sporttery-2036930",
+          "sporttery-2036931",
+          "sporttery-2036943",
+          "sporttery-2036944",
+          "sporttery-2036948",
+          "sporttery-2036949",
+          "sporttery-2036957",
+          "sporttery-2036959",
+          "sporttery-2036960",
+          "sporttery-2036996",
+          "sporttery-2036999",
+          "sporttery-2037000",
+          "sporttery-2037002",
+          "sporttery-2037003",
+          "sporttery-2037038",
+          "sporttery-2037040",
+          "sporttery-2037042",
+          "sporttery-2037043",
+          "sporttery-2037044",
+          "sporttery-2037046",
+          "sporttery-2037047",
+          "sporttery-2037063",
+          "sporttery-2037064",
+          "sporttery-2037065",
+          "sporttery-2037066",
+          "sporttery-2037068",
+          "sporttery-2037071",
+          "sporttery-2037072",
+          "sporttery-2037075",
+          "sporttery-2037076",
+          "sporttery-2037078",
+          "sporttery-2037200",
+          "sporttery-2037205",
+          "sporttery-2037244",
+          "sporttery-2037245",
+          "sporttery-2037247",
+          "sporttery-2037248",
+          "sporttery-2037249",
+          "sporttery-2037250",
+          "sporttery-2037253",
+          "sporttery-2037274",
+          "sporttery-2037275",
+          "sporttery-2037276",
+          "sporttery-2037277",
+          "sporttery-2037278",
+          "sporttery-2037279",
+          "sporttery-2037280",
+          "sporttery-2037282",
+          "sporttery-2037283",
+          "sporttery-2037290",
+          "sporttery-2037292",
+          "sporttery-2037294",
+          "sporttery-2037337",
+          "sporttery-2037338",
+          "sporttery-2037409",
+          "sporttery-2037410",
+          "sporttery-2037452",
+          "sporttery-2037453",
+          "sporttery-2037454",
+          "sporttery-2037455",
+          "sporttery-2037456",
+          "sporttery-2037457",
+          "sporttery-2037459",
+          "sporttery-2037460",
+          "sporttery-2037461",
+          "sporttery-2037479",
+          "sporttery-2037480",
+          "sporttery-2037481",
+          "sporttery-2037482",
+          "sporttery-2037483",
+          "sporttery-2037484",
+          "sporttery-2037486",
+          "sporttery-2037488",
+          "sporttery-2037496",
+          "sporttery-2037497",
+          "sporttery-2037498",
+          "sporttery-2037546",
+          "sporttery-2037613",
+          "sporttery-2037614",
+          "sporttery-2037615",
+          "sporttery-2037616",
+          "sporttery-2037650",
+          "sporttery-2037651",
+          "sporttery-2037652",
+          "sporttery-2037655",
+          "sporttery-2037656",
+          "sporttery-2037657",
+          "sporttery-2037673",
+          "sporttery-2037674",
+          "sporttery-2037675",
+          "sporttery-2037676",
+          "sporttery-2037677",
+          "sporttery-2037678",
+          "sporttery-2037679",
+          "sporttery-2037681",
+          "sporttery-2037682",
+          "sporttery-2037688",
+          "sporttery-2037689",
+          "sporttery-2037690",
+          "sporttery-2037738",
+          "sporttery-2037739",
+          "sporttery-2037740",
+          "sporttery-2037745",
+          "sporttery-2037750",
+          "sporttery-2037751",
+          "sporttery-2037752",
+          "sporttery-2037758",
+          "sporttery-2037765",
+          "sporttery-2037799",
+          "sporttery-2037804",
+          "sporttery-2037897",
+          "sporttery-2037898",
+          "sporttery-2037899",
+          "sporttery-2037900",
+          "sporttery-2037944",
+          "sporttery-2037945",
+          "sporttery-2037946",
+          "sporttery-2037947",
+          "sporttery-2037950",
+          "sporttery-2037951",
+          "sporttery-2037952",
+          "sporttery-2037968",
+          "sporttery-2037969",
+          "sporttery-2037970",
+          "sporttery-2037971",
+          "sporttery-2037972",
+          "sporttery-2037973",
+          "sporttery-2037974",
+          "sporttery-2037975",
+          "sporttery-2037979",
+          "sporttery-2037981",
+          "sporttery-2037984",
+          "sporttery-2038033",
+          "sporttery-2038034",
+          "sporttery-2038035",
+          "sporttery-2038040",
+          "sporttery-2038046",
+          "sporttery-2038047",
+          "sporttery-2038048",
+          "sporttery-2038049",
+          "sporttery-2038050",
+          "sporttery-2038054",
+          "sporttery-2038059",
+          "sporttery-2038097",
+          "sporttery-2038098",
+          "sporttery-2038139",
+          "sporttery-2038140",
+          "sporttery-2038141",
+          "sporttery-2038146",
+          "sporttery-2038148",
+          "sporttery-2038167",
+          "sporttery-2038170",
+          "sporttery-2038171",
+          "sporttery-2038172",
+          "sporttery-2038174",
+          "sporttery-2038175",
+          "sporttery-2038176",
+          "sporttery-2038181",
+          "sporttery-2038183",
+          "sporttery-2038292",
+          "sporttery-2038293",
+          "sporttery-2038294",
+          "sporttery-2038296",
+          "sporttery-2038325",
+          "sporttery-2038326",
+          "sporttery-2038328",
+          "sporttery-2038329",
+          "sporttery-2038330",
+          "sporttery-2038331",
+          "sporttery-2038334",
+          "sporttery-2038358",
+          "sporttery-2038359",
+          "sporttery-2038360",
+          "sporttery-2038361",
+          "sporttery-2038362",
+          "sporttery-2038363",
+          "sporttery-2038364",
+          "sporttery-2038365",
+          "sporttery-2038369",
+          "sporttery-2038371",
+          "sporttery-2038373",
+          "sporttery-2038477",
+          "sporttery-2038483",
+          "sporttery-2038484",
+          "sporttery-2038517",
+          "sporttery-2038518",
+          "sporttery-2038520",
+          "sporttery-2038521",
+          "sporttery-2038522",
+          "sporttery-2038523",
+          "sporttery-2038525",
+          "sporttery-2038526",
+          "sporttery-2038548",
+          "sporttery-2038550",
+          "sporttery-2038551",
+          "sporttery-2038553",
+          "sporttery-2038554",
+          "sporttery-2038555",
+          "sporttery-2038556",
+          "sporttery-2038791",
+          "sporttery-2038793",
+          "sporttery-2038825",
+          "sporttery-2038827",
+          "sporttery-2038828",
+          "sporttery-2038830",
+          "sporttery-2038832",
+          "sporttery-2038833",
+          "sporttery-2038856",
+          "sporttery-2038857",
+          "sporttery-2038859",
+          "sporttery-2038860",
+          "sporttery-2038861",
+          "sporttery-2038863",
+          "sporttery-2038871",
+          "sporttery-2038873",
+          "sporttery-2038876",
+          "sporttery-2038970",
+          "sporttery-2038976",
+          "sporttery-2038977",
+          "sporttery-2039023",
+          "sporttery-2039024",
+          "sporttery-2039025",
+          "sporttery-2039026",
+          "sporttery-2039027",
+          "sporttery-2039028",
+          "sporttery-2039029",
+          "sporttery-2039055",
+          "sporttery-2039056",
+          "sporttery-2039057",
+          "sporttery-2039058",
+          "sporttery-2039059",
+          "sporttery-2039064",
+          "sporttery-2039066",
+          "sporttery-2039067",
+          "sporttery-2039137",
+          "sporttery-2039141",
+          "sporttery-2039142",
+          "sporttery-2039143",
+          "sporttery-2039171",
+          "sporttery-2039172",
+          "sporttery-2039174",
+          "sporttery-2039175",
+          "sporttery-2039177",
+          "sporttery-2039199",
+          "sporttery-2039202",
+          "sporttery-2039203",
+          "sporttery-2039204",
+          "sporttery-2039207",
+          "sporttery-2039209",
+          "sporttery-2039243",
+          "sporttery-2039244",
+          "sporttery-2039248",
+          "sporttery-2039249",
+          "sporttery-2039253",
+          "sporttery-2039256",
+          "sporttery-2039261",
+          "sporttery-2039268",
+          "sporttery-2039270",
+          "sporttery-2039274",
+          "sporttery-2039297",
+          "sporttery-2039298",
+          "sporttery-2039299",
+          "sporttery-2039300",
+          "sporttery-2039326",
+          "sporttery-2039329",
+          "sporttery-2039330",
+          "sporttery-2039331",
+          "sporttery-2039332",
+          "sporttery-2039334",
+          "sporttery-2039335",
+          "sporttery-2039356",
+          "sporttery-2039357",
+          "sporttery-2039361",
+          "sporttery-2039362",
+          "sporttery-2039363",
+          "sporttery-2039366",
+          "sporttery-2039370",
+          "sporttery-2039372",
+          "sporttery-2039373",
+          "sporttery-2039439",
+          "sporttery-2039440",
+          "sporttery-2039441",
+          "sporttery-2039465",
+          "sporttery-2039467",
+          "sporttery-2039468",
+          "sporttery-2039469",
+          "sporttery-2039474",
+          "sporttery-2039496",
+          "sporttery-2039497",
+          "sporttery-2039499",
+          "sporttery-2039501",
+          "sporttery-2039503",
+          "sporttery-2039504",
+          "sporttery-2039509",
+          "sporttery-2039514",
+          "sporttery-2039515",
+          "sporttery-2039516",
+          "sporttery-2039580",
+          "sporttery-2039581",
+          "sporttery-2039582",
+          "sporttery-2039584",
+          "sporttery-2039615",
+          "sporttery-2039616",
+          "sporttery-2039617",
+          "sporttery-2039618",
+          "sporttery-2039622",
+          "sporttery-2039623",
+          "sporttery-2039644",
+          "sporttery-2039645",
+          "sporttery-2039646",
+          "sporttery-2039648",
+          "sporttery-2039649",
+          "sporttery-2039650",
+          "sporttery-2039652",
+          "sporttery-2039657",
+          "sporttery-2039658",
+          "sporttery-2039660",
+          "sporttery-2039695",
+          "sporttery-2039697",
+          "sporttery-2039699",
+          "sporttery-2039702",
+          "sporttery-2039703",
+          "sporttery-2039704",
+          "sporttery-2039707",
+          "sporttery-2039708",
+          "sporttery-2039709",
+          "sporttery-2039712",
+          "sporttery-2039715",
+          "sporttery-2039716",
+          "sporttery-2039717",
+          "sporttery-2039744",
+          "sporttery-2039745",
+          "sporttery-2039798",
+          "sporttery-2039799",
+          "sporttery-2039800",
+          "sporttery-2039801",
+          "sporttery-2039802",
+          "sporttery-2039803",
+          "sporttery-2039804",
+          "sporttery-2039805",
+          "sporttery-2039806",
+          "sporttery-2039807",
+          "sporttery-2039843",
+          "sporttery-2039844",
+          "sporttery-2039869",
+          "sporttery-2039884",
+          "sporttery-2039907",
+          "sporttery-2039910",
+          "sporttery-2039911",
+          "sporttery-2039912",
+          "sporttery-2039913",
+          "sporttery-2039914",
+          "sporttery-2039915",
+          "sporttery-2039916",
+          "sporttery-2039917",
+          "sporttery-2039942",
+          "sporttery-2039944",
+          "sporttery-2039945",
+          "sporttery-2039946",
+          "sporttery-2039947",
+          "sporttery-2039948",
+          "sporttery-2039949",
+          "sporttery-2039960",
+          "sporttery-2039986",
+          "sporttery-2040025",
+          "sporttery-2040688",
+          "sporttery-2040689",
+          "sporttery-2040690",
+          "sporttery-2040691",
+          "sporttery-2040692",
+          "sporttery-2040693",
+          "sporttery-2040694",
+          "sporttery-2040695",
+          "sporttery-2040696",
+          "sporttery-2040697",
+          "u-31fc443c17_na_20260801T2200Z_u-5a5a2d7f20__u-21cdfae94a",
+          "u-31fc443c17_na_20260802T0000Z_u-77fdca9076__u-cdc2fad02e",
+          "u-5301467cd3_na_20260802T0800Z_u-8e5fb29724__u-fc297a4e2d",
+          "u-564efa9922_na_20260802T0730Z_u-ab9fe034bf__fc-6658a9f032",
+          "u-564efa9922_na_20260802T0730Z_u-c5ff03cd61__u-18c4acdd4f",
+          "u-564efa9922_na_20260802T0830Z_u-6de99512ac__fc-b187df6269",
+          "u-564efa9922_na_20260802T0830Z_u-f67073dc3c__u-cf44f7ab91",
+          "u-564efa9922_na_20260802T1030Z_u-76575d9107__u-6ecf4fe70d",
+          "u-564efa9922_na_20260802T1045Z_u-973a49806b__u-e9284b63b8",
+          "u-6c72935bf4_na_20260801T2300Z_u-4ab584e8ea__u-17ff6ef727",
+          "u-6c72935bf4_na_20260802T0000Z_u-8e3a6cbbcc__u-351fb3a8b6",
+          "u-7d6efb4c98_na_20260801T2100Z_u-d8bf589c2b__u-ba914fc496"
+        ],
+        "test_match_ids": [
+          "sporttery-2040699",
+          "sporttery-2040700",
+          "sporttery-2040706",
+          "sporttery-2040718",
+          "sporttery-2040720",
+          "sporttery-2040721",
+          "sporttery-2040724",
+          "sporttery-2040725",
+          "sporttery-2040727",
+          "sporttery-2040728",
+          "sporttery-2040729",
+          "sporttery-2040737",
+          "sporttery-2040738",
+          "sporttery-2040739",
+          "sporttery-2040740",
+          "sporttery-2040741",
+          "sporttery-2040742",
+          "sporttery-2040743",
+          "sporttery-2040744",
+          "sporttery-2040745",
+          "sporttery-2040746",
+          "sporttery-2040754",
+          "sporttery-2040755",
+          "sporttery-2040756",
+          "sporttery-2040757",
+          "sporttery-2040758",
+          "sporttery-2040759",
+          "sporttery-2040760",
+          "sporttery-2040761",
+          "sporttery-2040762",
+          "sporttery-2040763",
+          "sporttery-2040764",
+          "sporttery-2040765",
+          "sporttery-2040767",
+          "sporttery-2040768",
+          "sporttery-2040769",
+          "sporttery-2040770",
+          "sporttery-2040772",
+          "sporttery-2040773",
+          "sporttery-2040774",
+          "sporttery-2040775",
+          "sporttery-2040776",
+          "sporttery-2040777",
+          "sporttery-2040778",
+          "sporttery-2040779",
+          "sporttery-2040780",
+          "sporttery-2040781",
+          "sporttery-2040782",
+          "sporttery-2040783",
+          "sporttery-2040784",
+          "sporttery-2040785",
+          "sporttery-2040786",
+          "sporttery-2040787",
+          "sporttery-2040789",
+          "sporttery-2040790",
+          "sporttery-2040791",
+          "sporttery-2040792",
+          "sporttery-2040793",
+          "sporttery-2040794",
+          "sporttery-2040795",
+          "sporttery-2040796",
+          "sporttery-2040798",
+          "sporttery-2040799",
+          "sporttery-2040800",
+          "sporttery-2040811",
+          "sporttery-2040812",
+          "sporttery-2040813",
+          "sporttery-2040814",
+          "sporttery-2040815",
+          "sporttery-2040816",
+          "sporttery-2040817",
+          "sporttery-2040818",
+          "sporttery-2040819",
+          "sporttery-2040820",
+          "sporttery-2040823",
+          "sporttery-2040827",
+          "sporttery-2040828",
+          "sporttery-2040829",
+          "sporttery-2040830",
+          "sporttery-2040831",
+          "sporttery-2040832",
+          "sporttery-2040874",
+          "sporttery-2040875",
+          "sporttery-2040876",
+          "sporttery-2040877",
+          "sporttery-2040878",
+          "sporttery-2040879",
+          "sporttery-2040880",
+          "sporttery-2040882",
+          "sporttery-2040883",
+          "sporttery-2040884",
+          "sporttery-2040885",
+          "sporttery-2040886",
+          "sporttery-2040887",
+          "sporttery-2040888",
+          "sporttery-2040889",
+          "sporttery-2040890",
+          "sporttery-2040891",
+          "sporttery-2040892",
+          "sporttery-2040893",
+          "sporttery-2040894",
+          "sporttery-2040895",
+          "sporttery-2040896",
+          "sporttery-2040897",
+          "sporttery-2040898",
+          "sporttery-2040899",
+          "sporttery-2040900",
+          "sporttery-2040901",
+          "sporttery-2040902",
+          "sporttery-2040903",
+          "sporttery-2040904",
+          "sporttery-2040905",
+          "sporttery-2040906",
+          "sporttery-2040907",
+          "sporttery-2040908",
+          "sporttery-2040909",
+          "sporttery-2040910",
+          "sporttery-2040911",
+          "sporttery-2040913",
+          "sporttery-2040914",
+          "sporttery-2040915",
+          "sporttery-2040916",
+          "sporttery-2040918",
+          "sporttery-2040920",
+          "sporttery-2040921",
+          "sporttery-2040922",
+          "sporttery-2040930",
+          "sporttery-2040931",
+          "sporttery-2040937",
+          "sporttery-2040938",
+          "sporttery-2040943",
+          "sporttery-2040944",
+          "sporttery-2040945",
+          "sporttery-2040946",
+          "sporttery-2040947",
+          "sporttery-2040950",
+          "u-6c72935bf4_na_20260804T0000Z_u-b6d4a96fb5__u-865c3afb4d",
+          "u-810d602832_na_20260805T0200Z_u-da8e24919e__nec-14fc2d1ad6"
+        ],
+        "test_metrics": {
+          "n": 138,
+          "accuracy_pct": 44.203,
+          "brier_mean": 0.65233859,
+          "brier_sum": 90.022726,
+          "log_loss": 1.08600274,
+          "ece": 0.064473,
+          "calibration_bins": [
+            {
+              "bin": "0.0-0.1",
+              "n": 12,
+              "avg_prob": 0.057667,
+              "actual_rate": 0.083333
+            },
+            {
+              "bin": "0.1-0.2",
+              "n": 65,
+              "avg_prob": 0.159415,
+              "actual_rate": 0.2
+            },
+            {
+              "bin": "0.2-0.3",
+              "n": 130,
+              "avg_prob": 0.255346,
+              "actual_rate": 0.315385
+            },
+            {
+              "bin": "0.3-0.4",
+              "n": 98,
+              "avg_prob": 0.338469,
+              "actual_rate": 0.357143
+            },
+            {
+              "bin": "0.4-0.5",
+              "n": 43,
+              "avg_prob": 0.437674,
+              "actual_rate": 0.395349
+            },
+            {
+              "bin": "0.5-0.6",
+              "n": 31,
+              "avg_prob": 0.549032,
+              "actual_rate": 0.387097
+            },
+            {
+              "bin": "0.6-0.7",
+              "n": 18,
+              "avg_prob": 0.646889,
+              "actual_rate": 0.5
+            },
+            {
+              "bin": "0.7-0.8",
+              "n": 11,
+              "avg_prob": 0.727091,
+              "actual_rate": 0.454545
+            },
+            {
+              "bin": "0.8-0.9",
+              "n": 4,
+              "avg_prob": 0.8095,
+              "actual_rate": 1.0
+            },
+            {
+              "bin": "0.9-1.0",
+              "n": 2,
+              "avg_prob": 0.9335,
+              "actual_rate": 0.5
+            }
+          ],
+          "score": {
+            "top1_accuracy_pct": 15.94,
+            "top3_accuracy_pct": 33.33,
+            "top5_accuracy_pct": 52.9,
+            "score_log_loss": 5.59224
+          },
+          "ou_2_5_brier": 0.246156,
+          "btts_brier": 0.2503
+        },
+        "paired_market": {
+          "n": 137,
+          "bootstrap_iterations": 2000,
+          "seed": 20260812,
+          "brier_delta_model_minus_market": -0.00411765,
+          "brier_delta_95ci": [
+            -0.02111583,
+            0.02081407
+          ],
+          "log_loss_delta_model_minus_market": 0.00998824,
+          "log_loss_delta_95ci": [
+            -0.03220017,
+            0.0813015
+          ],
+          "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+        }
+      }
+    ],
+    "combined_test_n": 449,
+    "combined_test_metrics": {
+      "n": 449,
+      "accuracy_pct": 49.666,
+      "brier_mean": 0.62691257,
+      "brier_sum": 281.483746,
+      "log_loss": 1.0446716,
+      "ece": 0.031621,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 46,
+          "avg_prob": 0.070652,
+          "actual_rate": 0.108696
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 215,
+          "avg_prob": 0.158158,
+          "actual_rate": 0.209302
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 443,
+          "avg_prob": 0.25265,
+          "actual_rate": 0.268623
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 292,
+          "avg_prob": 0.344315,
+          "actual_rate": 0.349315
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 134,
+          "avg_prob": 0.44753,
+          "actual_rate": 0.440299
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 84,
+          "avg_prob": 0.548821,
+          "actual_rate": 0.511905
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 71,
+          "avg_prob": 0.643662,
+          "actual_rate": 0.492958
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 46,
+          "avg_prob": 0.741761,
+          "actual_rate": 0.652174
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 14,
+          "avg_prob": 0.825286,
+          "actual_rate": 0.714286
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 2,
+          "avg_prob": 0.9335,
+          "actual_rate": 0.5
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 14.48,
+        "top3_accuracy_pct": 34.3,
+        "top5_accuracy_pct": 51.67,
+        "score_log_loss": 5.98353
+      },
+      "ou_2_5_brier": 0.253076,
+      "btts_brier": 0.254631,
+      "clv_mean_pp": -0.019,
+      "clv_n": 289
+    },
+    "combined_paired_market": {
+      "n": 448,
+      "bootstrap_iterations": 2000,
+      "seed": 20260808,
+      "brier_delta_model_minus_market": 0.00339526,
+      "brier_delta_95ci": [
+        -0.00803722,
+        0.0150714
+      ],
+      "log_loss_delta_model_minus_market": 0.00853153,
+      "log_loss_delta_95ci": [
+        -0.01334628,
+        0.03311049
+      ],
+      "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+    }
+  },
+  "current_identity": {
+    "skill_version": "1.5.0",
+    "fusion_version": "1.5.0",
+    "core_version": "3.4.4",
+    "fusion_schema_version": "1.4.0",
+    "model_version": "m3",
+    "probability_signature": "18c92711c9b13c0dac19edfb3611d64950b82bdb4f632f64e42d001631a485a0",
+    "decision_policy_signature": "97c6e47bce68d525c8dee1da1ea848b098b252767d40c31944a543b92fd43316",
+    "evidence_pipeline_signature": "72e4e7b18bd2bed65e0a840df6dcbe604d31dc540507b97d4d326376d4801e04",
+    "prediction_code_sha256": "a563a4427b54a6522c87de4b310213523cf8d62d2d5b3958f9bb814079926dfd",
+    "config_sha256": "4bacb262e8ee9750f2aea61c768d40a10262e23761b1543349512a6710e80e56",
+    "engine_bundle_sha256": "a5c014d0511f0a49e2f065b30c0e7d6371e13874c008a0506c5fcaf75d2cb04c"
+  },
+  "calibration_gate": {
+    "min_recalibration": 100,
+    "threshold_review": 200,
+    "current_version_n": 54,
+    "ready_for_recalibration": false,
+    "ready_for_threshold_review": false
+  },
+  "warning": "当前精确代码/配置版本独立比赛<200，不得据此宣称优于市场。",
+  "disclaimer": "概率模型输出，非投注建议。"
+}

@@ -53,6 +53,9 @@ calib = _load("cross_league_calibration", HERE / "cross_league_calibration.py")
 strength = calib.strength
 
 HALF_LIFE, XG_WEIGHT = 500.0, 0.4
+# ⚠️ 2026-08-19 步骤4 实测：英超 half_life=120 的 tunning 结论（无 xG 口径）在带 xG 的
+# 生产口径下无收益（full_backtest 实测 0.6214 vs 0.6202），保持默认 500，不覆盖。
+LEAGUE_HALF_LIFE: dict[str, float] = {}
 TIER_BOUNDS = ((0.010, "A"), (0.018, "B"), (0.030, "C"))
 # 频率基线分档（比市场基线弱得多，阈值必须更严）：大幅跑赢才 A，打平/略差一律 D
 FREQ_TIER_BOUNDS = ((-0.050, "A"), (-0.020, "B"), (0.0, "C"))
@@ -159,8 +162,9 @@ def resolve(index: dict, query: str):
 
 def fit_league(project: Path, slug: str, league_id, use_xg: bool, shrinkage_k: float):
     src = event_path(project, slug)
+    hl = LEAGUE_HALF_LIFE.get(slug, HALF_LIFE)
     goals = strength.load_matches(src, league_id=league_id, require_odds=False)
-    model = strength.fit_model(goals, half_life=HALF_LIFE)
+    model = strength.fit_model(goals, half_life=hl)
     if shrinkage_k:
         model = strength.apply_shrinkage(model, shrinkage_k)
         return model
@@ -171,7 +175,7 @@ def fit_league(project: Path, slug: str, league_id, use_xg: bool, shrinkage_k: f
                                                xg_input=xg_path)
             if len(xg_matches) >= 200:
                 model = strength.blend_models(model, strength.fit_model(
-                    xg_matches, half_life=HALF_LIFE, target="xg"), XG_WEIGHT)
+                    xg_matches, half_life=hl, target="xg"), XG_WEIGHT)
     return model
 
 

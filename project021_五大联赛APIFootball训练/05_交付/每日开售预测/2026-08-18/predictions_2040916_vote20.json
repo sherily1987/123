@@ -1,0 +1,35 @@
+{
+  "match_id": "sporttery-2040916",
+  "match_num": "周一003",
+  "home": "加的夫城",
+  "away": "雷克斯",
+  "kickoff": "2026-08-18T03:00:00+08:00",
+  "league": "英冠",
+  "collected_at_max": "2026-08-17T20:45:00+08:00",
+  "direction": "主胜",
+  "alt_direction": "平局",
+  "alt_note": "聚合 JSON 的 alt_direction 为 null，但 DeepSeek / Kimi 备选都是平局，按两票记备选平局",
+  "votes": 0.935,
+  "total_votes": 1.4025,
+  "strength": 0.6667,
+  "probs_1x2": [43.4, 28.6, 28.0],
+  "top_scores": ["2-1", "1-0", "1-1"],
+  "top_ou25": "大2.5",
+  "top_hafu": "平胜",
+  "caution": false,
+  "evidence_gap": true,
+  "reason_codes": ["LINEUP_POSITION_CONFLICT"],
+  "consensus_gate": "consensus",
+  "collapse_flags": [],
+  "ev_action": "skip",
+  "ev_reason": "market_only 对同一盘口算 EV，不构成推荐",
+  "voters": {
+    "deepseek/deepseek-chat": "主胜 / 平局 / 2-1 / 大2.5 / 平胜",
+    "moonshot/kimi-k3": "主胜 / 平局 / 1-0 / 小2.5 / 平胜"
+  },
+  "quant_market_only": {
+    "direction": "主胜",
+    "final_1x2_pct": [38.1, 28.8, 33.0],
+    "top_scores": ["1-1", "1-0", "2-1"]
+  }
+}

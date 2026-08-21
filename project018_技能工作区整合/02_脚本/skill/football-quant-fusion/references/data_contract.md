@@ -78,6 +78,8 @@
 
 工单落盘：`04_素材/shared-data/football-quant-fusion/jobs/<sales_day>/sporttery-<id>.json`。量化与 LLM 各写 `outputs[]` 一条，禁止合并为单一「更准」。入口：`fusion_cli.py job`。
 
+`research.intl_kelly` 是凯利路径 B 的侧车（见 `kelly_research.md`），与 `research.hybrid` 并列，不是第三轨输出。账本条只写在该侧车的 `ledger_entry`，不得在 `predict_one` 前注入 `adjustment_ledger` 以免改生产/影子 λ。
+
 ## 8. APIfootball赛前特征
 
 适配器原始数据统一放在`api_football`，经过

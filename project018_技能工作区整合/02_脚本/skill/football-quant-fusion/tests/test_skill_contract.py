@@ -42,3 +42,18 @@ def test_sample_counts_are_review_triggers_not_proof_thresholds():
 def test_market_baseline_and_data_risk_are_never_banker_states():
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8-sig")
     assert "MARKET_BASELINE`、`AVOID_DATA_RISK` 永不出胆" in text
+
+
+def test_kelly_research_is_hardened_and_not_a_stake():
+    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8-sig")
+    detail = (ROOT / "references" / "kelly_research.md").read_text(encoding="utf-8-sig")
+    output = (ROOT / "references" / "output_contract.md").read_text(encoding="utf-8-sig")
+    assert "KELLY_SANITY_FAIL" in skill
+    assert "research.intl_kelly" in skill
+    assert "不得输出" in skill and "f^*" in skill
+    assert "kelly_research.md" in skill
+    assert "路径 C（未开放）" in skill
+    assert "Pinnacle" in detail
+    assert "不得把只有 `outputs.quant`" in detail
+    assert "research.intl_kelly" in output
+    assert "KELLY_SANITY_FAIL" in output

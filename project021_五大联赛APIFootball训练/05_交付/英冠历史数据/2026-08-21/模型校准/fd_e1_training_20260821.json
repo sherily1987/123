@@ -1,0 +1,179 @@
+{
+  "league": {
+    "id": "E1",
+    "slug": "fd_e1",
+    "name": "England Championship"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 4416,
+    "season_count": 8,
+    "team_id_coverage": 1.0,
+    "team_count": 44,
+    "train_n": 2649,
+    "validation_n": 883,
+    "test_n": 884
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\英冠历史数据\\2026-08-21\\模型校准\\fd_e1_candidate.json",
+  "validation": {
+    "n": 700,
+    "skip": 183,
+    "model": {
+      "n": 700,
+      "brier_mean": 0.657094,
+      "log_loss": 1.085603,
+      "accuracy_pct": 42.14,
+      "score": {
+        "n_scored": 700,
+        "top1_accuracy_pct": 10.14,
+        "top3_accuracy_pct": 34.57,
+        "top5_accuracy_pct": 50.57
+      }
+    },
+    "model_on_baseline_subset": {
+      "n": 700,
+      "brier_mean": 0.657094,
+      "log_loss": 1.085603,
+      "accuracy_pct": 42.14,
+      "score": {
+        "n_scored": 700,
+        "top1_accuracy_pct": 10.14,
+        "top3_accuracy_pct": 34.57,
+        "top5_accuracy_pct": 50.57
+      }
+    },
+    "closing_market": {
+      "n": 700,
+      "brier_mean": 0.630016,
+      "log_loss": 1.046223,
+      "accuracy_pct": 44.57,
+      "score": {
+        "n_scored": 700,
+        "top1_accuracy_pct": 10.14,
+        "top3_accuracy_pct": 34.57,
+        "top5_accuracy_pct": 50.57
+      }
+    },
+    "frequency_baseline": {
+      "n": 700,
+      "brier_mean": 0.655836,
+      "log_loss": 1.082818,
+      "probs": [
+        0.4268,
+        0.2655,
+        0.3077
+      ]
+    },
+    "by_league": {
+      "E1": {
+        "n": 700,
+        "model": {
+          "n": 700,
+          "brier_mean": 0.657094,
+          "log_loss": 1.085603,
+          "accuracy_pct": 42.14,
+          "score": {
+            "n_scored": 700,
+            "top1_accuracy_pct": 10.14,
+            "top3_accuracy_pct": 34.57,
+            "top5_accuracy_pct": 50.57
+          }
+        },
+        "closing_market": {
+          "n": 700,
+          "brier_mean": 0.630016,
+          "log_loss": 1.046223,
+          "accuracy_pct": 44.57,
+          "score": {
+            "n_scored": 700,
+            "top1_accuracy_pct": 10.14,
+            "top3_accuracy_pct": 34.57,
+            "top5_accuracy_pct": 50.57
+          }
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 835,
+    "skip": 46,
+    "model": {
+      "n": 835,
+      "brier_mean": 0.642086,
+      "log_loss": 1.063449,
+      "accuracy_pct": 44.43,
+      "score": {
+        "n_scored": 835,
+        "top1_accuracy_pct": 12.22,
+        "top3_accuracy_pct": 34.85,
+        "top5_accuracy_pct": 54.37
+      }
+    },
+    "model_on_baseline_subset": {
+      "n": 835,
+      "brier_mean": 0.642086,
+      "log_loss": 1.063449,
+      "accuracy_pct": 44.43,
+      "score": {
+        "n_scored": 835,
+        "top1_accuracy_pct": 12.22,
+        "top3_accuracy_pct": 34.85,
+        "top5_accuracy_pct": 54.37
+      }
+    },
+    "closing_market": {
+      "n": 835,
+      "brier_mean": 0.619735,
+      "log_loss": 1.029565,
+      "accuracy_pct": 48.26,
+      "score": {
+        "n_scored": 835,
+        "top1_accuracy_pct": 12.22,
+        "top3_accuracy_pct": 34.85,
+        "top5_accuracy_pct": 54.37
+      }
+    },
+    "frequency_baseline": {
+      "n": 835,
+      "brier_mean": 0.648724,
+      "log_loss": 1.072514,
+      "probs": [
+        0.4283,
+        0.2656,
+        0.3061
+      ]
+    },
+    "by_league": {
+      "E1": {
+        "n": 835,
+        "model": {
+          "n": 835,
+          "brier_mean": 0.642086,
+          "log_loss": 1.063449,
+          "accuracy_pct": 44.43,
+          "score": {
+            "n_scored": 835,
+            "top1_accuracy_pct": 12.22,
+            "top3_accuracy_pct": 34.85,
+            "top5_accuracy_pct": 54.37
+          }
+        },
+        "closing_market": {
+          "n": 835,
+          "brier_mean": 0.619735,
+          "log_loss": 1.029565,
+          "accuracy_pct": 48.26,
+          "score": {
+            "n_scored": 835,
+            "top1_accuracy_pct": 12.22,
+            "top3_accuracy_pct": 34.85,
+            "top5_accuracy_pct": 54.37
+          }
+        }
+      }
+    }
+  }
+}

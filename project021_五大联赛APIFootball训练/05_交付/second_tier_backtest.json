@@ -8,7 +8,7 @@
   },
   "leagues": {
     "apisports_netherlands_eerste_divisie": {
-      "config": "滚动（无 xG 数据）",
+      "config": "滚动（无 xG 数据）hl=500",
       "baseline": "provider_market",
       "test_from": 739487,
       "n_all": 386,
@@ -24,23 +24,39 @@
       "thin": false
     },
     "fd_d2": {
-      "config": "滚动+xG w=0.4",
+      "config": "滚动+xG w=0.4 hl=500",
       "baseline": "closing_market",
       "test_from": 739464,
       "n_all": 302,
       "skip": 4,
-      "model_all": 0.627648,
+      "model_all": 0.627678,
       "n_subset": 302,
-      "model_subset": 0.627648,
+      "model_subset": 0.627678,
       "market": 0.618539,
       "frequency": 0.64352,
       "accuracy_pct": 44.04,
-      "log_loss": 1.042402,
+      "log_loss": 1.042445,
+      "no_market": false,
+      "thin": false
+    },
+    "fd_e1": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "closing_market",
+      "test_from": 739228,
+      "n_all": 877,
+      "skip": 4,
+      "model_all": 0.632269,
+      "n_subset": 877,
+      "model_subset": 0.632269,
+      "market": 0.622279,
+      "frequency": 0.64962,
+      "accuracy_pct": 45.95,
+      "log_loss": 1.048361,
       "no_market": false,
       "thin": false
     },
     "fd_usa": {
-      "config": "滚动（无 xG 数据）",
+      "config": "滚动（无 xG 数据）hl=500",
       "baseline": "closing_market",
       "test_from": 738998,
       "n_all": 1203,
@@ -60,13 +76,14 @@
     "closing_market": {
       "leagues": [
         "fd_d2",
+        "fd_e1",
         "fd_usa"
       ],
-      "n": 1505,
-      "model": 0.6309,
-      "market": 0.6104,
-      "frequency": 0.6457,
-      "gap": 0.0205
+      "n": 2382,
+      "model": 0.6314,
+      "market": 0.6148,
+      "frequency": 0.6471,
+      "gap": 0.0166
     },
     "no_market": {
       "leagues": [

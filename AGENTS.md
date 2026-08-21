@@ -86,7 +86,7 @@
 量化输出根上带 `match_id`；LLM audit/parsed 带同一 ID；Web 表与 `/api/job` 用同一把钥匙。
 工单文件在 `project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/jobs/<sales_day>/`。
 读写：`python fusion_cli.py job --input match.json --quant out.json` 或 `--match-id sporttery-2040898`。
-影子 hybrid（不开 m4、不登记）：`python fusion_cli.py hybrid-shadow --input raw.json --sales-day YYYY-MM-DD`；赛后 `--score`。结果在工单 `research.hybrid`，`research_only=true`。
+影子 hybrid（不开 m4、不登记）：`python fusion_cli.py hybrid-shadow --input raw.json --sales-day YYYY-MM-DD`；赛后 `--score`。结果在工单 `research.hybrid`，`research_only=true`。国际盘凯利指数是同一次跑出来的侧车 `research.intl_kelly`（UNFITTED，不算仓位）；先 `odds-intl` 才有 \(G\)。同一盘口 EV 卫生在 LLM `ev_calculator.same_book_ev_audit`。细则：`02_脚本/skill/football-quant-fusion/references/kelly_research.md`。有效 hybrid 分母只数带 `research.hybrid` 概率的场次，不是 `jobs/` 文件数。
 两轨各写 `outputs[]` 一条；`strength` 必须标 `vote_share`，禁止和 `final_1x2_pct` 混列。
 PPT / txt / SQLite 是投影。实现：`scripts/job_ticket.py`。
 

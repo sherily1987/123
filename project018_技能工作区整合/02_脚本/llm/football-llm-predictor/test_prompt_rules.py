@@ -51,6 +51,16 @@ def test_evidence_prompts_are_neutral_and_allow_abstention():
         assert '"decision":"abstain"' in prompt
         assert '"direction":null' in prompt
         assert "evidence_ids" in prompt
+        assert "近5场" in prompt
+        assert "不得编造伤停" in prompt
+        assert "近况0.30" in prompt and "阵容0.22" in prompt
+        assert "不得把缺维当 0 分中性" in prompt
+        assert "probs_1x2" in prompt and "top_scores" in prompt
+        assert "这五项禁止 null" in prompt
+        assert "量化轨校准概率" in prompt
+        assert "不得单独弃权" in prompt
+        assert "两个独立媒体" in prompt
+        assert "对其他对手" in prompt
         for biased in ("平局与低比分比想象中多", "优先低比分", "专猎冷门"):
             assert biased not in prompt
 
@@ -61,6 +71,10 @@ def test_deepseek_audit_prompt_has_no_result_direction_fields():
     assert "market_readiness" in prompt
     assert '"direction"' not in prompt
     assert "不得输出胜平负" in prompt
+    assert "近况0.30" not in prompt
+    assert "不得把整维阵容标不可用" in prompt
+    assert "不得把整维近况标不可用" in prompt
+    assert "必须且只能填目录里 status=UNAVAILABLE" in prompt
 
 
 def test_parse_four_market_anti_collapse():
@@ -150,8 +164,9 @@ def test_evidence_assessment_returns_hash_and_timestamp_range_before_kickoff():
 
 def test_predict_parse():
     p = pr.parse_evidence_prediction(
-        '{"direction":"客胜","alt_direction":"平局","score_pref":"0-1",'
-        '"ou25":"小","hafu":"平负","reasoning":"【战意:升班马】"}'
+        '{"direction":"客胜","alt_direction":"平局","probs_1x2":[18,24,58],'
+        '"top_scores":["0-1","0-2","1-1"],"ou25":"小","hafu":"平负",'
+        '"reasoning":"【战意:升班马】"}'
     )
     assert p["direction"] == "客胜" and p["ou25"] == "小2.5" and p["reasoning_ok"]
 
@@ -160,6 +175,9 @@ def test_prompt_uses_evidence_collection_timestamp_not_hardcoded_date():
     prompt = pr.build_evidence_prompt({"home": "A", "away": "B"}, SIX_SECTIONS, 1)
     assert "采集时间 2026-08-10T09:00:00+08:00" in prompt
     assert "采集时间 2026-08-05" not in prompt
+    assert "对其他对手" in prompt
+    assert "两个独立媒体" in prompt
+    assert "不得当无近5场" in prompt
 
 
 def test_cli_missing_evidence_is_json_and_never_initializes_llm(tmp_path, monkeypatch, capsys):
@@ -202,7 +220,8 @@ def test_evidence_gap_forces_dual_direction_and_caution():
 def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
     models = list(fp.DEFAULT_MODELS)
     successful = pr.parse_evidence_prediction(
-        '{"direction":"主胜","score_pref":"1-0","reasoning":"【近况:主队连胜】"}'
+        '{"direction":"主胜","probs_1x2":[58,24,18],"top_scores":["1-0","2-0","2-1"],'
+        '"ou25":"小","hafu":"平胜","reasoning":"【近况:主队连胜】"}'
     )
     agg = pr.aggregate_directions({models[0]: successful, models[1]: {"error": "timeout"},
                                    models[2]: successful})

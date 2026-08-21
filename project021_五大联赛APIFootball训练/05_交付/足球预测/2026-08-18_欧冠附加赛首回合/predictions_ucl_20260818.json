@@ -1,0 +1,89 @@
+{
+  "as_of": "2026-08-17T21:20:00+08:00",
+  "round": "2026/27 欧冠附加赛首回合",
+  "europe_date": "2026-08-18",
+  "beijing_kickoff": "2026-08-19T03:00:00+08:00",
+  "note": "欧洲日历 8 月 18 日 21:00 CEST，体彩记周二、北京时间 8 月 19 日 03:00。这是第一回合，不是次回合。",
+  "quant_status": "blocked_no_had",
+  "quant_reason": "三场体彩均为待开售，getFixedBonus 无 HAD。生产 m3 无锚且无市场则拒绝出 1X2。国际盘只作对照，不进生产量化。",
+  "matches": [
+    {
+      "match_id": "sporttery-2040943",
+      "match_num": "周二002",
+      "home": "索列夫",
+      "away": "雅典AEK",
+      "path": "Champions Path",
+      "quant": {"status": "blocked", "reason": "待开售无HAD"},
+      "llm": {
+        "direction": "主胜",
+        "alt_direction": null,
+        "voter_alts": ["平局", "客胜"],
+        "probs_1x2": [42.7, 28.2, 29.1],
+        "top_scores": ["1-0", "2-1", "1-1"],
+        "top_ou25": "小2.5",
+        "top_hafu": "平胜",
+        "strength": 0.6667,
+        "caution": false,
+        "evidence_gap": true,
+        "collapse_flags": ["SCORE_COLLAPSE:1-0x2", "OU_COLLAPSE:小2.5x2"],
+        "consensus_gate": "consensus",
+        "voters": {
+          "deepseek/deepseek-chat": "主胜 / 平局 / 1-0 / 小2.5 / 平胜",
+          "moonshot/kimi-k3": "主胜 / 客胜 / 1-0 / 小2.5 / 平胜"
+        }
+      }
+    },
+    {
+      "match_id": "sporttery-2040950",
+      "match_num": "周二003",
+      "home": "萨迪纳摩",
+      "away": "维京",
+      "path": "Champions Path",
+      "quant": {"status": "blocked", "reason": "待开售无HAD"},
+      "llm": {
+        "direction": "主胜",
+        "alt_direction": null,
+        "voter_alts": ["平局", "平局"],
+        "probs_1x2": [55.5, 25.0, 19.5],
+        "top_scores": ["2-0", "2-1", "1-0"],
+        "top_ou25": "大2.5",
+        "top_hafu": "胜胜",
+        "strength": 0.6667,
+        "caution": false,
+        "evidence_gap": true,
+        "collapse_flags": ["SCORE_COLLAPSE:2-0x2", "OU_COLLAPSE:大2.5x2", "HAFU_COLLAPSE:胜胜x2"],
+        "consensus_gate": "consensus",
+        "voters": {
+          "deepseek/deepseek-chat": "主胜 / 平局 / 2-0 / 大2.5 / 胜胜",
+          "moonshot/kimi-k3": "主胜 / 平局 / 2-0 / 大2.5 / 胜胜"
+        }
+      }
+    },
+    {
+      "match_id": "sporttery-2040944",
+      "match_num": "周二004",
+      "home": "费内巴切",
+      "away": "里昂",
+      "path": "League Path",
+      "quant": {"status": "blocked", "reason": "待开售无HAD"},
+      "research_odds_not_production": {"source": "tips.gg", "had": [2.05, 3.65, 3.40]},
+      "llm": {
+        "direction": "主胜",
+        "alt_direction": "平局",
+        "probs_1x2": [46.4, 27.5, 26.1],
+        "top_scores": ["2-1", "1-0", "1-1"],
+        "top_ou25": "大2.5",
+        "top_hafu": "平胜",
+        "strength": 0.6667,
+        "caution": true,
+        "evidence_gap": true,
+        "collapse_flags": ["SCORE_COLLAPSE:2-1x2", "OU_COLLAPSE:大2.5x2"],
+        "consensus_gate": "consensus",
+        "voters": {
+          "deepseek/deepseek-chat": "主胜 / 平局 / 2-1 / 大2.5 / 平胜",
+          "moonshot/kimi-k3": "主胜 / 平局 / 2-1 / 大2.5 / 平胜"
+        }
+      }
+    }
+  ]
+}

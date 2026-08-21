@@ -4,6 +4,12 @@
 
 工单层：融合输出根字段必须含 `match_id`（`sporttery-<id>`）与 `match_num`。这是身份，不是概率。双轨对照走 `jobs/` 工单，不在本模板里合并两轨数字。
 
+研究侧车（不得写入 `outputs[]`、不得进生产 1X2）：
+
+- `research.hybrid`：影子 hybrid 概率，必须 `research_only=true`。
+- `research.intl_kelly`：体彩相对国际盘凯利指数，必须 `research_only=true` 且 `calibration=UNFITTED`；禁止仓位字段。缺国际盘则为 `status=skipped`。
+- LLM EV 层的 `same_book_audit` 同属研究字段：`market_derived` 正 EV 只标 `KELLY_SANITY_FAIL`。
+
 ## 1. 报告结构
 
 先给总表，再逐场展开。总表列：编号 / 对阵 / 主平客概率 / 方向 / 数据质量 / 不确定性 / 决策状态。

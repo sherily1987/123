@@ -1,0 +1,296 @@
+{
+  "schema": "dual-track-backtest-1.0",
+  "date": null,
+  "records_dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+  "generated_at": "2026-08-20T21:36:08.547083+08:00",
+  "summary": {
+    "settled": 7,
+    "settlement_provenance": {
+      "official_formal": 7,
+      "cross_validation": 0
+    },
+    "comparability_note": "命中率只能与同口径的随机基线比较。argmax 与 LLM 单选均为 1/3 基线(33.33%)，可互相比较；LLM 双选为 2/3 基线(66.67%)，**不可与 argmax 并列**，只能看 lift_over_random_pp。",
+    "proper_scoring": {
+      "note": "Brier/log loss 只在**两轨都有概率**的已结算场次上计算；LLM 概率来自档位中点归一化，档位自相矛盾时 coherent=False 仍参与评分但已标记。",
+      "quant": {
+        "n": 0,
+        "status": "UNAVAILABLE",
+        "reason": "无同时具备两轨概率的已结算场次（旧记录无 LLM 档位）"
+      },
+      "llm": {
+        "n": 0,
+        "status": "UNAVAILABLE",
+        "reason": "无同时具备两轨概率的已结算场次（旧记录无 LLM 档位）"
+      },
+      "frequency_baseline": {
+        "n": 0,
+        "status": "UNAVAILABLE"
+      },
+      "llm_incoherent_bands": 0,
+      "tainted_excluded": 0,
+      "record_formats": [
+        "index_llm-1.0"
+      ]
+    },
+    "quant_1x2": {
+      "n": 7,
+      "hit": 5,
+      "hit_rate_pct": 71.43,
+      "random_baseline_pct": 33.33,
+      "lift_over_random_pp": 38.1,
+      "pick_size": 1
+    },
+    "llm_double": {
+      "n": 1,
+      "hit": 1,
+      "hit_rate_pct": 100.0,
+      "random_baseline_pct": 66.67,
+      "lift_over_random_pp": 33.33,
+      "pick_size": 2
+    },
+    "llm_single": {
+      "n": 0,
+      "hit": 0,
+      "hit_rate_pct": null,
+      "random_baseline_pct": 33.33,
+      "lift_over_random_pp": null,
+      "pick_size": 1
+    },
+    "score": {
+      "top1": {
+        "n": 7,
+        "hit": 0,
+        "hit_rate_pct": 0.0,
+        "quant": 0.0,
+        "llm": 0.0
+      },
+      "top3": {
+        "n": 7,
+        "hit": 1,
+        "hit_rate_pct": 14.29,
+        "quant": 14.29,
+        "llm": 0.0
+      }
+    }
+  },
+  "divergence": [],
+  "detail": [
+    {
+      "match_id": "sporttery-2040907",
+      "actual": "2-0",
+      "actual_1x2": "H",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "unresolved_missing_official_halftime_score",
+      "half_time_scored": false,
+      "actual_idx": 0,
+      "quant_probs": [
+        0.499,
+        0.27,
+        0.231
+      ],
+      "quant": {
+        "match_num": "周日022",
+        "match": "西班牙人 vs 莱万特",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-0",
+          "1-1",
+          "0-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040908",
+      "actual": "3-0",
+      "actual_1x2": "H",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "unresolved_missing_official_halftime_score",
+      "half_time_scored": false,
+      "actual_idx": 0,
+      "quant_probs": [
+        0.446,
+        0.305,
+        0.249
+      ],
+      "quant": {
+        "match_num": "周日023",
+        "match": "阿罗卡 vs 摩雷伦斯",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-1",
+          "1-0",
+          "0-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040909",
+      "actual": "1-0",
+      "actual_1x2": "H",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "unresolved_missing_official_halftime_score",
+      "half_time_scored": false,
+      "actual_idx": 0,
+      "quant_probs": [
+        0.512,
+        0.264,
+        0.22399999999999998
+      ],
+      "quant": {
+        "match_num": "周日024",
+        "match": "腓特烈 vs 克里斯蒂",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-1",
+          "1-0",
+          "2-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": true
+      },
+      "llm_record_format": "index_llm-1.0",
+      "llm": {
+        "match_num": "周日024",
+        "pick": "双选 主胜/平局（H/D）",
+        "double": [
+          "D",
+          "H"
+        ],
+        "single": null,
+        "double_hit": true,
+        "single_hit": null,
+        "score_picks": [],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040910",
+      "actual": "0-3",
+      "actual_1x2": "A",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "unresolved_missing_official_halftime_score",
+      "half_time_scored": false,
+      "actual_idx": 2,
+      "quant_probs": [
+        0.498,
+        0.28800000000000003,
+        0.214
+      ],
+      "quant": {
+        "match_num": "周日025",
+        "match": "达伽马 vs 桑托斯",
+        "pred_1x2": "H",
+        "hit": false,
+        "top_scores": [
+          "1-1",
+          "1-0",
+          "2-1"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040911",
+      "actual": "1-2",
+      "actual_1x2": "A",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "unresolved_missing_official_halftime_score",
+      "half_time_scored": false,
+      "actual_idx": 2,
+      "quant_probs": [
+        0.56,
+        0.271,
+        0.16899999999999998
+      ],
+      "quant": {
+        "match_num": "周日026",
+        "match": "法马利康 vs 马里迪莫",
+        "pred_1x2": "H",
+        "hit": false,
+        "top_scores": [
+          "1-0",
+          "1-1",
+          "2-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040912",
+      "status": "not_finished"
+    },
+    {
+      "match_id": "sporttery-2040913",
+      "actual": "2-0",
+      "actual_1x2": "H",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "unresolved_missing_official_halftime_score",
+      "half_time_scored": false,
+      "actual_idx": 0,
+      "quant_probs": [
+        0.415,
+        0.275,
+        0.31
+      ],
+      "quant": {
+        "match_num": "周日028",
+        "match": "纽约城 vs 费城",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-1",
+          "2-1",
+          "1-0"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    },
+    {
+      "match_id": "sporttery-2040914",
+      "actual": "3-2",
+      "actual_1x2": "H",
+      "status": "settled",
+      "source_provenance_class": "official_sporttery",
+      "half_time_status": "settled_official_halftime_score",
+      "half_time_scored": true,
+      "actual_ht": "2-2",
+      "actual_idx": 0,
+      "quant_probs": [
+        0.405,
+        0.25,
+        0.345
+      ],
+      "quant": {
+        "match_num": "周一001",
+        "match": "赫尔火花 vs 坦山猫",
+        "pred_1x2": "H",
+        "hit": true,
+        "top_scores": [
+          "1-1",
+          "2-1",
+          "1-2"
+        ],
+        "score_top1_hit": false,
+        "score_top3_hit": false
+      }
+    }
+  ],
+  "caveat": "n=3 单日样本，不构成两轨优劣结论；按 SKILL 纪律累计 >=100 场评估命中率、>=200 场做结论。"
+}

@@ -126,6 +126,15 @@ watcher 对每场只刷新一次；旧 canonical 证据归档至 `snapshots/`，
 .venv/Scripts/python.exe kleague_portal.py standings
 .venv/Scripts/python.exe kleague_portal.py players --meet-year 2026 --meet-seq 1 \
     --game-id 133 --home-team K22 --away-team K03   # ⚠️ 赛后数据
+
+# FotMob 联赛 JSON（understat 覆盖不到的联赛）。cutoff 必须带时区
+.venv/Scripts/python.exe fotmob_league.py --list
+.venv/Scripts/python.exe fotmob_league.py --league 日职 --cutoff "2026-08-17T02:00:00+08:00"
+.venv/Scripts/python.exe fotmob_league.py --league 沙职 --match-id 5803519   # match xG 赛后才有
+
+# 第 4 级发现：记下页面自己发出的 XHR，再拿去纯 HTTP 复验
+.venv/Scripts/python.exe capture_xhr.py --url "https://www.fotmob.com/leagues/57/overview/eredivisie" \
+    --out data/xhr_captures/manual.json
 ```
 
 各源可达性与封锁状态见仓库 `30_数据/网页源可达性矩阵.md`；

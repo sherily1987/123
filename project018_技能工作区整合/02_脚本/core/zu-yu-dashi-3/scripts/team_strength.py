@@ -32,6 +32,8 @@ except ImportError:
 
 
 RHO = -0.08
+# 比分矩阵 Top-K 保留的 K 值（Top1/Top3/Top5 命中率的上限档位）
+_SCORE_TOPK = 5
 # 最近一次 load_matches 的统计，供驱动脚本读取（xg 关联缺失数等）
 LAST_LOAD_STATS: dict = {}
 
@@ -458,7 +460,16 @@ def score_rows(subset, model, baseline_key="market", baseline_label="market", us
             "league": m["league"], "day": m["day"],
             "actual_idx": 0 if m["gh"] > m["ga"] else (1 if m["gh"] == m["ga"] else 2),
             "model": mp,
+            # 原始比分，供比分 Top-K 命中判定（actual_idx 只有 1X2 方向）
+            "gh": m["gh"], "ga": m["ga"],
         }
+        # [中文功能] 比分矩阵的 Top-K 排名（降序）：比分层改动（rho 逐联赛拟合、
+        # 比分分布校准等）在仅有 1X2 指标的回测下无从验证收益，必须保留比分排名。
+        # 矩阵本身较大不整行保存，只留前 K 个 (score, prob)。测试桩可能返回非
+        # dict 形状（既有测试 monkeypatch dc_matrix 为 [lh, la]），此时跳过 Top-K。
+        smat = dc_matrix(lh, la, RHO)
+        if isinstance(smat, dict) and smat:
+            row["top_scores"] = sorted(smat.items(), key=lambda kv: -kv[1])[:_SCORE_TOPK]
         if i is None or j is None:
             row["fallback_used"] = True
         if baseline_key == "market":
@@ -492,10 +503,24 @@ def build_report(rows, matches, from_day, skip, baseline_label="market", extra=N
         ll = [-math.log(max(1e-12, r[key][r["actual_idx"]])) for r in rs]
         hit = [int(max(range(3), key=lambda k: r[key][k]) == r["actual_idx"]) for r in rs]
         n = len(rs)
-        return {
+        # [中文功能] 比分 Top-K 命中率：实际比分是否落在 top_scores 前 K 名里。
+        # 只有 model 行自带 top_scores（score_rows 生成）；market 基线没有比分分布，
+        # rs 里缺该字段的行不计入分母（ncs 计实际可评行数，与 n 分开报）。
+        out = {
             "n": n, "brier_mean": round(sum(bs) / n, 6),
             "log_loss": round(sum(ll) / n, 6), "accuracy_pct": round(sum(hit) / n * 100, 2),
         }
+        scored = [r for r in rs if r.get("top_scores")]
+        if scored:
+            def topk_hit(r, k):
+                return int(any(s == (r.get("gh"), r.get("ga")) for s, _ in r["top_scores"][:k]))
+            out["score"] = {
+                "n_scored": len(scored),
+                "top1_accuracy_pct": round(sum(topk_hit(r, 1) for r in scored) / len(scored) * 100, 2),
+                "top3_accuracy_pct": round(sum(topk_hit(r, 3) for r in scored) / len(scored) * 100, 2),
+                "top5_accuracy_pct": round(sum(topk_hit(r, 5) for r in scored) / len(scored) * 100, 2),
+            }
+        return out
 
     freq = {0: 0.0, 1: 0.0, 2: 0.0}
     for m in matches:

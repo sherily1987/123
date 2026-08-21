@@ -119,6 +119,38 @@ def test_prompt_assigns_evidence_ids_without_claiming_cross_verification():
     assert "来源已交叉验证" not in prompt
 
 
+def test_catalog_marks_vote_slot_placeholders_unavailable():
+    text = """## 1. 伤停/阵容
+- 源17 besoccer.com：封锁源占槽、不采正文 | source(https://www.besoccer.com/x) | collected_at(t)
+- 源9 livescore.com：无本场逐人预测十一人 | source(https://www.livescore.com/) | collected_at(t)
+- 二十源整合预测首发（4-4-2，拉科）：Román | source(https://www.fotmob.com/x) | collected_at(t)
+"""
+    catalog = predict.build_evidence_catalog(text)
+    by_id = {item["id"]: item for item in catalog}
+    assert by_id["E1"]["status"] == "UNAVAILABLE"
+    assert by_id["E2"]["status"] == "UNAVAILABLE"
+    assert by_id["E3"]["status"] == "SINGLE_SOURCE"
+
+
+def test_parser_keeps_opinion_when_lineup_gap_is_only_reason_code():
+    payload = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": "平局",
+        "probs_1x2": [48.0, 28.0, 24.0], "top_scores": ["1-0", "2-0", "1-1"],
+        "ou25": "小", "hafu": "平胜",
+        "evidence_gap": True, "evidence_ids": ["E2"],
+        "unsupported_assumptions": [], "reason_codes": ["LINEUP_UNAVAILABLE"],
+        "summary": "E2近况支持主胜；两源首发可用。",
+    }
+    out = predict.parse_evidence_prediction(
+        __import__("json").dumps(payload, ensure_ascii=False),
+        [{"id": "E2", "status": "VERIFIED_MULTI_SOURCE"}],
+    )
+    assert out["decision"] == "opinion"
+    assert out["direction"] == "主胜"
+    assert out["probs_1x2"] == [48.0, 28.0, 24.0]
+    assert "LINEUP_UNAVAILABLE" in out["reason_codes"]
+
+
 def test_parser_accepts_abstain_and_nullable_markets():
     payload = {
         "decision": "abstain", "direction": None, "alt_direction": None,
@@ -200,6 +232,12 @@ def test_voter_prompt_contains_neutral_audit_not_direction():
     prompt = predict.build_voter_prompt("BASE", audit)
     assert "BASE" in prompt and "E2" in prompt
     assert '"direction"' not in prompt
+
+
+def test_glm_audits_and_deepseek_votes():
+    assert predict.EVIDENCE_AUDITOR_MODEL == "zhipu/glm-4-flash"
+    voters = [model for model in fp.DEFAULT_MODELS if model != predict.EVIDENCE_AUDITOR_MODEL]
+    assert voters == ["deepseek/deepseek-chat", "moonshot/kimi-k3"]
 
 
 def test_two_voter_consensus_requires_two_matching_opinions():

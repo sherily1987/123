@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fusion_predict_core import load_core, predict_one
+from intl_kelly_index import intl_kelly_for_match
 from job_ticket import (
     hybrid_from_fusion_output,
     identity_from,
@@ -23,6 +24,10 @@ from job_ticket import (
 from production_router import BIG5, GOALS_ONLY, load_event_rows, route_match
 from runtime_paths import backtest_store, data_root, workspace_root
 from sales_day_collect import build_field_meta
+
+
+def intl_store() -> Path:
+    return data_root() / "odds" / "intl_production.jsonl"
 
 
 def default_events_path() -> str | None:
@@ -105,6 +110,14 @@ def actual_idx(score_90) -> int | None:
     return 0 if h > a else (2 if h < a else 1)
 
 
+def _research_blob(match: dict, hybrid: dict) -> dict:
+    """hybrid 数字与 intl_kelly 侧车打包；凯利不进 predict 输入。"""
+    blob = dict(hybrid)
+    blob["research_only"] = True
+    blob["intl_kelly"] = intl_kelly_for_match(match, intl_store())
+    return blob
+
+
 def run_one(core, version, match: dict, understat, events, min_history: int, sales_day: str | None) -> dict:
     ident = identity_from(match)
     if sales_day:
@@ -112,7 +125,7 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
     skip = in_scope(match)
     if skip:
         upsert_job(jobs_root(), ident, input_obj=match,
-                   research=hybrid_from_fusion_output({}, skip_reason=skip))
+                   research=_research_blob(match, hybrid_from_fusion_output({}, skip_reason=skip)))
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": skip}
 
     routed = route_match(match, understat, events, min_history, enable_experimental=True)
@@ -120,14 +133,13 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
     if not prior or routed.get("research_only") is not True:
         reason = ((routed.get("field_meta") or {}).get("production_router") or {}).get("fallback_reason") or "no_prior"
         upsert_job(jobs_root(), ident, input_obj=match,
-                   research=hybrid_from_fusion_output({}, skip_reason=reason))
+                   research=_research_blob(match, hybrid_from_fusion_output({}, skip_reason=reason)))
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": reason}
 
     out = predict_one(core, version, routed)
     if out.get("research_only") is not True:
         out["research_only"] = True
-    blob = hybrid_from_fusion_output(out, prior=prior)
-    blob["research_only"] = True
+    blob = _research_blob(match, hybrid_from_fusion_output(out, prior=prior))
     path = upsert_job(jobs_root(), ident, input_obj=match, research=blob)
     return {
         "match_id": ident.get("match_id"),

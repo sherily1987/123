@@ -1,0 +1,216 @@
+{
+  "id": "hmQuantSettle001",
+  "name": "足球预测 - 次日结算",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 11 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c1000000-0000-4000-8000-000000000001",
+      "name": "每日触发",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 结算昨天开球的场次：北京时间 D-1。\nconst cst = new Date(Date.now() + 8 * 3600 * 1000 - 24 * 3600 * 1000);\nconst kickoff_date = cst.toISOString().slice(0, 10);\nreturn [{ json: { base: 'http://127.0.0.1:8765', kickoff_date } }];"
+      },
+      "id": "c1000000-0000-4000-8000-000000000002",
+      "name": "参数",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.base }}/api/health",
+        "options": {}
+      },
+      "id": "c1000000-0000-4000-8000-000000000003",
+      "name": "健康检查",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('参数').first().json.base }}/api/settle",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ kickoff_date: $('参数').first().json.kickoff_date }) }}",
+        "options": {}
+      },
+      "id": "c1000000-0000-4000-8000-000000000004",
+      "name": "结算",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "id": "c1000000-0000-4000-8000-000000000005",
+      "name": "等结算",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [800, 300],
+      "webhookId": "d1000000-0000-4000-8000-000000000005"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('参数').first().json.base }}/api/run/{{ $('结算').first().json.run_id }}",
+        "options": {}
+      },
+      "id": "c1000000-0000-4000-8000-000000000006",
+      "name": "查结算进度",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-settle-err",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "error",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "c1000000-0000-4000-8000-000000000007",
+      "name": "结算出错?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ '结算失败: ' + ($json.message || '无消息') }}"
+      },
+      "id": "c1000000-0000-4000-8000-000000000008",
+      "name": "中止-结算失败",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [1400, 140]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-settle-done",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "done",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "c1000000-0000-4000-8000-000000000009",
+      "name": "结算完成?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1400, 460]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('参数').first().json.base }}/api/board",
+        "options": {}
+      },
+      "id": "c1000000-0000-4000-8000-000000000010",
+      "name": "读看板",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1620, 460]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 只做汇总播报，不下任何「谁更准」的结论——评测口径由 backtest 脚本负责。\nconst b = $input.first().json;\nconst s = b.summary || {};\nconst day = $('参数').first().json.kickoff_date;\nreturn [{ json: {\n  kickoff_date: day,\n  已开售: s.on_sale ?? null,\n  已预测: s.predicted ?? null,\n  未预测: s.missing_pred ?? null,\n  提示: '样本门槛未到前不得据此宣称模型优于市场'\n} }];"
+      },
+      "id": "c1000000-0000-4000-8000-000000000011",
+      "name": "汇总",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 460]
+    }
+  ],
+  "connections": {
+    "每日触发": {
+      "main": [[{ "node": "参数", "type": "main", "index": 0 }]]
+    },
+    "参数": {
+      "main": [[{ "node": "健康检查", "type": "main", "index": 0 }]]
+    },
+    "健康检查": {
+      "main": [[{ "node": "结算", "type": "main", "index": 0 }]]
+    },
+    "结算": {
+      "main": [[{ "node": "等结算", "type": "main", "index": 0 }]]
+    },
+    "等结算": {
+      "main": [[{ "node": "查结算进度", "type": "main", "index": 0 }]]
+    },
+    "查结算进度": {
+      "main": [[{ "node": "结算出错?", "type": "main", "index": 0 }]]
+    },
+    "结算出错?": {
+      "main": [
+        [{ "node": "中止-结算失败", "type": "main", "index": 0 }],
+        [{ "node": "结算完成?", "type": "main", "index": 0 }]
+      ]
+    },
+    "结算完成?": {
+      "main": [
+        [{ "node": "读看板", "type": "main", "index": 0 }],
+        [{ "node": "等结算", "type": "main", "index": 0 }]
+      ]
+    },
+    "读看板": {
+      "main": [[{ "node": "汇总", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "Asia/Shanghai"
+  },
+  "pinData": {}
+}

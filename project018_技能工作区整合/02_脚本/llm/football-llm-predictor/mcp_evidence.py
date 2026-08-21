@@ -833,11 +833,11 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
              f"> 第三方结构化数据: apifootball MCP | source({source_url}) collected_at({collected_at})",
              f"> match_identity(sporttery_match_id={raw_m.get('match_id', '')};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
              f"> 竞彩: {raw_m.get('match_num','')} | 体彩matchId {raw_m.get('match_id')} | apifootball match_id {mid}", ""]
-    # 赛季首战数据缺口警告 (08-05 回测教训: 此时量化指标全部失效, 主胜偏见高发)
+    # 赛季首战：本季积分榜为空 ≠ 无近5场。必须改取该队对其他对手的最近正式赛。
     if detect_season_opener(standings, h2h):
-        parts.append("> ⚠️ [赛季首战数据缺口] 积分榜为空且无近期状态数据 → 近况/积分/状态类量化指标全部失效。"
-                     "历史回测(2026-08-05)显示此类场次模型靠'主场优势'空话推理, 5场错4场。"
-                     "本场必须只依赖伤停/阵容/交锋/赔率/战意证据, 且优先双选, 禁止仅凭'主场作战'选主胜。")
+        parts.append("> ⚠️ [赛季首战] 本季积分榜为空不等于无近5场。"
+                     "近况必须取该队对其他对手的最近最多5场正式赛（上季联赛收官、杯赛正式场；热身不算）。"
+                     "不得把整维近况标不可用；不得仅凭主场空话选主胜。")
     blocks = [lee.render_sporttery_markets(raw_m, collected_at)]
     if api_sports is not None:
         blocks.append(lee.render_api_sports_evidence(api_sports, collected_at))

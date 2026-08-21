@@ -247,6 +247,71 @@ def test_score_rows_uses_fallback_instead_of_skipping(monkeypatch):
     assert scored[0]["fallback_used"] is True
 
 
+# --- 比分 Top1/Top3 指标（2026-08-20：回测框架无比分指标，比分层改动无从验证） ---
+
+
+def _patch_dc(monkeypatch):
+    """与既有测试一致：score_rows 的 dc_matrix/dc_one 在测试环境不可导入，统一打桩。
+
+    桩矩阵刻意设计成 Top1=1-1、Top2=2-1、Top3=0-0，供 Top-K 命中断言用。
+    """
+    mat = {(0, 0): 0.25, (1, 1): 0.40, (2, 1): 0.20, (0, 1): 0.05, (1, 0): 0.10}
+    monkeypatch.setattr(strength, "dc_matrix", lambda lh, la, rho: mat)
+    monkeypatch.setattr(strength, "dc_one", lambda values: [
+        sum(v for (i, j), v in values.items() if i > j),
+        sum(v for (i, j), v in values.items() if i == j),
+        sum(v for (i, j), v in values.items() if i < j),
+    ])
+
+
+def test_score_rows_emits_topk_scores(monkeypatch):
+    """score_rows 必须保留比分矩阵的 Top-K 排名，不能只留 1X2 聚合就丢掉矩阵。"""
+    _patch_dc(monkeypatch)
+    model = _toy_model()
+    subset = [{"home": "A", "away": "B", "gh": 2, "ga": 1, "day": 5, "league": "152", "odds": []}]
+
+    rows, skip = strength.score_rows(subset, model)
+
+    assert skip == 0 and len(rows) == 1
+    top = rows[0]["top_scores"]
+    # 概率降序排列
+    probs = [p for _, p in top]
+    assert probs == sorted(probs, reverse=True)
+    # 至少含 Top3；实际比分 2-1 必须在名单里（供 Top-K 命中判定）
+    assert (2, 1) in [s for s, _ in top]
+    assert len(top) >= 3
+
+
+def test_build_report_includes_score_topk_metrics(monkeypatch):
+    """验证报告必须含 score.top1/top3/top5 命中率，否则比分层改动无法验证收益。
+
+    桩矩阵 Top1=1-1、Top2=2-1、Top3=0-0：
+    - 场1 实际 2-1 -> Top1 未中、Top3 命中
+    - 场2 实际 0-0 -> Top3 命中
+    - 场3 实际 1-1 -> Top1 命中
+    期望 top1=33.33%、top3=100%。
+    """
+    _patch_dc(monkeypatch)
+    model = _toy_model()
+    subset = [
+        {"home": "A", "away": "B", "gh": 2, "ga": 1, "day": 5, "league": "152", "odds": []},
+        {"home": "B", "away": "A", "gh": 0, "ga": 0, "day": 6, "league": "152", "odds": []},
+        {"home": "A", "away": "C", "gh": 1, "ga": 1, "day": 7, "league": "152", "odds": []},
+    ]
+
+    rows, skip = strength.score_rows(subset, model)
+    report = strength.build_report(rows, subset, from_day=5, skip=skip)
+
+    assert report["n"] == 3
+    s = report["model"]["score"]
+    for key in ("top1_accuracy_pct", "top3_accuracy_pct", "top5_accuracy_pct"):
+        assert key in s, f"缺少 {key}"
+        assert 0.0 <= s[key] <= 100.0
+    assert abs(s["top1_accuracy_pct"] - 100.0 / 3) < 0.01
+    assert s["top3_accuracy_pct"] == 100.0
+    assert s["top5_accuracy_pct"] == 100.0
+
+
 # --- xG 目标与混合 ---
 
 def test_rho_is_zero_for_xg_target():

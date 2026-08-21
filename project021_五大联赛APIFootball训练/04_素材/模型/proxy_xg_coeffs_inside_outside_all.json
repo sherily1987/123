@@ -2,12 +2,12 @@
   "model": "poisson_identity_link",
   "basis": "inside_outside",
   "formula": "xg = a*shots_inside_box + b*shots_outside_box",
-  "a_inside_box": 0.155772,
-  "b_outside_box": 0.033864,
+  "a_inside_box": 0.156133,
+  "b_outside_box": 0.033545,
   "converged": true,
-  "n_rows": 46298,
-  "n_matches": 23149,
-  "train_until": "2025-04-28",
+  "n_rows": 48294,
+  "n_matches": 24147,
+  "train_until": "2025-08-08",
   "sources": [
     "apisports_japan_j1_league_match_stats.jsonl",
     "apisports_korea_k_league_1_match_stats.jsonl",
@@ -37,12 +37,12 @@
     "world_cup_match_stats.jsonl"
   ],
   "self_check": {
-    "total_predicted": 64796.0,
-    "total_actual": 64827.0,
-    "total_deviation_pct": -0.048,
+    "total_predicted": 67766.0,
+    "total_actual": 67797.0,
+    "total_deviation_pct": -0.046,
     "total_conserved": true,
     "primary_gt_secondary": true,
-    "primary_secondary_ratio": 4.6
+    "primary_secondary_ratio": 4.65
   },
   "penalty_conversion": null,
   "penalties_excluded": false,

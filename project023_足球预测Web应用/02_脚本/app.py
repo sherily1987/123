@@ -17,6 +17,14 @@ db.init()
 app = FastAPI(title="足球预测工作台", version="0.2.0")
 
 
+@app.middleware("http")
+async def no_store_api(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 class DayReq(BaseModel):
     kickoff_date: str | None = None
     sales_day: str | None = None
@@ -35,6 +43,7 @@ def health():
         "read_only_store": True,
         "manual_backtest": True,
         "quant_mode": "market_only",
+        "llm_track": True,
     }
 
 
@@ -62,6 +71,18 @@ def late_info():
     return summary
 
 
+@app.get("/api/history")
+def history(day: str | None = None, full: bool = False):
+    try:
+        if day:
+            return sv.history_day(day)
+        if full:
+            return sv.history_full()
+        return sv.history_index()
+    except Exception as exc:
+        raise HTTPException(500, f"历史失败: {exc}") from exc
+
+
 @app.post("/api/collect")
 def collect(req: DayReq):
     day = req.day()
@@ -80,10 +101,22 @@ def settle(req: DayReq):
     return {"run_id": runner.start_settle(req.day()), "status": "started"}
 
 
+@app.post("/api/llm")
+def llm(req: DayReq):
+    return {"run_id": runner.start_llm(req.day()), "status": "started"}
+
+
 @app.post("/api/backtest")
-def backtest(req: DayReq):
-    """手动结算。没有自动回测任务。"""
-    return settle(req)
+def backtest():
+    return {"run_id": runner.start_backtest(), "status": "started"}
+
+
+@app.get("/api/match/{match_id}")
+def match_detail(match_id: str):
+    card = sv.match_card(match_id)
+    if not card:
+        raise HTTPException(404, "match not found")
+    return card
 
 
 @app.get("/api/run/{run_id}")
@@ -137,7 +170,7 @@ def export_report():
                 f"| {r.get('match_num')} | {(r.get('kickoff') or '')[5:16]} | "
                 f"{r.get('home')} vs {r.get('away')} | "
                 f"{'/'.join(str(x) for x in (r.get('odds') or [])) or '无HAD'} | "
-                f"{pcts} | {r.get('bucket')} | {llm.get('direction') or '-'} |"
+                f"{pcts} | {r.get('bucket')} | {llm.get('direction') or ('已采集' if llm else '未采集')} |"
             )
         L.append("")
     out = HERE / "data" / "board_report.md"

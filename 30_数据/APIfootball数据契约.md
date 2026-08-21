@@ -141,7 +141,51 @@ GET https://understat.com/getLeagueData/<联赛代号>/<赛季起始年>
 一场比赛只有在任何时区解释下都早于 cutoff 才计入赛前统计。代价是 cutoff 前 14h 内的
 比赛被保守丢弃，换来赛后数据绝不混进赛前证据。
 
-覆盖范围限五大联赛——**韩职、日职、沙职仍无 xG**，那几条的「无 xG 训练路径」不变。
+覆盖范围限五大联赛 + RFPL。**逐场 npxG/ppda 仍只有 understat**。
+五大联赛以外：日职、沙职现有 FotMob **赛季累计** table.xg（见下节），不是逐场历史；
+韩职 / 韩K2 / 日乙 / 芬超 / MLS 的 FotMob 积分榜没有 xG 列——训练轨「无 xG 路径」对这些联赛仍不变。
+
+### FotMob 联赛接口（2026-08-16 实测，第 4 级）
+
+understat 覆盖之外的体彩联赛，用同一手法（抓页面自己的请求，再纯 HTTP 复验）落到
+FotMob 公开 JSON，不再渲染联赛页。
+
+```text
+GET https://www.fotmob.com/api/data/allLeagues              联赛 id 目录（86KB）
+GET https://www.fotmob.com/api/data/leagues?id=<联赛ID>     积分榜 + 全季赛程（400KB～1.2MB）
+GET https://www.fotmob.com/api/data/matchDetails?matchId=   单场统计，含球队 xG
+```
+
+无鉴权。id **不要猜**：`allLeagues` 是发现路径。2026-08-16 已复验：
+
+| 联赛 | fotmob id | 赛程 utcTime | table.xg（赛季累计） |
+|---|---|---|---|
+| 荷甲 | 57 | 带 Z | 有 |
+| 葡超 | 61 | 带 Z | 有 |
+| 日职 J1 | 223 | 带 Z | 有（广岛 2 轮 xG 5.95 / xGA 0.62） |
+| 日乙 J2 | 8974 | 带 Z | **无** |
+| 美职 MLS | 130 | 带 Z | **无** |
+| 瑞超 | 67 | 带 Z | 有 |
+| 挪超 | 59 | 带 Z | 有 |
+| 英冠 | 48 | 带 Z | 有 |
+| 巴甲 | 268 | 带 Z | 有 |
+| 芬超 | 51 | 带 Z | **无** |
+| 沙职 | 536 | 带 Z | 有（希拉尔揭幕 xG 4.46 / xGA 1.86） |
+| 韩职 | 9080 | 带 Z | **无** |
+| 韩 K2 | 9116 | 带 Z | **无** |
+
+已接入 `fotmob_league.py`。**三条硬约束**：
+
+1. **`status.utcTime` 带 Z**（如 `2026-08-07T10:25:00Z`），按 `collected_at < kickoff`
+   过滤即可，不必走 understat 那套 ±14h。cutoff 仍必须带 offset，无 offset 直接抛错。
+2. **table.xg 是抓取时刻的赛季累计快照**，不是逐场历史。对当场比赛要当赛前证据，
+   必须 `collected_at < 该场 kickoff`；开球后再拉的榜已经含本场，状态是
+   `POST_MATCH_NOT_USABLE`。
+3. **`matchDetails` 的球队 xG 是赛后字段**（实测日职 5803519 完场才有 1.46 / 3.44）。
+   `looks_post_match` 为真时不得写入该场赛前证据，只能回测。
+
+页面 HTML 仍是骨架（矩阵里 fotmob.com 那行「必须渲染」指伤停正文，不是指这份 JSON）。
+**不写入生产 1X2，不与量化轨融合。**
 
 ### 洲际/无源赛事矩阵
 
@@ -174,9 +218,10 @@ GET https://understat.com/getLeagueData/<联赛代号>/<赛季起始年>
    K League 官网实测都在这一层拿到。**页面 HTML 常达 128KB～764KB，必须确认关键字段
    真的在正文里，别被 `web_extract` 的截断骗成「未取到」**；
 3. **真浏览器渲染**（`playwright_fetch.py`，无头 Chromium）：数据只存在于 JS 变量或
-   XHR 的站点，实测 fotmob、understat 属此类；
-4. **抓站点自身的公开接口**：用浏览器记录页面发出的 XHR/fetch，再直接调（K League
-   的 `portal.kleague.com/data/matc/*.do` 即由此得来）；
+   页面正文、没有对应 JSON 接口的站点（fotmob **页面**伤停仍属此类）；
+4. **抓站点自身的公开接口**：用 `capture_xhr.py` 记录页面发出的 XHR/fetch，再纯 HTTP
+   复验。understat `/getLeagueData`、FotMob `/api/data/leagues`、K League
+   `portal.kleague.com/data/matc/*.do` 与 `kleague.com/api/*.do` 都由此得来；
 5. **换源**：同一事实找别的域名，这也是六类证据「每类两个独立 hostname」的本意；
 6. **记缺口**。
 

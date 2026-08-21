@@ -9,8 +9,7 @@
 - Sports Mole：达伽马缺 Mateus Carvalho（膝）、Carlos Cuesta（肌肉）、Brenner 等，文中称主队缺阵约5人 | source(https://www.sportsmole.co.uk/football/vasco/preview/vasco-vs-santos-prediction-team-news-lineups_603083.html) | collected_at(2026-08-16T12:30:00+08:00)
 - OneFootball：达伽马缺 Brenner、Mateus Carvalho，左闸 Cuiabano 停赛 | source(https://onefootball.com/en/news/vasco-da-gama-v-santos-level-on-points-strugglers-target-lift-from-the-drop-43282639) | collected_at(2026-08-16T12:30:00+08:00)
 - FotMob：达伽马不可用 Cuiabano（停赛）、Carlos Cuesta、Andrés Gómez、Brenner；桑托斯列出 Gabriel Bontempo、Gabriel Menino、Igor Vinícius、Lucas Veríssimo、Moisés、Gustavo Henrique、Vinicius Lira | source(https://www.fotmob.com/matches/santos-fc-vs-vasco-da-gama/2x42tj) | collected_at(2026-08-16T12:30:00+08:00)
-- SportsGambler 伤停表仅列达伽马 Mateus Cocao（膝），桑托斯写“当前无伤停/停赛”——与 FotMob 冲突 | source(https://www.sportsgambler.com/betting-tips/football/vasco-da-gama-vs-santos-prediction-lineups-odds-2026-08-16/) | collected_at(2026-08-16T12:30:00+08:00)
-> 证据缺口：桑托斯伤停两源冲突，不得当作“客队无人缺阵”；官方首发未公布。
+> 证据缺口：SportsGambler 写桑托斯当前无伤停/停赛，与 FotMob 名单冲突，不得当作客队无人缺阵。官方首发本轮未核实。
 
 ## 2. 战意/动机
 - OneFootball：两队积分接近、处于保级带，本场被写成抢分战 | source(https://onefootball.com/en/news/vasco-da-gama-v-santos-level-on-points-strugglers-target-lift-from-the-drop-43282639) | collected_at(2026-08-16T12:30:00+08:00)

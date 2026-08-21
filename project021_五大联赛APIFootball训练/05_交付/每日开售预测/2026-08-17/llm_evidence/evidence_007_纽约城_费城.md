@@ -7,9 +7,8 @@
 
 ## 1. 伤停/阵容
 - Philly Soccer Page（2026-08-15）：NYCFC 伤停列出 Maclean Learned、Drew Baiera、Kai Trewin、Aiden O'Neill、Maxi Moralez、Arnau Farnós、Alonso Martinez（均 OUT，腿伤/长伤）；文中写 Trewin 腿伤不打本场、Moralez 伤缺；费城俱乐部伤停栏写 N/A，但同文写 Kai Trewin 是纽约城球员 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)
-- SportsGambler：NYCFC 列 Maxi Moralez（十字韧带）、Drew Baiera（膝）、Alonso Martinez（十字韧带）、Jacob Arroyave；费城写无伤停 | source(https://www.sportsgambler.com/betting-tips/football/new-york-city-vs-philadelphia-union-prediction-lineups-odds-2026-08-16/) | collected_at(2026-08-16T12:30:00+08:00)
-- Squawka 预览写双方“未标出缺阵、预期全员”，与上两源冲突，不采用该全员结论 | source(https://www.squawka.com/us/news/mls/match-preview-new-york-city-fc-vs-philadelphia-union-08-16-26-mls/) | collected_at(2026-08-16T12:30:00+08:00)
-> 证据缺口：官方 MLS 伤停报告未直接打开；预测阵容不是官方首发。
+- SportsGambler：NYCFC 列 Maxi Moralez（十字韧带）、Drew Baiera（膝）、Alonso Martinez（十字韧带）、Jacob Arroyave | source(https://www.sportsgambler.com/betting-tips/football/new-york-city-vs-philadelphia-union-prediction-lineups-odds-2026-08-16/) | collected_at(2026-08-16T12:30:00+08:00)
+> 证据缺口：Squawka 写双方预期全员，与 Philly Soccer Page / SportsGambler 的 NYCFC 伤停名单冲突，不采用全员结论。官方首发本轮未核实。
 
 ## 2. 战意/动机
 - Philly Soccer Page：费城东区第13、18场16分，距季后赛区7分，近3个 MLS 场次连胜；NYCFC 东区第5、26分 | source(https://phillysoccerpage.net/2026/08/15/match-preview-philadelphia-union-vs-new-york-city-fc-9/) | collected_at(2026-08-16T12:30:00+08:00)

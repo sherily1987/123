@@ -62,7 +62,7 @@ DEFAULT_MODELS = [
     "moonshot/kimi-k3",                     # Kimi K3 (推理模型, temperature=1)
 ]
 
-TIMEOUT = 90          # 单模型调用超时(秒)
+TIMEOUT = 180         # 单模型调用超时(秒)；kimi 推理常超过 90s
 TEMPERATURE = 0.8     # 温度: 让各模型略有差异, 避免全部雷同
 
 # 共享提示词/反坍缩规则（2026-08-08 全面优化）
