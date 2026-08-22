@@ -149,7 +149,8 @@ def test_primary_writer_refuses_to_overwrite_existing_primary_evidence(tmp_path)
 
 
 def test_playwright_engine_persists_snapshot_and_runs_existing_verifier(tmp_path):
-    upcoming = {**RAW_MATCH, "kickoff_iso": "2026-08-20T23:00:00+08:00"}
+    # 固定为远未来，避免真实日期推进后误触发赛前时间门禁。
+    upcoming = {**RAW_MATCH, "kickoff_iso": "2099-08-20T23:00:00+08:00"}
 
     async def fake_fetch(url):
         return {

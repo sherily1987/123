@@ -74,7 +74,7 @@ AGGREGATION_RULE_SPEC = {
     "weak_strength_threshold": 0.6,
 }
 MIN_VALID_EVIDENCE_MODELS = 2
-EVIDENCE_AUDITOR_MODEL = "zhipu/glm-4-flash"
+EVIDENCE_AUDITOR_MODEL = "moonshot/kimi-k3"
 # 主胜比例熔断：批内主胜方向占比过高 = 赛季初/主队系统性高估（08-05 回测 4/5 主胜全错，
 # 08-13 官方赔率方向仅 30% 命中）。触发后把"强度最低"的主胜场次改判为次高方向。
 HOME_BIAS_THRESHOLD = 0.65   # 主胜方向占比 >= 65% 触发熔断
@@ -356,6 +356,18 @@ def build_voter_prompt(base_prompt, evidence_audit):
 
 def two_voter_consensus(predictions, voter_models):
     voter_models = list(voter_models)
+    if len(voter_models) == 1:
+        record = predictions.get(voter_models[0])
+        if not isinstance(record, dict) or "error" in record or record.get("decision") != "opinion":
+            return {"status": "skip", "action": "skip", "reason": "single_voter_abstained_or_failed",
+                    "voter_models": voter_models}
+        return {
+            "status": "single_model_research",
+            "action": "observe",
+            "reason": "single_model_no_consensus",
+            "direction": record.get("direction"),
+            "voter_models": voter_models,
+        }
     if len(voter_models) != 2:
         return {"status": "skip", "action": "skip", "reason": "requires_exactly_two_voters",
                 "voter_models": voter_models}
@@ -747,14 +759,14 @@ def decide_single_pick(agg, ev_results, first_leg, match=None):
     }
 
 
-def aggregate_directions(predictions):
+def aggregate_directions(predictions, *, allow_single_model_research=False):
     """单选1票/双选0.5; reasoning差与2-1坍缩降权; 强度<60%强制双选。"""
     valid = {md: p for md, p in predictions.items()
              if isinstance(p, dict) and "error" not in p and p.get("decision", "opinion") == "opinion"}
     if not valid:
         return {"error": "所有模型均调用失败",
                 "errors": [p for p in predictions.values() if isinstance(p, dict) and "error" in p]}
-    if len(valid) < 2:
+    if len(valid) < 2 and not allow_single_model_research:
         return {
             "error": "insufficient_model_responses",
             "valid_model_count": len(valid),
@@ -804,6 +816,27 @@ def aggregate_directions(predictions):
         [x / prob_w for x in prob_acc]
     ) if prob_w else None
     alt_dir, caution = lpr.force_dual_if_weak(strength, votes, 0.6)
+    if len(valid) == 1:
+        only_prediction = next(iter(valid.values()))
+        alt_dir = only_prediction.get("alt_direction") or next(
+            direction for direction in ("平局", "主胜", "客胜") if direction != top_dir
+        )
+        collapse = lpr.summarize_collapse(valid)
+        return {
+            "direction": top_dir, "votes": top_votes, "total_votes": total_votes,
+            "strength": None, "all_votes": dict(votes),
+            "probs_1x2": None,
+            "top_score_pref": top_score, "top_scores": top3, "score_prefs": dict(score_prefs),
+            "top_ou25": top_ou, "all_ou25": dict(ou_prefs),
+            "top_hafu": top_hafu, "all_hafu": dict(hafu_prefs),
+            "alt_direction": alt_dir, "caution": True,
+            "single_model": True, "research_only": True, "action": "observe",
+            "reason": "single_model_no_consensus",
+            "valid_model_count": 1,
+            "minimum_valid_models": MIN_VALID_EVIDENCE_MODELS,
+            "collapse_flags": collapse.get("flags") or [],
+            "individual": fp.standardize_individual_predictions(predictions, list(predictions)),
+        }
     if len(valid) < MIN_VALID_EVIDENCE_MODELS:
         caution = True
         ranked_alternatives = [(direction, count) for direction, count in votes.most_common()
@@ -983,8 +1016,8 @@ def main():
     for n in sorted(evidence_files):
         print(f"   - {n}")
 
-    voter_models = [model for model in args.models if model != EVIDENCE_AUDITOR_MODEL]
-    print(f"🎯 共 {len(selected_matches)} 场比赛待预测, glm-4-flash 证据审计 + {len(voter_models)} 个投票模型\n")
+    voter_models = list(dict.fromkeys(args.models))
+    print(f"🎯 共 {len(selected_matches)} 场比赛待预测, {EVIDENCE_AUDITOR_MODEL} 证据审计 + {len(voter_models)} 个投票模型\n")
 
     # 全局比分坍缩统计：收集每场 top 比分，循环结束后做跨场次分布检测。
     score_prefs_collected = []
@@ -1058,10 +1091,16 @@ def main():
                     print(f"     ✓ [{md.split('/')[-1].split(':')[0][:18]:<18}] "
                           f"-> {p['direction']}{alt}{sp}")
 
-        agg = aggregate_directions(predictions)
+        single_model_mode = len(voter_models) == 1
+        agg = aggregate_directions(predictions, allow_single_model_research=single_model_mode)
         consensus_gate = two_voter_consensus(predictions, voter_models)
-        if consensus_gate["status"] != "consensus":
+        if consensus_gate["status"] == "skip":
             print(f"  🚫 最终门控: skip ({consensus_gate['reason']})")
+            print(json.dumps(build_skip_audit_record(
+                predictions, voter_models, voter_prompt, evidence_status,
+                evidence_audit, consensus_gate, agg.get("error", consensus_gate["reason"]),
+            ), ensure_ascii=False))
+            continue
         if evidence_status["evidence_gap"] and "error" not in agg:
             agg = enforce_evidence_gap(agg)
         if "error" in agg:
@@ -1069,6 +1108,22 @@ def main():
             print(json.dumps(build_skip_audit_record(
                 predictions, voter_models, voter_prompt, evidence_status,
                 evidence_audit, consensus_gate, agg["error"],
+            ), ensure_ascii=False))
+            continue
+
+        if agg.get("single_model"):
+            print(f"\n  🔎 K3 单模型研究意见: {agg['direction']}（非共识，不显示强度/概率）")
+            print(f"  🚫 下注建议: 跳过（{agg['reason']}）")
+            top3 = agg.get("top_scores") or ([agg["top_score_pref"]] if agg.get("top_score_pref") else [])
+            print(f"  🎯 比分研究偏好: {', '.join(top3) if top3 else '分散'}")
+            print(f"  📦 大小球研究偏好: {agg.get('top_ou25') or '-'}")
+            print(f"  ⏱️ 半全场研究偏好: {agg.get('top_hafu') or '-'}")
+            print(json.dumps(build_audit_record(
+                agg, voter_models, voter_prompt, evidence_status,
+                ev_recommendation={"action": "skip", "reason": "single_model_no_consensus"},
+                single_pick={"pick": None, "confidence": None, "reason": "single_model_no_consensus", "skip": True},
+                evidence_audit=evidence_audit, consensus_gate=consensus_gate,
+                match=m,
             ), ensure_ascii=False))
             continue
 

@@ -35,14 +35,23 @@ def test_normalize():
     assert lpr.normalize_score_pref("6-0") == "胜其他"
 
 
-def test_production_default_models_are_three_domestic_voters_including_kimi():
-    assert fp.DEFAULT_MODELS == [
-        "zhipu/glm-4-flash",
-        "deepseek/deepseek-chat",
-        "moonshot/kimi-k3",
-    ]
+def test_production_default_models_are_kimi_k3_only():
+    assert fp.DEFAULT_MODELS == ["moonshot/kimi-k3"]
     assert "moonshot/kimi-k2.6" not in fp.DEFAULT_MODELS
     assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k3"] == 1.0
+
+
+def test_legacy_k3_only_aggregate_is_research_only_not_100_percent_consensus():
+    model = "moonshot/kimi-k3"
+    result = fp.aggregate({model: {
+        "home_score": 1, "away_score": 0, "result": "主胜", "total_goals": "1",
+        "half_result": "主胜", "ou25": "小2.5", "hafu": "胜胜",
+        "confidence": 0.6, "reasoning": "【近况:有依据】", "reasoning_ok": True,
+    }}, [model])
+    assert result["single_model"] is True
+    assert result["research_only"] is True
+    assert result["strength"] is None
+    assert result["avg_confidence"] is None
 
 
 def test_evidence_prompts_are_neutral_and_allow_abstention():
@@ -218,7 +227,7 @@ def test_evidence_gap_forces_dual_direction_and_caution():
 
 
 def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
-    models = list(fp.DEFAULT_MODELS)
+    models = ["moonshot/kimi-k3", "deepseek/deepseek-chat", "zhipu/glm-4-flash"]
     successful = pr.parse_evidence_prediction(
         '{"direction":"主胜","probs_1x2":[58,24,18],"top_scores":["1-0","2-0","2-1"],'
         '"ou25":"小","hafu":"平胜","reasoning":"【近况:主队连胜】"}'
@@ -233,7 +242,7 @@ def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
     assert agg["direction"] == "主胜"
     assert agg["all_votes"] == {"主胜": 1.3}
     assert record["individual"][models[0]]["model_id"] == models[0]
-    assert record["individual"][models[0]]["provider"] == "zhipu"
+    assert record["individual"][models[0]]["provider"] == "moonshot"
     assert record["individual"][models[0]]["status"] == "success"
     assert record["individual"][models[1]] == {
         "model_id": models[1], "provider": "deepseek", "status": "failed", "error": "timeout"

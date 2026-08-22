@@ -19,7 +19,7 @@ def evidence_with_fact(fact_suffix=""):
 
 def evidence_prediction(direction, *, alt=None, gap=False):
     return {
-        "direction": direction, "alt_direction": alt, "score_pref": "1-0",
+        "decision": "opinion", "direction": direction, "alt_direction": alt, "score_pref": "1-0",
         "reasoning": "【近况:有可核验事实】", "reasoning_ok": True,
         "evidence_gap": gap, "collapse_score": False,
     }
@@ -105,6 +105,47 @@ def test_one_valid_model_returns_insufficient_model_responses():
     result = predict.aggregate_directions({"a": evidence_prediction("主胜"), "b": {"error": "down"}})
     assert result["error"] == "insufficient_model_responses"
     assert result["valid_model_count"] == 1
+
+
+def test_explicit_k3_single_model_is_research_only_not_false_consensus():
+    result = predict.aggregate_directions(
+        {"moonshot/kimi-k3": evidence_prediction("主胜", alt="平局")},
+        allow_single_model_research=True,
+    )
+    assert result["direction"] == "主胜"
+    assert result["single_model"] is True
+    assert result["research_only"] is True
+    assert result["strength"] is None
+    assert result["probs_1x2"] is None
+    assert result["action"] == "observe"
+
+
+def test_k3_only_main_skips_ev_and_single_pick(tmp_path, monkeypatch, capsys):
+    raw_path = tmp_path / "raw.json"
+    evidence_dir = tmp_path / "evidence"
+    evidence_dir.mkdir()
+    raw_path.write_text(json.dumps({"matches": [{
+        "match_id": 3, "match_num": "003", "home": "E", "away": "F",
+        "kickoff_iso": "2099-01-01T12:00:00+08:00",
+    }]}, ensure_ascii=False), encoding="utf-8")
+    (evidence_dir / "evidence_001_target.md").write_text(evidence_with_fact(), encoding="utf-8")
+
+    monkeypatch.setattr(predict.fp, "get_client", lambda *_: object())
+    monkeypatch.setattr(predict, "call_evidence_auditor", lambda *_: {
+        "status": "ok", "usable_evidence_ids": [], "unusable_evidence_ids": [],
+        "conflict_evidence_ids": [], "gaps": [], "market_readiness": {}, "summary": "ok",
+    })
+    monkeypatch.setattr(predict, "call_evidence_model",
+                        lambda _client, model, *_: (model, evidence_prediction("主胜", alt="平局")))
+    monkeypatch.setattr(sys, "argv", ["predict.py", "--input", str(raw_path),
+                                       "--evidence-dir", str(evidence_dir),
+                                       "--models", "moonshot/kimi-k3"])
+    predict.main()
+    output = capsys.readouterr().out
+    assert "K3 单模型研究意见" in output
+    assert "single_model_no_consensus" in output
+    assert "💰 下注推荐" not in output
+    assert '"action": "observe"' in output
 
 
 def test_two_valid_models_forces_cautious_dual_output():

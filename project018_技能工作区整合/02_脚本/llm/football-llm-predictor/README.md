@@ -102,7 +102,7 @@ python fetch_sporttery_full.py --results --date 2026-08-06 --output data/results
 python backtest.py
 ```
 
-watcher 对每场只刷新一次；旧 canonical 证据归档至 `snapshots/`，开球后禁止生成新的赛前证据。
+watcher 在开球前会持续重试；只有 API-Sports 已给出首发或证据已满足首发条件时才停止刷新。旧 canonical 证据归档至 `snapshots/`，开球后禁止生成新的赛前证据。
 
 `predict.py` 会把官方赔率（胜平负/让球/总进球/比分/半全场）+ 六类证据拼进每个模型的提示词，
 模型参考赔率但保留独立判断；输出综合预测 + 官方赔率隐含概率对照。
@@ -164,8 +164,11 @@ python simulate_from_odds.py --input data/raw_2026-08-05.json --sim 10000
 输出：λ/期望进球、官方vs引擎1X2、Top比分、让球/总进球/半全场概率、模拟N场比分统计。
 与 LLM 投票形成互补：**引擎给概率分布（客观），LLM 给主观推理**。
 
-## 自定义模型
-编辑 `football_predictor.py` 顶部的 `DEFAULT_MODELS`，或运行时用 `--models` 指定。
+## 模型配置
+
+默认只调用 `moonshot/kimi-k3`，包括证据审计与研究意见。单模型输出标记为 `single_model_research` / `action=observe`：它不是投票共识，不显示投票强度或 LLM 概率，也不会计算 EV、生成单选或下注建议。只有显式传入两个独立投票模型时，才可能形成 `consensus`；即使如此，LLM 轨仍只作研究，不能替代量化轨校准概率。
+
+需要做隔离实验时，可运行时用 `--models` 指定模型列表；不要修改默认池或把实验输出混入生产登记/回测。
 
 **多 provider 支持**：模型 ID 加前缀路由到不同服务商——
 - `zhipu/glm-4-flash` → 智谱（完全免费无限量，国内直连，key 已持久化 `ZHIPU_API_KEY`）

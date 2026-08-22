@@ -53,12 +53,9 @@ MODEL_TEMPERATURE_OVERRIDES = {
     "doubao-seed-evolving": 1.0,
 }
 
-# 正式证据LLM模型池：国内直连三模型（2026-08-12 移除千问 qwen3.8-max：
-# 用户裁定删除，DASHSCOPE key 401 失效且不再续用）。
-# 海外/其他模型只能显式传参用于独立实验，不得因默认值混入生产投票或同一回测池。
+# 默认只保留用户指定的 Kimi K3。单模型结论仅作研究观察，不能伪装成多模型共识，
+# 更不能用于概率、EV 或下注建议。其他模型只能显式传参用于独立实验。
 DEFAULT_MODELS = [
-    "zhipu/glm-4-flash",                    # 智谱 (完全免费, 无限量)
-    "deepseek/deepseek-chat",               # DeepSeek V3 (国内直连, 强推理, 极低价)
     "moonshot/kimi-k3",                     # Kimi K3 (推理模型, temperature=1)
 ]
 
@@ -464,6 +461,7 @@ def aggregate(predictions, models_used):
 
     # 序列化友好的 score keys
     all_scores = {f"{a}-{b}": v for (a, b), v in score_counter.items()}
+    single_model = len(scores) == 1
 
     return {
         "top_score": top_score,
@@ -475,8 +473,9 @@ def aggregate(predictions, models_used):
         "top_ou25": top_ou,
         "alt_direction": alt_dir,
         "caution": caution,
-        "strength": strength,
-        "avg_confidence": avg_conf,
+        # 单个模型的方向和自报 confidence 不是共识强度或校准概率。
+        "strength": None if single_model else strength,
+        "avg_confidence": None if single_model else avg_conf,
         "disagreement": disagreement,
         "all_scores": all_scores,
         "all_results": dict(result_counter),
@@ -488,6 +487,10 @@ def aggregate(predictions, models_used):
         "errors": errors,
         "models_used": models_used,
         "valid_count": len(scores),
+        "single_model": single_model,
+        "research_only": single_model,
+        "action": "observe" if single_model else "research_opinion",
+        "reason": "single_model_no_consensus" if single_model else None,
     }
 
 
@@ -499,6 +502,16 @@ def print_report(home, away, agg):
         print(f"[失败] {agg['error']}")
         for e in agg.get("errors", []):
             print(f"  - {e}")
+        return
+
+    if agg.get("single_model"):
+        print(f"\n  🔎 单模型研究意见: {agg['top_result']}（非共识，不显示强度/置信度）")
+        print("  🚫 下注建议: 跳过（single_model_no_consensus）")
+        print(f"  🎯 比分研究偏好:  {home} {agg['top_score'][0]} - {agg['top_score'][1]} {away}")
+        if agg.get("top_ou25"):
+            print(f"  📦 大小球研究偏好: {agg['top_ou25']}")
+        if agg.get("top_hafu"):
+            print(f"  ⏱️ 半全场研究偏好: {agg['top_hafu']}")
         return
 
     print(f"\n  📊 综合预测比分:  {home} {agg['top_score'][0]} - {agg['top_score'][1]} {away}"

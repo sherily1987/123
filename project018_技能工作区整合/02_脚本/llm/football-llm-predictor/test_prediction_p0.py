@@ -234,10 +234,9 @@ def test_voter_prompt_contains_neutral_audit_not_direction():
     assert '"direction"' not in prompt
 
 
-def test_glm_audits_and_deepseek_votes():
-    assert predict.EVIDENCE_AUDITOR_MODEL == "zhipu/glm-4-flash"
-    voters = [model for model in fp.DEFAULT_MODELS if model != predict.EVIDENCE_AUDITOR_MODEL]
-    assert voters == ["deepseek/deepseek-chat", "moonshot/kimi-k3"]
+def test_kimi_k3_is_the_only_default_auditor_and_voter():
+    assert predict.EVIDENCE_AUDITOR_MODEL == "moonshot/kimi-k3"
+    assert fp.DEFAULT_MODELS == ["moonshot/kimi-k3"]
 
 
 def test_two_voter_consensus_requires_two_matching_opinions():
@@ -253,6 +252,18 @@ def test_two_voter_consensus_requires_two_matching_opinions():
     abstained = predict.two_voter_consensus(
         {voters[0]:glm, voters[1]:{"decision":"abstain","direction":None}}, voters)
     assert abstained["status"] == "skip" and abstained["reason"] == "voter_abstained_or_failed"
+
+
+def test_single_k3_is_research_observation_not_consensus():
+    voter = "moonshot/kimi-k3"
+    observed = predict.two_voter_consensus(
+        {voter: {"decision": "opinion", "direction": "主胜"}}, [voter]
+    )
+    assert observed == {
+        "status": "single_model_research", "action": "observe",
+        "reason": "single_model_no_consensus", "direction": "主胜",
+        "voter_models": [voter],
+    }
 
 
 def test_kimi_reasoning_model_gets_larger_output_budget():
