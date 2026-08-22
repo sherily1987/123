@@ -61,7 +61,7 @@ def test_api_sports_client_collects_recent_and_marks_empty_availability():
         if path == "/fixtures" and "last" in params:
             name = "Arsenal" if params["team"] == 42 else "Manchester City"
             return {"response": [{"fixture": {"date": "2026-08-10T12:00:00+00:00", "status": {"short": "FT"}},
-                                   "league": {"name": "Friendly"},
+                                   "league": {"name": "Premier League"},
                                    "teams": {"home": {"name": name}, "away": {"name": "Opponent"}},
                                    "score": {"fulltime": {"home": 2, "away": 1}},
                                    "goals": {"home": 2, "away": 1}}]}
@@ -108,3 +108,36 @@ def test_api_sports_client_matches_fixture_against_verified_alias_lists():
     )
 
     assert result["status"] == "ok" and result["fixture_id"] == 1492340
+
+
+def test_api_sports_recent_form_excludes_friendlies_and_keeps_official_matches():
+    def fixture(league, date):
+        return {
+            "fixture": {"date": date, "status": {"short": "FT"}},
+            "league": {"name": league, "type": "League"},
+            "teams": {"home": {"name": "Home"}, "away": {"name": "Away"}},
+            "score": {"fulltime": {"home": 1, "away": 0}},
+        }
+
+    def transport(path, params):
+        if path == "/fixtures" and "date" in params:
+            return {"response": [{
+                "fixture": {"id": 7, "date": "2026-08-24T16:30:00+00:00"},
+                "teams": {"home": {"id": 1, "name": "Home"}, "away": {"id": 2, "name": "Away"}},
+            }]}
+        if path == "/fixtures" and "last" in params:
+            rows = [fixture("Friendlies Clubs", f"2026-08-{20-i:02d}T12:00:00+00:00") for i in range(5)]
+            rows.append(fixture("Serie A", "2026-05-20T12:00:00+00:00"))
+            return {"response": rows}
+        if path in ("/injuries", "/fixtures/lineups"):
+            return {"response": []}
+        raise AssertionError((path, params))
+
+    result = lee.ApiSportsClient(transport=transport).collect_match(
+        "Home", "Away", "2026-08-25T00:30:00+08:00")
+
+    assert [row["league"] for row in result["recent"]["home"]] == ["Serie A"]
+    assert result["recent_meta"]["home"]["friendly_excluded"] == 5
+    assert "排除友谊赛5场" in lee.render_recent_form(
+        result["recent"], COLLECTED, result["recent_meta"]
+    )

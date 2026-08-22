@@ -50,11 +50,15 @@ def render_sporttery_markets(raw_match, collected_at):
     return "\n".join(lines)
 
 
-def render_recent_form(payload, collected_at):
+def render_recent_form(payload, collected_at, meta=None):
     source = f"{API_BASE}/fixtures"
     lines = ["## API-Football 最近5场"]
     for side, label in (("home", "主队近况"), ("away", "客队近况")):
         rows = list((payload or {}).get(side) or [])[:5]
+        friendly_excluded = int(((meta or {}).get(side) or {}).get("friendly_excluded") or 0)
+        if friendly_excluded:
+            lines.append(_fact(f"{label}口径", f"正式比赛优先；排除友谊赛{friendly_excluded}场",
+                               source, collected_at))
         if not rows:
             lines.append(_fact(label, "UNAVAILABLE", source, collected_at))
             continue
@@ -100,6 +104,12 @@ def _normal_names(value):
     return {_normal(item) for item in values if _normal(item)}
 
 
+def _is_friendly_fixture(row):
+    league = row.get("league") or {}
+    text = " ".join(str(league.get(key) or "") for key in ("name", "type")).casefold()
+    return "friendly" in text or "friendlies" in text or "友谊" in text
+
+
 def _normalize_fixture(row):
     status = ((row.get("fixture") or {}).get("status") or {}).get("short")
     score = (row.get("score") or {}).get("fulltime") or {}
@@ -112,6 +122,7 @@ def _normalize_fixture(row):
         "away": ((row.get("teams") or {}).get("away") or {}).get("name"),
         "score_90": f"{score.get('home')}-{score.get('away')}",
         "status": status,
+        "is_friendly": _is_friendly_fixture(row),
     }
 
 
@@ -173,15 +184,20 @@ class ApiSportsClient:
         fixture_id = fixture.get("id")
         home_id = (teams.get("home") or {}).get("id")
         away_id = (teams.get("away") or {}).get("id")
-        recent = {}
+        recent, recent_meta = {}, {}
         for side, team_id in (("home", home_id), ("away", away_id)):
             try:
                 rows = self._request("/fixtures", {
-                    "team": team_id, "last": 5, "timezone": "UTC",
+                    "team": team_id, "last": 20, "timezone": "UTC",
                 }).get("response", [])
-                recent[side] = [_normalize_fixture(row) for row in rows[:5]]
+                normalized = [_normalize_fixture(row) for row in rows]
+                recent[side] = [row for row in normalized if not row["is_friendly"]][:5]
+                recent_meta[side] = {
+                    "friendly_excluded": sum(1 for row in normalized if row["is_friendly"]),
+                }
             except Exception:
                 recent[side] = []
+                recent_meta[side] = {"friendly_excluded": 0}
         try:
             injuries = self._request("/injuries", {"fixture": fixture_id}).get("response", [])
         except Exception:
@@ -194,6 +210,7 @@ class ApiSportsClient:
             "status": "ok", "fixture_id": fixture_id,
             "team_ids": {"home": home_id, "away": away_id},
             "recent": recent,
+            "recent_meta": recent_meta,
             "injuries": injuries,
             "injuries_status": "ok" if injuries else "UNAVAILABLE",
             "lineups": lineups,
@@ -208,7 +225,8 @@ def render_api_sports_evidence(payload, collected_at):
         lines.append(_fact("API-Sports 状态", f"{status}: {(payload or {}).get('reason', '')}",
                            f"{API_BASE}/fixtures", collected_at))
         return "\n".join(lines)
-    lines.append(render_recent_form(payload.get("recent") or {}, collected_at))
+    lines.append(render_recent_form(payload.get("recent") or {}, collected_at,
+                                    payload.get("recent_meta") or {}))
     fid = payload.get("fixture_id")
     lines.append(_fact("伤停状态", payload.get("injuries_status", "UNAVAILABLE"),
                        f"{API_BASE}/injuries?fixture={fid}", collected_at))
