@@ -30,3 +30,9 @@ def test_full_matrix_candidate_uses_raw_matrix_and_separate_rank_metrics():
     assert report["test"]["candidate"]["score_matrix"]["n"] == 3
     assert report["test"]["baseline"]["ou_2_5"]["n"] == 3
     assert report["test"]["candidate"]["ou_3_5"]["n"] == 3
+
+
+def test_default_lambda3_grid_does_not_stop_at_current_release_value():
+    """研究网格不能把当前 λ3=0.20 人为当成可搜索上限。"""
+    assert 0.20 in tune.LAMBDA3_GRID
+    assert max(tune.LAMBDA3_GRID) > 0.20

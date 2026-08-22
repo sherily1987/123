@@ -26,7 +26,9 @@ HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[3]
 CORE = PROJECT / "02_脚本" / "core" / "zu-yu-dashi-3" / "scripts"
 DEFAULT_LAMBDA3 = 0.05
-LAMBDA3_GRID = (0.0, 0.02, 0.05, 0.08, 0.10, 0.15, 0.20)
+# Keep search values above the currently released 0.20.  A grid that ends at
+# the incumbent cannot distinguish a genuine optimum from a boundary artifact.
+LAMBDA3_GRID = (0.0, 0.02, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40)
 MIN_TEST_N = 120
 MIN_LOGLOSS_GAIN = 0.005
 
