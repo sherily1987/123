@@ -1,0 +1,40 @@
+{
+  "schema": "four-market-admission-1.0",
+  "research_only": true,
+  "production_change_allowed": false,
+  "families": {
+    "wdl": {
+      "decision": "hold",
+      "reason": "current_version_sample_below_minimum",
+      "n": 64,
+      "minimum_n": 100
+    },
+    "score": {
+      "decision": "hold",
+      "reason": "paired_ci_not_decisive_for_all_affected_outputs",
+      "n": 401,
+      "lambda3": 0.2,
+      "observed_delta": -0.025081
+    },
+    "ou": {
+      "decision": "hold",
+      "reason": "paired_ci_not_decisive_for_all_affected_outputs",
+      "n": 401,
+      "minimum_n": 200
+    },
+    "hafu": {
+      "decision": "hold",
+      "reason": "hafu_predictions_unfitted",
+      "n": 0,
+      "excluded_unfitted_prediction": 165,
+      "minimum_n": 200
+    }
+  },
+  "note": "review_required 也不是自动上线；任何概率变化仍须版本升级、独立复核与发布锁。当前脚本不会写入生产配置。",
+  "inputs": {
+    "backtest": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest\\store_backtest_20260821_late.json",
+    "derivatives": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\research\\derivative-diagnostics\\latest.json",
+    "score_shadow": "F:\\HM足球比赛预测\\project018_技能工作区整合\\06_复盘\\2026-08-21_四类精度基线\\score_shadow_big5_matrix_semantics_corrected.json",
+    "score_time_split": "F:\\HM足球比赛预测\\project018_技能工作区整合\\06_复盘\\2026-08-22_四类精度持续验证\\sporttery_score_lambda3_time_split_ci_gated.json"
+  }
+}

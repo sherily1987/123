@@ -37,6 +37,7 @@ def test_same_source_score_and_ou_time_split_can_reach_manual_review_only():
         "test": {
             "delta_log_loss_candidate_minus_baseline": -0.025081,
             "ou_non_regression_passed": True,
+            "paired_ci_supports_full_candidate": True,
             "baseline": {"ou_2_5": {"n": 401}, "ou_3_5": {"n": 401}},
             "candidate": {"ou_2_5": {"n": 401}, "ou_3_5": {"n": 401}},
         },
@@ -54,3 +55,30 @@ def test_same_source_score_and_ou_time_split_can_reach_manual_review_only():
     assert report["production_change_allowed"] is False
     assert report["families"]["score"]["decision"] == "review_required"
     assert report["families"]["ou"]["decision"] == "review_required"
+
+
+def test_same_source_candidate_holds_when_paired_ci_is_not_decisive():
+    score_time_split = {
+        "schema": "sporttery-score-lambda3-1.0",
+        "research_only": True,
+        "test_n": 401,
+        "candidate": {"lambda3": 0.2},
+        "test": {
+            "delta_log_loss_candidate_minus_baseline": -0.025081,
+            "ou_non_regression_passed": True,
+            "paired_ci_supports_full_candidate": False,
+            "baseline": {"ou_2_5": {"n": 401}, "ou_3_5": {"n": 401}},
+            "candidate": {"ou_2_5": {"n": 401}, "ou_3_5": {"n": 401}},
+        },
+    }
+
+    report = admission.admission_report(
+        {"calibration_gate": {"current_version_n": 64}},
+        {"ou_2_5": {"n": 167}, "ou_3_5": {"n": 167}, "hafu": {"n": 0}},
+        {"big5_candidate": {"n": 7, "score_matrix": {}}}, score_time_split,
+    )
+
+    assert report["families"]["score"]["decision"] == "hold"
+    assert report["families"]["ou"]["decision"] == "hold"
+    assert report["families"]["score"]["reason"] == "paired_ci_not_decisive_for_all_affected_outputs"
+    assert report["families"]["ou"]["reason"] == "paired_ci_not_decisive_for_all_affected_outputs"

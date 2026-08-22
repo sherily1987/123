@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -31,6 +32,8 @@ DEFAULT_LAMBDA3 = 0.05
 LAMBDA3_GRID = (0.0, 0.02, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40)
 MIN_TEST_N = 120
 MIN_LOGLOSS_GAIN = 0.005
+BOOTSTRAP_DRAWS = 2000
+BOOTSTRAP_SEED = 20260822
 
 
 def _predict_module():
@@ -151,8 +154,78 @@ def matrix_metrics(rows: Iterable[Mapping[str, Any]], lambda3: float) -> dict[st
     }
 
 
+def _quantile(values: list[float], fraction: float) -> float:
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * fraction
+    lower, upper = int(position), math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
+
+
+def paired_matrix_bootstrap(
+    rows: Iterable[Mapping[str, Any]], baseline_lambda3: float, candidate_lambda3: float,
+    *, draws: int = BOOTSTRAP_DRAWS, seed: int = BOOTSTRAP_SEED,
+) -> dict[str, dict[str, float | int | None]]:
+    """Paired candidate-minus-baseline uncertainty on identical test matches."""
+    predict = _predict_module()
+    deltas: dict[str, list[float]] = {
+        "score_log_loss": [], "ou_2_5_brier": [], "ou_3_5_brier": [],
+    }
+    for row in rows:
+        try:
+            home_lambda, away_lambda = row["lambdas"]
+            home_text, away_text = str(row["actual_score"]).split("-", 1)
+            home, away = int(home_text), int(away_text)
+            baseline = predict.bp_matrix(float(home_lambda), float(away_lambda), float(baseline_lambda3))
+            candidate = predict.bp_matrix(float(home_lambda), float(away_lambda), float(candidate_lambda3))
+        except (KeyError, TypeError, ValueError):
+            continue
+        deltas["score_log_loss"].append(
+            -math.log(max(float(candidate[(home, away)]), 1e-15))
+            + math.log(max(float(baseline[(home, away)]), 1e-15))
+        )
+        total = home + away
+        for line, key in ((2.5, "ou_2_5_brier"), (3.5, "ou_3_5_brier")):
+            actual = int(total > line)
+            baseline_over = float(predict.ou(baseline, line)["over_pct"]) / 100.0
+            candidate_over = float(predict.ou(candidate, line)["over_pct"]) / 100.0
+            deltas[key].append((candidate_over - actual) ** 2 - (baseline_over - actual) ** 2)
+
+    rng = random.Random(seed)
+    report: dict[str, dict[str, float | int | None]] = {}
+    for key, values in deltas.items():
+        if not values:
+            report[key] = {"n": 0, "draws": draws, "seed": seed,
+                           "delta_candidate_minus_baseline": None,
+                           "ci95_low": None, "ci95_high": None}
+            continue
+        sampled = [sum(values[rng.randrange(len(values))] for _ in range(len(values))) / len(values)
+                   for _ in range(draws)]
+        report[key] = {
+            "n": len(values), "draws": draws, "seed": seed,
+            "delta_candidate_minus_baseline": round(sum(values) / len(values), 8),
+            "ci95_low": round(_quantile(sampled, 0.025), 8),
+            "ci95_high": round(_quantile(sampled, 0.975), 8),
+        }
+    return report
+
+
+def paired_ci_supports_full_candidate(paired: Mapping[str, Any]) -> bool:
+    """Require every affected scored output to have a strictly negative CI upper bound."""
+    for key in ("score_log_loss", "ou_2_5_brier", "ou_3_5_brier"):
+        metric = paired.get(key)
+        if not isinstance(metric, Mapping):
+            return False
+        upper = metric.get("ci95_high")
+        if not isinstance(upper, (int, float)) or upper >= 0.0:
+            return False
+    return True
+
+
 def fit_report(rows: list[dict[str, Any]], *, lambda_grid: Iterable[float] = LAMBDA3_GRID,
-               min_test_n: int = MIN_TEST_N) -> dict[str, Any]:
+               min_test_n: int = MIN_TEST_N, bootstrap_draws: int = BOOTSTRAP_DRAWS,
+               bootstrap_seed: int = BOOTSTRAP_SEED) -> dict[str, Any]:
     """Choose by train raw-matrix log loss, then disclose an untouched test."""
     if len(rows) < 2:
         return {"schema": "sporttery-score-lambda3-1.0", "research_only": True,
@@ -181,6 +254,10 @@ def fit_report(rows: list[dict[str, Any]], *, lambda_grid: Iterable[float] = LAM
     chosen = min(options, key=lambda option: float(option["train"]["score_log_loss"]))
     candidate_lambda3 = float(chosen["lambda3"])
     candidate_test = matrix_metrics(test, candidate_lambda3)
+    paired_bootstrap = paired_matrix_bootstrap(
+        test, DEFAULT_LAMBDA3, candidate_lambda3, draws=bootstrap_draws, seed=bootstrap_seed,
+    )
+    paired_ci_supported = paired_ci_supports_full_candidate(paired_bootstrap)
     baseline_loss = baseline_test["score_log_loss"]
     candidate_loss = candidate_test["score_log_loss"]
     delta = (round(float(candidate_loss) - float(baseline_loss), 6)
@@ -196,9 +273,11 @@ def fit_report(rows: list[dict[str, Any]], *, lambda_grid: Iterable[float] = LAM
         ou_not_worse = ou_not_worse and brier_delta is not None and brier_delta <= 0.0
     score_wins = (candidate_lambda3 != DEFAULT_LAMBDA3 and len(test) >= min_test_n
                   and delta is not None and delta <= -MIN_LOGLOSS_GAIN)
-    adopt = score_wins and ou_not_worse
+    adopt = score_wins and ou_not_worse and paired_ci_supported
     if adopt:
-        reason = "same_source_time_split_score_gain_without_ou_brier_regression"
+        reason = "same_source_time_split_paired_score_and_ou_gain"
+    elif score_wins and ou_not_worse and not paired_ci_supported:
+        reason = "paired_uncertainty_not_decisive_for_all_affected_outputs"
     elif score_wins:
         reason = "score_gain_but_ou_brier_regressed"
     else:
@@ -230,6 +309,8 @@ def fit_report(rows: list[dict[str, Any]], *, lambda_grid: Iterable[float] = LAM
                                "ou_3_5": candidate_test["ou_3_5"]},
                  "delta_log_loss_candidate_minus_baseline": delta,
                  "delta_ou_brier_candidate_minus_baseline": ou_deltas,
+                 "paired_bootstrap": paired_bootstrap,
+                 "paired_ci_supports_full_candidate": paired_ci_supported,
                  "ou_non_regression_required": True,
                  "ou_non_regression_passed": ou_not_worse},
         "adopt_for_research": adopt,

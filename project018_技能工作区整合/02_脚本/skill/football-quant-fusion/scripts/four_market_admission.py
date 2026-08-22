@@ -49,7 +49,8 @@ def _same_source_score_evidence(report: Mapping[str, Any] | None) -> dict[str, A
     except (KeyError, TypeError, ValueError):
         return None
     return {"test_n": test_n, "lambda3": lambda3, "score_delta_log_loss": delta,
-            "ou_n": ou_n, "ou_non_regression_passed": test.get("ou_non_regression_passed") is True}
+            "ou_n": ou_n, "ou_non_regression_passed": test.get("ou_non_regression_passed") is True,
+            "paired_ci_supports_full_candidate": test.get("paired_ci_supports_full_candidate") is True}
 
 
 def admission_report(backtest: Mapping[str, Any], derivatives: Mapping[str, Any],
@@ -74,10 +75,17 @@ def admission_report(backtest: Mapping[str, Any], derivatives: Mapping[str, Any]
     if (same_source is not None and same_source["test_n"] >= MIN_SCORE_N
             and same_source["lambda3"] != 0.05
             and same_source["score_delta_log_loss"] <= -MIN_SCORE_LOGLOSS_GAIN
-            and same_source["ou_non_regression_passed"]):
+            and same_source["ou_non_regression_passed"]
+            and same_source["paired_ci_supports_full_candidate"]):
         score = {"decision": "review_required", "reason": "same_source_time_split_score_and_ou_passed",
                  "n": same_source["test_n"], "lambda3": same_source["lambda3"],
                  "observed_delta": same_source["score_delta_log_loss"]}
+    elif (same_source is not None and same_source["test_n"] >= MIN_SCORE_N
+          and same_source["lambda3"] != 0.05
+          and same_source["score_delta_log_loss"] <= -MIN_SCORE_LOGLOSS_GAIN
+          and same_source["ou_non_regression_passed"]):
+        score = _hold("paired_ci_not_decisive_for_all_affected_outputs", n=same_source["test_n"],
+                      lambda3=same_source["lambda3"], observed_delta=same_source["score_delta_log_loss"])
     elif score_n < MIN_SCORE_N:
         score = _hold("same_family_oos_sample_below_minimum", n=score_n, minimum_n=MIN_SCORE_N)
     elif not isinstance(delta, (int, float)) or delta > -MIN_SCORE_LOGLOSS_GAIN:
@@ -90,9 +98,14 @@ def admission_report(backtest: Mapping[str, Any], derivatives: Mapping[str, Any]
     ou25, ou35 = derivatives.get("ou_2_5", {}), derivatives.get("ou_3_5", {})
     ou_n = min(int(ou25.get("n") or 0), int(ou35.get("n") or 0))
     if (same_source is not None and same_source["ou_n"] >= MIN_OU_N
-            and same_source["ou_non_regression_passed"]):
+            and same_source["ou_non_regression_passed"]
+            and same_source["paired_ci_supports_full_candidate"]):
         ou = {"decision": "review_required", "reason": "same_source_lambda3_ou_non_regression_passed",
               "n": same_source["ou_n"], "minimum_n": MIN_OU_N}
+    elif (same_source is not None and same_source["ou_n"] >= MIN_OU_N
+          and same_source["ou_non_regression_passed"]):
+        ou = _hold("paired_ci_not_decisive_for_all_affected_outputs", n=same_source["ou_n"],
+                   minimum_n=MIN_OU_N)
     else:
         ou = (_hold("both_ou_lines_need_same_family_samples", n=ou_n, minimum_n=MIN_OU_N,
                 ou_2_5_n=int(ou25.get("n") or 0), ou_3_5_n=int(ou35.get("n") or 0))

@@ -36,3 +36,30 @@ def test_default_lambda3_grid_does_not_stop_at_current_release_value():
     """研究网格不能把当前 λ3=0.20 人为当成可搜索上限。"""
     assert 0.20 in tune.LAMBDA3_GRID
     assert max(tune.LAMBDA3_GRID) > 0.20
+
+
+def test_time_split_report_includes_paired_score_and_ou_uncertainty():
+    """比分/大小球候选必须在同场配对差异上报告不确定性。"""
+    rows = [
+        {"day": f"2026-02-{index:02d}", "lambdas": (1.5, 0.8), "actual_score": "1-0"}
+        for index in range(1, 11)
+    ]
+
+    report = tune.fit_report(
+        rows, lambda_grid=(0.05, 0.15), min_test_n=2, bootstrap_draws=100, bootstrap_seed=7,
+    )
+
+    paired = report["test"]["paired_bootstrap"]
+    assert paired["score_log_loss"]["draws"] == 100
+    assert set(paired) == {"score_log_loss", "ou_2_5_brier", "ou_3_5_brier"}
+
+
+def test_paired_ci_gate_rejects_candidate_when_one_ou_interval_crosses_zero():
+    """共享 λ3 影响两条大小球线，任一线不确定就不能宣称整体提升。"""
+    paired = {
+        "score_log_loss": {"ci95_high": -0.001},
+        "ou_2_5_brier": {"ci95_high": -0.002},
+        "ou_3_5_brier": {"ci95_high": 0.001},
+    }
+
+    assert tune.paired_ci_supports_full_candidate(paired) is False
