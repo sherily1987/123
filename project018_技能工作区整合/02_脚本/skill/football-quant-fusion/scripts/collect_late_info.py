@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""盘后伤停 + T-75 首发采集。只写研究库，不改生产 input / 不登记。
+"""伤停 + T-75 首发采集。只写研究库，不改生产 input / 不登记。
 
 伤停：体彩 getInjurySuspensionV1（有 sporttery match_id 即可）。
-首发：apifootball get_lineups，且必须已有 apifootball_match_id，不开球前 75 分钟内不拉。
+首发：API-Sports /fixtures/lineups，要求先经队名别名和开球时间映射到
+api_sports_fixture_id；开球前 75 分钟以外不拉首发。
 """
 from __future__ import annotations
 
