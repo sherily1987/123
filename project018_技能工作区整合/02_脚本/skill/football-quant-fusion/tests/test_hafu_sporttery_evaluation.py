@@ -54,3 +54,46 @@ def test_paired_bootstrap_reports_negative_delta_when_temperature_improves_every
     assert report["brier"]["ci95_high"] < 0
     assert report["log_loss"]["delta_candidate_minus_raw"] < 0
     assert report["log_loss"]["ci95_high"] < 0
+
+
+def test_candidate_admission_holds_when_only_brier_improves():
+    """半全场候选必须同时改善 Brier 与对数损失，不能以单项改进放行。"""
+    decision = module.candidate_admission_decision({
+        "brier": {"delta_candidate_minus_baseline": -0.001,
+                  "ci95_low": -0.003, "ci95_high": -0.0001},
+        "log_loss": {"delta_candidate_minus_baseline": 0.0001,
+                     "ci95_low": -0.002, "ci95_high": 0.003},
+    })
+
+    assert decision["decision"] == "hold"
+    assert decision["reason_code"] == "NO_DUAL_METRIC_IMPROVEMENT"
+
+
+def test_hafu_from_had_odds_returns_a_nine_state_probability_vector():
+    """HAD 派生候选只能读取赛前 HAD，不能偷用 HAFU 九态基线。"""
+    probability = module.hafu_from_had_odds([1.80, 3.60, 4.20])
+
+    assert probability is not None
+    assert len(probability) == 9
+    assert abs(sum(probability) - 1.0) < 1e-9
+
+
+def test_had_derived_shadow_scores_candidate_against_same_hafu_baseline():
+    """影子评估要保留同一场的 HAFU 基线与 HAD 派生候选，不能混用分母。"""
+    hafu = {"hh": "2.0", "hd": "4.0", "ha": "8.0", "dh": "5.0", "dd": "6.0",
+            "da": "10.0", "ah": "12.0", "ad": "15.0", "aa": "20.0"}
+    matches = [
+        {"kickoff_iso": "2026-02-03T20:00:00+08:00",
+         "closing_pre_match": {"hafu": hafu, "had": {"h": "1.8", "d": "3.6", "a": "4.2"}},
+         "match_result_list": [{"code": "HAFU", "combination": "H:H"}]},
+        {"kickoff_iso": "2026-02-04T20:00:00+08:00",
+         "closing_pre_match": {"hafu": hafu, "had": {"h": "2.1", "d": "3.2", "a": "3.8"}},
+         "match_result_list": [{"code": "HAFU", "combination": "D:D"}]},
+    ]
+
+    report = module.evaluate_had_derived_shadow(matches, test_fraction=0.30, draws=20, seed=7)
+
+    assert report["test"]["baseline"]["n"] == 1
+    assert report["test"]["candidate"]["n"] == 1
+    assert report["admission"]["decision"] == "hold"
+    assert report["admission"]["reason_code"] == "INSUFFICIENT_OUT_OF_TIME_SAMPLE"
