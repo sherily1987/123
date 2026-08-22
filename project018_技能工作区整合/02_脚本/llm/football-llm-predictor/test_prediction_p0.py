@@ -69,6 +69,16 @@ def test_mcp_sidecar_identity_must_match_selected_raw_match():
     assert result == {"ok": False, "reason": "mcp_match_identity_mismatch"}
 
 
+def test_mcp_sidecar_identity_accepts_sporttery_meta_match_id():
+    mcp = """# MCP 数据证据块
+> source(https://apifootball.com/) collected_at(2026-08-10T20:00:00+08:00)
+> match_identity(sporttery_match_id=2041018;home=弗洛西诺;away=尤文图斯;api_match_id=807857)
+- 结构化事实 source(https://apifootball.com/) collected_at(2026-08-10T20:00:00+08:00)
+"""
+    match = {"sporttery_meta": {"match_id": 2041018}, "home": "弗洛西诺", "away": "尤文图斯"}
+    assert predict.assess_mcp_evidence(mcp, "2026-08-11T01:00:00+08:00", match=match) == {"ok": True}
+
+
 def test_automatic_match_rejects_same_league_time_with_different_teams():
     raw = [{
         "league": "瑞超", "kickoff_local": "2026-08-11 01:00",

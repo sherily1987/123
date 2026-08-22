@@ -56,6 +56,17 @@ def _api_football_key():
     return (os.environ.get("MCP_APIFOOTBALL_API_KEY") or "").strip()
 
 
+def sporttery_match_id_of(raw_match):
+    """Read the canonical Sporttery ID from both single-match and batch inputs."""
+    value = raw_match.get("match_id") or (raw_match.get("sporttery_meta") or {}).get("match_id")
+    return "" if value in (None, "") else str(value).replace("sporttery-", "")
+
+
+def sporttery_match_num_of(raw_match):
+    value = raw_match.get("match_num") or (raw_match.get("sporttery_meta") or {}).get("match_num")
+    return "" if value in (None, "") else str(value)
+
+
 def fetch_lineups_rest(match_id, retries=4):
     """GET apiv3 get_lineups?match_id=... 返回原始 dict 或 None。"""
     import time
@@ -891,11 +902,13 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
         if fallback else
         f"> 第三方结构化数据: apifootball MCP | source({source_url}) collected_at({collected_at})"
     )
+    sporttery_id = sporttery_match_id_of(raw_m)
+    sporttery_num = sporttery_match_num_of(raw_m)
     parts = [f"# MCP 数据证据块: {raw_m.get('home','')}({home_en}) vs {raw_m.get('away','')}({away_en}) | {raw_m.get('league','')}",
              "",
              source_note,
-             f"> match_identity(sporttery_match_id={raw_m.get('match_id', '')};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
-             f"> 竞彩: {raw_m.get('match_num','')} | 体彩matchId {raw_m.get('match_id')} | apifootball match_id {mid}", ""]
+             f"> match_identity(sporttery_match_id={sporttery_id};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
+             f"> 竞彩: {sporttery_num} | 体彩matchId {sporttery_id} | apifootball match_id {mid}", ""]
     # 赛季首战：本季积分榜为空 ≠ 无近5场。必须改取该队对其他对手的最近正式赛。
     if detect_season_opener(standings, h2h):
         parts.append("> ⚠️ [赛季首战] 本季积分榜为空不等于无近5场。"

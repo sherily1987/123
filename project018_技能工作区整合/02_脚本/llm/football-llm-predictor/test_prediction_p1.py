@@ -44,6 +44,19 @@ def test_evidence_filename_requires_exact_sequence_boundary():
     assert predict.match_evidence_file(3, files) == "evidence_003_target.md"
 
 
+def test_mcp_filename_prefers_identity_matched_refresh_over_stale_duplicate():
+    files = {
+        "evidence_001_unknown_juventus_mcp.md": (
+            "match_identity(sporttery_match_id=;home=弗洛西诺;away=尤文图斯;api_match_id=None)"
+        ),
+        "evidence_001_frosinone_juventus_mcp.md": (
+            "match_identity(sporttery_match_id=2041018;home=弗洛西诺;away=尤文图斯;api_match_id=807857)"
+        ),
+    }
+    match = {"sporttery_meta": {"match_id": 2041018}, "home": "弗洛西诺", "away": "尤文图斯"}
+    assert predict.match_mcp_file(1, files, match=match) == "evidence_001_frosinone_juventus_mcp.md"
+
+
 def test_original_third_match_single_rerun_uses_evidence_003(tmp_path, monkeypatch, capsys):
     raw_path = tmp_path / "raw.json"
     evidence_dir = tmp_path / "evidence"

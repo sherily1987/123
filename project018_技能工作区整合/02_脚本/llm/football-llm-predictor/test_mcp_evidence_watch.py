@@ -51,4 +51,16 @@ def test_api_sports_fallback_item_preserves_aliases_and_marks_evidence_gap():
     assert item["mid"] is None
     assert "Atletico Paranaense" in item["api_sports_away_names"]
     assert "API-Sports 降级证据" in block
+
+
+def test_mcp_block_uses_sporttery_meta_identity_when_flat_id_is_absent():
+    raw = {
+        "home": "弗洛西诺", "away": "尤文图斯", "competition": "意甲",
+        "sporttery_meta": {"match_id": 2041018, "match_num": "周日018"},
+    }
+    block = mcp.build_block(raw, {"home_team": "Frosinone", "away_team": "Juventus"},
+                            [], None, None, None, "807857")
+
+    assert "sporttery_match_id=2041018" in block
+    assert "体彩matchId 2041018" in block
     assert "数据缺口" in block

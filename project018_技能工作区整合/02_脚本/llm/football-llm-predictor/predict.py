@@ -48,11 +48,27 @@ def match_evidence_file(match_idx, evidence_files):
     return matches[0] if len(matches) == 1 else None
 
 
-def match_mcp_file(match_idx, evidence_files):
+def _selected_match_identity(match):
+    meta = (match or {}).get("sporttery_meta") or {}
+    value = (match or {}).get("match_id") or meta.get("match_id")
+    sporttery_id = "" if value in (None, "") else str(value).replace("sporttery-", "")
+    return sporttery_id, str((match or {}).get("home") or ""), str((match or {}).get("away") or "")
+
+
+def match_mcp_file(match_idx, evidence_files, match=None):
     """按序号前缀匹配 *_mcp.md (apifootball MCP 数据证据块, mcp_evidence.py 生成)。"""
     pattern = re.compile(rf"^evidence_{match_idx:03d}(?:_|\.)", re.I)
     matches = [name for name in evidence_files
                if pattern.match(name) and name.lower().endswith("_mcp.md")]
+    if len(matches) > 1 and match is not None:
+        expected = _selected_match_identity(match)
+        identity_pattern = re.compile(
+            r"match_identity\(\s*sporttery_match_id=([^;)]*);home=([^;)]*);away=([^;)]*);api_match_id=([^;)]*)\s*\)",
+            re.I,
+        )
+        matches = [name for name in matches
+                   if (found := identity_pattern.search(evidence_files[name] or ""))
+                   and tuple(part.strip() for part in found.groups()[:3]) == expected]
     return matches[0] if len(matches) == 1 else None
 
 
@@ -189,9 +205,8 @@ def assess_mcp_evidence(mcp_text, kickoff, match=None):
         if not identity:
             return {"ok": False, "reason": "missing_mcp_match_identity"}
         sporttery_id, home, away, _api_id = (part.strip() for part in identity.groups())
-        if (sporttery_id != str(match.get("match_id", "")) or
-                home != str(match.get("home", "")) or
-                away != str(match.get("away", ""))):
+        expected_sporttery_id, expected_home, expected_away = _selected_match_identity(match)
+        if (sporttery_id != expected_sporttery_id or home != expected_home or away != expected_away):
             return {"ok": False, "reason": "mcp_match_identity_mismatch"}
     return {"ok": True}
 
@@ -208,7 +223,7 @@ def select_matches(matches, match_id=None, max_matches=0, min_match=0):
         selected = selected[:max_matches]
     if match_id is not None:
         selected = [(idx, match) for idx, match in selected
-                    if str(match.get("match_id")) == str(match_id)]
+                    if _selected_match_identity(match)[0] == str(match_id)]
     return selected
 
 
@@ -946,7 +961,9 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_rec
         raise ValueError("cannot audit a failed aggregation")
     record = dict(aggregation)
     if match:
-        record["match_id"] = _normalize_match_id(match.get("match_id"))
+        record["match_id"] = _normalize_match_id(
+            match.get("match_id") or (match.get("sporttery_meta") or {}).get("match_id")
+        )
         record["match_num"] = match.get("match_num")
         record["home"] = match.get("home")
         record["away"] = match.get("away")
@@ -1045,7 +1062,7 @@ def main():
             print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
             continue
         ev_text = primary_evidence
-        mcp_name = match_mcp_file(match_idx, evidence_files)
+        mcp_name = match_mcp_file(match_idx, evidence_files, match=m)
         if mcp_name:
             mcp_status = assess_mcp_evidence(evidence_files[mcp_name], kickoff, match=m)
             if mcp_status["ok"]:

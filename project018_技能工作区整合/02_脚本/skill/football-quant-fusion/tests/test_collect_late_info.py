@@ -94,6 +94,36 @@ def test_api_sports_fixture_resolver_covers_provider_team_name_variants():
     }
 
 
+def test_api_sports_fixture_resolver_covers_20260823_sporttery_alias_gaps():
+    """Known Sporttery labels must resolve to the provider fixtures used at T-75."""
+    matches = [
+        {"sporttery_meta": {"match_id": 2041018}, "home": "弗洛西诺", "away": "尤文图斯",
+         "kickoff": "2026-08-24T00:30:00+08:00"},
+        {"sporttery_meta": {"match_id": 2041019}, "home": "威尼斯", "away": "莱切",
+         "kickoff": "2026-08-24T00:30:00+08:00"},
+        {"sporttery_meta": {"match_id": 2041021}, "home": "赫塔费", "away": "桑坦德",
+         "kickoff": "2026-08-24T01:30:00+08:00"},
+        {"sporttery_meta": {"match_id": 2041026}, "home": "新英格兰", "away": "纽约城",
+         "kickoff": "2026-08-24T04:30:00+08:00"},
+    ]
+    fixtures = [
+        {"fixture": {"id": 1550090, "date": "2026-08-23T16:30:00+00:00"},
+         "teams": {"home": {"name": "Frosinone"}, "away": {"name": "Juventus"}}},
+        {"fixture": {"id": 1550096, "date": "2026-08-23T16:30:00+00:00"},
+         "teams": {"home": {"name": "Venezia"}, "away": {"name": "Lecce"}}},
+        {"fixture": {"id": 1570348, "date": "2026-08-23T17:30:00+00:00"},
+         "teams": {"home": {"name": "Getafe"}, "away": {"name": "Racing Santander"}}},
+        {"fixture": {"id": 1490419, "date": "2026-08-23T20:30:00+00:00"},
+         "teams": {"home": {"name": "New England Revolution"}, "away": {"name": "New York City FC"}}},
+    ]
+
+    resolved = mod.resolve_api_sports_fixture_ids(matches, fetch_by_utc_date=lambda _: fixtures)
+
+    assert {mid: row["fixture_id"] for mid, row in resolved.items()} == {
+        2041018: 1550090, 2041019: 1550096, 2041021: 1570348, 2041026: 1490419,
+    }
+
+
 def test_due_manifest_carries_api_sports_fixture_identity(tmp_path: Path):
     matches = [{
         "sporttery_meta": {"match_id": 2041028},
