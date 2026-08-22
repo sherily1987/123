@@ -552,46 +552,44 @@ def call_evidence_auditor(client, prompt, evidence_catalog):
     try:
         if EVIDENCE_AUDITOR_MODEL.startswith("zhipu/"):
             prompt = sanitize_for_zhipu(prompt)
+        auditor_model = fp.strip_provider(EVIDENCE_AUDITOR_MODEL)
+        temperature = fp.MODEL_TEMPERATURE_OVERRIDES.get(auditor_model, 0.0)
+        audit_max_tokens = output_token_budget(EVIDENCE_AUDITOR_MODEL) if auditor_model == "kimi-k3" else 768
         messages = [
             {"role": "system", "content": lpr.system_prompt_evidence_audit()},
             {"role": "user", "content": prompt},
         ]
         response = client.chat.completions.create(
-            model=fp.strip_provider(EVIDENCE_AUDITOR_MODEL),
+            model=auditor_model,
             messages=messages,
-            temperature=0.0,
-            max_tokens=768,
+            temperature=temperature,
+            max_tokens=audit_max_tokens,
         )
         raw = response.choices[0].message.content
         parsed = parse_evidence_audit(raw, evidence_catalog)
-        if parsed.get("error") != "audit_unavailable_status_mismatch":
+        retryable_errors = {
+            "audit_missing_json", "audit_unknown_evidence_id",
+            "audit_marks_unusable_evidence_as_usable", "audit_unavailable_status_mismatch",
+            "audit_conflict_status_mismatch", "audit_invalid_market_readiness",
+        }
+        error = str(parsed.get("error") or "")
+        if error.split(":", 1)[0] not in retryable_errors:
             return parsed
-        catalog = {str(item.get("id")): item for item in (evidence_catalog or [])}
-        match = re.search(r"\{.*\}", raw or "", re.S)
-        bad = []
-        if match:
-            try:
-                data = json.loads(match.group(0))
-            except json.JSONDecodeError:
-                data = {}
-            for eid in data.get("unusable_evidence_ids") or []:
-                status = catalog.get(str(eid), {}).get("status")
-                if status != "UNAVAILABLE":
-                    bad.append(f"{eid}={status}")
         messages.append({"role": "assistant", "content": raw})
         messages.append({
             "role": "user",
             "content": (
-                "审计未通过：unusable_evidence_ids 里有非 UNAVAILABLE 编号 "
-                + (",".join(bad) or "未知")
-                + "。请只把 status=UNAVAILABLE 的编号放入 unusable_evidence_ids，其余 SINGLE_SOURCE/VERIFIED_MULTI_SOURCE 放回 usable_evidence_ids。只输出 JSON。"
+                f"审计未通过：{error}。请只使用证据目录内的 E 编号；"
+                "SINGLE_SOURCE/VERIFIED_MULTI_SOURCE 只能放 usable_evidence_ids，"
+                "UNAVAILABLE 只能放 unusable_evidence_ids，SOURCE_CONFLICT 只能放 conflict_evidence_ids。"
+                "四个 market_readiness 字段必须为布尔值。只输出一个完整 JSON 对象。"
             ),
         })
         response = client.chat.completions.create(
-            model=fp.strip_provider(EVIDENCE_AUDITOR_MODEL),
+            model=auditor_model,
             messages=messages,
-            temperature=0.0,
-            max_tokens=768,
+            temperature=temperature,
+            max_tokens=audit_max_tokens,
         )
         return parse_evidence_audit(response.choices[0].message.content, evidence_catalog)
     except Exception as exc:

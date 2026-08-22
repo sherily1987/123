@@ -1,4 +1,5 @@
 import pytest
+from types import SimpleNamespace
 
 import football_predictor as fp
 import mcp_evidence as me
@@ -16,6 +17,48 @@ def primary_evidence(collected_at="2026-08-10T20:00:00+08:00"):
             f"- 已核验事实{number} | source(https://example.test/{number}) | collected_at({collected_at})",
         ))
     return "\n".join(rows)
+
+
+def test_k3_evidence_auditor_uses_model_temperature_override():
+    requests = []
+
+    class Completions:
+        def create(self, **kwargs):
+            requests.append(kwargs)
+            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="{}"))])
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=Completions()))
+
+    predict.call_evidence_auditor(client, "证据审计", [])
+
+    assert requests
+    assert all(request["temperature"] == 1.0 for request in requests)
+    assert all(request["max_tokens"] == 4096 for request in requests)
+
+
+def test_evidence_auditor_retries_once_after_unknown_evidence_id():
+    responses = [
+        '{"usable_evidence_ids":["E999"],"unusable_evidence_ids":[],"conflict_evidence_ids":[],"gaps":[],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"first"}',
+        '{"usable_evidence_ids":["E1"],"unusable_evidence_ids":[],"conflict_evidence_ids":[],"gaps":[],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"second"}',
+    ]
+    requests = []
+
+    class Completions:
+        def create(self, **kwargs):
+            requests.append(kwargs)
+            return SimpleNamespace(choices=[SimpleNamespace(
+                message=SimpleNamespace(content=responses.pop(0))
+            )])
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=Completions()))
+    catalog = [{"id": "E1", "status": "SINGLE_SOURCE"}]
+
+    result = predict.call_evidence_auditor(client, "证据审计", catalog)
+
+    assert result["status"] == "ok"
+    assert result["usable_evidence_ids"] == ["E1"]
+    assert len(requests) == 2
+    assert "audit_unknown_evidence_id" in requests[1]["messages"][-1]["content"]
 
 
 def test_report_accepts_serialized_score_keys():
