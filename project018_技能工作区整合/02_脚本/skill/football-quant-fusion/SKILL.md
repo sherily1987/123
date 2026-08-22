@@ -31,7 +31,7 @@ python $cli --help
 | 当前版本还差多少样本 | `version-progress` |
 | 统一工单读写 | `job` |
 | 影子 hybrid（不登记） | `hybrid-shadow` |
-| 盘后伤停 / T-75 首发（只写研究库） | `late-info` |
+| 赛前证据回补（只写研究库） | `llm-evidence` + `evidence_orchestrator.py` |
 | 赛事模拟 | `tournament`，仅在赛制和输入已核验时 |
 | 双回合晋级 | 先分别计算每场90分钟，再显式处理总比分、加时和点球；没有统一 CLI 时不得声称已自动完成 |
 
@@ -85,13 +85,17 @@ python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\fusion
 
 `--research-route` 的输出必须带 `research_only=true`，不能写入正式预测登记库或 current cohort。`--production-route` 仅运行生产安全路由和 shadow 候选，不表示候选模型已获准融合。
 
-LLM轨只负责证据整理和定性分析。DeepSeek先分析、Kimi K3与GLM复核投票时，仍必须分别展示来源、弃权理由、`action` 和 `reason`；不得把共识票数当概率。真实生产 LLM 工程位于本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/`（2026-08-16 迁入），可用环境变量 `FOOTBALL_LLM_ROOT` 覆盖：
+LLM轨只负责证据整理和定性分析。生产默认只调用 Kimi K3；其它模型只能显式传参做隔离实验，不能把票数当概率或共识。每条输出必须展示来源、缺口、`action` 和 `reason`。真实生产 LLM 工程位于本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/`（2026-08-16 迁入），可用环境变量 `FOOTBALL_LLM_ROOT` 覆盖：
 
 ```powershell
-python $cli llm-evidence --input match.json --out-dir evidence --watch-refresh --refresh-before-minutes 75
+python $cli llm-evidence --input match.json --out-dir evidence
 ```
 
-证据链应采集两队最近5场、CRS/TTG/HAFU，并在开球前约75分钟重新拉取首发和伤停。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。
+证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发。
+本地 HTTP/Playwright 优先；失败项写入 `browser_tasks.json`，由当前 Codex 浏览器回补并落成可审计快照。
+所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
+仅剩体彩赔率时 K3 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
+禁止 EV/Kelly/下注推荐。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。
 
 ## 凯利研究路径（2026-08-18 固化）
 
@@ -125,8 +129,10 @@ current cohort 以 `model_version + probability_signature` 识别。概率算法
 
 ```powershell
 python $cli odds-intl --match-file raw.json
-python $cli late-info --from-collect raw.json
-python $cli late-info --from-collect raw.json --watch
+python $cli llm-evidence --input raw.json --out-dir evidence
+python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\evidence_orchestrator.py \
+  --input raw.json --sources crawl_sources.json --snapshot-dir crawl_snapshots \
+  --browser-task-file evidence/browser_tasks.json
 python $cli hybrid-shadow --input raw.json --sales-day YYYY-MM-DD
 python $cli hybrid-shadow --score --sales-day YYYY-MM-DD
 python $cli job --input match.json --quant model_output.json --out job.json

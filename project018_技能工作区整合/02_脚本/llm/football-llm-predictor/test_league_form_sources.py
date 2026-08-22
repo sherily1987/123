@@ -23,19 +23,16 @@ def test_jleague_uses_official_site_and_fotmob():
     assert "id=223" in " ".join(got["urls"])
 
 
-def test_collect_defaults_include_previous_season_and_two_source_xi():
+def test_collect_defaults_describe_real_snapshot_only_policy():
     import evidence_collect_defaults as ecd
     form = "\n".join(ecd.form_lines("西甲", "2026-08-16T12:00:00+08:00"))
-    assert "对其他对手" in form
-    assert "不得当「无近5场」" in form
+    assert "正式比赛页面/API快照" in form
+    assert "候选 URL 不是事实" in form
     assert "https://understat.com/getLeagueData/La_liga/2025" in form
     lineup = "\n".join(ecd.lineup_lines("2026-08-16T12:00:00+08:00", league="西甲"))
-    assert "两个独立媒体" in lineup
-    assert "20个独立主机投票" in lineup
-    assert "得票最高的缺阵名单直接当可用伤停" in lineup
-    assert "不得因官方未出整维弃权" in lineup
-    assert "源1 sportsmole.co.uk" in lineup
-    assert lineup.count("- 源") == 20
+    assert "真实页面/API快照" in lineup
+    assert "不是本场事实" in lineup
+    assert "源1 sportsmole.co.uk" not in lineup
 
 
 def test_unknown_league_does_not_invent_fotmob_id():

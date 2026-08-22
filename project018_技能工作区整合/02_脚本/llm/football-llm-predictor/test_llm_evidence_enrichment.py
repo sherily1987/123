@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import llm_evidence_enrichment as lee
 
@@ -29,15 +29,6 @@ def test_render_recent_form_limits_each_team_to_five():
                                    "away": [dict(row, home="Man City", away="Inter") for _ in range(6)]}, COLLECTED)
     assert text.count("- 主队近况:") == 5
     assert text.count("- 客队近况:") == 5
-
-
-def test_refresh_due_has_closed_t75_open_kickoff_boundary():
-    kickoff = datetime(2026, 8, 16, 14, 0, tzinfo=timezone.utc)
-    assert lee.refresh_due(kickoff, kickoff - timedelta(minutes=76)) is False
-    assert lee.refresh_due(kickoff, kickoff - timedelta(minutes=75)) is True
-    assert lee.refresh_due(kickoff, kickoff - timedelta(minutes=1)) is True
-    assert lee.refresh_due(kickoff, kickoff) is False
-    assert lee.refresh_due(kickoff, kickoff + timedelta(seconds=1)) is False
 
 
 def test_write_canonical_snapshot_archives_previous_content(tmp_path):

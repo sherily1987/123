@@ -54,11 +54,11 @@ def test_legacy_k3_only_aggregate_is_research_only_not_100_percent_consensus():
     assert result["avg_confidence"] is None
 
 
-def test_evidence_prompts_are_neutral_and_allow_abstention():
+def test_evidence_prompts_are_neutral_and_allow_observe_only_odds():
     for model in fp.DEFAULT_MODELS:
         prompt = lpr.system_prompt_evidence(model, fp.DEFAULT_MODELS)
-        assert '"decision":"abstain"' in prompt
-        assert '"direction":null' in prompt
+        assert '"decision":"opinion"' in prompt
+        assert '"reason_codes":["ONLY_ODDS"]' in prompt
         assert "evidence_ids" in prompt
         assert "近5场" in prompt
         assert "不得编造伤停" in prompt
@@ -67,9 +67,9 @@ def test_evidence_prompts_are_neutral_and_allow_abstention():
         assert "probs_1x2" in prompt and "top_scores" in prompt
         assert "这五项禁止 null" in prompt
         assert "量化轨校准概率" in prompt
-        assert "不得单独弃权" in prompt
-        assert "两个独立媒体" in prompt
-        assert "对其他对手" in prompt
+        assert "下游会强制 confidence=null" in prompt
+        assert "占位文本" in prompt
+        assert "不得用投票" in prompt
         for biased in ("平局与低比分比想象中多", "优先低比分", "专猎冷门"):
             assert biased not in prompt
 
@@ -81,8 +81,8 @@ def test_deepseek_audit_prompt_has_no_result_direction_fields():
     assert '"direction"' not in prompt
     assert "不得输出胜平负" in prompt
     assert "近况0.30" not in prompt
-    assert "不得把整维阵容标不可用" in prompt
-    assert "不得把整维近况标不可用" in prompt
+    assert "不得用投票" in prompt
+    assert "占位文本" in prompt
     assert "程序按目录状态自动推导" in prompt
 
 
@@ -184,9 +184,8 @@ def test_prompt_uses_evidence_collection_timestamp_not_hardcoded_date():
     prompt = pr.build_evidence_prompt({"home": "A", "away": "B"}, SIX_SECTIONS, 1)
     assert "采集时间 2026-08-10T09:00:00+08:00" in prompt
     assert "采集时间 2026-08-05" not in prompt
-    assert "对其他对手" in prompt
-    assert "两个独立媒体" in prompt
-    assert "不得当无近5场" in prompt
+    assert "来源/时间门禁" in prompt
+    assert "不得用投票" in prompt
 
 
 def test_cli_missing_evidence_is_json_and_never_initializes_llm(tmp_path, monkeypatch, capsys):

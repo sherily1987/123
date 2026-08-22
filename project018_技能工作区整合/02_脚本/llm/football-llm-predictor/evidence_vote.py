@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""20 源投票：首发 / 伤停 / 近 5 场。以后每场都按这个采。
+"""历史投票包兼容层。
 
 标准全文：EVIDENCE_COLLECT.md
   1) new_pack() 开 20 槽空包 → data/vote_packs/sporttery-<id>.json
@@ -58,14 +58,9 @@ BLOCKED = frozenset({"besoccer.com", "whoscored.com", "forebet.com", "fbref.com"
 
 # 采集硬规则。改这里等于改以后所有场次。
 COLLECT_RULES = (
-    "每场必须走 20 独立主机投票：首发、伤停、近5场都投。"
-    "两家独立媒体对同一位置/同一人缺阵/同一比分一致即写入。"
-    "平票取票多一侧；再平取结构化阵型页（FotMob/Flashscore/ESPN）。"
-    "投票结果就是可用数据，不再等官方。"
-    "封锁源占槽不采正文。转载不另计。403/验证码记缺口不绕过。"
-    "揭幕战用对其他对手的最近正式赛，不得当无近5场。热身票低于正式赛不采用。"
-    "空表/fully fit 票低于点名缺阵则不采用。伤停表有名但仍写进预测首发的不进缺阵名单。"
-    "开球后不得用新的 collected_at 写赛前票。"
+    "历史投票包仅作待采任务清单，不是事实来源。首发、伤停和近5场必须来自"
+    "可审计的 API/网页快照；页面身份、来源、采集时间和开球前门禁全部通过后才能写入。"
+    "验证码、403、重定向到其他域名或缺少关键词都记为缺口，不绕过。"
 )
 
 
@@ -116,40 +111,31 @@ def render_source_lines(pack: dict) -> list[str]:
 
 
 def render_voted_facts(pack: dict) -> tuple[list[str], list[str]]:
-    """Return (section1 extra lines, section3 extra lines)."""
+    """Return verified facts only; legacy vote fields are deliberately ignored."""
+    verified = pack.get("verified_facts")
+    if not isinstance(verified, list) or not verified:
+        return [], []
     at = pack.get("collected_at") or ""
-    src = pack.get("canonical_source") or "policy://vote-20"
-    sec1 = render_source_lines(pack) + [
-        f"- 二十源整合预测首发（{pack.get('home_xi', {}).get('formation', '')}，{pack.get('home')}）："
-        f"{pack.get('home_xi', {}).get('line', '')}。"
-        f"{pack.get('home_xi', {}).get('tally', '计票见 vote_packs。')}"
-        f"两个独立媒体对同一位置一致，视为可用首发 |"
-        f" source({src}) | collected_at({at})",
-        f"- 二十源整合预测首发（{pack.get('away_xi', {}).get('formation', '')}，{pack.get('away')}）："
-        f"{pack.get('away_xi', {}).get('line', '')}。"
-        f"{pack.get('away_xi', {}).get('tally', '')}"
-        f"两个独立媒体对同一位置一致，视为可用首发 |"
-        f" source({src}) | collected_at({at})",
-        f"- 二十源整合伤停（得票最高，当可用伤停，不再等官方）：{pack.get('injury_line', '')} |"
-        f" source({src}) | collected_at({at})",
-    ]
-    sec3 = [
-        f"- 二十源整合投票近5场（得票最高，对其他对手的最近正式赛）。揭幕战不得当「无近5场」 |"
-        f" source({src}) | collected_at({at})",
-        f"- {pack.get('home')}近5场（新到旧，投票结果）：{pack.get('home_form_line', '')} |"
-        f" source({src}) | collected_at({at})",
-        f"- {pack.get('away')}近5场（新到旧，投票结果）：{pack.get('away_form_line', '')} |"
-        f" source({src}) | collected_at({at})",
-    ]
+    sec1, sec3 = [], []
+    for fact in verified:
+        if not isinstance(fact, dict) or fact.get("section") not in (1, 3):
+            continue
+        source = fact.get("source") or pack.get("canonical_source") or ""
+        collected = fact.get("collected_at") or at
+        line = f"- {fact.get('text', '').strip()} | source({source}) | collected_at({collected})"
+        (sec1 if fact.get("section") == 1 else sec3).append(line)
     return sec1, sec3
 
 
-def _strip_old_vote_lines(section: str) -> str:
+def _strip_old_vote_lines(section: str, verified: list[dict] | None = None) -> str:
+    verified_texts = {str(item.get("text", "")).strip() for item in (verified or []) if isinstance(item, dict)}
     keep = []
     for line in section.splitlines():
         if line.startswith("- 二十源整合") or line.startswith("- 源"):
             continue
         if "近5场（新到旧，投票结果）" in line:
+            continue
+        if any(text and text in line for text in verified_texts):
             continue
         keep.append(line)
     return "\n".join(keep).rstrip()
@@ -158,15 +144,17 @@ def _strip_old_vote_lines(section: str) -> str:
 def merge_into_evidence(text: str, pack: dict) -> str:
     """Insert voted facts after each section heading. Idempotent."""
     sec1, sec3 = render_voted_facts(pack)
+    if not sec1 and not sec3:
+        return text
     parts = re.split(r"(?=^## )", text or "", flags=re.M)
     out = []
     for part in parts:
         if part.startswith("## 1."):
-            body = _strip_old_vote_lines(part)
+            body = _strip_old_vote_lines(part, pack.get("verified_facts"))
             head, _, rest = body.partition("\n")
             part = head + "\n" + "\n".join(sec1) + (("\n" + rest.lstrip("\n")) if rest else "")
         elif part.startswith("## 3."):
-            body = _strip_old_vote_lines(part)
+            body = _strip_old_vote_lines(part, pack.get("verified_facts"))
             head, _, rest = body.partition("\n")
             part = head + "\n" + "\n".join(sec3) + (("\n" + rest.lstrip("\n")) if rest else "")
         if out and not out[-1].endswith("\n"):

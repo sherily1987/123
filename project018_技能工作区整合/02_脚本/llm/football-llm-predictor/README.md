@@ -89,12 +89,19 @@ python fetch_sporttery_full.py --date 2026-08-05 --method all \
 cd "$LLM"
 python predict.py --input data/raw_2026-08-05.json --evidence-dir data/evidence_2026-08-05
 
-# 2a) 自动加入最近5场、CRS/TTG/HAFU，并在T−75刷新伤停/首发
+# 2a) 单次采集结构化证据；不会等待固定分钟数，也不会周期刷新
 python mcp_evidence.py --input data/raw_2026-08-05.json \
-    --out-dir data/evidence_2026-08-05 \
-    --watch-refresh --refresh-before-minutes 75 --poll-seconds 60
+    --out-dir data/evidence_2026-08-05
 
-# 2b) 生成报告 (Markdown + Excel)
+# 2b) 本地 HTTP/Playwright 优先抓取；失败项生成 Codex 浏览器回补任务
+python evidence_orchestrator.py --input data/raw_2026-08-05.json \
+    --sources data/crawl_sources_2026-08-05.json \
+    --snapshot-dir data/crawl_snapshots/2026-08-05 \
+    --browser-task-file data/evidence_2026-08-05/browser_tasks.json \
+    --evidence-dir data/evidence_2026-08-05
+
+# 2c) 浏览器完成任务并把 JSON 快照写入 snapshot-dir 后，重新运行上一步，再预测
+# 2d) 生成报告 (Markdown + Excel)
 python export_report.py data/predictions_2026-08-05.txt data/raw_2026-08-05.json
 
 # 3) 赛后采集赛果，回测预测（旧文本回测）
@@ -108,7 +115,12 @@ python evaluate_llm_track.py \
     --output data/llm_track_evaluation.json
 ```
 
-watcher 在开球前会持续重试；只有 API-Sports 已给出首发或证据已满足首发条件时才停止刷新。旧 canonical 证据归档至 `snapshots/`，开球后禁止生成新的赛前证据。
+采集器只运行一次。缺失项进入 `browser_tasks.json`，由当前 Codex 会话的浏览器人工/编排回补；
+浏览器结果可用 `evidence_orchestrator.write_browser_snapshot(...)` 写成统一 JSON 快照，
+再重新运行编排器合并。
+浏览器快照必须通过身份、域名、关键词和开球前时间门禁后才能进主证据。无法回补就保留缺口。
+仅剩体彩赔率时仍允许 K3 输出观察性研究意见，但强制 `evidence_gap=true`、`confidence=null`、
+`action=observe`，不计算 EV/Kelly、不生成下注推荐。旧 canonical 证据仍归档至 `snapshots/`。
 
 `predict.py` 会把官方赔率（胜平负/让球/总进球/比分/半全场）+ 六类证据拼进每个模型的提示词，
 模型参考赔率但保留独立判断；输出综合预测 + 官方赔率隐含概率对照。

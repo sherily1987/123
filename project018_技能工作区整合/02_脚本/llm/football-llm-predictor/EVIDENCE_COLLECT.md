@@ -1,37 +1,33 @@
-# LLM 证据采集标准（20 源投票）
+# LLM 证据采集标准（单次、可审计）
 
-以后每场都按这个模式采。投票结果就是可用首发、可用伤停、可用近 5 场，不再等官方。
+每场在一个采集窗口内尽量完成结构化 API 与网页抓取。只有通过身份、来源域名、
+采集时间早于开球和关键词门禁的事实才能进入提示词；找不到就写缺口，不用投票或常识补齐。
 
 对照成品：`data/evidence_rerun33/evidence_031_加的夫城_雷克斯.md`、`evidence_022_西班牙人_莱万特.md`、`evidence_032_拉科_埃尔切.md`。
 
-## 必须投票的三件事
+## 必须采集的三类事实
 
 1. 预测十一人（按位置计票，不是整份名单一刀切）
 2. 缺阵/停赛
 3. 对其他对手的最近最多 5 场正式赛
 
-## 计票规则
+## 采集与验证规则
 
-- 开 20 个独立主机槽。名单由 `evidence_vote.slot_hosts(联赛)` 给出；最后两槽按联赛换成地区媒体 + 官网。
-- 两个独立媒体对同一位置、同一人缺阵、同一场比分一致，即可写入。
-- 平票取票多一侧；再平取结构化阵型页（FotMob / Flashscore / ESPN）。
-- 封锁源只占槽、不采正文：`besoccer.com`、`whoscored.com`、`forebet.com`、`fbref.com`。
-- 转载不算第二家（Yahoo = BBC，OneFootball = 原报社）。
+- 来源清单由 `crawl_sources_YYYY-MM-DD.json` 显式声明；不再用 20 槽投票替代事实。
+- 本地 HTTP/Playwright 优先；失败或需要当前 Codex 浏览器时生成 `browser_tasks.json`。
+- 浏览器快照由 `evidence_orchestrator.merge_browser_snapshots` 再次验证后才可合并。
 - 403 / 验证码 / 人机验证：记缺口，不绕过。
-- 揭幕战或该队本季第一场：用对其他对手的上季或最近正式赛，不得当「无近 5 场」。
-- 热身票数低于正式赛则不采用。
-- 空表 / fully fit 票数低于点名缺阵则不采用。
-- 伤停表有名但仍被写成预测首发的，不进缺阵名单（评估票多于确认缺席同理）。
+- 揭幕战没有可核验的上季或最近正式赛时，明确标记 FORM_UNAVAILABLE。
+- 热身赛不当正式近5场；不齐的比分不编造。
 - 对不齐的比分不编造。写已对齐的场次即可，最多 5 场。
 - `collected_at` 必须早于开球。已经开球的场次不得用新的赛前票；开球后确认阵容不得回写成预测票。
 
 ## 落盘步骤
 
-1. `evidence_vote.new_pack(...)` 开空包，写入 `data/vote_packs/sporttery-<体彩id>.json`。
-2. 按 源1…源20 填每家看到的 XI / 伤停 / 近 5 场（没有就写「无十一人」或「仅伤停」）。
-3. 按位置计票，写入 `home_xi` / `away_xi` / `injury_line` / `home_form_line` / `away_form_line`。
-4. 证据保持六节。第 1 节放 源1–20 + 三条「二十源整合」；第 3 节放投票近 5 场。
-5. `runner.prepare_llm_evidence` 会自动 `apply_pack_file`。手工文件也可直接写成对照成品那样。
+1. `mcp_evidence.py` 完成一次结构化 API/MCP 采集。
+2. `evidence_orchestrator.py` 调用本地抓取并输出 `browser_tasks.json`。
+3. Codex 浏览器把任务结果保存为带 `url/final_url/crawled_at/markdown` 的 JSON 快照。
+4. 重新运行编排器，验证通过的事实才写入主证据；预测程序读取同一目录。
 
 ## 评测入口
 
@@ -48,8 +44,8 @@ python evaluate_llm_track.py \
 
 ## 禁止
 
-- 不得因官方未出而整维弃权。
-- 不得把整维阵容或近况标不可用。
+- 不得用投票、占位文本或模型常识补齐缺失事实。
+- 不得把候选 URL、抓取失败或 UNAVAILABLE 当成事实。
 - 不得只用一家预测站交差。
 - 不得把 Playwright 当验证码绕过工具。
 

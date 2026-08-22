@@ -31,6 +31,7 @@ import model_weights as mw
 import ev_calculator as evc
 import fusion_probability_source as fps
 import llm_track_contract as ltc
+import evidence_orchestrator as eo
 
 def load_evidence(evidence_dir):
     """读取证据目录下所有 md 文件, 返回 {文件名: 内容}。"""
@@ -81,7 +82,10 @@ REQUIRED_EVIDENCE_SECTIONS = {
     5: r"赔率",
     6: r"身份|核验",
 }
-EVIDENCE_GAP_MARKERS = ("证据缺口", "未检索到", "未拿到", "未做", "不足", "缺失")
+EVIDENCE_GAP_MARKERS = (
+    "证据缺口", "未检索到", "未拿到", "未做", "不足", "缺失",
+    "UNAVAILABLE", "FORM_UNAVAILABLE", "LINEUP_UNAVAILABLE",
+)
 AGGREGATION_RULE_VERSION = "evidence-direction-v1"
 AGGREGATION_RULE_SPEC = {
     "alt_direction_weight": 0.5,
@@ -122,7 +126,7 @@ def _require_aware_datetime(value):
     return parsed
 
 
-def assess_evidence(evidence_text, kickoff=None, now=None):
+def assess_evidence(evidence_text, kickoff=None, now=None, *, allow_odds_only=False):
     """Validate the minimum evidence contract before any LLM client is used."""
     if not evidence_text or not evidence_text.strip():
         return {"ok": False, "reason": "missing_evidence_file"}
@@ -145,7 +149,12 @@ def assess_evidence(evidence_text, kickoff=None, now=None):
         content_fact_lines.append(line)
         if "source(" not in line.lower() or "collected_at(" not in line.lower():
             return {"ok": False, "reason": "fact_missing_source_or_collected_at"}
-    if not content_fact_lines or all(any(marker in line for marker in EVIDENCE_GAP_MARKERS) for line in content_fact_lines):
+    non_market_fact_lines = [line for line in content_fact_lines
+                             if not re.search(r"体彩|赔率|CRS|TTG|HAFU|让球", line, re.I)]
+    only_gaps = (not non_market_fact_lines or
+                 all(any(marker in line for marker in EVIDENCE_GAP_MARKERS)
+                     for line in non_market_fact_lines))
+    if only_gaps and not allow_odds_only:
         return {"ok": False, "reason": "only_evidence_gaps"}
     collected_raw = re.findall(r"collected_at\(\s*([^)]*?)\s*\)", evidence_text, re.I)
     collected_times = [_parse_evidence_datetime(value) for value in collected_raw]
@@ -173,7 +182,8 @@ def assess_evidence(evidence_text, kickoff=None, now=None):
             return _evidence_time_rejection("incomparable_collected_at_and_kickoff")
     return {
         "ok": True,
-        "evidence_gap": any(marker in evidence_text for marker in EVIDENCE_GAP_MARKERS),
+        "evidence_gap": only_gaps or any(marker in evidence_text for marker in EVIDENCE_GAP_MARKERS),
+        "collection_status": "ONLY_ODDS" if only_gaps and allow_odds_only else None,
         "evidence_file_sha256": hashlib.sha256(evidence_text.encode("utf-8")).hexdigest(),
         "evidence_collected_at_min": collected_raw[collected_times.index(earliest)],
         "evidence_collected_at_max": collected_raw[collected_times.index(latest)],
@@ -315,8 +325,8 @@ def build_evidence_prompt(match, evidence_text, match_idx):
     lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
     lines.append(
         "\n只使用上述 E 编号。decision=opinion 时必须给出 probs_1x2、比分Top3、大小球、半全场，不得留空。"
-        "近5场用证据里 20 源投票得票最高的正式赛果，不再等官方联赛页。揭幕战/该队本季第一场必须用该队对其他对手的最近正式赛，不得当无近5场。"
-        "首发和伤停都用证据里 20 源投票得票最高的名单，不再等官网。两个独立媒体对同一位置一致即可写入，不得因官方未出单独弃权。"
+        "近5场、首发和伤停只用目录中已通过来源/时间门禁的真实快照；未采集到就写缺口，不得用投票、占位文本或常识补齐。"
+        "仅赔率时仍给观察性 opinion，但不得把赔率外推成基本面，且下游强制 observe。"
     )
     return "\n".join(lines)
 
@@ -1010,23 +1020,33 @@ def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
         lowered = text.lower()
         return any(term.lower() in lowered for term in terms)
 
+    def has_usable(*terms):
+        for line in text.splitlines():
+            lowered = line.lower()
+            if not line.lstrip().startswith(("-", "*")) or "source(" not in lowered:
+                continue
+            if any(term.lower() in lowered for term in terms) and not any(
+                marker in line for marker in EVIDENCE_GAP_MARKERS
+            ):
+                return True
+        return False
+
     evidence = {
-        "recent_form": {"home": [1] if has("近5场", "最近5场", "近况") else [],
-                        "away": [1] if has("近5场", "最近5场", "近况") else []},
+        "recent_form": {"home": [1] if has_usable("近5场", "最近5场", "近况") else [],
+                        "away": [1] if has_usable("近5场", "最近5场", "近况") else []},
         "crs": match.get("crs") or ([1] if has("CRS", "比分赔率") else []),
         "ttg": match.get("ttg") or ([1] if has("TTG", "总进球赔率") else []),
         "hafu": match.get("hafu") or ([1] if has("HAFU", "半全场赔率") else []),
         "injuries_status": "UNAVAILABLE" if has("伤停状态=UNAVAILABLE", "伤停=UNAVAILABLE")
-        else ("AVAILABLE" if has("伤停") else "UNAVAILABLE"),
+        else ("AVAILABLE" if has_usable("伤停", "缺阵") else "UNAVAILABLE"),
         "lineups_status": "UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
-        else ("AVAILABLE" if has("首发") else "UNAVAILABLE"),
+        else ("AVAILABLE" if has_usable("首发", "阵容") else "UNAVAILABLE"),
         "collected_at": evidence_status.get("evidence_collected_at_max"),
-        "t75_refresh": evidence_status.get("t75_refresh") or {
-            "attempted": has("T-75", "T75", "75分钟"),
-            "status": "OBSERVED_IN_TEXT" if has("T-75", "T75", "75分钟") else "NOT_ATTEMPTED",
-        },
     }
-    return ltc.build_evidence_manifest(match, evidence)
+    manifest = ltc.build_evidence_manifest(match, evidence)
+    if evidence_status.get("collection_status") == "ONLY_ODDS":
+        manifest["collection_status"] = "ONLY_ODDS"
+    return manifest
 
 
 def build_skip_audit_record(predictions, models_used, prompt, evidence_status,
@@ -1111,9 +1131,12 @@ def main():
         now = datetime.now(timezone.utc)
         ev_name = match_evidence_file(match_idx, evidence_files)
         mcp_name = match_mcp_file(match_idx, evidence_files, match=m)
+        odds_available = bool(m.get("model_odds") or m.get("crs") or m.get("ttg") or m.get("hafu"))
         if ev_name:
             primary_evidence = evidence_files[ev_name]
-            evidence_status = assess_evidence(primary_evidence, kickoff=kickoff, now=now)
+            evidence_status = assess_evidence(
+                primary_evidence, kickoff=kickoff, now=now, allow_odds_only=odds_available
+            )
             if not evidence_status["ok"]:
                 print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
                 continue
@@ -1139,7 +1162,9 @@ def main():
                 print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": mcp_status["reason"]}, ensure_ascii=False))
                 continue
             ev_text = evidence_files[mcp_name]
-            evidence_status = assess_evidence(ev_text, kickoff=kickoff, now=now)
+            evidence_status = assess_evidence(
+                ev_text, kickoff=kickoff, now=now, allow_odds_only=odds_available
+            )
             if not evidence_status["ok"]:
                 print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
                 continue
@@ -1150,6 +1175,9 @@ def main():
         # 仅在内存中交给契约清单生成器，正式记录仍保存哈希和时间戳，
         # 不把整篇原始证据重复嵌入预测 JSON。
         evidence_status["evidence_text"] = ev_text
+        evidence_manifest = _build_llm_evidence_manifest(m, evidence_status, ev_text)
+        evidence_status["collection_status"] = evidence_manifest.get("collection_status")
+        evidence_status["gap_sections"] = evidence_manifest.get("gap_sections", [])
 
         print("=" * 64)
         print(f"⚽ 第{i}/{len(selected_matches)}场 [{idx}] {m['home']} VS {m['away']} | {m.get('league', '')} | {m.get('kickoff_local', '')}")
@@ -1210,6 +1238,7 @@ def main():
             continue
 
         if agg.get("single_model"):
+            agg = eo.apply_collection_degradation(agg, evidence_status.get("collection_status", "PARTIAL"))
             print(f"\n  🔎 K3 单模型研究意见: {agg['direction']}（非共识，不显示强度/概率）")
             print(f"  🚫 下注建议: 跳过（{agg['reason']}）")
             top3 = agg.get("top_scores") or ([agg["top_score_pref"]] if agg.get("top_score_pref") else [])
@@ -1225,6 +1254,7 @@ def main():
             ), ensure_ascii=False))
             continue
 
+        agg = eo.apply_collection_degradation(agg, evidence_status.get("collection_status", "PARTIAL"))
         breaker_results.append((match_idx, m, dict(agg)))
 
         print(f"\n  📊 综合方向: {agg['direction']}  "
@@ -1256,7 +1286,10 @@ def main():
         # ---------- EV 下注推荐 ----------
         mo = m.get("model_odds") or []
         ev_rec = None
-        if all(isinstance(x, (int, float)) and x > 0 for x in mo[:3]) if len(mo) >= 3 else False:
+        if evidence_status.get("collection_status") == "ONLY_ODDS":
+            ev_rec = {"action": "skip", "reason": "odds_only_evidence"}
+            print("\n  💰 下注推荐: 跳过(仅有官方赔率，无独立证据；不计算EV/Kelly)")
+        elif all(isinstance(x, (int, float)) and x > 0 for x in mo[:3]) if len(mo) >= 3 else False:
             # 概率来源取轨道A融合引擎的 final_1x2_pct（核心引擎按联赛校准过的真概率）。
             # 取不到就传 None，ev_calculator 会 fail closed——**不得回退到投票比例**。
             fusion_probs = fps.load_fusion_probabilities(m.get("match_id"))
@@ -1290,8 +1323,12 @@ def main():
         # 把 skip 场次塞进推荐表的同一条通路，只不过那次发生在人工摘录环节。
         ev_results = (ev_rec.get("ev_analysis", {}) or {}) if (
             isinstance(ev_rec, dict) and ev_rec.get("action") == "bet") else {}
-        sp = decide_single_pick(agg, ev_results, fl, match=m)
-        print(f"  🎯 下注建议: {sp['pick']} (信心{sp['confidence']*100:.0f}%) | {sp['reason']}")
+        if evidence_status.get("collection_status") == "ONLY_ODDS":
+            sp = {"pick": None, "confidence": None, "reason": "odds_only_evidence", "skip": True}
+        else:
+            sp = decide_single_pick(agg, ev_results, fl, match=m)
+        confidence_text = "—" if sp.get("confidence") is None else f"{sp['confidence']*100:.0f}%"
+        print(f"  🎯 下注建议: {sp['pick'] or '观察'} (信心{confidence_text}) | {sp['reason']}")
         if fl.get("is_second_leg"):
             if fl.get("margin") is not None and fl["margin"] >= 2:
                 print(f"  ⚠️ 次回合战意提示: 首回合{fl.get('first_leg_score') or '?'}(净胜{fl['margin']}球) → 领先方可能轮换/保守, 平局概率上升")

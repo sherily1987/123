@@ -125,16 +125,6 @@ def parse_lineups_payload(data, match_id):
     return {"home": home, "away": away, "available": True}
 
 
-def should_retry_late_lineup_refresh(api_sports, lineups):
-    """Keep the T-75 watcher alive until either provider confirms a lineup."""
-    legacy_available = isinstance(lineups, dict) and bool(lineups.get("available"))
-    api_sports_available = (
-        isinstance(api_sports, dict)
-        and str(api_sports.get("lineups_status") or "").lower() == "ok"
-    )
-    return not (legacy_available or api_sports_available)
-
-
 def _fmt_players(rows, limit=11):
     out = []
     for r in (rows or [])[:limit]:
@@ -1002,9 +992,6 @@ def main():
     ap.add_argument("--seq", type=int, default=1, help="手动模式: 场次序号(证据文件序号)")
     ap.add_argument("--kickoff-iso", default="", help="手动模式: 带时区开球时间，例如 2026-08-10T17:00:00Z")
     ap.add_argument("--workers", type=int, default=4, help="并发数(服务器慢, 默认4)")
-    ap.add_argument("--watch-refresh", action="store_true", help="初次生成后监控至T-75并自动刷新")
-    ap.add_argument("--refresh-before-minutes", type=int, default=75)
-    ap.add_argument("--poll-seconds", type=int, default=60)
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -1112,7 +1099,6 @@ def main():
 
     # ---- 3. 生成文件 ----
     made = 0
-    contexts = []
     api_client = lee.ApiSportsClient()
     for item in manual:
         ri = item["ri"] + 1
@@ -1137,54 +1123,9 @@ def main():
         fname = f"evidence_{ri:03d}_{_safe_name(home_en)}_{_safe_name(away_en)}_mcp.md"
         path = os.path.join(args.out_dir, fname)
         written = lee.write_canonical_snapshot(path, block, datetime.now(timezone.utc).isoformat())
-        contexts.append({"item": item, "path": path, "kickoff": kickoff,
-                         "api_sports_home_names": api_sports_home,
-                         "api_sports_away_names": api_sports_away,
-                         "odds_list": odds_list, "pred": pred, "standings": standings,
-                         "h2h": h2h, "lineups": lineups})
         made += 1
         print(f"📄 {path} ({len(block)}字, archived={written['archived']})")
     print(f"\n✅ 完成, 生成 {made} 个 MCP 数据块 -> {args.out_dir}")
-
-    if args.watch_refresh and contexts:
-        pending = {str(ctx["item"].get("mid") or (ctx["item"].get("raw", {}).get("sporttery_meta", {}).get("match_id"))
-                       or ctx["item"]["ri"]): ctx for ctx in contexts if ctx.get("kickoff")}
-        print(f"👀 T-{args.refresh_before_minutes} watcher 启动, 待刷新 {len(pending)} 场", flush=True)
-        while pending:
-            now = datetime.now(timezone.utc)
-            for key, ctx in list(pending.items()):
-                kickoff_dt = datetime.fromisoformat(ctx["kickoff"].replace("Z", "+00:00"))
-                if now >= kickoff_dt.astimezone(timezone.utc):
-                    print(f"⛔ {key} 已开球, 禁止刷新", flush=True)
-                    pending.pop(key)
-                    continue
-                if not lee.refresh_due(kickoff_dt, now, args.refresh_before_minutes):
-                    continue
-                item = ctx["item"]
-                home_en, away_en = item.get("home_en", ""), item.get("away_en", "")
-                refreshed_api = api_client.collect_match(
-                    ctx.get("api_sports_home_names") or home_en,
-                    ctx.get("api_sports_away_names") or away_en,
-                    ctx["kickoff"],
-                )
-                try:
-                    refreshed_lineups = (parse_lineups_payload(fetch_lineups_rest(item["mid"]), item["mid"])
-                                         if item.get("mid") else None)
-                except Exception:
-                    refreshed_lineups = None
-                refreshed_block = build_block(
-                    item["raw"], item.get("cand") or {}, ctx["odds_list"], ctx["pred"],
-                    ctx["standings"], ctx["h2h"], item["mid"],
-                    lineups=refreshed_lineups, api_sports=refreshed_api)
-                written = lee.write_canonical_snapshot(
-                    ctx["path"], refreshed_block, datetime.now(timezone.utc).isoformat())
-                print(f"🔄 {key} T-{args.refresh_before_minutes} 刷新完成, archived={written['archived']}", flush=True)
-                if should_retry_late_lineup_refresh(refreshed_api, refreshed_lineups):
-                    print(f"⏳ {key} 首发尚未公布，将在开球前继续刷新", flush=True)
-                else:
-                    pending.pop(key)
-            if pending:
-                time.sleep(max(1, args.poll_seconds))
 
 
 if __name__ == "__main__":

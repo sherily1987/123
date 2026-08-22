@@ -46,7 +46,7 @@ def test_single_model_record_cannot_claim_consensus_or_bet():
     assert "SINGLE_MODEL_ACTION_NOT_OBSERVE" in result["reason_codes"]
 
 
-def test_evidence_manifest_preserves_unavailable_sections_and_t75_state():
+def test_evidence_manifest_preserves_unavailable_sections_without_t75_state():
     raw_match = {
         "match_id": "sporttery-2040999",
         "kickoff": "2026-08-22T20:00:00+08:00",
@@ -58,7 +58,6 @@ def test_evidence_manifest_preserves_unavailable_sections_and_t75_state():
         "recent_form": {"home": [{"result": "W"}], "away": []},
         "injuries_status": "UNAVAILABLE",
         "lineups_status": "UNAVAILABLE",
-        "t75_refresh": {"attempted": True, "status": "lineup_unavailable"},
         "collected_at": "2026-08-22T18:45:00+08:00",
     }
 
@@ -70,5 +69,7 @@ def test_evidence_manifest_preserves_unavailable_sections_and_t75_state():
     assert manifest["sections"]["ttg"]["status"] == "UNAVAILABLE"
     assert manifest["sections"]["hafu"]["status"] == "UNAVAILABLE"
     assert manifest["sections"]["lineups"]["status"] == "UNAVAILABLE"
-    assert manifest["t75_refresh"]["attempted"] is True
-
+    assert manifest["collection_mode"] == "single_pass"
+    assert manifest["collection_status"] == "PARTIAL"
+    assert manifest["gap_sections"] == ["recent_form", "crs", "ttg", "hafu", "injuries", "lineups"]
+    assert "t75_refresh" not in manifest

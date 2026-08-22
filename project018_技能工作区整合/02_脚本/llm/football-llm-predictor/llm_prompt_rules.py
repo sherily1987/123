@@ -253,25 +253,25 @@ def role_prompt_for(model: str, models_used: Optional[Sequence[str]] = None) -> 
 
 # ---------- JSON 规则：证据轨（direction） ----------
 JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外文字。
-证据不足示例（仅当可用维只剩赔率、或身份对不上）:
-{"decision":"abstain","direction":null,"alt_direction":null,"probs_1x2":null,"top_scores":null,"ou25":null,"hafu":null,"evidence_gap":true,"evidence_ids":["E1"],"unsupported_assumptions":[],"reason_codes":["ONLY_ODDS"],"summary":"除赔率外无可用基本面，弃权。"}
+仅赔率示例（仍给研究意见，但绝不下注）:
+{"decision":"opinion","direction":"主胜","alt_direction":"平局","probs_1x2":[45.0,30.0,25.0],"top_scores":["1-0","1-1","0-0"],"ou25":"小","hafu":"平胜","evidence_gap":true,"evidence_ids":["E5"],"unsupported_assumptions":["缺少近况、伤停、首发和战意的独立事实"],"reason_codes":["ONLY_ODDS"],"summary":"仅依据E5体彩市场作观察性研究意见；独立证据缺口，禁止下注。"}
 有足够证据示例（阵容有缺口仍须给方向）:
 {"decision":"opinion","direction":"主胜","alt_direction":"平局","probs_1x2":[48.0,28.0,24.0],"top_scores":["1-0","2-0","1-1"],"ou25":"小","hafu":"平胜","evidence_gap":true,"evidence_ids":["E2","E4"],"unsupported_assumptions":[],"reason_codes":["LINEUP_UNAVAILABLE"],"summary":"E2近况与E4主场支持主胜；官方首发未出，已标缺口。"}
 
 规则:
-1. decision 只能是 opinion 或 abstain。abstain 时 direction 与四个市场字段必须为 null。
+1. decision 只能是 opinion 或 abstain。仅赔率时仍输出 opinion；只有身份无法核验或没有任何可审计证据时才 abstain。abstain 时 direction 与四个市场字段必须为 null。
 2. opinion 时必须同时给出：direction（主胜/平局/客胜）、probs_1x2（主/平/客三位合计100）、top_scores（恰好3个比分）、ou25（大或小）、hafu（九宫格）。这五项禁止 null。
-3. evidence_ids 只能引用提示词中存在的 E 编号。UNAVAILABLE 和 SOURCE_CONFLICT 只能证明缺口/冲突，不能支持 opinion。
+3. evidence_ids 只能引用提示词中存在的 E 编号。UNAVAILABLE 和 SOURCE_CONFLICT 只能证明缺口/冲突；ONLY_ODDS 只能引用官方体彩市场，不得声称有独立基本面支持。
 4. 不得编造伤停、赛果或队名事实。必须假设的内容写入 unsupported_assumptions。官方首发未出、用上季近5场，不算必须弃权的未支持假设。
 5. probs_1x2 由第9条多维加权换算，一位小数，argmax 必须等于 direction。这是本模型的判断概率，不是量化轨校准概率，禁止冒充 xG 或精确到多位小数。
 6. top_scores 按可能性从高到低恰好3个竞彩比分；第1个必须与 direction 同向（主胜则主>客，客胜则客>主，平局则平局比分）。ou25 只能大/小。hafu 必须是胜胜/胜平/胜负/平胜/平平/平负/负胜/负平/负负之一。
 7. 口径仅为90分钟含补时，不含加时和点球。summary 限两句。
-8. 近5场：用证据里 20 源投票得票最高的最近最多5场正式赛，必须引用【近况】。揭幕战/该队本季第一场取对其他对手的上季或最近正式赛，不得当「无近5场」。热身票数低于正式赛则不采用。完全检索不到正式赛果才删近况权重，仍须 opinion。
-9. 多维加权（只给目录里可用的维打分；缺维删除该权后重标定，不得把缺维当 0 分中性或默认主队）:
+8. 近5场：只使用证据目录中逐场列出的正式赛果，必须引用【近况】；不得用投票、常识或占位文本补齐。完全检索不到正式赛果时写 FORM_UNAVAILABLE、evidence_gap=true，仍可给观察性 opinion。
+9. 多维加权（只给目录里可用的维打分；缺维删除该权后重标定，不得把缺维当 0 分中性或默认主队）。仅赔率时方向、比分和四玩法都只是观察性研究意见，probs_1x2 不是量化校准概率；下游会强制 confidence=null、action=observe，禁止 EV/Kelly/推荐:
    近况0.30 / 阵容0.22 / 战意0.15 / 赔率0.15 / 主客环境0.13。身份核验是门禁不是权重。
    各维对主队打 -2..+2，只能引用 E 编号事实。近况内部近5场按新到旧 5>4>3>2>1 加权（Dixon-Coles 1997 时间衰减的短窗近似）。
-   将加权和换算为 probs_1x2 并必须输出。仅赔率一维可用时必须 abstain。
-10. 不再等俱乐部官宣。20 源投票得票最高的名单直接当可用首发。伤停同样用 20 源投票得票最高的缺阵名单，不再等官方。两个独立媒体对同一位置一致即可写入。LINEUP_UNAVAILABLE / FORM_UNAVAILABLE 只能进 reason_codes 并 evidence_gap=true，不得单独弃权。"""
+   将加权和换算为 probs_1x2 并必须输出；仅赔率时只能按官方市场做观察性研究，不得把它当量化概率。
+10. 只允许写入页面或 API 快照中实际出现、且通过身份/时间/来源门禁的首发和伤停。不得用模型投票、占位文本或“通常首发”补齐。LINEUP_UNAVAILABLE / FORM_UNAVAILABLE 进 reason_codes 并 evidence_gap=true；仅赔率时仍输出观察意见，但不得把赔率外推成基本面事实。"""
 
 EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据可用性，不做比赛预测。
 不得输出胜平负、比分、大小球或半全场的任何方向。
@@ -282,7 +282,7 @@ EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据�
 2. gaps 只记录输入可推导的异常或缺口代码，不得补充输入中没有的事实。
 3. market_readiness 只评估证据是否足以供下游判断，不暗示任何结果；四个字段必须都是布尔值。
 4. summary 限两句，且不得包含方向、比分、大小球或半全场结论。
-5. 20 源投票得票最高的名单视为可用首发，不得把整维阵容标不可用。揭幕战用该队对其他对手的上季正式近5场或投票近5场，不得把整维近况标不可用。不得因官方未出整维弃权。"""
+5. 只接受输入中已有的、通过来源与时间门禁的首发/近况事实；未采集到就保留对应缺口，不得用投票、占位文本或上季常识填充。"""
 
 
 def system_prompt_evidence_audit() -> str:

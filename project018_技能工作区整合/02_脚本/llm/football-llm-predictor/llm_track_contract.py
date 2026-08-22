@@ -108,22 +108,27 @@ def build_evidence_manifest(raw_match: dict[str, Any], evidence: dict[str, Any])
     gaps = [name for name, item in sections.items() if item["status"] != "AVAILABLE"]
     if not gaps:
         overall = "COMPLETE"
-    elif len(gaps) == len(sections):
+    elif all(item["status"] == "UNAVAILABLE" for item in sections.values()):
         overall = "UNAVAILABLE"
     else:
         overall = "PARTIAL"
-    t75 = evidence.get("t75_refresh") or evidence.get("late_refresh") or {
-        "attempted": False,
-        "status": "NOT_ATTEMPTED",
-    }
+    independent = [name for name, item in sections.items()
+                   if name not in {"crs", "ttg", "hafu"}
+                   and item["status"] in {"AVAILABLE", "PARTIAL"}]
+    has_markets = any(raw_match.get(name) or evidence.get(name)
+                      for name in ("crs", "ttg", "hafu"))
+    if overall != "COMPLETE" and has_markets and not independent:
+        collection_status = "ONLY_ODDS"
+    else:
+        collection_status = overall
     return {
         "match_id": match_id,
         "kickoff": raw_match.get("kickoff_iso") or raw_match.get("kickoff"),
         "collected_at": evidence.get("collected_at") or evidence.get("evidence_collected_at"),
         "overall_status": overall,
+        "collection_mode": "single_pass",
+        "collection_status": collection_status,
         "required_sections": list(REQUIRED_EVIDENCE_SECTIONS),
         "gap_sections": gaps,
         "sections": sections,
-        "t75_refresh": dict(t75) if isinstance(t75, dict) else {"attempted": False, "status": "INVALID"},
     }
-

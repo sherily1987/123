@@ -7,7 +7,7 @@ import os
 import re
 import urllib.parse
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -67,11 +67,6 @@ def render_recent_form(payload, collected_at, meta=None):
                      f"{row.get('score_90')} {row.get('away')} | status={row.get('status')}")
             lines.append(_fact(label, value, source, collected_at))
     return "\n".join(lines)
-
-
-def refresh_due(kickoff, now, before_minutes=75):
-    delta = _dt(kickoff) - _dt(now)
-    return timedelta(0) < delta <= timedelta(minutes=before_minutes)
 
 
 def write_canonical_snapshot(path, text, collected_at):

@@ -27,7 +27,7 @@ def test_new_pack_is_the_default_collection_skeleton():
         league="西甲", collected_at="2026-08-17T12:00:00+08:00",
     )
     assert len(pack["sources"]) == 20
-    assert ev.COLLECT_RULES.startswith("每场必须走 20 独立主机投票")
+    assert "不是事实来源" in ev.COLLECT_RULES
     blocked = [s for s in pack["sources"] if "封锁" in s["note"]]
     pending = [s for s in pack["sources"] if s["note"] == "待采"]
     assert len(blocked) >= 2
@@ -57,7 +57,7 @@ def test_merge_keeps_section_headings_on_line_start(tmp_path, monkeypatch):
     raw = "## 1. 伤停/阵容\n- old\n\n## 2. 战意/动机\n- motive\n\n## 3. 近况/状态\n- old form\n"
     once = ev.apply_pack_file(raw, 1)
     twice = ev.apply_pack_file(once, 1)
-    assert twice == once
+    assert twice == raw
     assert "\n## 2. " in once
     assert "\n## 3. " in once
     assert once.count("## 3. ") == 1
@@ -76,16 +76,19 @@ def test_merge_inserts_voted_facts(tmp_path, monkeypatch):
         "injury_line": "Yeremay 伤缺",
         "home_form_line": "1-2 负拉斯帕尔马斯",
         "away_form_line": "1-1 平赫罗纳",
+        "verified_facts": [
+            {"section": 1, "text": "主队首发快照事实", "source": "https://www.fotmob.com/x", "collected_at": "2026-08-17T02:10:00+00:00"},
+            {"section": 3, "text": "主队近5场快照事实", "source": "https://www.fotmob.com/x", "collected_at": "2026-08-17T02:10:00+00:00"},
+        ],
     }
     ev.save_pack(pack)
     raw = "## 1. 伤停/阵容\n- old\n\n## 3. 近况/状态\n- old form\n"
     got = ev.apply_pack_file(raw, 2040922)
-    assert got.count("二十源整合预测首发") == 2
-    assert "二十源整合伤停" in got
-    assert "二十源整合投票近5场" in got
-    assert "不得当「无近5场」" in got
+    assert "主队首发快照事实" in got
+    assert "主队近5场快照事实" in got
+    assert "二十源整合" not in got
     again = ev.apply_pack_file(got, 2040922)
-    assert again.count("二十源整合伤停") == 1
+    assert again.count("主队首发快照事实") == 1
 
 
 def test_pack_sources_render_as_slot_lines(tmp_path, monkeypatch):
@@ -108,8 +111,6 @@ def test_pack_sources_render_as_slot_lines(tmp_path, monkeypatch):
     }
     ev.save_pack(pack)
     got = ev.apply_pack_file("## 1. 伤停/阵容\n\n## 3. 近况/状态\n", 2040907)
-    assert "源1 sportsmole.co.uk" in got
-    assert "封锁源占槽" in got
-    assert got.count("源1 ") == 1
+    assert got == "## 1. 伤停/阵容\n\n## 3. 近况/状态\n"
     again = ev.apply_pack_file(got, 2040907)
-    assert again.count("源1 sportsmole.co.uk") == 1
+    assert again == got
