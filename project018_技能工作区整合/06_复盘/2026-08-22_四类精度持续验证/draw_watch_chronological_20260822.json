@@ -1,0 +1,60 @@
+{
+  "schema_version": "sporttery-draw-watch-research-1.0",
+  "research_only": true,
+  "production_probabilities_changed": false,
+  "source_policy": "official Sporttery closing HAD -> existing power devig + existing league calibration",
+  "split": {
+    "method": "chronological_by_match_day",
+    "train_n": 1066,
+    "test_n": 284,
+    "train_through": "2026-06-04",
+    "test_from": "2026-06-05"
+  },
+  "train_selection": {
+    "decision": "selected_for_out_of_time_evaluation",
+    "margin": 0.115,
+    "metrics": {
+      "n": 1066,
+      "overall_accuracy": 0.5093808630393997,
+      "draw_predictions": 230,
+      "actual_draws": 287,
+      "draw_precision": 0.3739130434782609,
+      "draw_recall": 0.29965156794425085,
+      "draw_f1": 0.33268858800773693
+    },
+    "baseline_metrics": {
+      "n": 1066,
+      "overall_accuracy": 0.5140712945590994,
+      "draw_predictions": 12,
+      "actual_draws": 287,
+      "draw_precision": 0.5,
+      "draw_recall": 0.020905923344947737,
+      "draw_f1": 0.04013377926421405
+    },
+    "guards": {
+      "max_overall_accuracy_loss": 0.005,
+      "min_draw_precision": 0.3
+    },
+    "research_only": true,
+    "production_probabilities_changed": false
+  },
+  "test_baseline_argmax": {
+    "n": 284,
+    "overall_accuracy": 0.5492957746478874,
+    "draw_predictions": 6,
+    "actual_draws": 82,
+    "draw_precision": 0.5,
+    "draw_recall": 0.036585365853658534,
+    "draw_f1": 0.06818181818181818
+  },
+  "test_draw_watch": {
+    "n": 284,
+    "overall_accuracy": 0.545774647887324,
+    "draw_predictions": 53,
+    "actual_draws": 82,
+    "draw_precision": 0.37735849056603776,
+    "draw_recall": 0.24390243902439024,
+    "draw_f1": 0.2962962962962963
+  },
+  "source_file": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest\\snapshots\\sporttery_all_leagues_2026.jsonl"
+}

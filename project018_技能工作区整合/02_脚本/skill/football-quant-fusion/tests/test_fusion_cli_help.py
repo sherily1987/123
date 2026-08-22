@@ -15,3 +15,5 @@ def test_top_level_help_lists_supported_commands():
     assert "backtest" in completed.stdout
     assert "hybrid-evaluate" in completed.stdout
     assert "odds-intl-capture" in completed.stdout
+    assert "draw-watch-evaluate" in completed.stdout
+    assert "draw-ttg-shadow-research" in completed.stdout

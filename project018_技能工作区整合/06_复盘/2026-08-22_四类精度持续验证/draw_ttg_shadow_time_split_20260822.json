@@ -1,0 +1,72 @@
+{
+  "schema_version": "sporttery-ttg-draw-shadow-research-1.0",
+  "research_only": true,
+  "production_probability_adjustment_applied": false,
+  "source_policy": "official Sporttery closing HAD + TTG only; same-book derivative, not independent evidence",
+  "split": {
+    "method": "chronological_by_match_day",
+    "train_n": 977,
+    "test_n": 326,
+    "train_through": "2026-06-24",
+    "test_from": "2026-06-25"
+  },
+  "candidate": {
+    "ttg_under2_threshold": 0.45,
+    "focus_draw_k": 1.25,
+    "other_draw_k": 1.0,
+    "train_metrics": {
+      "n": 977,
+      "one_x2_brier": 0.5891806959358613,
+      "one_x2_logloss": 0.9881729244621698,
+      "draw_brier": 0.19219368531629827,
+      "top1_accuracy": 0.5220061412487206,
+      "mean_draw_probability": 0.27155257276295747,
+      "actual_draw_rate": 0.2712384851586489
+    },
+    "selection_metric": "one_x2_logloss"
+  },
+  "test_baseline": {
+    "n": 326,
+    "one_x2_brier": 0.5861118568035802,
+    "one_x2_logloss": 0.9766755647642691,
+    "draw_brier": 0.20400598778654358,
+    "top1_accuracy": 0.5276073619631901,
+    "mean_draw_probability": 0.2552417428370917,
+    "actual_draw_rate": 0.294478527607362
+  },
+  "test_shadow": {
+    "n": 326,
+    "one_x2_brier": 0.582985322426411,
+    "one_x2_logloss": 0.9715566301070426,
+    "draw_brier": 0.20178628888819883,
+    "top1_accuracy": 0.5368098159509203,
+    "mean_draw_probability": 0.27575555574348454,
+    "actual_draw_rate": 0.294478527607362
+  },
+  "test_paired_bootstrap": {
+    "n": 326,
+    "draws": 2000,
+    "seed": 20260822,
+    "one_x2_brier": {
+      "delta_shadow_minus_base": -0.0031265343771692982,
+      "ci95_low": -0.008543776524930229,
+      "ci95_high": 0.0019303889112707497
+    },
+    "one_x2_logloss": {
+      "delta_shadow_minus_base": -0.005118934657226543,
+      "ci95_low": -0.012882709818868243,
+      "ci95_high": 0.0023414864068752113
+    },
+    "draw_brier": {
+      "delta_shadow_minus_base": -0.0022196988983448234,
+      "ci95_low": -0.0057246211039262305,
+      "ci95_high": 0.0009949144245779353
+    }
+  },
+  "admission": {
+    "decision": "hold",
+    "reason_code": "PAIRED_INTERVAL_NOT_DECISIVE",
+    "minimum_test_n": 200
+  },
+  "source_file": "project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\research\\hafu-training\\sporttery_history_probe_20260203_20260821.json"
+}

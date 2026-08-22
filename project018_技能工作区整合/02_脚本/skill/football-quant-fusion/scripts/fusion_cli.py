@@ -13,6 +13,7 @@ from pathlib import Path
 
 from runtime import resolve_python
 from runtime_paths import core_scripts_dir, data_root, odds_store
+from draw_watch_signal import build_draw_calibration_shadow, build_draw_research
 
 # 统一解释器：当前为 3.14 等非 3.12 时，所有子进程改用内置 Python 3.12
 PY = resolve_python()
@@ -37,6 +38,7 @@ Supported commands:
   odds-add | odds-drift | odds-intl | odds-intl-capture | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
   version-progress | derivative-diagnostics | half-time-enrichment | score-shadow-compare
+  draw-watch-evaluate | draw-ttg-shadow-research
   half-time-collect | four-market-admission
   job
   hybrid-shadow | hybrid-evaluate | hybrid-admission
@@ -52,6 +54,35 @@ def option_value(rest, flag):
     if j + 1 < len(rest) and not rest[j + 1].startswith('-'):
         return rest[j + 1]
     return None
+
+
+def attach_draw_research(wrapped, input_payload):
+    """Append the draw-observation label after the frozen probability engine.
+
+    This deliberately runs in the command-router layer: no probability value,
+    calibration, registration gate, or probability signature is modified.
+    """
+    if not isinstance(wrapped, dict) or not isinstance(input_payload, dict):
+        return wrapped
+    if isinstance(wrapped.get("results"), list) and isinstance(input_payload.get("matches"), list):
+        result = dict(wrapped)
+        result["results"] = [
+            attach_draw_research(item, payload)
+            for item, payload in zip(wrapped["results"], input_payload["matches"])
+        ]
+        return result
+    if wrapped.get("fusion_status") != "ok" or not isinstance(wrapped.get("forecast"), dict):
+        return wrapped
+    result = dict(wrapped)
+    forecast = dict(wrapped["forecast"])
+    forecast["draw_research"] = build_draw_research(
+        forecast.get("final_1x2_pct"), input_payload.get("ttg"),
+    )
+    forecast["draw_calibration_shadow"] = build_draw_calibration_shadow(
+        forecast.get("final_1x2_pct"), input_payload.get("ttg"),
+    )
+    result["forecast"] = forecast
+    return result
 
 
 # [中文功能] 以子进程运行脚本并实时转发其输出（不再 capture 吞掉进度）
@@ -136,6 +167,9 @@ def record_fusion(rest):
     if proc.returncode != 0:
         raise SystemExit(proc.stderr or proc.stdout)
     wrapped = json.loads(fusion_output.read_text(encoding="utf-8"))
+    input_payload = json.loads(Path(input_path).read_text(encoding="utf-8-sig"))
+    wrapped = attach_draw_research(wrapped, input_payload)
+    fusion_output.write_text(json.dumps(wrapped, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if wrapped.get("fusion_status") != "ok":
         raise SystemExit("fusion prediction blocked; refuse registration")
     # 保留完整 fusion payload，同时保持 core 兼容概率字段在顶层
@@ -259,6 +293,14 @@ def main():
     if cmd == "derivative-diagnostics":
         # 大小球/半全场独立分母评测；HAFU 必须同时有已核验半场证据与非 UNFITTED 概率。
         run_script("derivative_diagnostics.py", rest)
+        return
+    if cmd == "draw-watch-evaluate":
+        # 平局 watch/focus 只读结算；样本不足时永远 hold，不触碰生产概率。
+        run_script("draw_watch_evaluation.py", rest)
+        return
+    if cmd == "draw-ttg-shadow-research":
+        # TTG 条件平局概率候选的严格时序回测；仅报告 hold/review，不改变生产概率。
+        run_script("draw_ttg_shadow_research.py", rest)
         return
     if cmd == "score-shadow-compare":
         # 仅比较已验证的 Big5 比分参数候选；不触碰 m3 与生产比分矩阵。

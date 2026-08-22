@@ -1,0 +1,44 @@
+{
+  "research_only": true,
+  "probability_adjustment_applied": false,
+  "all_settled": {
+    "n": 0,
+    "actual_draws": 0,
+    "actual_draw_rate": null
+  },
+  "watch_including_focus": {
+    "n": 0,
+    "draw_hits": 0,
+    "draw_precision": null,
+    "draw_precision_wilson95": null,
+    "draw_recall": null
+  },
+  "focus_only": {
+    "n": 0,
+    "draw_hits": 0,
+    "draw_precision": null,
+    "draw_precision_wilson95": null,
+    "draw_recall": null
+  },
+  "admission": {
+    "decision": "hold",
+    "reason_code": "FOCUS_SAMPLE_BELOW_MINIMUM",
+    "minimum_focus_n": 100
+  },
+  "schema_version": "fusion-draw-watch-evaluation-1.0",
+  "source_policy": "formal registered predictions + verified 90-minute settlement only",
+  "snapshot_policy": "latest_before_kickoff",
+  "row_audit": {
+    "excluded": {
+      "no_draw_research_label": 1634,
+      "invalid_or_pending_result": 3,
+      "no_result": 69
+    },
+    "dedupe_dropped": 0,
+    "candidate_snapshots": 0
+  },
+  "shadow_probability_paired": {
+    "n": 0,
+    "status": "no_settled_shadow_probability"
+  }
+}

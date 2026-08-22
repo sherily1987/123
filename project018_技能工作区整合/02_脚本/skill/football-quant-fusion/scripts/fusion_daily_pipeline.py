@@ -160,6 +160,20 @@ def run_derivative_research(store: Path) -> dict:
     return {"status": "ok", "output": str(output), "metrics": payload.get("metrics")}
 
 
+def run_draw_watch_research(store: Path) -> dict:
+    """Refresh settled draw-watch/shadow evidence without touching m4 outputs."""
+    output = store.parent / "research" / "draw-watch" / "latest.json"
+    result = run([HERE / "draw_watch_evaluation.py", "--store", store, "--output", output])
+    try:
+        payload = json.loads(result.stdout)
+    except ValueError:
+        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+    if result.returncode != 0:
+        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+    return {"status": "ok", "output": str(output), "admission": payload.get("admission"),
+            "shadow_probability_paired": payload.get("shadow_probability_paired")}
+
+
 # [中文功能] 每日流水线：结算→采集→登记→赔率移动
 def main():
     ap = argparse.ArgumentParser()
@@ -189,7 +203,7 @@ def main():
     report = {'ran_at': datetime.now(CST).isoformat(), 'sales_day': sales_day,
               'settle': None, 'collect': None, 'record': [], 'movement': None,
               'intl_odds': None, 'hybrid_shadow': None, 'half_time_research': None,
-              'derivative_research': None}
+              'derivative_research': None, 'draw_watch_research': None}
 
     # 1) Settle already-finished matches first (official matchId preferred).
     r = run([HERE / 'fusion_settle.py', '--store', a.store]
@@ -216,9 +230,11 @@ def main():
     if not a.dry_run and int((report['settle'] or {}).get('settled') or 0) > 0:
         report['half_time_research'] = run_half_time_research(a.store)
         report['derivative_research'] = run_derivative_research(a.store)
+        report['draw_watch_research'] = run_draw_watch_research(a.store)
     else:
         report['half_time_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
         report['derivative_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
+        report['draw_watch_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
 
     # 2) Collect the full cross-midnight sales day via fusion's own collector.
     d = a.work_dir / sales_day

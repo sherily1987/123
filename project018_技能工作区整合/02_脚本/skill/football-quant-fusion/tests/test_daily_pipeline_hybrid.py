@@ -93,6 +93,27 @@ def test_derivative_research_runs_from_verified_half_time_sidecar(monkeypatch, t
     assert retries == 0
 
 
+def test_draw_watch_research_runs_after_settlement_without_affecting_prediction_flow(monkeypatch, tmp_path):
+    seen = []
+
+    def fake_run(command, retries=0):
+        seen.append((command, retries))
+        output = command[command.index("--output") + 1]
+        payload = {"admission": {"decision": "hold"}, "shadow_probability_paired": {"n": 3}}
+        return type("Result", (), {"returncode": 0, "stdout": json.dumps(payload), "stderr": ""})()
+
+    monkeypatch.setattr(pipeline, "run", fake_run)
+
+    report = pipeline.run_draw_watch_research(tmp_path / "backtest")
+
+    command, retries = seen[0]
+    assert command[0].name == "draw_watch_evaluation.py"
+    assert command[command.index("--store") + 1] == tmp_path / "backtest"
+    assert report == {"status": "ok", "output": str(tmp_path / "research" / "draw-watch" / "latest.json"),
+                      "admission": {"decision": "hold"}, "shadow_probability_paired": {"n": 3}}
+    assert retries == 0
+
+
 def test_daily_pipeline_default_snapshot_is_truthful_generic_prematch(monkeypatch, tmp_path):
     """A default run may not claim an arbitrary T-minus hour it did not measure."""
     seen = []
@@ -149,6 +170,7 @@ def test_daily_pipeline_refreshes_derivatives_after_a_new_settlement(monkeypatch
     monkeypatch.setattr(pipeline, "run", fake_run)
     monkeypatch.setattr(pipeline, "run_half_time_research", lambda store: calls.append(("half", store)) or {"status": "ok"})
     monkeypatch.setattr(pipeline, "run_derivative_research", lambda store: calls.append(("derivative", store)) or {"status": "ok"})
+    monkeypatch.setattr(pipeline, "run_draw_watch_research", lambda store: calls.append(("draw", store)) or {"status": "ok"})
     monkeypatch.setattr(pipeline.sys, "argv", [
         "fusion_daily_pipeline.py", "--kickoff-date", "2026-08-25",
         "--store", str(tmp_path / "backtest"), "--odds-store", str(tmp_path / "odds.jsonl"),
@@ -157,9 +179,10 @@ def test_daily_pipeline_refreshes_derivatives_after_a_new_settlement(monkeypatch
 
     pipeline.main()
 
-    assert [name for name, _ in calls] == ["half", "derivative"]
+    assert [name for name, _ in calls] == ["half", "derivative", "draw"]
     report = json.loads(capsys.readouterr().out)
     assert report["derivative_research"] == {"status": "ok"}
+    assert report["draw_watch_research"] == {"status": "ok"}
 
 
 def test_daily_pipeline_skips_market_sidecars_when_collector_has_no_formal_inputs(monkeypatch, tmp_path):
