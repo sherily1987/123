@@ -104,6 +104,44 @@ def run_hybrid_shadow(batch: Path, sales_day: str, day_dir: Path, snapshot: str)
     }
 
 
+def run_half_time_research(store: Path) -> dict:
+    """Capture and verify half-time labels as research evidence after settlement."""
+    research = store.parent / "research"
+    fixture_dir = research / "half-time-fixtures" / "apifootball"
+    fixtures = fixture_dir / "fixtures.json"
+    evidence = research / "half-time-evidence" / "apifootball_verified_latest.json"
+    capture = run([
+        HERE / "collect_half_time_apifootball.py", "--store", store,
+        "--output-dir", fixture_dir, "--fixtures-output", fixtures,
+    ])
+    try:
+        captured = json.loads(capture.stdout)
+    except ValueError:
+        return {"status": "error", "stage": "capture",
+                "error": (capture.stderr or capture.stdout)[-300:]}
+    if capture.returncode != 0 or captured.get("status") != "ok":
+        return {"status": "error", "stage": "capture",
+                "error": (capture.stderr or capture.stdout)[-300:]}
+    fixtures = Path(captured.get("fixtures") or fixtures)
+    if not fixtures.is_file():
+        return {"status": "error", "stage": "capture", "error": "fixtures_output_missing"}
+    aliases = HERE.parent / "config" / "intl_odds_sources.json"
+    enriched = run([
+        HERE / "half_time_enrichment.py", "--fixtures", fixtures,
+        "--store", store, "--aliases", aliases, "--output", evidence,
+    ])
+    try:
+        result = json.loads(enriched.stdout)
+    except ValueError:
+        return {"status": "error", "stage": "enrichment",
+                "error": (enriched.stderr or enriched.stdout)[-300:]}
+    if enriched.returncode != 0 or result.get("status") != "ok":
+        return {"status": "error", "stage": "enrichment",
+                "error": (enriched.stderr or enriched.stdout)[-300:]}
+    return {"status": "ok", "provider_rows": captured.get("provider_rows", 0),
+            "rows": result.get("rows", 0), "verified": result.get("verified", 0)}
+
+
 # [中文功能] 每日流水线：结算→采集→登记→赔率移动
 def main():
     ap = argparse.ArgumentParser()
@@ -132,7 +170,7 @@ def main():
     sales_day = a.kickoff_date or a.sales_day or today.strftime('%Y-%m-%d')
     report = {'ran_at': datetime.now(CST).isoformat(), 'sales_day': sales_day,
               'settle': None, 'collect': None, 'record': [], 'movement': None,
-              'intl_odds': None, 'hybrid_shadow': None}
+              'intl_odds': None, 'hybrid_shadow': None, 'half_time_research': None}
 
     # 1) Settle already-finished matches first (official matchId preferred).
     r = run([HERE / 'fusion_settle.py', '--store', a.store]
@@ -152,6 +190,14 @@ def main():
                             'detail': detail}
     except (ValueError, AttributeError):
         report['settle'] = {'error': (r.stderr or r.stdout)[:200]}
+
+    # 1.5) New 90-minute settlements need independently verified half-time
+    # labels before HAFU can ever be evaluated.  This is research-only and a
+    # provider failure must not block the production collection/registration.
+    if not a.dry_run and int((report['settle'] or {}).get('settled') or 0) > 0:
+        report['half_time_research'] = run_half_time_research(a.store)
+    else:
+        report['half_time_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
 
     # 2) Collect the full cross-midnight sales day via fusion's own collector.
     d = a.work_dir / sales_day

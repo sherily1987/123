@@ -39,6 +39,34 @@ def test_hybrid_shadow_uses_the_exact_collected_batch_and_sales_day(monkeypatch,
                       "output": str(tmp_path / "hybrid_T-7h.json")}
 
 
+def test_half_time_research_captures_then_enriches_without_touching_settlement(monkeypatch, tmp_path):
+    seen = []
+    fixtures = tmp_path / "research" / "half-time-fixtures" / "apifootball" / "fixtures.json"
+
+    def fake_run(command, retries=0):
+        seen.append((command, retries))
+        if command[0].name == "collect_half_time_apifootball.py":
+            fixtures.parent.mkdir(parents=True, exist_ok=True)
+            fixtures.write_text("[]", encoding="utf-8")
+            payload = {"status": "ok", "fixtures": str(fixtures), "provider_rows": 3}
+        elif command[0].name == "half_time_enrichment.py":
+            payload = {"status": "ok", "rows": 2, "verified": 1}
+        else:
+            raise AssertionError(command)
+        return type("Result", (), {"returncode": 0, "stdout": json.dumps(payload), "stderr": ""})()
+
+    monkeypatch.setattr(pipeline, "run", fake_run)
+
+    report = pipeline.run_half_time_research(tmp_path / "backtest")
+
+    assert report == {"status": "ok", "provider_rows": 3, "rows": 2, "verified": 1}
+    capture, enrich = [entry[0] for entry in seen]
+    assert capture[0].name == "collect_half_time_apifootball.py"
+    assert enrich[0].name == "half_time_enrichment.py"
+    assert enrich[enrich.index("--fixtures") + 1] == fixtures
+    assert "--aliases" in enrich and "--output" in enrich
+
+
 def test_daily_pipeline_default_snapshot_is_truthful_generic_prematch(monkeypatch, tmp_path):
     """A default run may not claim an arbitrary T-minus hour it did not measure."""
     seen = []
