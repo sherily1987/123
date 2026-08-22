@@ -20,9 +20,16 @@ CORE = core_scripts_dir()
 if str(CORE) not in sys.path:
     sys.path.insert(0, str(CORE))
 import fetch_match_preview as preview  # noqa: E402
+from sporttery_trained_aliases import SPORTTERY_TO_TRAINED  # noqa: E402
 
 CST = timezone(timedelta(hours=8))
 T75_MINUTES = 75
+API_SPORTS_BASE = "https://v3.football.api-sports.io"
+ALIAS_CONFIG = Path(__file__).resolve().parents[1] / "config" / "intl_odds_sources.json"
+try:
+    TEAM_ALIASES = json.loads(ALIAS_CONFIG.read_text(encoding="utf-8")).get("team_aliases") or {}
+except (OSError, ValueError):
+    TEAM_ALIASES = {}
 CAP = {
     "Forward": (0.10, 0.00),
     "Midfielder": (0.06, 0.03),
@@ -162,6 +169,98 @@ def api_match_id_of(rec: dict):
     )
 
 
+def api_sports_fixture_id_of(rec: dict):
+    return (
+        rec.get("api_sports_fixture_id")
+        or (rec.get("provider_refs") or {}).get("api_sports_fixture_id")
+    )
+
+
+def normalized_name(value) -> str:
+    return "".join(ch for ch in str(value or "").casefold() if ch.isalnum())
+
+
+def team_candidates(name) -> list[str]:
+    """Return the Sporttery label and its verified provider aliases."""
+    key = str(name or "")
+    # ``intl_odds_sources.json`` is the full alias authority; the trained
+    # aliases supplement leagues not represented there.
+    return [key, *TEAM_ALIASES.get(key, []), *SPORTTERY_TO_TRAINED.get(key, [])]
+
+
+def resolve_api_sports_fixture_ids(matches: list[dict], fetch_by_utc_date) -> dict[int, dict]:
+    """Attach a unique API-Sports fixture ID without altering formal market data.
+
+    ``fetch_by_utc_date`` is deliberately injected so identity matching stays
+    testable and the network boundary remains outside this pure resolver.
+    """
+    rows_by_date: dict[str, list[dict]] = {}
+    resolved: dict[int, dict] = {}
+    for rec in matches:
+        mid = match_id_of(rec)
+        kickoff = kickoff_of(rec)
+        if mid is None or kickoff is None:
+            continue
+        existing = rec.get("api_sports_fixture_id") or (rec.get("provider_refs") or {}).get("api_sports_fixture_id")
+        if existing:
+            resolved[mid] = {"status": "resolved", "fixture_id": existing}
+            continue
+        day = kickoff.astimezone(timezone.utc).date().isoformat()
+        if day not in rows_by_date:
+            try:
+                payload = fetch_by_utc_date(day)
+                rows_by_date[day] = payload if isinstance(payload, list) else []
+            except Exception:
+                rows_by_date[day] = []
+        home = {normalized_name(v) for v in team_candidates(rec.get("home")) if normalized_name(v)}
+        away = {normalized_name(v) for v in team_candidates(rec.get("away")) if normalized_name(v)}
+        candidates = []
+        for row in rows_by_date[day]:
+            fixture = row.get("fixture") or {}
+            teams = row.get("teams") or {}
+            try:
+                provider_kickoff = parse_dt(fixture.get("date"))
+            except (TypeError, ValueError):
+                provider_kickoff = None
+            provider_home = normalized_name((teams.get("home") or {}).get("name"))
+            provider_away = normalized_name((teams.get("away") or {}).get("name"))
+            fixture_id = fixture.get("id")
+            if (provider_kickoff is not None and fixture_id is not None
+                    and abs((provider_kickoff - kickoff).total_seconds()) <= 5400
+                    and provider_home in home and provider_away in away):
+                candidates.append(fixture_id)
+        if len(candidates) == 1:
+            rec["api_sports_fixture_id"] = candidates[0]
+            resolved[mid] = {"status": "resolved", "fixture_id": candidates[0]}
+        else:
+            resolved[mid] = {
+                "status": "SOURCE_CONFLICT" if len(candidates) > 1 else "UNAVAILABLE",
+                "reason": f"fixture_match_count={len(candidates)}",
+            }
+    return resolved
+
+
+def fetch_api_sports_fixtures(utc_date: str) -> list[dict]:
+    """Fetch one UTC calendar day from the configured API-Sports account."""
+    key = (os.environ.get("API_FOOTBALL_KEY") or "").strip()
+    if not key:
+        return []
+    import urllib.parse
+    import urllib.request
+    url = API_SPORTS_BASE + "/fixtures?" + urllib.parse.urlencode({
+        "date": utc_date,
+        "timezone": "UTC",
+    })
+    try:
+        req = urllib.request.Request(url, headers={"x-apisports-key": key})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            payload = json.load(response)
+    except Exception:
+        return []
+    rows = payload.get("response") if isinstance(payload, dict) else None
+    return rows if isinstance(rows, list) else []
+
+
 def append_jsonl(path: Path, row: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
@@ -172,39 +271,45 @@ def fetch_injury(mid: int) -> dict | None:
     return preview.fetch(f"getInjurySuspensionV1.qry?sportteryMatchId={mid}")
 
 
-def fetch_lineup(api_mid) -> dict | None:
-    key = (os.environ.get("API_FOOTBALL_KEY") or os.environ.get("MCP_APIFOOTBALL_API_KEY") or "").strip()
-    if not key or not api_mid:
+def fetch_api_sports_lineup(fixture_id) -> list[dict] | None:
+    """Fetch API-Sports lineups by the provider fixture identity."""
+    key = (os.environ.get("API_FOOTBALL_KEY") or "").strip()
+    if not key or not fixture_id:
         return None
     import urllib.parse
     import urllib.request
-    qs = urllib.parse.urlencode({"action": "get_lineups", "APIkey": key, "match_id": str(api_mid)})
-    url = "https://apiv3.apifootball.com/?" + qs
+    url = API_SPORTS_BASE + "/fixtures/lineups?" + urllib.parse.urlencode({"fixture": str(fixture_id)})
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"})
-        with urllib.request.urlopen(req, timeout=40) as resp:
-            data = json.loads(resp.read().decode("utf-8", "replace"))
+        req = urllib.request.Request(url, headers={"x-apisports-key": key})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            payload = json.load(response)
     except Exception:
         return None
-    if isinstance(data, dict) and data.get("error") is not None:
+    rows = payload.get("response") if isinstance(payload, dict) else None
+    return rows if isinstance(rows, list) else None
+
+
+def fold_api_sports_lineup(rec: dict, rows: list[dict] | None) -> dict | None:
+    """Map API-Sports' team-named lineup rows to audited home/away sides."""
+    if not isinstance(rows, list):
         return None
-    obj = data.get(str(api_mid)) if isinstance(data, dict) else None
-    if obj is None and isinstance(data, dict):
-        obj = data.get(api_mid) or data
-    lineup = (obj or {}).get("lineup") if isinstance(obj, dict) else {}
-    if not isinstance(lineup, dict):
-        return None
-    out = {}
-    for side in ("home", "away"):
-        block = lineup.get(side) or {}
-        starters = block.get("starting_lineups") or []
-        missing = block.get("missing_players") or []
-        out[side] = {
-            "starting_count": len(starters),
-            "missing_count": len(missing),
-            "starting": [p.get("player") or p.get("lineup_player") for p in starters if isinstance(p, dict)],
-            "missing": [p.get("player") or p.get("lineup_player") for p in missing if isinstance(p, dict)],
-        }
+    sides = {
+        "home": {normalized_name(v) for v in team_candidates(rec.get("home")) if normalized_name(v)},
+        "away": {normalized_name(v) for v in team_candidates(rec.get("away")) if normalized_name(v)},
+    }
+    out = {side: {"starting_count": 0, "missing_count": 0, "starting": [], "missing": []}
+           for side in ("home", "away")}
+    for block in rows:
+        provider_team = normalized_name((block.get("team") or {}).get("name"))
+        side = next((key for key, aliases in sides.items() if provider_team in aliases), None)
+        if side is None:
+            continue
+        starters = [
+            (item.get("player") or {}).get("name")
+            for item in (block.get("startXI") or []) if isinstance(item, dict)
+        ]
+        out[side]["starting"] = [name for name in starters if name]
+        out[side]["starting_count"] = len(out[side]["starting"])
     if out["home"]["starting_count"] == 0 and out["away"]["starting_count"] == 0:
         return None
     return out
@@ -257,17 +362,17 @@ def collect_one(rec, snapshot, want_injury, want_lineup, events_path):
         elif not in_t75_window(kickoff, collected_at):
             row["status"] = "TOO_EARLY"
         else:
-            api_mid = api_match_id_of(rec)
-            if not api_mid:
+            fixture_id = api_sports_fixture_id_of(rec)
+            if not fixture_id:
                 row["status"] = "NO_API_ID"
             else:
-                lineup = fetch_lineup(api_mid)
+                lineup = fold_api_sports_lineup(rec, fetch_api_sports_lineup(fixture_id))
                 if lineup is None:
                     row["status"] = "UNAVAILABLE"
                 else:
                     row["status"] = "VALID"
                     row["lineup"] = lineup
-                    row["apifootball_match_id"] = api_mid
+                    row["api_sports_fixture_id"] = fixture_id
         if row["status"] != "TOO_EARLY":
             append_jsonl(events_path, row)
             out.append(row)
@@ -288,6 +393,8 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
             "t75_at": (kickoff - timedelta(minutes=T75_MINUTES)).isoformat(),
             "odds_at": odds_at_of(rec).isoformat() if odds_at_of(rec) else None,
             "apifootball_match_id": api_match_id_of(rec),
+            "api_sports_fixture_id": api_sports_fixture_id_of(rec),
+            "lineup_provider": "api-sports.io",
             "snapshot": snapshot,
             "research_only": True,
         })
@@ -316,6 +423,10 @@ def main() -> None:
     matches = load_matches(src)
     work = (args.work_dir or src.parent).resolve()
     events_path = (args.events or late_info_store() / "events.jsonl").resolve()
+    # The mapping belongs to the research sidecar only.  Formal Sporttery
+    # input remains immutable; the in-memory ID is consumed by this run and
+    # written to the due manifest / late-info evidence.
+    resolve_api_sports_fixture_ids(matches, fetch_api_sports_fixtures)
     due_path = work / "late_info_due.json"
     due = write_due(due_path, matches, args.snapshot)
 
