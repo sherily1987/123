@@ -39,14 +39,18 @@ def build_store(root: Path, predictions, results):
     return store
 
 
-def prediction(match_id, created_at, model_version, signature, snapshot="prematch"):
-    return {
+def prediction(match_id, created_at, model_version, signature, snapshot="prematch",
+               prediction_as_of=None):
+    row = {
         "prediction_id": f"{match_id}__{created_at}__{snapshot}",
         "match_id": match_id,
         "snapshot_type": snapshot,
         "created_at": created_at,
         "model": {"model_version": model_version, "probability_signature": signature},
     }
+    if prediction_as_of is not None:
+        row["prediction_as_of"] = prediction_as_of
+    return row
 
 
 class VersionProgressTests(unittest.TestCase):
@@ -108,6 +112,17 @@ class VersionProgressTests(unittest.TestCase):
              prediction("m-1", "2026-08-10T06:00:00Z", "m2", CURRENT_SIG, snapshot="closing")],
             [{"match_id": "m-1"}])
         self.assertEqual(report["current"]["settled"], 1)
+
+    def test_current_version_uses_prediction_as_of_not_delayed_registry_write(self):
+        """Delayed persistence must not hide the later deployed version."""
+        report = self._report(
+            [prediction("m-1", "2026-08-21T16:00:00Z", "m3", OTHER_SIG,
+                        snapshot="prematch", prediction_as_of="2026-08-21T13:00:00Z"),
+             prediction("m-1", "2026-08-21T15:00:00Z", "m4", CURRENT_SIG,
+                        snapshot="T-7h", prediction_as_of="2026-08-21T14:00:00Z")],
+            [], model_version="m4")
+        self.assertEqual(report["current"]["pending"], 1)
+        self.assertEqual(report["by_model_version"]["m4"]["pending"], 1)
 
     def test_verified_alias_versions_count_toward_current(self):
         alias = {"model_version": "m1", "probability_signature": OTHER_SIG,

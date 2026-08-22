@@ -143,10 +143,10 @@ def main():
                 is_complete_sha256(value) for value in governance_signatures.values()):
             sys.exit('complete decision/evidence signatures required for formal model m2 registration')
     created = datetime.now(timezone.utc)
-    if a.snapshot == 'prematch':
-        prediction_as_of = formal_prediction_as_of(inp, kd)
-    else:
-        prediction_as_of = inp.get('prediction_as_of') or created.isoformat()
+    # Every record in the formal registry, including an explicitly named
+    # T-minus snapshot, must prove it was generated before kickoff.  Labels
+    # are not a waiver for the no-future-leakage boundary.
+    prediction_as_of = formal_prediction_as_of(inp, kd)
 
     route = inp.get('route') or out.get('route') or 'unknown'
     mode = inp.get('mode') or out.get('mode') or 'unknown'
@@ -161,7 +161,11 @@ def main():
         sys.exit('LLM audit hashes required for formal production LLM prematch registration')
     version = f"fusion-{fusion_ver}-core-{core_ver}"
     vslug = slug(version)
-    pid = f"{mid}__v{vslug}__{created.strftime('%Y%m%dT%H%M%SZ')}__{slug(a.snapshot)}"
+    # 同一秒内的跨版本重预测必须物理分文件；否则不同概率 cohort 会碰撞到
+    # 同一路径，即使登记去重已正确放行也无法留档。
+    cohort_slug = f"m{slug(model_version)}-p{slug(probability_signature[:12])}"
+    pid = (f"{mid}__v{vslug}__{cohort_slug}__{created.strftime('%Y%m%dT%H%M%SZ')}"
+           f"__{slug(a.snapshot)}")
 
     if a.snapshot == 'prematch' and a.replace_snapshot:
         sys.exit('prematch snapshots are immutable; use an explicit distinct experiment snapshot')
@@ -172,11 +176,17 @@ def main():
             ep = Path(e['path'])
             if not ep.exists():
                 continue
-            if json.load(open(ep, encoding='utf-8')).get('snapshot_type') == a.snapshot:
+            existing = json.load(open(ep, encoding='utf-8'))
+            existing_model = existing.get('model') or {}
+            same_probability_version = (
+                str(existing_model.get('model_version') or 'unknown') == model_version
+                and str(existing_model.get('probability_signature') or 'unknown') == probability_signature
+            )
+            if existing.get('snapshot_type') == a.snapshot and same_probability_version:
                 print(json.dumps({
                     'status': 'skipped_duplicate_snapshot', 'match_id': mid,
                     'snapshot_type': a.snapshot, 'existing_prediction_id': e.get('prediction_id'),
-                    'note': '同一比赛同一快照已登记；如确需覆盖用 --replace-snapshot'},
+                    'note': '同一比赛同一快照同一概率版本已登记；如确需覆盖用 --replace-snapshot'},
                     ensure_ascii=False))
                 sys.exit(0)
 

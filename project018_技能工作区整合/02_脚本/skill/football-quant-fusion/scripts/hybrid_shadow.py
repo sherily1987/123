@@ -139,6 +139,21 @@ def _research_blob(match: dict, hybrid: dict) -> dict:
     return blob
 
 
+def _attach_routing_audit(blob: dict, routed: dict, market_input: dict, research_run_at: str) -> dict:
+    """Persist the time boundary used by the independent-prior router.
+
+    The job's ``input`` deliberately remains the immutable market snapshot.
+    The router works on a copy, so its no-future-leakage evidence must travel
+    with the research sidecar instead of being silently discarded.
+    """
+    audit = ((routed.get("field_meta") or {}).get("production_router") or {})
+    if audit:
+        blob["routing_audit"] = dict(audit)
+    blob["market_input_as_of"] = market_input.get("prediction_as_of") or market_input.get("collected_at")
+    blob["research_run_at"] = research_run_at
+    return blob
+
+
 def weight_sweep(core, version, routed: dict, prior: dict, *, weights=WEIGHT_SWEEP) -> list[dict]:
     """Record alternative hybrid blends without mutating the primary route.
 
@@ -173,18 +188,23 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
                    research=_research_blob(match, hybrid_from_fusion_output({}, skip_reason=skip)))
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": skip}
 
+    research_run_at = datetime.now(timezone.utc).isoformat()
     routed = route_match(match, understat, events, min_history, enable_experimental=True)
     prior = routed.get("lambda_prior")
     if not prior or routed.get("research_only") is not True:
         reason = ((routed.get("field_meta") or {}).get("production_router") or {}).get("fallback_reason") or "no_prior"
+        skipped_blob = _attach_routing_audit(
+            _research_blob(match, hybrid_from_fusion_output({}, skip_reason=reason)),
+            routed, match, research_run_at)
         upsert_job(jobs_root(), ident, input_obj=match,
-                   research=_research_blob(match, hybrid_from_fusion_output({}, skip_reason=reason)))
+                   research=skipped_blob)
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": reason}
 
     out = predict_one(core, version, routed)
     if out.get("research_only") is not True:
         out["research_only"] = True
     blob = _research_blob(match, hybrid_from_fusion_output(out, prior=prior))
+    blob = _attach_routing_audit(blob, routed, match, research_run_at)
     blob["weight_sweep"] = weight_sweep(core, version, routed, prior)
     path = upsert_job(jobs_root(), ident, input_obj=match, research=blob)
     return {

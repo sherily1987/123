@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import sys
 from pathlib import Path
 
 
 MODULE = Path(__file__).parents[1] / "scripts" / "derivative_diagnostics.py"
+if str(MODULE.parent) not in sys.path:
+    sys.path.insert(0, str(MODULE.parent))
 SPEC = importlib.util.spec_from_file_location("derivative_diagnostics", MODULE)
 diagnostics = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader
@@ -93,3 +97,35 @@ def test_hafu_temperature_shadow_keeps_one_verified_sample_set():
     assert report["temperature"] == 1.2
     assert report["raw"]["accuracy_pct"] == 100.0
     assert report["candidate"]["accuracy_pct"] == 100.0
+
+
+def test_registered_derivative_rows_select_by_prediction_as_of_across_versions(tmp_path):
+    """Score/O-U/HAFU diagnostics must retain the post-release m4 record."""
+    store = tmp_path / "backtest"
+    predictions = store / "predictions"
+    results = store / "results"
+    predictions.mkdir(parents=True)
+    results.mkdir()
+    (results / "m1.json").write_text(
+        json.dumps({"status": "finished", "settlement_scope": "90min", "score_90": {"home": 1, "away": 0}}),
+        encoding="utf-8")
+    rows = []
+    for name, model_version, created_at, prediction_as_of in [
+        ("m3", "m3", "2026-08-21T16:00:00Z", "2026-08-21T13:00:00Z"),
+        ("m4", "m4", "2026-08-21T15:00:00Z", "2026-08-21T14:00:00Z"),
+    ]:
+        path = predictions / f"{name}.json"
+        path.write_text(json.dumps({
+            "match_id": "m1", "snapshot_type": "prematch", "created_at": created_at,
+            "prediction_as_of": prediction_as_of,
+            "model": {"model_version": model_version, "probability_signature": model_version * 32},
+            "output": {"forecast": {"ou_2_5": {"over_pct": 50}}},
+        }), encoding="utf-8")
+        rows.append({"match_id": "m1", "path": str(path)})
+    (store / "registry.jsonl").write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+    selected = diagnostics.load_registered_rows(str(store), "latest_before_kickoff")
+
+    assert len(selected) == 1
+    assert selected[0]["model"]["model_version"] == "m4"

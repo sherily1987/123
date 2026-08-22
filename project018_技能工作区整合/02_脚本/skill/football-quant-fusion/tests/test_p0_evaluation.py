@@ -199,6 +199,33 @@ class BuildIdentityTests(unittest.TestCase):
             experiment = json.loads(Path(entries[1]["path"]).read_text(encoding="utf-8"))
             self.assertEqual(experiment["prediction_as_of"], "2099-08-09T20:00:00+08:00")
 
+    def test_same_prematch_allows_distinct_probability_version_after_release(self):
+        """A new released probability cohort must be registrable for the same match."""
+        m4_identity = fusion.build_identity()
+        m3_identity = dict(m4_identity, model_version="m3", probability_signature="a" * 64)
+        with tempfile.TemporaryDirectory(prefix="fusion-cross-version-record-") as td:
+            root = Path(td)
+            inp = {"home": "Home", "away": "Away", "stage": "Test",
+                   "kickoff": "2099-08-10T20:00:00+08:00",
+                   "prediction_as_of": "2099-08-09T20:00:00+08:00",
+                   "sporttery_meta": {"match_id": "cross-version-test"}}
+            input_path, output_path, store = root / "input.json", root / "output.json", root / "store"
+            input_path.write_text(json.dumps(inp), encoding="utf-8")
+            command = [sys.executable, str(SCRIPTS / "fusion_record.py"),
+                       "--input", str(input_path), "--output", str(output_path),
+                       "--store", str(store), "--snapshot", "prematch"]
+
+            output_path.write_text(json.dumps({"fusion_status": "ok", "build_identity": m3_identity}), encoding="utf-8")
+            first = subprocess.run(command, text=True, capture_output=True)
+            self.assertEqual(json.loads(first.stdout)["status"], "recorded")
+
+            output_path.write_text(json.dumps({"fusion_status": "ok", "build_identity": m4_identity}), encoding="utf-8")
+            second = subprocess.run(command, text=True, capture_output=True)
+            self.assertEqual(second.returncode, 0, second.stderr or second.stdout)
+            self.assertEqual(json.loads(second.stdout)["status"], "recorded")
+            entries = [json.loads(line) for line in (store / "registry.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(len(entries), 2)
+
     def test_prematch_requires_explicit_timezone_aware_as_of_strictly_before_kickoff(self):
         identity = fusion.build_identity()
         cases = {
@@ -221,6 +248,29 @@ class BuildIdentityTests(unittest.TestCase):
                                        "--store", str(root / "store"), "--snapshot", "prematch"], text=True, capture_output=True)
                 self.assertNotEqual(proc.returncode, 0)
                 self.assertIn("prediction_as_of", proc.stderr)
+
+    def test_named_t_minus_snapshot_rejects_post_kickoff_prediction_time(self):
+        """A T-minus label cannot bypass the formal pre-kickoff time boundary."""
+        identity = fusion.build_identity()
+        with tempfile.TemporaryDirectory(prefix="fusion-tminus-asof-") as td:
+            root = Path(td)
+            inp = {
+                "home": "Home", "away": "Away", "stage": "Test",
+                "kickoff": "2099-08-10T20:00:00+08:00",
+                "prediction_as_of": "2099-08-10T20:00:01+08:00",
+            }
+            (root / "input.json").write_text(json.dumps(inp), encoding="utf-8")
+            (root / "output.json").write_text(
+                json.dumps({"fusion_status": "ok", "build_identity": identity}), encoding="utf-8")
+
+            proc = subprocess.run([
+                sys.executable, str(SCRIPTS / "fusion_record.py"),
+                "--input", str(root / "input.json"), "--output", str(root / "output.json"),
+                "--store", str(root / "store"), "--snapshot", "T-7h",
+            ], text=True, capture_output=True)
+
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("prediction_as_of", proc.stderr)
 
     def test_llm_audit_hashes_are_required_and_frozen_in_prematch_cohort(self):
         identity = fusion.build_identity()
@@ -262,6 +312,59 @@ class BuildIdentityTests(unittest.TestCase):
 
 
 class BacktestSamplingTests(unittest.TestCase):
+    def test_scored_row_retains_prediction_as_of_for_primary_snapshot_selection(self):
+        """Registry evaluation must select by original prediction time, not persistence time."""
+        with tempfile.TemporaryDirectory(prefix="fusion-score-asof-") as td:
+            root = Path(td)
+            (root / "results").mkdir()
+            (root / "results" / "m1.json").write_text(
+                json.dumps({"score_90": {"home": 1, "away": 0}}), encoding="utf-8")
+            record = {
+                "match_id": "m1", "prediction_id": "m1-p", "snapshot_type": "prematch",
+                "created_at": "2026-08-21T16:00:00Z",
+                "prediction_as_of": "2026-08-21T14:00:00Z",
+                "match": {"kickoff": "2026-08-22T00:00:00Z"},
+                "model": {"model_version": "m4", "probability_signature": "a" * 64},
+                "input": {"odds": [2.0, 3.0, 4.0]},
+                "output": {"final_1x2_pct": [50.0, 30.0, 20.0]},
+            }
+
+            row, error = backtest.score_record(record, root)
+
+        self.assertIsNone(error)
+        self.assertEqual(row["prediction_as_of"], "2026-08-21T14:00:00Z")
+
+    def test_dedupe_keeps_same_snapshot_when_probability_versions_differ(self):
+        """A post-release m4 prediction is a distinct evaluable record from m3."""
+        rows = [
+            {"match_id": "m1", "snapshot_type": "prematch", "created_at": "2026-08-21T13:00:00Z",
+             "prediction_id": "m1-m3", "model": {"model_version": "m3", "probability_signature": "a" * 64}},
+            {"match_id": "m1", "snapshot_type": "prematch", "created_at": "2026-08-21T14:00:00Z",
+             "prediction_id": "m1-m4", "model": {"model_version": "m4", "probability_signature": "b" * 64}},
+        ]
+
+        deduped, dropped = backtest.dedupe_snapshot_rows(rows)
+
+        self.assertEqual({row["prediction_id"] for row in deduped}, {"m1-m3", "m1-m4"})
+        self.assertEqual(dropped, [])
+
+    def test_latest_before_kickoff_uses_actual_prediction_time_across_versions(self):
+        """Later valid m4 snapshot must not be hidden by an older generic prematch label."""
+        rows = [
+            {"match_id": "m1", "snapshot_type": "prematch",
+             "created_at": "2026-08-21T13:28:40Z",
+             "prediction_as_of": "2026-08-21T13:28:33Z",
+             "prediction_id": "m1-m3", "model_version": "m3"},
+            {"match_id": "m1", "snapshot_type": "T-7h",
+             "created_at": "2026-08-21T16:11:10Z",
+             "prediction_as_of": "2026-08-21T16:10:49Z",
+             "prediction_id": "m1-m4", "model_version": "m4"},
+        ]
+
+        primary = backtest.select_primary_rows(rows, "latest_before_kickoff")
+
+        self.assertEqual([row["prediction_id"] for row in primary], ["m1-m4"])
+
     def test_primary_evaluation_keeps_one_snapshot_per_match(self):
         rows = [
             {"match_id": "m1", "snapshot_type": "opening", "created_at": "2026-08-01T00:00:00Z", "prediction_id": "m1-o1"},

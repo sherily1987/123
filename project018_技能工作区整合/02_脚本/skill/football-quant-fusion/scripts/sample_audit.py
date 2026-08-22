@@ -40,6 +40,7 @@ def main():
             'snapshot_type': record.get('snapshot_type'),
             'prediction_id': record.get('prediction_id'),
             'created_at': record.get('created_at') or '',
+            'prediction_as_of': record.get('prediction_as_of') or '',
             'version': model.get('version') if isinstance(model, dict) else str(model or ''),
             'model': model if isinstance(model, dict) else {},
             '_record': record,

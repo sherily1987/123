@@ -62,6 +62,7 @@ def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
             "prediction_id": rec.get("prediction_id") or entry.get("prediction_id"),
             "snapshot_type": rec.get("snapshot_type") or "unspecified",
             "created_at": rec.get("created_at") or entry.get("created_at") or "",
+            "prediction_as_of": rec.get("prediction_as_of") or "",
             "kickoff": rec.get("kickoff") or "",
             "model_version": str(model.get("model_version") or "unattributable"),
             "probability_signature": str(model.get("probability_signature") or ""),

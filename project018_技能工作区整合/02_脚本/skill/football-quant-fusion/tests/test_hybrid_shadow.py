@@ -96,3 +96,38 @@ def test_weight_sweep_is_research_only_and_does_not_mutate_primary_route(monkeyp
     assert routed["market_weight"] == 0.6
     assert [item["market_weight"] for item in sweep] == [0.4, 0.7]
     assert all(item["research_only"] is True for item in sweep)
+
+
+def test_run_one_persists_router_time_audit_with_research_sidecar(monkeypatch, tmp_path):
+    """保护：原始市场输入与路由后的历史截止时间必须同时留档，才能审计无未来泄漏。"""
+    captured = {}
+    router_audit = {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-22T00:00:00+00:00",
+        "history_latest": "2026-08-20T00:00:00+00:00",
+        "no_future_leakage": True,
+    }
+    prior = {"lambda_home": 1.1, "lambda_away": 0.9, "source": "test", "sample_legs": 10}
+
+    monkeypatch.setattr(hs, "route_match", lambda match, *_args, **_kwargs: {
+        **match, "mode": "hybrid", "research_only": True, "lambda_prior": prior,
+        "field_meta": {"production_router": router_audit},
+    })
+    monkeypatch.setattr(hs, "predict_one", lambda *_args: {
+        "fusion_status": "ok", "mode": "hybrid",
+        "forecast": {"final_1x2_pct": [40, 30, 30], "market_prob_pct": [45, 25, 30]},
+    })
+    monkeypatch.setattr(hs, "weight_sweep", lambda *_args, **_kwargs: [])
+    monkeypatch.setattr(hs, "_research_blob", lambda _match, blob: blob)
+    monkeypatch.setattr(hs, "jobs_root", lambda: tmp_path)
+    monkeypatch.setattr(hs, "upsert_job", lambda _root, _identity, **kwargs: captured.update(kwargs) or tmp_path / "job.json")
+
+    hs.run_one(None, {}, {
+        "match_id": "sporttery-1", "home": "主队", "away": "客队", "competition": "英超",
+        "kickoff": "2026-08-22T00:00:00+00:00", "prediction_as_of": "2026-08-21T20:00:00+00:00",
+    }, [], [], 5, "2026-08-22")
+
+    hybrid = captured["research"]
+    assert hybrid["routing_audit"] == router_audit
+    assert hybrid["market_input_as_of"] == "2026-08-21T20:00:00+00:00"
+    assert hybrid["research_run_at"].endswith("+00:00")

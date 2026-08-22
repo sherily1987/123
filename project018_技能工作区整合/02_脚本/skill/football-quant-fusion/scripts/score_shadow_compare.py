@@ -164,7 +164,9 @@ def load_registered_rows(store: str, snapshot_policy: str) -> list[dict[str, Any
         core = output.get("core_output") if isinstance(output.get("core_output"), Mapping) else output
         rows.append({
             "match_id": match_id, "created_at": rec.get("created_at") or "",
+            "prediction_as_of": rec.get("prediction_as_of") or "",
             "snapshot_type": rec.get("snapshot_type"),
+            "model": rec.get("model") or {},
             "league": (rec.get("match") or {}).get("competition") or (rec.get("match") or {}).get("stage"),
             "xg": core.get("xg"), "actual_score": f"{home}-{away}",
         })

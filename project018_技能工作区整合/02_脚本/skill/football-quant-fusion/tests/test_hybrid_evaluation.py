@@ -12,7 +12,15 @@ SPEC.loader.exec_module(evaluation)
 
 
 def _job(match_id, hybrid, *, prediction_as_of="2026-08-21T10:00:00+00:00",
-         kickoff="2026-08-21T12:00:00+00:00", score="2-1"):
+         kickoff="2026-08-21T12:00:00+00:00", score="2-1", include_router_audit=True):
+    hybrid = dict(hybrid)
+    if include_router_audit:
+        hybrid.setdefault("routing_audit", {
+            "no_future_leakage": True,
+            "history_latest": "2026-08-21T09:00:00+00:00",
+            "as_of": kickoff,
+        })
+        hybrid.setdefault("research_run_at", "2026-08-21T10:01:00+00:00")
     return {
         "identity": {"match_id": match_id, "home": "Home", "away": "Away"},
         "input": {"prediction_as_of": prediction_as_of, "kickoff": kickoff},
@@ -84,6 +92,21 @@ def test_paired_bootstrap_interval_is_reproducible(tmp_path):
     ci = first["metrics"]["brier"]["paired_bootstrap_95_ci"]
     assert len(ci) == 2
     assert ci[0] <= first["metrics"]["brier"]["delta_hybrid_minus_market"] <= ci[1]
+
+
+def test_evaluation_excludes_hybrid_without_persisted_router_audit(tmp_path):
+    """保护：仅靠 lambda_prior 文本不足以证明历史数据早于开球。"""
+    hybrid = {
+        "research_only": True, "status": "ok", "mode": "hybrid",
+        "final_1x2_pct": [60, 25, 15], "market_1x2_pct": [50, 30, 20],
+        "lambda_prior": {"source": "independent_strength"},
+    }
+    _write_job(tmp_path, "no-audit", _job("sporttery-no-audit", hybrid, include_router_audit=False))
+
+    report = evaluation.evaluate_jobs(tmp_path)
+
+    assert report["n"] == 0
+    assert report["excluded"] == {"missing_router_audit": 1}
 
 
 def test_cli_creates_parent_directory_for_report(tmp_path):

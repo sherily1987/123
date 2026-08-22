@@ -1,0 +1,73 @@
+{
+  "schema_version": "sporttery-hafu-chronological-evaluation-1.0",
+  "source_policy": {
+    "odds": "closing_pre_match.hafu: last official quote strictly before kickoff",
+    "outcome": "match_result_list code=HAFU official settlement",
+    "no_full_time_proxy": true
+  },
+  "state_labels": [
+    "HH",
+    "HD",
+    "HA",
+    "DH",
+    "DD",
+    "DA",
+    "AH",
+    "AD",
+    "AA"
+  ],
+  "split": {
+    "method": "chronological",
+    "train_n": 968,
+    "test_n": 416,
+    "train_through": "2026-06-09T19:35:00+08:00",
+    "test_from": "2026-06-10T01:00:00+08:00"
+  },
+  "temperature": {
+    "value": 0.98,
+    "selection_metric": "train_log_loss",
+    "train_log_loss": 1.84684241
+  },
+  "metrics": {
+    "train_raw": {
+      "n": 968,
+      "multiclass_brier": 0.79106404,
+      "log_loss": 1.84703281,
+      "top1_accuracy_pct": 33.26
+    },
+    "train_temperature": {
+      "n": 968,
+      "multiclass_brier": 0.79095999,
+      "log_loss": 1.84684241,
+      "top1_accuracy_pct": 33.26
+    },
+    "test_raw": {
+      "n": 416,
+      "multiclass_brier": 0.77874691,
+      "log_loss": 1.81074378,
+      "top1_accuracy_pct": 34.62
+    },
+    "test_temperature": {
+      "n": 416,
+      "multiclass_brier": 0.77849918,
+      "log_loss": 1.81021362,
+      "top1_accuracy_pct": 34.62
+    }
+  },
+  "test_paired_bootstrap": {
+    "draws": 2000,
+    "seed": 20260821,
+    "brier": {
+      "delta_candidate_minus_raw": -0.00024772,
+      "ci95_low": -0.00082137,
+      "ci95_high": 0.00033798
+    },
+    "log_loss": {
+      "delta_candidate_minus_raw": -0.00053016,
+      "ci95_low": -0.00192787,
+      "ci95_high": 0.00106994
+    }
+  },
+  "valid_sample_n": 1384,
+  "source_file": "project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/research/hafu-training/sporttery_history_probe_20260203_20260821.json"
+}

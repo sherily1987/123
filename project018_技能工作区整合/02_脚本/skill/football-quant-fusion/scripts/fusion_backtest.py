@@ -40,11 +40,21 @@ def load_jsonl(path):
 
 
 def dedupe_snapshot_rows(rows):
-    """同一比赛同一快照只保留created_at最新的一条。"""
+    """同一比赛、快照和概率版本只保留 created_at 最新的一条。
+
+    同场在新版本发布后重跑属于不同可审计概率 cohort，不能被旧版本
+    的同名 ``prematch`` 快照静默覆盖；主评测随后仍按赛前时刻只选一条。
+    """
     selected = {}
     dropped = []
     for row in rows:
-        key = (row.get("match_id"), str(row.get("snapshot_type") or "unspecified").lower())
+        model = row.get("model") or {}
+        key = (
+            row.get("match_id"),
+            str(row.get("snapshot_type") or "unspecified").lower(),
+            str(model.get("model_version") or "unknown"),
+            str(model.get("probability_signature") or "unknown"),
+        )
         current = selected.get(key)
         if current is None or str(row.get("created_at") or "") > str(current.get("created_at") or ""):
             if current is not None:
@@ -74,6 +84,26 @@ def _snapshot_rank(snapshot_type):
     return 0
 
 
+def _selection_time(row):
+    """Return the auditable prediction time used for primary-snapshot choice.
+
+    ``snapshot_type`` is a label (for example, an older generic ``prematch``
+    or a later ``T-7h``) and must not decide which deployed version is
+    evaluated.  Formal records carry ``prediction_as_of``; legacy records
+    fall back to their immutable registry creation time.
+    """
+    raw = row.get("prediction_as_of") or row.get("created_at") or ""
+    if not isinstance(raw, str):
+        return datetime.min.replace(tzinfo=timezone.utc)
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        return datetime.min.replace(tzinfo=timezone.utc)
+    if parsed.tzinfo is None:
+        return datetime.min.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
 def select_primary_rows(rows, policy="latest_before_kickoff"):
     """按比赛选择一个主评估快照；其他快照仅用于时点研究。"""
     by_match = {}
@@ -88,7 +118,8 @@ def select_primary_rows(rows, policy="latest_before_kickoff"):
                 continue
             chosen = max(exact, key=lambda r: str(r.get("created_at") or ""))
         elif policy == "latest_before_kickoff":
-            chosen = max(candidates, key=lambda r: (_snapshot_rank(r.get("snapshot_type")),
+            chosen = max(candidates, key=lambda r: (_selection_time(r),
+                                                     _snapshot_rank(r.get("snapshot_type")),
                                                      str(r.get("created_at") or "")))
         else:
             raise ValueError(f"unknown snapshot policy: {policy}")
@@ -493,6 +524,7 @@ def score_record(rec, root):
         "prediction_id": rec.get("prediction_id"),
         "match_id": mid,
         "created_at": rec.get("created_at") or "",
+        "prediction_as_of": rec.get("prediction_as_of") or "",
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
         "model": _m if isinstance(_m, dict) else {},

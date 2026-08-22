@@ -77,12 +77,42 @@ def run(cmd, retries=0):
     return r
 
 
+def run_hybrid_shadow(batch: Path, sales_day: str, day_dir: Path, snapshot: str) -> dict:
+    """Run research-only hybrid from the exact market batch just collected.
+
+    The quant record and hybrid sidecar therefore share an identical Sporttery
+    snapshot.  A failed research pass must not block the production-safe
+    market-only registration performed immediately before it.
+    """
+    output = day_dir / f"hybrid_{snapshot}.json"
+    result = run([
+        HERE / "hybrid_shadow.py", "--input", batch,
+        "--sales-day", sales_day, "--output", output,
+    ])
+    try:
+        payload = json.loads(result.stdout)
+    except ValueError:
+        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+    if result.returncode != 0:
+        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+    return {
+        "status": "ok",
+        "n": payload.get("n", 0),
+        "ok": payload.get("ok", 0),
+        "skipped": payload.get("skipped", 0),
+        "output": str(output),
+    }
+
+
 # [中文功能] 每日流水线：结算→采集→登记→赔率移动
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--kickoff-date', help='[新规则] 按开球日期采集：同日开球为一组 YYYY-MM-DD')
     ap.add_argument('--sales-day', help='YYYY-MM-DD; defaults to today (Asia/Shanghai)')
-    ap.add_argument('--snapshot', default='T-7h')
+    # Generic ``prematch`` is truthful at any pre-kickoff collection time.
+    # A precise T-minus label may only be supplied explicitly by a scheduler
+    # that actually ran at that measured offset.
+    ap.add_argument('--snapshot', default='prematch')
     ap.add_argument('--store', type=Path, default=STORE)
     ap.add_argument('--odds-store', type=Path, default=ODDS_STORE)
     ap.add_argument('--work-dir', type=Path, default=WORK)
@@ -102,7 +132,7 @@ def main():
     sales_day = a.kickoff_date or a.sales_day or today.strftime('%Y-%m-%d')
     report = {'ran_at': datetime.now(CST).isoformat(), 'sales_day': sales_day,
               'settle': None, 'collect': None, 'record': [], 'movement': None,
-              'intl_odds': None}
+              'intl_odds': None, 'hybrid_shadow': None}
 
     # 1) Settle already-finished matches first (official matchId preferred).
     r = run([HERE / 'fusion_settle.py', '--store', a.store]
@@ -140,6 +170,24 @@ def main():
         report['collect'] = {'count': info.get('count'), 'with_odds': info.get('input_count')}
     except ValueError:
         report['collect'] = {'error': (r.stderr or r.stdout)[:300]}
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    if not batch.exists():
+        report['input_gate'] = {'status': 'skipped', 'reason': 'collector did not emit formal input batch'}
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    try:
+        matches = json.load(open(batch, encoding='utf-8')).get('matches', [])
+    except (OSError, ValueError, AttributeError) as exc:
+        report['input_gate'] = {'status': 'error', 'reason': f'formal input batch unreadable: {exc}'}
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    if not matches:
+        # 待开售 / 缺完整 HAD 的原始行不是可登记预测，也不值得消耗国际盘额度。
+        report['input_gate'] = {'status': 'skipped', 'reason': 'no formal Sporttery inputs (unopened or incomplete odds)'}
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    if a.dry_run:
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return
 
@@ -180,13 +228,8 @@ def main():
             report['late_info'] = {'status': 'error',
                                    'error': (li.stderr or li.stdout)[-200:]}
 
-    if a.dry_run or not batch.exists():
-        print(json.dumps(report, ensure_ascii=False, indent=2))
-        return
-
     # 4) Register each match through the FULL fusion path (fusion_cli record
     #    -> fusion_predict -> core.predict), not the bare core registration.
-    matches = json.load(open(batch, encoding='utf-8')).get('matches', [])
     for mm in matches:
         num = (mm.get('sporttery_meta') or {}).get('match_num', 'unknown')
         ip = d / f'{num}_input.json'
@@ -207,6 +250,11 @@ def main():
             'note': None if ok or dup else (q.stderr or q.stdout).strip().splitlines()[-1][:120]
                     if (q.stderr or q.stdout) else None})
 
+    # 4.5) The research-only route must consume exactly this collection batch.
+    # It writes only research.hybrid sidecars and never changes the production
+    # probability or its registry entry.
+    report['hybrid_shadow'] = run_hybrid_shadow(batch, sales_day, d, a.snapshot)
+
     report['summary'] = {
         'settled': (report['settle'] or {}).get('settled', 0),
         'collected': (report['collect'] or {}).get('count', 0),
@@ -214,6 +262,7 @@ def main():
         'duplicate_snapshot': sum(1 for x in report['record'] if x.get('duplicate')),
         'skipped_or_blocked': sum(1 for x in report['record'] if not x['ok'] and not x.get('duplicate')),
         'odds_snapshots_added': (report['movement'] or {}).get('added', 0),
+        'hybrid_shadow_ok': (report['hybrid_shadow'] or {}).get('ok', 0),
     }
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

@@ -379,8 +379,10 @@ def load_registered_rows(store: str, snapshot_policy: str) -> list[dict[str, Any
         # Selection helpers need these common snapshot fields, while the
         # diagnostic does not expose them as metrics.
         row.update({"created_at": prediction.get("created_at") or "",
+                    "prediction_as_of": prediction.get("prediction_as_of") or "",
                     "snapshot_type": prediction.get("snapshot_type"),
-                    "match_id": match_id})
+                    "match_id": match_id,
+                    "model": prediction.get("model") or {}})
         candidates.append((prediction, row))
     deduped, _ = dedupe_snapshot_rows([row for _, row in candidates])
     selected = select_primary_rows(deduped, snapshot_policy)

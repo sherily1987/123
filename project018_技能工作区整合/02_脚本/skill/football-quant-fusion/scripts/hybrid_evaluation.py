@@ -69,6 +69,26 @@ def _score_90(job: dict, jobs_root: Path) -> object:
         return None
 
 
+def _router_audit_reason(hybrid: dict, kickoff: datetime) -> str | None:
+    """Require persisted point-in-time evidence for an independent prior."""
+    audit = hybrid.get("routing_audit")
+    if not isinstance(audit, dict):
+        return "missing_router_audit"
+    if audit.get("no_future_leakage") is not True:
+        return "router_audit_no_future_leakage_not_confirmed"
+    history_latest = _parse_time(audit.get("history_latest"))
+    if history_latest is None:
+        return "missing_router_history_latest"
+    if history_latest >= kickoff:
+        return "router_history_not_prematch"
+    research_run_at = _parse_time(hybrid.get("research_run_at"))
+    if research_run_at is None:
+        return "missing_research_run_at"
+    if research_run_at >= kickoff:
+        return "research_run_not_prematch"
+    return None
+
+
 def _eligible(job: dict, jobs_root: Path) -> tuple[dict | None, str | None]:
     hybrid = ((job.get("research") or {}).get("hybrid") or {})
     if hybrid.get("research_only") is not True or hybrid.get("mode") != "hybrid" or hybrid.get("status") != "ok":
@@ -82,6 +102,9 @@ def _eligible(job: dict, jobs_root: Path) -> tuple[dict | None, str | None]:
     kickoff = _parse_time(input_obj.get("kickoff") or input_obj.get("kickoff_iso"))
     if prediction_as_of is None or kickoff is None or prediction_as_of >= kickoff:
         return None, "not_prematch"
+    audit_reason = _router_audit_reason(hybrid, kickoff)
+    if audit_reason:
+        return None, audit_reason
     hybrid_probs = _probabilities(hybrid.get("final_1x2_pct"))
     market_probs = _probabilities(hybrid.get("market_1x2_pct"))
     if hybrid_probs is None or market_probs is None:
