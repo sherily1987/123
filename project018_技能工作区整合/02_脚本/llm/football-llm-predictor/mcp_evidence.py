@@ -113,6 +113,16 @@ def parse_lineups_payload(data, match_id):
     return {"home": home, "away": away, "available": True}
 
 
+def should_retry_late_lineup_refresh(api_sports, lineups):
+    """Keep the T-75 watcher alive until either provider confirms a lineup."""
+    legacy_available = isinstance(lineups, dict) and bool(lineups.get("available"))
+    api_sports_available = (
+        isinstance(api_sports, dict)
+        and str(api_sports.get("lineups_status") or "").lower() == "ok"
+    )
+    return not (legacy_available or api_sports_available)
+
+
 def _fmt_players(rows, limit=11):
     out = []
     for r in (rows or [])[:limit]:
@@ -1060,7 +1070,10 @@ def main():
                 written = lee.write_canonical_snapshot(
                     ctx["path"], refreshed_block, datetime.now(timezone.utc).isoformat())
                 print(f"🔄 {key} T-{args.refresh_before_minutes} 刷新完成, archived={written['archived']}", flush=True)
-                pending.pop(key)
+                if should_retry_late_lineup_refresh(refreshed_api, refreshed_lineups):
+                    print(f"⏳ {key} 首发尚未公布，将在开球前继续刷新", flush=True)
+                else:
+                    pending.pop(key)
             if pending:
                 time.sleep(max(1, args.poll_seconds))
 
