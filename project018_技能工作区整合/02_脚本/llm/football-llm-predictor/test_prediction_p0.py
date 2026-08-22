@@ -19,6 +19,66 @@ def primary_evidence(collected_at="2026-08-10T20:00:00+08:00"):
     return "\n".join(rows)
 
 
+def test_success_audit_record_carries_llm_contract_and_evidence_manifest():
+    aggregation = {
+        "direction": "主胜",
+        "single_model": True,
+        "research_only": True,
+        "action": "observe",
+        "reason": "single_model_no_consensus",
+        "models_used": ["moonshot/kimi-k3"],
+        "individual": {},
+    }
+    evidence_status = {
+        "evidence_file_sha256": "abc",
+        "evidence_collected_at_min": "2026-08-10T20:00:00+08:00",
+        "evidence_collected_at_max": "2026-08-10T20:00:00+08:00",
+        "evidence_source": "web_primary",
+    }
+    match = {
+        "match_id": "2040999",
+        "home": "主队",
+        "away": "客队",
+        "kickoff": "2026-08-10T22:00:00+08:00",
+        "crs": [],
+        "ttg": [],
+        "hafu": [],
+    }
+
+    record = predict.build_audit_record(
+        aggregation,
+        ["moonshot/kimi-k3"],
+        "prompt",
+        evidence_status,
+        match=match,
+    )
+
+    assert record["match_id"] == "sporttery-2040999"
+    assert record["llm_track_contract"]["valid"] is True
+    assert record["evidence_manifest"]["match_id"] == "sporttery-2040999"
+    assert record["prediction_as_of"]
+
+
+def test_skip_audit_record_keeps_match_identity():
+    record = predict.build_skip_audit_record(
+        {},
+        ["moonshot/kimi-k3"],
+        "prompt",
+        {
+            "evidence_file_sha256": "abc",
+            "evidence_collected_at_min": "2026-08-10T20:00:00+08:00",
+            "evidence_collected_at_max": "2026-08-10T20:00:00+08:00",
+        },
+        {},
+        {"reason": "single_model_no_consensus"},
+        "failed",
+        match={"match_id": "2040999", "home": "主队", "away": "客队"},
+    )
+
+    assert record["match_id"] == "sporttery-2040999"
+    assert record["action"] == "skip"
+
+
 def test_k3_evidence_auditor_uses_model_temperature_override():
     requests = []
 

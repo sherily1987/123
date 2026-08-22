@@ -30,6 +30,7 @@ import llm_prompt_rules as lpr
 import model_weights as mw
 import ev_calculator as evc
 import fusion_probability_source as fps
+import llm_track_contract as ltc
 
 def load_evidence(evidence_dir):
     """读取证据目录下所有 md 文件, 返回 {文件名: 内容}。"""
@@ -964,6 +965,8 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_rec
     if aggregation.get("error"):
         raise ValueError("cannot audit a failed aggregation")
     record = dict(aggregation)
+    record["models_used"] = list(models_used)
+    record["prediction_as_of"] = datetime.now(timezone.utc).isoformat()
     if match:
         record["match_id"] = _normalize_match_id(
             match.get("match_id") or (match.get("sporttery_meta") or {}).get("match_id")
@@ -973,6 +976,10 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_rec
         record["away"] = match.get("away")
         record["kickoff"] = match.get("kickoff_iso") or match.get("kickoff")
         record["league"] = match.get("league")
+        record["llm_track_contract"] = ltc.validate_prediction_record(record)
+        record["evidence_manifest"] = _build_llm_evidence_manifest(
+            match, evidence_status, evidence_status.get("evidence_text", "")
+        )
     record.update({
         "individual": fp.standardize_individual_predictions(
             aggregation.get("individual", {}), models_used
@@ -996,10 +1003,36 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_rec
     return record
 
 
+def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
+    """Convert existing evidence-boundary output into the machine manifest."""
+    text = evidence_text or ""
+    def has(*terms):
+        lowered = text.lower()
+        return any(term.lower() in lowered for term in terms)
+
+    evidence = {
+        "recent_form": {"home": [1] if has("近5场", "最近5场", "近况") else [],
+                        "away": [1] if has("近5场", "最近5场", "近况") else []},
+        "crs": match.get("crs") or ([1] if has("CRS", "比分赔率") else []),
+        "ttg": match.get("ttg") or ([1] if has("TTG", "总进球赔率") else []),
+        "hafu": match.get("hafu") or ([1] if has("HAFU", "半全场赔率") else []),
+        "injuries_status": "UNAVAILABLE" if has("伤停状态=UNAVAILABLE", "伤停=UNAVAILABLE")
+        else ("AVAILABLE" if has("伤停") else "UNAVAILABLE"),
+        "lineups_status": "UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
+        else ("AVAILABLE" if has("首发") else "UNAVAILABLE"),
+        "collected_at": evidence_status.get("evidence_collected_at_max"),
+        "t75_refresh": evidence_status.get("t75_refresh") or {
+            "attempted": has("T-75", "T75", "75分钟"),
+            "status": "OBSERVED_IN_TEXT" if has("T-75", "T75", "75分钟") else "NOT_ATTEMPTED",
+        },
+    }
+    return ltc.build_evidence_manifest(match, evidence)
+
+
 def build_skip_audit_record(predictions, models_used, prompt, evidence_status,
-                            evidence_audit, consensus_gate, aggregation_error):
+                            evidence_audit, consensus_gate, aggregation_error, match=None):
     """Preserve a complete audit trail when the two-voter gate skips a match."""
-    return {
+    record = {
         "status": "skip",
         "action": "skip",
         "reason": consensus_gate.get("reason") or aggregation_error,
@@ -1016,7 +1049,24 @@ def build_skip_audit_record(predictions, models_used, prompt, evidence_status,
         "evidence_collected_at_max": evidence_status["evidence_collected_at_max"],
         "evidence_audit": evidence_audit,
         "consensus_gate": consensus_gate,
+        "models_used": list(models_used),
+        "prediction_as_of": datetime.now(timezone.utc).isoformat(),
     }
+    if match:
+        record["match_id"] = ltc.normalize_match_id(
+            match.get("match_id") or (match.get("sporttery_meta") or {}).get("match_id")
+        )
+        record["home"] = match.get("home")
+        record["away"] = match.get("away")
+        record["kickoff"] = match.get("kickoff_iso") or match.get("kickoff")
+        record["llm_track_contract"] = ltc.validate_prediction_record({
+            **record, "single_model": len(models_used) == 1,
+            "research_only": True if len(models_used) == 1 else False,
+            "action": "observe" if len(models_used) == 1 else "skip",
+            "reason": "single_model_no_consensus" if len(models_used) == 1 else record["reason"],
+        })
+        record["evidence_manifest"] = _build_llm_evidence_manifest(match, evidence_status, "")
+    return record
 
 
 def main():
@@ -1097,6 +1147,10 @@ def main():
             evidence_status["evidence_source"] = "mcp_primary"
             evidence_status["mcp_evidence_file_sha256"] = evidence_status["evidence_file_sha256"]
 
+        # 仅在内存中交给契约清单生成器，正式记录仍保存哈希和时间戳，
+        # 不把整篇原始证据重复嵌入预测 JSON。
+        evidence_status["evidence_text"] = ev_text
+
         print("=" * 64)
         print(f"⚽ 第{i}/{len(selected_matches)}场 [{idx}] {m['home']} VS {m['away']} | {m.get('league', '')} | {m.get('kickoff_local', '')}")
         source_label = " (MCP 主证据)" if evidence_status["evidence_source"] == "mcp_primary" else ""
@@ -1142,7 +1196,7 @@ def main():
             print(f"  🚫 最终门控: skip ({consensus_gate['reason']})")
             print(json.dumps(build_skip_audit_record(
                 predictions, voter_models, voter_prompt, evidence_status,
-                evidence_audit, consensus_gate, agg.get("error", consensus_gate["reason"]),
+                evidence_audit, consensus_gate, agg.get("error", consensus_gate["reason"]), match=m,
             ), ensure_ascii=False))
             continue
         if evidence_status["evidence_gap"] and "error" not in agg:
@@ -1151,7 +1205,7 @@ def main():
             print(f"  [失败] {agg['error']}")
             print(json.dumps(build_skip_audit_record(
                 predictions, voter_models, voter_prompt, evidence_status,
-                evidence_audit, consensus_gate, agg["error"],
+                evidence_audit, consensus_gate, agg["error"], match=m,
             ), ensure_ascii=False))
             continue
 
