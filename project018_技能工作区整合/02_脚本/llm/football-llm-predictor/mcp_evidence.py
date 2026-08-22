@@ -31,6 +31,7 @@ import time
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 for _p in (r"F:\HM足球比赛预测\project001_足球预测\02_脚本",):
@@ -357,6 +358,24 @@ TEAM_NAME_ALIASES = {
 }
 
 
+def _load_shared_team_aliases():
+    """Reuse the Sporttery alias authority instead of maintaining a second map."""
+    config = (Path(__file__).resolve().parents[2] / "skill" / "football-quant-fusion"
+              / "config" / "intl_odds_sources.json")
+    try:
+        aliases = json.loads(config.read_text(encoding="utf-8")).get("team_aliases") or {}
+    except (OSError, ValueError):
+        return
+    for sporttery_name, provider_names in aliases.items():
+        if isinstance(provider_names, list):
+            TEAM_NAME_ALIASES.setdefault(str(sporttery_name), set()).update(
+                str(name) for name in provider_names if name
+            )
+
+
+_load_shared_team_aliases()
+
+
 def _safe_name(value):
     """把队名转成文件名安全的片段，**保留中文**。
 
@@ -389,7 +408,7 @@ def _team_matches(raw_name, candidate_name):
 
 
 def raw_kickoff_bj(raw_match):
-    kickoff_iso = raw_match.get("kickoff_iso")
+    kickoff_iso = raw_match.get("kickoff_iso") or raw_match.get("kickoff")
     if kickoff_iso:
         try:
             value = datetime.fromisoformat(str(kickoff_iso).replace("Z", "+00:00"))
@@ -426,7 +445,8 @@ def match_raw_to_candidates(raw_matches, candidates, window_sec=90 * 60):
             continue
         hits = []
         for c in candidates:
-            if not league_match(m.get("league", ""), c):
+            raw_league = m.get("league") or m.get("competition") or m.get("stage") or ""
+            if not league_match(raw_league, c):
                 continue
             t_c = to_bj(c.get("kickoff_utc", ""))
             if t_c is None or abs((t_c - t_bj).total_seconds()) > window_sec:
@@ -751,7 +771,7 @@ def utc_date(item):
         except ValueError:
             return None
     raw = item.get("raw") or {}
-    kickoff_iso = raw.get("kickoff_iso")
+    kickoff_iso = raw.get("kickoff_iso") or raw.get("kickoff")
     if kickoff_iso:
         try:
             value = datetime.fromisoformat(str(kickoff_iso).replace("Z", "+00:00"))
@@ -935,7 +955,7 @@ def main():
         if args.limit:
             raw_ms = raw_ms[:args.limit]
         # 拉 apifootball 比赛候选
-        dates = [parse_bj(m.get("kickoff_local", "")) for m in raw_ms]
+        dates = [raw_kickoff_bj(m) for m in raw_ms]
         dates = [d for d in dates if d]
         if not dates:
             ap.error("raw 里没有可解析的 kickoff_local")
@@ -1027,7 +1047,8 @@ def main():
         standings = results.get("standings", {}).get(str(item.get("league_id", "")), None) if item.get("league_id") else None
         h2h = results.get("h2h", {}).get(f"{home_en}|{away_en}", None)
         lineups = results.get("lineups", {}).get(mid)
-        kickoff = raw_m.get("kickoff_iso") or (item.get("cand") or {}).get("kickoff_utc")
+        kickoff = (raw_m.get("kickoff_iso") or raw_m.get("kickoff")
+                   or (item.get("cand") or {}).get("kickoff_utc"))
         api_sports = (api_client.collect_match(home_en, away_en, kickoff)
                       if home_en and away_en and kickoff else
                       {"status": "UNAVAILABLE", "reason": "missing_identity_or_kickoff"})
