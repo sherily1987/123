@@ -67,11 +67,11 @@ python football_predictor.py "曼城" "利物浦" --dry-run
 
 ## 工作原理
 1. 每个模型独立收到相同的比赛信息，各自预测比分 + 置信度 + 理由
-2. 7个模型并行调用（线程池），单个失败不影响整体
+2. 默认调用 Kimi K3；其他模型只能通过 `--models` 做隔离实验，单模型结果始终是研究意见
 3. 聚合：比分众数投票 → 综合预测；赛果众数 → 综合赛果
 4. 输出平均置信度 + 分歧度（分歧大 = 谨慎参考）
 
-## 完整流水线：体彩采集 → 多LLM预测
+## 完整流水线：体彩采集 → K3 研究预测
 配合足彩移动采集器（中国体彩官方移动端链路，零依赖零Key）使用：
 
 ```bash
@@ -97,9 +97,15 @@ python mcp_evidence.py --input data/raw_2026-08-05.json \
 # 2b) 生成报告 (Markdown + Excel)
 python export_report.py data/predictions_2026-08-05.txt data/raw_2026-08-05.json
 
-# 3) 赛后采集赛果，回测预测
+# 3) 赛后采集赛果，回测预测（旧文本回测）
 python fetch_sporttery_full.py --results --date 2026-08-06 --output data/results.json
 python backtest.py
+
+# 4) 统一 LLM 轨评测：只把已核验的90分钟赛果纳入分母
+python evaluate_llm_track.py \
+    --predictions data/llm_records.json \
+    --results data/results.json \
+    --output data/llm_track_evaluation.json
 ```
 
 watcher 在开球前会持续重试；只有 API-Sports 已给出首发或证据已满足首发条件时才停止刷新。旧 canonical 证据归档至 `snapshots/`，开球后禁止生成新的赛前证据。
@@ -169,6 +175,12 @@ python simulate_from_odds.py --input data/raw_2026-08-05.json --sim 10000
 默认只调用 `moonshot/kimi-k3`，包括证据审计与研究意见。单模型输出标记为 `single_model_research` / `action=observe`：它不是投票共识，不显示投票强度或 LLM 概率，也不会计算 EV、生成单选或下注建议。只有显式传入两个独立投票模型时，才可能形成 `consensus`；即使如此，LLM 轨仍只作研究，不能替代量化轨校准概率。
 
 需要做隔离实验时，可运行时用 `--models` 指定模型列表；不要修改默认池或把实验输出混入生产登记/回测。
+
+## LLM 轨评测契约
+
+`evaluate_llm_track.py` 接受预测数组（或 `{\"records\": [...]}`）和赛果映射（或 `{\"results\": {...}}`）。赛果只有在 `score_90_status=verified`、且 `score_90` 为有效90分钟比分时才进入分母；重复 `match_id`、缺失赛果和未验证赛果会进入 `audit` 排除计数。
+
+报告分别输出 1X2、平局、Top1 比分、大小 2.5 和 HAFU 的样本量与命中率。LLM 置信度不被转换为概率，报告不会生成 EV、凯利或下注金额。
 
 **多 provider 支持**：模型 ID 加前缀路由到不同服务商——
 - `zhipu/glm-4-flash` → 智谱（完全免费无限量，国内直连，key 已持久化 `ZHIPU_API_KEY`）

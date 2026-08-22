@@ -48,3 +48,14 @@ def test_evaluation_reports_1x2_draw_and_score_metrics_separately():
     assert report["ou25"]["n"] == 2
     assert report["hafu"]["n"] == 2
 
+
+def test_cli_loaders_accept_records_and_result_maps(tmp_path):
+    predictions = tmp_path / "predictions.json"
+    results = tmp_path / "results.json"
+    predictions.write_text('{"records":[{"match_id":"sporttery-1","direction":"平局"}]}', encoding="utf-8")
+    results.write_text('{"results":{"sporttery-1":{"score_90":[0,0],"score_90_status":"verified"}}}', encoding="utf-8")
+
+    from evaluate_llm_track import load_records, load_results
+
+    assert load_records(predictions)[0]["match_id"] == "sporttery-1"
+    assert load_results(results)["sporttery-1"]["score_90_status"] == "verified"

@@ -33,6 +33,19 @@
 4. 证据保持六节。第 1 节放 源1–20 + 三条「二十源整合」；第 3 节放投票近 5 场。
 5. `runner.prepare_llm_evidence` 会自动 `apply_pack_file`。手工文件也可直接写成对照成品那样。
 
+## 评测入口
+
+预测登记后使用 `evaluate_llm_track.py` 评估 K3 研究轨：
+
+```bash
+python evaluate_llm_track.py \
+  --predictions data/llm_records.json \
+  --results data/results.json \
+  --output data/llm_track_evaluation.json
+```
+
+评测只接受 `score_90_status=verified` 的90分钟赛果，按 `sporttery-<体彩id>` 去重；重复、缺失或未核验记录只写入排除审计，不进入指标分母。
+
 ## 禁止
 
 - 不得因官方未出而整维弃权。
