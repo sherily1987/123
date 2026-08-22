@@ -142,6 +142,24 @@ def run_half_time_research(store: Path) -> dict:
             "rows": result.get("rows", 0), "verified": result.get("verified", 0)}
 
 
+def run_derivative_research(store: Path) -> dict:
+    """Refresh O/U and HAFU diagnostics after settlement without changing production outputs."""
+    research = store.parent / "research"
+    evidence = research / "half-time-evidence" / "apifootball_verified_latest.json"
+    output = research / "derivative-diagnostics" / "latest.json"
+    result = run([
+        HERE / "derivative_diagnostics.py", "--store", store,
+        "--half-time-evidence", evidence, "--output", output,
+    ])
+    try:
+        payload = json.loads(result.stdout)
+    except ValueError:
+        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+    if result.returncode != 0 or payload.get("status") != "ok":
+        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+    return {"status": "ok", "output": str(output), "metrics": payload.get("metrics")}
+
+
 # [中文功能] 每日流水线：结算→采集→登记→赔率移动
 def main():
     ap = argparse.ArgumentParser()
@@ -170,7 +188,8 @@ def main():
     sales_day = a.kickoff_date or a.sales_day or today.strftime('%Y-%m-%d')
     report = {'ran_at': datetime.now(CST).isoformat(), 'sales_day': sales_day,
               'settle': None, 'collect': None, 'record': [], 'movement': None,
-              'intl_odds': None, 'hybrid_shadow': None, 'half_time_research': None}
+              'intl_odds': None, 'hybrid_shadow': None, 'half_time_research': None,
+              'derivative_research': None}
 
     # 1) Settle already-finished matches first (official matchId preferred).
     r = run([HERE / 'fusion_settle.py', '--store', a.store]
@@ -196,8 +215,10 @@ def main():
     # provider failure must not block the production collection/registration.
     if not a.dry_run and int((report['settle'] or {}).get('settled') or 0) > 0:
         report['half_time_research'] = run_half_time_research(a.store)
+        report['derivative_research'] = run_derivative_research(a.store)
     else:
         report['half_time_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
+        report['derivative_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
 
     # 2) Collect the full cross-midnight sales day via fusion's own collector.
     d = a.work_dir / sales_day

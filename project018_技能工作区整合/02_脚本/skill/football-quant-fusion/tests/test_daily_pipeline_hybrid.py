@@ -67,6 +67,32 @@ def test_half_time_research_captures_then_enriches_without_touching_settlement(m
     assert "--aliases" in enrich and "--output" in enrich
 
 
+def test_derivative_research_runs_from_verified_half_time_sidecar(monkeypatch, tmp_path):
+    seen = []
+
+    def fake_run(command, retries=0):
+        seen.append((command, retries))
+        output = command[command.index("--output") + 1]
+        return type("Result", (), {
+            "returncode": 0,
+            "stdout": json.dumps({"status": "ok", "output": str(output),
+                                    "metrics": {"ou_2_5": {"n": 3}, "hafu": {"n": 1}}}),
+            "stderr": "",
+        })()
+
+    monkeypatch.setattr(pipeline, "run", fake_run)
+
+    report = pipeline.run_derivative_research(tmp_path / "backtest")
+
+    command, retries = seen[0]
+    assert command[0].name == "derivative_diagnostics.py"
+    assert command[command.index("--store") + 1] == tmp_path / "backtest"
+    assert command[command.index("--half-time-evidence") + 1].name == "apifootball_verified_latest.json"
+    assert report == {"status": "ok", "output": str(tmp_path / "research" / "derivative-diagnostics" / "latest.json"),
+                      "metrics": {"ou_2_5": {"n": 3}, "hafu": {"n": 1}}}
+    assert retries == 0
+
+
 def test_daily_pipeline_default_snapshot_is_truthful_generic_prematch(monkeypatch, tmp_path):
     """A default run may not claim an arbitrary T-minus hour it did not measure."""
     seen = []
@@ -102,6 +128,38 @@ def test_daily_pipeline_default_snapshot_is_truthful_generic_prematch(monkeypatc
     collect = next(command for command in seen if command[0].name == "sales_day_collect.py")
     assert Path(collect[collect.index("--output") + 1]).name == "sporttery_prematch.json"
     assert Path(collect[collect.index("--emit-input") + 1]).name == "inputs_prematch.json"
+
+
+def test_daily_pipeline_refreshes_derivatives_after_a_new_settlement(monkeypatch, tmp_path, capsys):
+    calls = []
+
+    def fake_run(command, retries=0):
+        if command[0].name == "fusion_settle.py":
+            payload = {"settled": 1, "official": {"pending": 0, "report": [{"status": "settled"}]}}
+        elif command[0].name == "sales_day_collect.py":
+            output = command[command.index("--output") + 1]
+            emitted = command[command.index("--emit-input") + 1]
+            Path(output).write_text("{}", encoding="utf-8")
+            Path(emitted).write_text(json.dumps({"matches": []}), encoding="utf-8")
+            payload = {"count": 0}
+        else:
+            raise AssertionError(command)
+        return type("Result", (), {"returncode": 0, "stdout": json.dumps(payload), "stderr": ""})()
+
+    monkeypatch.setattr(pipeline, "run", fake_run)
+    monkeypatch.setattr(pipeline, "run_half_time_research", lambda store: calls.append(("half", store)) or {"status": "ok"})
+    monkeypatch.setattr(pipeline, "run_derivative_research", lambda store: calls.append(("derivative", store)) or {"status": "ok"})
+    monkeypatch.setattr(pipeline.sys, "argv", [
+        "fusion_daily_pipeline.py", "--kickoff-date", "2026-08-25",
+        "--store", str(tmp_path / "backtest"), "--odds-store", str(tmp_path / "odds.jsonl"),
+        "--work-dir", str(tmp_path / "forward"),
+    ])
+
+    pipeline.main()
+
+    assert [name for name, _ in calls] == ["half", "derivative"]
+    report = json.loads(capsys.readouterr().out)
+    assert report["derivative_research"] == {"status": "ok"}
 
 
 def test_daily_pipeline_skips_market_sidecars_when_collector_has_no_formal_inputs(monkeypatch, tmp_path):
