@@ -161,6 +161,17 @@ def test_t75_lineup_uses_api_sports_fixture_identity(tmp_path: Path, monkeypatch
     assert rows[0]["lineup"]["away"]["starting"] == ["Away Starter"]
 
 
+def test_t75_watcher_retries_until_a_valid_lineup_arrives():
+    unavailable = [
+        {"kind": "injury", "status": "UNAVAILABLE"},
+        {"kind": "lineup", "status": "UNAVAILABLE"},
+    ]
+    valid = [{"kind": "lineup", "status": "VALID"}]
+
+    assert mod.should_retry_lineup(unavailable) is True
+    assert mod.should_retry_lineup(valid) is False
+
+
 def test_due_and_jsonl_are_research_only(tmp_path: Path):
     matches = [{
         "match_id": 2040907,

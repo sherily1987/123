@@ -380,6 +380,11 @@ def collect_one(rec, snapshot, want_injury, want_lineup, events_path):
     return out
 
 
+def should_retry_lineup(rows: list[dict]) -> bool:
+    """Keep a watched match pending until a provider has actual starters."""
+    return not any(row.get("kind") == "lineup" and row.get("status") == "VALID" for row in rows)
+
+
 def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
     due = []
     for rec in matches:
@@ -449,8 +454,11 @@ def main() -> None:
                 if kickoff is None or now_utc() >= kickoff:
                     continue
                 if in_t75_window(kickoff):
-                    collected.extend(collect_one(
-                        rec, "T-75", want_injury=True, want_lineup=True, events_path=events_path))
+                    rows = collect_one(
+                        rec, "T-75", want_injury=True, want_lineup=True, events_path=events_path)
+                    collected.extend(rows)
+                    if should_retry_lineup(rows):
+                        still.append(rec)
                 else:
                     still.append(rec)
             pending = still
