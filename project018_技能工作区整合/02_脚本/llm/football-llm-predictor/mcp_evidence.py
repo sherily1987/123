@@ -909,12 +909,36 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
              source_note,
              f"> match_identity(sporttery_match_id={sporttery_id};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
              f"> 竞彩: {sporttery_num} | 体彩matchId {sporttery_id} | apifootball match_id {mid}", ""]
+    late_status = api_sports or {}
+    injury_status = str(late_status.get("injuries_status") or "UNAVAILABLE")
+    lineup_status = str(late_status.get("lineups_status") or "UNAVAILABLE")
+    lineup_note = (
+        "伤停或首发尚不可用，属于证据缺口，不能解读为无人缺阵或首发已确认。"
+        if "UNAVAILABLE" in (injury_status, lineup_status)
+        else "伤停与首发状态已随下方结构化数据保留，仍须按各来源时点核验。"
+    )
+    # MCP 可在没有网页抓取主证据时作为研究主证据，但必须显式覆盖与网页证据相同的
+    # 六项审计维度。这里仅描述数据覆盖与身份，不推断伤停、战意、天气或比赛方向。
+    contract_blocks = [
+        "## 1. 伤停与阵容\n"
+        f"- API-Sports 伤停状态={injury_status}；首发状态={lineup_status}。{lineup_note}",
+        "## 2. 战意与动机\n"
+        "- 本结构化块不把排名、赛程或主场直接推断为战意；没有逐项可核验事实时属于证据缺口。",
+        "## 3. 近况与状态\n"
+        "- 两队最近正式比赛、积分与交锋（若供应方返回）保留在下方对应数据块；热身赛不作为正式近况依据。",
+        "## 4. 主客/旅行/天气\n"
+        "- 当前结构化源未提供旅行与天气事实，属于数据缺口（证据缺口），不能按无影响处理。",
+        "## 5. 赔率\n"
+        "- 体彩官方市场字段保留在下方；若具体盘口未返回，则属于证据缺口，不得补写或推断赔率。",
+        "## 6. 身份核验\n"
+        f"- 已绑定 sporttery_match_id={sporttery_id}、主队={raw_m.get('home', '')}、客队={raw_m.get('away', '')}、api_match_id={mid}。",
+    ]
     # 赛季首战：本季积分榜为空 ≠ 无近5场。必须改取该队对其他对手的最近正式赛。
     if detect_season_opener(standings, h2h):
         parts.append("> ⚠️ [赛季首战] 本季积分榜为空不等于无近5场。"
                      "近况必须取该队对其他对手的最近最多5场正式赛（上季联赛收官、杯赛正式场；热身不算）。"
                      "不得把整维近况标不可用；不得仅凭主场空话选主胜。")
-    blocks = [lee.render_sporttery_markets(raw_m, collected_at)]
+    blocks = contract_blocks + [lee.render_sporttery_markets(raw_m, collected_at)]
     if api_sports is not None:
         blocks.append(lee.render_api_sports_evidence(api_sports, collected_at))
     b1 = fmt_odds_block(odds_list)

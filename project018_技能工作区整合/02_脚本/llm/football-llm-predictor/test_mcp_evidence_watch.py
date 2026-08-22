@@ -1,4 +1,5 @@
 import mcp_evidence as mcp
+import predict
 
 
 def test_late_refresh_retries_when_no_provider_lineup_is_available():
@@ -64,3 +65,27 @@ def test_mcp_block_uses_sporttery_meta_identity_when_flat_id_is_absent():
     assert "sporttery_match_id=2041018" in block
     assert "体彩matchId 2041018" in block
     assert "数据缺口" in block
+
+
+def test_mcp_block_meets_primary_evidence_contract_without_fabricating_gaps():
+    raw = {
+        "home": "天狼星", "away": "布鲁马波卡纳", "competition": "瑞超",
+        "sporttery_meta": {"match_id": 100},
+    }
+    api = {
+        "status": "ok", "fixture_id": 715575,
+        "recent": {"home": [{"date": "2026-08-10", "league": "瑞超", "home": "Sirius",
+                               "away": "AIK", "score_90": "1-0", "status": "FT"}], "away": []},
+        "injuries_status": "UNAVAILABLE", "lineups_status": "UNAVAILABLE",
+    }
+    block = mcp.build_block(
+        raw, {"home_team": "Sirius", "away_team": "Brommapojkarna"},
+        [], None, None, None, "715575", api_sports=api,
+    )
+
+    status = predict.assess_evidence(
+        block, kickoff="2099-01-01T12:00:00+08:00", now="2026-08-22T12:00:00+08:00"
+    )
+
+    assert status["ok"] is True
+    assert status["evidence_gap"] is True

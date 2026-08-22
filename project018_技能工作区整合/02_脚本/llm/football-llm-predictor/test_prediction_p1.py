@@ -161,6 +161,46 @@ def test_k3_only_main_skips_ev_and_single_pick(tmp_path, monkeypatch, capsys):
     assert '"action": "observe"' in output
 
 
+def test_k3_only_main_uses_valid_mcp_as_primary_when_web_evidence_is_absent(tmp_path, monkeypatch, capsys):
+    raw_path = tmp_path / "raw.json"
+    evidence_dir = tmp_path / "evidence"
+    evidence_dir.mkdir()
+    raw_path.write_text(json.dumps({"matches": [{
+        "match_id": 3, "match_num": "003", "home": "E", "away": "F",
+        "kickoff_iso": "2099-01-01T12:00:00+08:00",
+    }]}, ensure_ascii=False), encoding="utf-8")
+    mcp = me.build_block(
+        {"home": "E", "away": "F", "league": "测试联赛", "match_id": 3},
+        {"home_team": "E", "away_team": "F"}, [], None, None, None, "999",
+        api_sports={
+            "status": "ok", "fixture_id": 999,
+            "recent": {"home": [{"date": "2026-08-10", "league": "测试联赛", "home": "E",
+                                   "away": "G", "score_90": "1-0", "status": "FT"}], "away": []},
+            "injuries_status": "UNAVAILABLE", "lineups_status": "UNAVAILABLE",
+        },
+    )
+    (evidence_dir / "evidence_001_target_mcp.md").write_text(mcp, encoding="utf-8")
+
+    monkeypatch.setattr(predict.fp, "get_client", lambda *_: object())
+    monkeypatch.setattr(predict, "call_evidence_auditor", lambda *_: {
+        "status": "ok", "usable_evidence_ids": [], "unusable_evidence_ids": [],
+        "conflict_evidence_ids": [], "gaps": [], "market_readiness": {}, "summary": "ok",
+    })
+    monkeypatch.setattr(predict, "call_evidence_model",
+                        lambda _client, model, *_: (model, evidence_prediction("主胜", alt="平局")))
+    monkeypatch.setattr(sys, "argv", ["predict.py", "--input", str(raw_path),
+                                       "--evidence-dir", str(evidence_dir),
+                                       "--models", "moonshot/kimi-k3"])
+
+    predict.main()
+
+    output = capsys.readouterr().out
+    assert "证据: evidence_001_target_mcp.md (MCP 主证据)" in output
+    assert "K3 单模型研究意见" in output
+    assert "💰 下注推荐" not in output
+    assert '"evidence_source": "mcp_primary"' in output
+
+
 def test_two_valid_models_forces_cautious_dual_output():
     result = predict.aggregate_directions({
         "a": evidence_prediction("主胜"), "b": evidence_prediction("客胜"),

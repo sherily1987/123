@@ -980,6 +980,8 @@ def build_audit_record(aggregation, models_used, prompt, evidence_status, ev_rec
         "aggregation_rule_sha256": _stable_sha256(AGGREGATION_RULE_SPEC),
         "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         "evidence_file_sha256": evidence_status["evidence_file_sha256"],
+        "evidence_source": evidence_status.get("evidence_source", "web_primary"),
+        "mcp_evidence_file_sha256": evidence_status.get("mcp_evidence_file_sha256"),
         "evidence_collected_at_min": evidence_status["evidence_collected_at_min"],
         "evidence_collected_at_max": evidence_status["evidence_collected_at_max"],
         "ev_recommendation": ev_recommendation,
@@ -1004,6 +1006,8 @@ def build_skip_audit_record(predictions, models_used, prompt, evidence_status,
         ).hexdigest(),
         "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         "evidence_file_sha256": evidence_status["evidence_file_sha256"],
+        "evidence_source": evidence_status.get("evidence_source", "web_primary"),
+        "mcp_evidence_file_sha256": evidence_status.get("mcp_evidence_file_sha256"),
         "evidence_collected_at_min": evidence_status["evidence_collected_at_min"],
         "evidence_collected_at_max": evidence_status["evidence_collected_at_max"],
         "evidence_audit": evidence_audit,
@@ -1047,33 +1051,52 @@ def main():
             time.sleep(5)
         idx = m.get("match_num", "")
         # 使用 raw 文件中的原始场次序号，避免 --match-id 过滤后重新编号而错配证据。
-        ev_name = match_evidence_file(match_idx, evidence_files)
-        if not ev_name:
-            print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": "missing_evidence_file"}, ensure_ascii=False))
-            continue
-        primary_evidence = evidence_files[ev_name]
         # kickoff_iso 带明确时区（体彩原始数据为 Asia/Shanghai），用于与
         # collected_at 的 ISO 时间戳比较；kickoff_local 仅是展示用回退字段。
         kickoff = m.get("kickoff_iso") or m.get("kickoff") or m.get("kickoff_local")
-        evidence_status = assess_evidence(
-            primary_evidence, kickoff=kickoff, now=datetime.now(timezone.utc)
-        )
-        if not evidence_status["ok"]:
-            print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
-            continue
-        ev_text = primary_evidence
+        now = datetime.now(timezone.utc)
+        ev_name = match_evidence_file(match_idx, evidence_files)
         mcp_name = match_mcp_file(match_idx, evidence_files, match=m)
-        if mcp_name:
+        if ev_name:
+            primary_evidence = evidence_files[ev_name]
+            evidence_status = assess_evidence(primary_evidence, kickoff=kickoff, now=now)
+            if not evidence_status["ok"]:
+                print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
+                continue
+            evidence_status["evidence_source"] = "web_primary"
+            ev_text = primary_evidence
+            if mcp_name:
+                mcp_status = assess_mcp_evidence(evidence_files[mcp_name], kickoff, match=m)
+                if mcp_status["ok"]:
+                    ev_text += "\n\n" + evidence_files[mcp_name]
+                    evidence_status["evidence_source"] = "web_primary_with_mcp"
+                    evidence_status["mcp_evidence_file_sha256"] = hashlib.sha256(
+                        evidence_files[mcp_name].encode("utf-8")
+                    ).hexdigest()
+                    print(f"   数据块: {mcp_name} (MCP 已拼入)")
+                else:
+                    print(f"   ⚠️ MCP 数据块已拒绝: {mcp_status['reason']}")
+        else:
+            if not mcp_name:
+                print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": "missing_evidence_file"}, ensure_ascii=False))
+                continue
             mcp_status = assess_mcp_evidence(evidence_files[mcp_name], kickoff, match=m)
-            if mcp_status["ok"]:
-                ev_text += "\n\n" + evidence_files[mcp_name]
-                print(f"   数据块: {mcp_name} (MCP 已拼入)")
-            else:
-                print(f"   ⚠️ MCP 数据块已拒绝: {mcp_status['reason']}")
+            if not mcp_status["ok"]:
+                print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": mcp_status["reason"]}, ensure_ascii=False))
+                continue
+            ev_text = evidence_files[mcp_name]
+            evidence_status = assess_evidence(ev_text, kickoff=kickoff, now=now)
+            if not evidence_status["ok"]:
+                print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
+                continue
+            ev_name = mcp_name
+            evidence_status["evidence_source"] = "mcp_primary"
+            evidence_status["mcp_evidence_file_sha256"] = evidence_status["evidence_file_sha256"]
 
         print("=" * 64)
         print(f"⚽ 第{i}/{len(selected_matches)}场 [{idx}] {m['home']} VS {m['away']} | {m.get('league', '')} | {m.get('kickoff_local', '')}")
-        print(f"   证据: {ev_name}")
+        source_label = " (MCP 主证据)" if evidence_status["evidence_source"] == "mcp_primary" else ""
+        print(f"   证据: {ev_name}{source_label}")
         print("=" * 64)
 
         evidence_catalog = build_evidence_catalog(ev_text)
