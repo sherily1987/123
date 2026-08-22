@@ -35,3 +35,20 @@ def test_formal_collector_schema_matches_provider_candidate_with_shared_aliases(
     }
 
     assert mcp.match_raw_to_candidates([raw], [candidate]) == [(0, candidate)]
+
+
+def test_api_sports_fallback_item_preserves_aliases_and_marks_evidence_gap():
+    raw = {
+        "home": "博塔弗戈", "away": "巴竞技", "competition": "巴甲",
+        "kickoff": "2026-08-25T07:00:00+08:00",
+        "sporttery_meta": {"match_id": 2041038},
+    }
+
+    item = mcp.api_sports_fallback_item(raw, 8)
+    block = mcp.build_block(raw, item["cand"], [], None, None, None, None,
+                            api_sports={"status": "ok", "recent": {}})
+
+    assert item["mid"] is None
+    assert "Atletico Paranaense" in item["api_sports_away_names"]
+    assert "API-Sports 降级证据" in block
+    assert "数据缺口" in block

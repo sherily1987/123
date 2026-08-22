@@ -95,6 +95,11 @@ def _normal(value):
     return "".join(ch for ch in str(value or "").casefold() if ch.isalnum())
 
 
+def _normal_names(value):
+    values = value if isinstance(value, (list, tuple, set)) else (value,)
+    return {_normal(item) for item in values if _normal(item)}
+
+
 def _normalize_fixture(row):
     status = ((row.get("fixture") or {}).get("status") or {}).get("short")
     score = (row.get("score") or {}).get("fulltime") or {}
@@ -140,6 +145,7 @@ class ApiSportsClient:
 
     def collect_match(self, home, away, kickoff):
         kick = _dt(kickoff)
+        home_names, away_names = _normal_names(home), _normal_names(away)
         try:
             fixtures = self._request("/fixtures", {
                 "date": kick.astimezone(timezone.utc).date().isoformat(), "timezone": "UTC",
@@ -149,8 +155,8 @@ class ApiSportsClient:
         matches = []
         for row in fixtures:
             teams = row.get("teams") or {}
-            if (_normal((teams.get("home") or {}).get("name")) != _normal(home)
-                    or _normal((teams.get("away") or {}).get("name")) != _normal(away)):
+            if (_normal((teams.get("home") or {}).get("name")) not in home_names
+                    or _normal((teams.get("away") or {}).get("name")) not in away_names):
                 continue
             try:
                 event_time = _dt((row.get("fixture") or {}).get("date"))

@@ -407,6 +407,32 @@ def _team_matches(raw_name, candidate_name):
     return bool(_normal_name(candidate_name) and _normal_name(candidate_name) in expected)
 
 
+def api_sports_name_candidates(raw_name):
+    """Return the Sporttery label plus configured provider aliases deterministically."""
+    aliases = sorted(str(name) for name in TEAM_NAME_ALIASES.get(str(raw_name), set()) if name)
+    return [str(raw_name or ""), *aliases]
+
+
+def api_sports_fallback_item(raw_match, index):
+    """Build a research-only fallback when APIFootball has no safe identity match."""
+    home_names = api_sports_name_candidates(raw_match.get("home"))
+    away_names = api_sports_name_candidates(raw_match.get("away"))
+    home_provider = next((name for name in home_names if _normal_name(name)), "")
+    away_provider = next((name for name in away_names if _normal_name(name)), "")
+    return {
+        "ri": index,
+        "raw": raw_match,
+        "mid": None,
+        "home_en": home_provider,
+        "away_en": away_provider,
+        "api_sports_home_names": home_names,
+        "api_sports_away_names": away_names,
+        "league_id": None,
+        "cand": {"home_team": home_provider, "away_team": away_provider},
+        "source_mode": "api_sports_fallback",
+    }
+
+
 def raw_kickoff_bj(raw_match):
     kickoff_iso = raw_match.get("kickoff_iso") or raw_match.get("kickoff")
     if kickoff_iso:
@@ -857,10 +883,17 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
     home_en = cand.get("home_team", "") if cand else ""
     away_en = cand.get("away_team", "") if cand else ""
     collected_at = datetime.now(timezone.utc).isoformat()
-    source_url = "https://apifootball.com/"
+    fallback = mid is None
+    source_url = lee.API_BASE if fallback else "https://apifootball.com/"
+    source_note = (
+        f"> API-Sports 降级证据: APIFootball 未能安全匹配该场；只保留体彩市场与 API-Sports 近况/伤停/首发，"
+        "不得把缺失的官方模型、积分榜或交锋信息视作无风险。"
+        if fallback else
+        f"> 第三方结构化数据: apifootball MCP | source({source_url}) collected_at({collected_at})"
+    )
     parts = [f"# MCP 数据证据块: {raw_m.get('home','')}({home_en}) vs {raw_m.get('away','')}({away_en}) | {raw_m.get('league','')}",
              "",
-             f"> 第三方结构化数据: apifootball MCP | source({source_url}) collected_at({collected_at})",
+             source_note,
              f"> match_identity(sporttery_match_id={raw_m.get('match_id', '')};home={raw_m.get('home', '')};away={raw_m.get('away', '')};api_match_id={mid})",
              f"> 竞彩: {raw_m.get('match_num','')} | 体彩matchId {raw_m.get('match_id')} | apifootball match_id {mid}", ""]
     # 赛季首战：本季积分榜为空 ≠ 无近5场。必须改取该队对其他对手的最近正式赛。
@@ -897,6 +930,9 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
     b4 = fmt_h2h_block(h2h)
     if b4:
         blocks.append(b4)
+    if fallback:
+        blocks.append("## 5. 数据缺口\n- APIFootball 身份匹配不可用；官方模型、积分榜与交锋未采集。"
+                      "本场仅以体彩市场和 API-Sports 可核验事实作研究参考。")
     if len(blocks) < 2:
         blocks.append("## 5. 数据缺口\n- 本场 MCP 数据覆盖不全 (部分块未取到), 预测时以人工证据为主, 此块仅参考")
     # Layer 1 量化信号摘要 (置顶注入, 让 LLM 先看到核心异常信号)
@@ -969,10 +1005,13 @@ def main():
             if c:
                 manual.append({"ri": ri, "raw": raw_ms[ri], "mid": c.get("match_id"),
                                "home_en": c.get("home_team", ""), "away_en": c.get("away_team", ""),
+                               "api_sports_home_names": api_sports_name_candidates(raw_ms[ri].get("home")),
+                               "api_sports_away_names": api_sports_name_candidates(raw_ms[ri].get("away")),
                                "league_id": c.get("league_id"), "cand": c})
             else:
                 print(f"⚠️ 第{ri+1}场 [{raw_ms[ri].get('match_num','')}] {raw_ms[ri].get('home')} vs {raw_ms[ri].get('away')} "
-                      f"({raw_ms[ri].get('league')}) 未匹配到 apifootball 比赛, 跳过")
+                      f"({raw_ms[ri].get('league') or raw_ms[ri].get('competition')}) 未匹配到 apifootball 比赛, 改用 API-Sports 降级证据")
+                manual.append(api_sports_fallback_item(raw_ms[ri], ri))
 
     # ---- 2. 并发拉数据 ----
     lock = threading.Lock()
@@ -1006,6 +1045,8 @@ def main():
         # odds + predictions: 每场单查 (批量接口截断); date 用 UTC 日期口径
         for item in manual:
             mid = item["mid"]
+            if not mid:
+                continue
             d = utc_date(item)
             if d is None:
                 print(f"⚠️ 跳过 {mid}: 缺少可验证的带时区开球时间")
@@ -1049,8 +1090,10 @@ def main():
         lineups = results.get("lineups", {}).get(mid)
         kickoff = (raw_m.get("kickoff_iso") or raw_m.get("kickoff")
                    or (item.get("cand") or {}).get("kickoff_utc"))
-        api_sports = (api_client.collect_match(home_en, away_en, kickoff)
-                      if home_en and away_en and kickoff else
+        api_sports_home = item.get("api_sports_home_names") or home_en
+        api_sports_away = item.get("api_sports_away_names") or away_en
+        api_sports = (api_client.collect_match(api_sports_home, api_sports_away, kickoff)
+                      if api_sports_home and api_sports_away and kickoff else
                       {"status": "UNAVAILABLE", "reason": "missing_identity_or_kickoff"})
         block = build_block(raw_m, item.get("cand") or {}, odds_list, pred, standings, h2h, mid,
                             lineups=lineups, api_sports=api_sports)
@@ -1058,6 +1101,8 @@ def main():
         path = os.path.join(args.out_dir, fname)
         written = lee.write_canonical_snapshot(path, block, datetime.now(timezone.utc).isoformat())
         contexts.append({"item": item, "path": path, "kickoff": kickoff,
+                         "api_sports_home_names": api_sports_home,
+                         "api_sports_away_names": api_sports_away,
                          "odds_list": odds_list, "pred": pred, "standings": standings,
                          "h2h": h2h, "lineups": lineups})
         made += 1
@@ -1065,7 +1110,8 @@ def main():
     print(f"\n✅ 完成, 生成 {made} 个 MCP 数据块 -> {args.out_dir}")
 
     if args.watch_refresh and contexts:
-        pending = {str(ctx["item"]["mid"]): ctx for ctx in contexts if ctx.get("kickoff")}
+        pending = {str(ctx["item"].get("mid") or (ctx["item"].get("raw", {}).get("sporttery_meta", {}).get("match_id"))
+                       or ctx["item"]["ri"]): ctx for ctx in contexts if ctx.get("kickoff")}
         print(f"👀 T-{args.refresh_before_minutes} watcher 启动, 待刷新 {len(pending)} 场", flush=True)
         while pending:
             now = datetime.now(timezone.utc)
@@ -1079,9 +1125,14 @@ def main():
                     continue
                 item = ctx["item"]
                 home_en, away_en = item.get("home_en", ""), item.get("away_en", "")
-                refreshed_api = api_client.collect_match(home_en, away_en, ctx["kickoff"])
+                refreshed_api = api_client.collect_match(
+                    ctx.get("api_sports_home_names") or home_en,
+                    ctx.get("api_sports_away_names") or away_en,
+                    ctx["kickoff"],
+                )
                 try:
-                    refreshed_lineups = parse_lineups_payload(fetch_lineups_rest(item["mid"]), item["mid"])
+                    refreshed_lineups = (parse_lineups_payload(fetch_lineups_rest(item["mid"]), item["mid"])
+                                         if item.get("mid") else None)
                 except Exception:
                     refreshed_lineups = None
                 refreshed_block = build_block(

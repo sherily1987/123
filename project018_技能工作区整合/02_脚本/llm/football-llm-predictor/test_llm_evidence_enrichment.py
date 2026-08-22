@@ -86,3 +86,25 @@ def test_api_sports_fixture_query_uses_utc_date_for_offset_kickoff():
     lee.ApiSportsClient(transport=transport).collect_match(
         "A", "B", "2026-08-16T01:00:00+08:00")
     assert seen == ["2026-08-15"]
+
+
+def test_api_sports_client_matches_fixture_against_verified_alias_lists():
+    def transport(path, params):
+        if path == "/fixtures" and "date" in params:
+            return {"response": [{
+                "fixture": {"id": 1492340, "date": "2026-08-24T23:00:00+00:00"},
+                "teams": {"home": {"id": 1, "name": "Botafogo"},
+                          "away": {"id": 2, "name": "Atletico Paranaense"}},
+            }]}
+        if path == "/fixtures" and "last" in params:
+            return {"response": []}
+        if path in ("/injuries", "/fixtures/lineups"):
+            return {"response": []}
+        raise AssertionError((path, params))
+
+    result = lee.ApiSportsClient(transport=transport).collect_match(
+        ["博塔弗戈", "Botafogo"], ["巴竞技", "Atletico Paranaense"],
+        "2026-08-25T07:00:00+08:00",
+    )
+
+    assert result["status"] == "ok" and result["fixture_id"] == 1492340
