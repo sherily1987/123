@@ -76,14 +76,14 @@ def test_evidence_prompts_are_neutral_and_allow_abstention():
 
 def test_deepseek_audit_prompt_has_no_result_direction_fields():
     prompt = lpr.system_prompt_evidence_audit()
-    assert "usable_evidence_ids" in prompt
+    assert '"usable_evidence_ids"' not in prompt
     assert "market_readiness" in prompt
     assert '"direction"' not in prompt
     assert "不得输出胜平负" in prompt
     assert "近况0.30" not in prompt
     assert "不得把整维阵容标不可用" in prompt
     assert "不得把整维近况标不可用" in prompt
-    assert "必须且只能填目录里 status=UNAVAILABLE" in prompt
+    assert "程序按目录状态自动推导" in prompt
 
 
 def test_parse_four_market_anti_collapse():

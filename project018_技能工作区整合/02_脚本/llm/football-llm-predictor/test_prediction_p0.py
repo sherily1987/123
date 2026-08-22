@@ -39,7 +39,7 @@ def test_k3_evidence_auditor_uses_model_temperature_override():
 def test_evidence_auditor_retries_once_after_unknown_evidence_id():
     responses = [
         '{"usable_evidence_ids":["E999"],"unusable_evidence_ids":[],"conflict_evidence_ids":[],"gaps":[],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"first"}',
-        '{"usable_evidence_ids":["E1"],"unusable_evidence_ids":[],"conflict_evidence_ids":[],"gaps":[],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"second"}',
+        '{"gaps":[],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"second"}',
     ]
     requests = []
 
@@ -59,6 +59,7 @@ def test_evidence_auditor_retries_once_after_unknown_evidence_id():
     assert result["usable_evidence_ids"] == ["E1"]
     assert len(requests) == 2
     assert "audit_unknown_evidence_id" in requests[1]["messages"][-1]["content"]
+    assert "不得输出 usable_evidence_ids" in requests[1]["messages"][-1]["content"]
 
 
 def test_report_accepts_serialized_score_keys():
@@ -275,6 +276,27 @@ def test_evidence_audit_validates_ids_and_unavailable_status():
     assert audit["usable_evidence_ids"] == ["E2"]
     payload["usable_evidence_ids"] = ["E1"]
     assert "error" in predict.parse_evidence_audit(__import__("json").dumps(payload, ensure_ascii=False), catalog)
+
+
+def test_evidence_audit_derives_status_lists_when_k3_omits_them():
+    catalog = [
+        {"id": "E1", "status": "SINGLE_SOURCE"},
+        {"id": "E2", "status": "UNAVAILABLE"},
+        {"id": "E3", "status": "SOURCE_CONFLICT"},
+        {"id": "E4", "status": "VERIFIED_MULTI_SOURCE"},
+    ]
+    payload = {
+        "gaps": ["LINEUP_UNAVAILABLE"],
+        "market_readiness": {"one_x_two": True, "score": False, "ou25": False, "hafu": False},
+        "summary": "仅输出缺口与市场就绪状态。",
+    }
+
+    audit = predict.parse_evidence_audit(__import__("json").dumps(payload, ensure_ascii=False), catalog)
+
+    assert audit["status"] == "ok"
+    assert audit["usable_evidence_ids"] == ["E1", "E4"]
+    assert audit["unusable_evidence_ids"] == ["E2"]
+    assert audit["conflict_evidence_ids"] == ["E3"]
 
 
 def test_voter_prompt_contains_neutral_audit_not_direction():

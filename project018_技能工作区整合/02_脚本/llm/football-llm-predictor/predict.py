@@ -335,9 +335,16 @@ def parse_evidence_audit(content, evidence_catalog):
     if forbidden & set(data):
         return {"error": "audit_contains_prediction_fields"}
     catalog = {str(item.get("id")): item for item in (evidence_catalog or [])}
-    usable = [str(value) for value in (data.get("usable_evidence_ids") or [])]
-    unusable = [str(value) for value in (data.get("unusable_evidence_ids") or [])]
-    conflicts = [str(value) for value in (data.get("conflict_evidence_ids") or [])]
+    usable = ([str(value) for value in (data.get("usable_evidence_ids") or [])]
+              if "usable_evidence_ids" in data else
+              [eid for eid, item in catalog.items()
+               if item.get("status") in ("SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE")])
+    unusable = ([str(value) for value in (data.get("unusable_evidence_ids") or [])]
+                if "unusable_evidence_ids" in data else
+                [eid for eid, item in catalog.items() if item.get("status") == "UNAVAILABLE"])
+    conflicts = ([str(value) for value in (data.get("conflict_evidence_ids") or [])]
+                 if "conflict_evidence_ids" in data else
+                 [eid for eid, item in catalog.items() if item.get("status") == "SOURCE_CONFLICT"])
     all_ids = usable + unusable + conflicts
     if any(value not in catalog for value in all_ids):
         return {"error": "audit_unknown_evidence_id"}
@@ -579,10 +586,9 @@ def call_evidence_auditor(client, prompt, evidence_catalog):
         messages.append({
             "role": "user",
             "content": (
-                f"审计未通过：{error}。请只使用证据目录内的 E 编号；"
-                "SINGLE_SOURCE/VERIFIED_MULTI_SOURCE 只能放 usable_evidence_ids，"
-                "UNAVAILABLE 只能放 unusable_evidence_ids，SOURCE_CONFLICT 只能放 conflict_evidence_ids。"
-                "四个 market_readiness 字段必须为布尔值。只输出一个完整 JSON 对象。"
+                f"审计未通过：{error}。程序会按目录状态自动推导证据可用性；"
+                "不得输出 usable_evidence_ids、unusable_evidence_ids 或 conflict_evidence_ids，也不得枚举 E 编号。"
+                "四个 market_readiness 字段必须为布尔值。只输出包含 gaps、market_readiness、summary 的完整 JSON 对象。"
             ),
         })
         response = client.chat.completions.create(

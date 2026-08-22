@@ -276,12 +276,12 @@ JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外
 EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据可用性，不做比赛预测。
 不得输出胜平负、比分、大小球或半全场的任何方向。
 只输出一个 JSON 对象:
-{"usable_evidence_ids":["E2"],"unusable_evidence_ids":["E1"],"conflict_evidence_ids":[],"gaps":["LINEUP_POSITION_CONFLICT"],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"E2可用；仅个别位置两源对不上，不得整维标阵容或近况不可用。"}
+{"gaps":["LINEUP_POSITION_CONFLICT"],"market_readiness":{"one_x_two":true,"score":true,"ou25":true,"hafu":true},"summary":"仅个别位置两源对不上，不得整维标阵容或近况不可用。"}
 规则:
-1. 所有 ID 必须存在于输入证据目录。
-2. unusable_evidence_ids 必须且只能填目录里 status=UNAVAILABLE 的编号。SINGLE_SOURCE / VERIFIED_MULTI_SOURCE 一律放入 usable_evidence_ids，即使该行没写出完整十一人。SOURCE_CONFLICT 只能放入 conflict_evidence_ids。
-3. market_readiness 只评估证据是否足以供下游判断，不暗示任何结果。
-4. 不得补充输入中没有的事实。summary 限两句。
+1. 程序按目录状态自动推导 usable_evidence_ids、unusable_evidence_ids、conflict_evidence_ids；不得输出这三个字段，也不得枚举 E 编号。
+2. gaps 只记录输入可推导的异常或缺口代码，不得补充输入中没有的事实。
+3. market_readiness 只评估证据是否足以供下游判断，不暗示任何结果；四个字段必须都是布尔值。
+4. summary 限两句，且不得包含方向、比分、大小球或半全场结论。
 5. 20 源投票得票最高的名单视为可用首发，不得把整维阵容标不可用。揭幕战用该队对其他对手的上季正式近5场或投票近5场，不得把整维近况标不可用。不得因官方未出整维弃权。"""
 
 
