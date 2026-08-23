@@ -25,4 +25,21 @@ def test_kickoff_dates_only_include_finished_90_minute_registered_matches():
 
 def test_payload_rows_accept_provider_list_and_reject_non_list():
     assert collector.payload_rows([{"match_id": "1"}]) == [{"match_id": "1"}]
+    assert collector.payload_rows({"response": [{"fixture": {"id": 1}}]}) == [{"fixture": {"id": 1}}]
     assert collector.payload_rows({"result": []}) == []
+
+
+def test_capture_api_sports_uses_fixture_endpoint_and_preserves_provider_label(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_request(params):
+        calls.append(params)
+        return {"response": [{"fixture": {"id": 1}}]}
+
+    monkeypatch.setattr(collector, "_api_sports_request", fake_request)
+    manifest, rows = collector.capture(tmp_path / "store", ["2026-08-02"], tmp_path / "out",
+                                       provider="api-sports")
+
+    assert calls == [{"date": "2026-08-02"}]
+    assert manifest["provider"] == "api-sports.io"
+    assert rows == [{"fixture": {"id": 1}}]

@@ -22,6 +22,7 @@ from half_time_enrichment import load_settled_records
 HERE = Path(__file__).resolve().parent
 WORKSPACE = HERE.parents[4]
 ADAPTER = WORKSPACE / "project007_APIFootball数据接入" / "02_脚本" / "apifootball_com_adapter.py"
+API_SPORTS_ADAPTER = HERE / "api_football_adapter.py"
 DEFAULT_STORE = data_root() / "backtest"
 DEFAULT_OUTPUT_DIR = data_root() / "research" / "half-time-fixtures" / "apifootball"
 
@@ -39,7 +40,11 @@ def kickoff_dates(records: Iterable[tuple[dict[str, Any], dict[str, Any]]]) -> l
 
 
 def payload_rows(payload: Any) -> list[dict[str, Any]]:
-    return payload if isinstance(payload, list) else []
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict) and isinstance(payload.get("response"), list):
+        return payload["response"]
+    return []
 
 
 def _adapter_request(action: str, params: dict[str, Any]) -> Any:
@@ -51,10 +56,23 @@ def _adapter_request(action: str, params: dict[str, Any]) -> Any:
     return module.request(action, params)
 
 
+def _api_sports_request(params: dict[str, Any]) -> Any:
+    """Fetch API-Sports fixtures through the existing authenticated adapter."""
+    spec = importlib.util.spec_from_file_location("api_football_adapter", API_SPORTS_ADAPTER)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"无法加载 api-sports adapter: {API_SPORTS_ADAPTER}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.fetch("/fixtures", params)
+
+
 def capture(store: Path, dates: list[str], output_dir: Path, *, refresh: bool = False,
-            dry_run: bool = False) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+            dry_run: bool = False, provider: str = "apifootball") -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    if provider not in {"apifootball", "api-sports"}:
+        raise ValueError(f"unsupported provider: {provider}")
     manifest: dict[str, Any] = {
-        "schema": "half-time-provider-capture-1.0", "provider": "apifootball.com",
+        "schema": "half-time-provider-capture-1.0",
+        "provider": "apifootball.com" if provider == "apifootball" else "api-sports.io",
         "research_only": True, "store": str(store), "dates": [],
         "note": "Provider fixture data is research evidence only and cannot overwrite formal 90-minute results.",
     }
@@ -69,7 +87,8 @@ def capture(store: Path, dates: list[str], output_dir: Path, *, refresh: bool = 
             continue
         else:
             try:
-                payload = _adapter_request("get_events", {"from": day, "to": day, "timezone": "Asia/Shanghai"})
+                payload = (_adapter_request("get_events", {"from": day, "to": day, "timezone": "Asia/Shanghai"})
+                           if provider == "apifootball" else _api_sports_request({"date": day}))
                 output_dir.mkdir(parents=True, exist_ok=True)
                 path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 source = "captured"
@@ -89,22 +108,32 @@ def main() -> None:
     parser.add_argument("--store", type=Path, default=DEFAULT_STORE)
     parser.add_argument("--date", action="append", help="可重复；省略时取所有正式已结算比赛的开球日")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--provider", choices=("apifootball", "api-sports", "both"), default="apifootball",
+                        help="数据源；both 分别写入 output-dir 下的两个子目录")
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--fixtures-output", type=Path)
     parser.add_argument("--refresh", action="store_true", help="明确允许重抓并覆盖同日原始响应")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     dates = sorted(set(args.date or kickoff_dates(load_settled_records(args.store))))
-    manifest, rows = capture(args.store, dates, args.output_dir, refresh=args.refresh, dry_run=args.dry_run)
-    manifest_path = args.manifest or args.output_dir / "capture_manifest.json"
-    fixtures_path = args.fixtures_output or args.output_dir / "fixtures.json"
-    if not args.dry_run:
-        manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        fixtures_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    providers = ("apifootball", "api-sports") if args.provider == "both" else (args.provider,)
+    summaries = []
+    for provider in providers:
+        provider_dir = args.output_dir / provider if args.provider == "both" else args.output_dir
+        manifest, rows = capture(args.store, dates, provider_dir, refresh=args.refresh,
+                                 dry_run=args.dry_run, provider=provider)
+        manifest_path = (args.manifest if len(providers) == 1 and args.manifest
+                         else provider_dir / "capture_manifest.json")
+        fixtures_path = (args.fixtures_output if len(providers) == 1 and args.fixtures_output
+                         else provider_dir / "fixtures.json")
+        if not args.dry_run:
+            manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            fixtures_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        summaries.append({"provider": provider, "provider_rows": len(rows),
+                          "manifest": str(manifest_path), "fixtures": str(fixtures_path)})
     print(json.dumps({"status": "dry_run" if args.dry_run else "ok", "dates": len(dates),
-                      "provider_rows": len(rows), "manifest": str(manifest_path),
-                      "fixtures": str(fixtures_path)}, ensure_ascii=False))
+                      "providers": summaries}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
