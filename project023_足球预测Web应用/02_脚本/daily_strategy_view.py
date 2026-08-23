@@ -41,25 +41,41 @@ def _load_jobs(folder: Path) -> list[dict]:
 
 def _attach_evidence_sidecars(jobs: list[dict], store: Path, day: str) -> list[dict]:
     """Attach the latest audited sidecar without rewriting prediction tickets."""
+    # The daily pipeline writes immutable snapshots under ``forward/<day>``
+    # while older/manual collectors use ``research/evidence/<day>``.  Both are
+    # canonical read-only evidence stores; looking at only the latter made a
+    # valid snapshot appear as EVIDENCE_AUDIT_MISSING in the workbench.
     evidence_root = store / "research" / "evidence" / day
-    sidecars = {}
-    for path in sorted(evidence_root.rglob("sporttery-*.json")) if evidence_root.is_dir() else []:
+    roots = [evidence_root, store / "forward" / day]
+    sidecars: dict[str, tuple[float, Path, dict]] = {}
+    paths = []
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for path in root.rglob("sporttery-*.json"):
+            # Do not treat prediction tickets/results as evidence sidecars.
+            if path.parent.name not in {"evidence_snapshots", "bb-browser", "evidence"}:
+                continue
+            paths.append(path)
+    for path in sorted(paths, key=lambda item: (item.stat().st_mtime, str(item))):
         try:
             blob = json.loads(path.read_text(encoding="utf-8-sig"))
         except (OSError, json.JSONDecodeError):
             continue
-        sidecars[str(blob.get("match_id") or path.stem)] = blob
+        key = str(blob.get("match_id") or path.stem)
+        sidecars[key] = (path.stat().st_mtime, path, blob)
     enriched = []
     for job in jobs:
         mid = str(job.get("match_id") or (job.get("identity") or {}).get("match_id") or "")
-        blob = sidecars.get(mid) or sidecars.get(f"sporttery-{mid}")
-        if not blob:
+        found = sidecars.get(mid) or sidecars.get(f"sporttery-{mid}")
+        if not found:
             enriched.append(job)
             continue
+        _, sidecar_path, blob = found
         audit = blob.get("evidence_audit") or {}
         item = dict(job)
         item["evidence_audit"] = audit
-        item["evidence_snapshot_ref"] = str(next((p for p in evidence_root.rglob(f"{mid}.json")), ""))
+        item["evidence_snapshot_ref"] = str(sidecar_path)
         enriched.append(item)
     return enriched
 

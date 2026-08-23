@@ -88,6 +88,33 @@ def test_daily_strategy_view_missing_jobs_preserves_budget(tmp_path: Path):
     assert got["single_purchase_recommendations"] == []
 
 
+def test_daily_strategy_view_attaches_forward_pipeline_sidecar(tmp_path: Path):
+    """The pipeline's forward snapshot must reach the planner without rewriting jobs."""
+    import daily_strategy_view as view
+
+    _write_jobs(tmp_path, "2026-08-23", count=1)
+    sidecar_dir = tmp_path / "forward" / "2026-08-23" / "evidence_snapshots"
+    sidecar_dir.mkdir(parents=True)
+    (sidecar_dir / "sporttery-1.json").write_text(
+        json.dumps({
+            "match_id": "sporttery-1",
+            "evidence_audit": {
+                "evidence_gap": False,
+                "evidence_status": "OK",
+                "evidence_gap_reasons": [],
+                "entries": {"team_stats": {"status": "VALID"}},
+            },
+        }),
+        encoding="utf-8",
+    )
+
+    jobs = view._attach_evidence_sidecars(
+        view._load_jobs(tmp_path / "jobs" / "2026-08-23"), tmp_path, "2026-08-23"
+    )
+    assert jobs[0]["evidence_audit"]["evidence_status"] == "OK"
+    assert jobs[0]["evidence_snapshot_ref"].endswith("sporttery-1.json")
+
+
 def test_daily_strategy_view_rejects_non_date_path(tmp_path: Path):
     """Catches path traversal through the day query parameter."""
     import daily_strategy_view as view
