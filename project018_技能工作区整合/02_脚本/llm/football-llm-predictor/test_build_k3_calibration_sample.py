@@ -130,3 +130,9 @@ def test_build_sample_can_target_deepseek_v4_flash_without_changing_default_k3(t
 
     assert report["model"] == "deepseek/deepseek-v4-flash"
     assert report["eligible_settled_rows"] == 1
+
+
+def test_deepseek_calibration_entrypoint_has_fixed_model_id():
+    from scripts.build_deepseek_calibration_sample import MODEL_ID
+
+    assert MODEL_ID == "deepseek/deepseek-v4-flash"
