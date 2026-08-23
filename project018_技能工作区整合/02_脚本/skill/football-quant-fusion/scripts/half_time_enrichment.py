@@ -92,6 +92,32 @@ def load_fixture_payload(payload: Any) -> list[dict[str, Any]]:
             if fixture is not None]
 
 
+def load_alias_files(paths: list[Path]) -> dict[str, list[str]]:
+    """Merge explicit alias files without weakening identity matching.
+
+    Different collectors maintain different, audited alias inventories (for
+    example APIFootball-specific names and the broader international-odds
+    inventory).  Requiring callers to pass both files keeps the source choice
+    visible while avoiding the previous all-or-nothing behaviour.  A later
+    file supplements an existing key; it never replaces an explicit alias.
+    """
+    merged: dict[str, list[str]] = {}
+    for path in paths:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        values = (raw.get("aliases", raw.get("team_aliases", raw))
+                  if isinstance(raw, dict) else {})
+        if not isinstance(values, dict):
+            raise ValueError(f"aliases must be a JSON object: {path}")
+        for source_name, provider_names in values.items():
+            candidates = provider_names if isinstance(provider_names, (list, tuple)) else [provider_names]
+            bucket = merged.setdefault(str(source_name), [])
+            for candidate in candidates:
+                text = str(candidate or "").strip()
+                if text and text not in bucket:
+                    bucket.append(text)
+    return merged
+
+
 def match_finished_fixture(record: dict[str, Any], result: dict[str, Any], fixture: dict[str, Any],
                            aliases: dict[str, str], tolerance_minutes: int = 30) -> dict[str, Any]:
     match_id = str(record.get("match_id") or "")
@@ -172,17 +198,12 @@ def main() -> None:
     parser.add_argument("--fixtures", type=Path, required=True,
                         help="已抓取的 API-Sports response JSON 或 APIFootball 事件数组")
     parser.add_argument("--store", type=Path, required=True, help="football-quant-fusion/backtest 目录")
-    parser.add_argument("--aliases", type=Path, help="可选队名映射 JSON，格式 {aliases:{体彩名:供应商名}}")
+    parser.add_argument("--aliases", type=Path, nargs="+",
+                        help="可选队名映射 JSON（可传多个，按顺序合并），格式 {aliases:{体彩名:供应商名}}")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     payload = json.loads(args.fixtures.read_text(encoding="utf-8"))
-    aliases: dict[str, Any] = {}
-    if args.aliases:
-        raw_aliases = json.loads(args.aliases.read_text(encoding="utf-8"))
-        aliases = (raw_aliases.get("aliases", raw_aliases.get("team_aliases", raw_aliases))
-                   if isinstance(raw_aliases, dict) else {})
-        if not isinstance(aliases, dict):
-            raise SystemExit("aliases must be a JSON object or {aliases: {...}}")
+    aliases: dict[str, Any] = load_alias_files(args.aliases or [])
     report = build_half_time_evidence(load_settled_records(args.store), load_fixture_payload(payload), aliases)
     report["fixture_input"] = str(args.fixtures)
     report["settled_record_count"] = len(load_settled_records(args.store))

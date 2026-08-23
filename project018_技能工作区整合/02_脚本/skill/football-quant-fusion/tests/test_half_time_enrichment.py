@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import json
 
 
 MODULE = Path(__file__).parents[1] / "scripts" / "half_time_enrichment.py"
@@ -76,3 +77,14 @@ def test_load_fixture_payload_accepts_api_sports_response_envelope():
     fixtures = enrichment.load_fixture_payload({"response": [api_sports_fixture()]})
 
     assert fixtures == [enrichment.normalize_fixture(api_sports_fixture())]
+
+
+def test_load_alias_files_merges_provider_inventories_without_duplicates(tmp_path):
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.json"
+    first.write_text(json.dumps({"aliases": {"斯达": "Start"}}), encoding="utf-8")
+    second.write_text(json.dumps({"team_aliases": {"斯达": ["Start", "IK Start"], "维京": "Viking"}}), encoding="utf-8")
+
+    assert enrichment.load_alias_files([first, second]) == {
+        "斯达": ["Start", "IK Start"], "维京": ["Viking"]
+    }
