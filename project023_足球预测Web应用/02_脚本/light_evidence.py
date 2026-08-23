@@ -66,6 +66,15 @@ def render_fusion_evidence(m: dict) -> str:
     for key in ("evidence_snapshot_ref", "browser_evidence_ref"):
         if m.get(key):
             lines.append(f"> - {key}: {m[key]}")
+    probe = m.get("official_page_probe")
+    if isinstance(probe, dict):
+        probe_status = probe.get("status") or "UNKNOWN"
+        lineup_status = probe.get("lineup_status") or "UNKNOWN"
+        url = probe.get("source_url") or "unknown"
+        lines.append(
+            f"> - official_page_probe: status={probe_status}；lineup_status={lineup_status}"
+            f" | source({url}) | captured_at({probe.get('captured_at') or 'unknown'})"
+        )
     lines.append("> 说明：以上是采集器快照事实；预计首发仍是预测值，不等同官方确认首发；LLM票数不得当作概率。")
     return "\n".join(lines)
 

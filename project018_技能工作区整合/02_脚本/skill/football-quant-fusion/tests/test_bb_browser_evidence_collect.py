@@ -64,6 +64,30 @@ def test_collect_one_accepts_predicted_xi_as_explicit_nonofficial_evidence(monke
     assert any(args[0] == "close" for args in calls)
 
 
+def test_collect_one_attaches_official_page_probe_without_changing_lineup_status(monkeypatch):
+    def fake_run(args):
+        if args[0] == "open":
+            return "tab: official-probe\n"
+        if args[0] == "eval":
+            return json.dumps(_payload(), ensure_ascii=False)
+        return "closed\n"
+
+    monkeypatch.setattr(bec, "_run_browser", fake_run)
+    monkeypatch.setattr(bec, "_probe_official_page", lambda match, url: {
+        "status": "ok", "source_url": url, "lineup_status": "LINEUP_PENDING"
+    })
+    row = bec.collect_one(
+        {"match_id": "sporttery-1", "home": "Bodø/Glimt", "away": "NEC Nijmegen",
+         "kickoff": "2026-08-26T03:00:00+08:00"},
+        {"url": "https://www.fotmob.com/matches/a/x", "fotmob_match_id": "5987811",
+         "official_url": "https://www.uefa.com/match/1"},
+        now=bec._parse("2026-08-23T17:45:00+00:00"),
+    )
+    assert row["official_page_probe"]["status"] == "ok"
+    assert row["official_page_probe"]["lineup_status"] == "LINEUP_PENDING"
+    assert row["evidence_audit"]["entries"]["starting_xi"]["status"] == "PREDICTED"
+
+
 def test_mapping_predicted_xi_overlay_keeps_media_provenance(monkeypatch):
     def fake_run(args):
         if args[0] == "open":

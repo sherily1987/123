@@ -15,6 +15,8 @@ import json
 import os
 import re
 import subprocess
+import sys
+import tempfile
 import time
 import urllib.parse
 from datetime import datetime, timezone
@@ -162,6 +164,34 @@ def _match_xg(payload: dict[str, Any]) -> dict[str, Any] | None:
                 if set(result) == {"home", "away"}:
                     return result
     return None
+
+
+def _probe_official_page(match: dict[str, Any], url: str) -> dict[str, Any]:
+    """Run the optional Scrapling probe and return auditable page facts."""
+    script = Path(__file__).with_name("official_page_probe.py")
+    if not script.is_file():
+        return {"status": "source_fetch_error", "source_url": url,
+                "reason": "OFFICIAL_PROBE_SCRIPT_MISSING"}
+    output_path = Path(tempfile.mkstemp(prefix="official_probe_", suffix=".json")[1])
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(script), "--url", str(url),
+             "--home", str(match.get("home") or ""),
+             "--away", str(match.get("away") or ""),
+             "--kickoff-date", str(match.get("kickoff") or "")[:10],
+             "--output", str(output_path)],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=180,
+        )
+        if output_path.is_file():
+            return json.loads(output_path.read_text(encoding="utf-8"))
+        return {"status": "source_fetch_error", "source_url": url,
+                "reason": (proc.stderr or proc.stdout or "OFFICIAL_PROBE_NO_OUTPUT")[-300:]}
+    except Exception as exc:
+        return {"status": "source_fetch_error", "source_url": url,
+                "reason": str(exc)[:300]}
+    finally:
+        output_path.unlink(missing_ok=True)
 
 
 def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
@@ -344,13 +374,17 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         if general.get("started") or general.get("finished"):
             return {"status": "post_kickoff", "match_id": match.get("match_id"),
                     "reason": "BROWSER_SOURCE_SAYS_MATCH_STARTED"}
-        return {"status": "ok", **_snapshot(
+        row = {"status": "ok", **_snapshot(
             match, payload, str(url), collected_at,
             source_id=str(mapping.get("source_id") or "fotmob.bb_browser"),
             provider=str(mapping.get("provider") or "fotmob_via_bb_browser"),
             predicted_xi=mapping.get("predicted_xi"),
             predicted_xi_source_url=mapping.get("predicted_xi_source_url"),
         )}
+        official_url = mapping.get("official_url")
+        if official_url:
+            row["official_page_probe"] = _probe_official_page(match, str(official_url))
+        return row
     except Exception:
         # A source page can be reachable while its structured FotMob endpoint
         # is blocked/rate-limited.  If a browser review already captured an
@@ -361,13 +395,17 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
             raise
         payload = {"general": {"started": False, "finished": False},
                    "content": {"matchFacts": {}, "lineup": {}}}
-        return {"status": "ok", **_snapshot(
+        row = {"status": "ok", **_snapshot(
             match, payload, str(url), collected_at,
             source_id=str(mapping.get("source_id") or "fotmob.bb_browser"),
             provider=str(mapping.get("provider") or "fotmob_via_bb_browser"),
             predicted_xi=predicted,
             predicted_xi_source_url=mapping.get("predicted_xi_source_url"),
         )}
+        official_url = mapping.get("official_url")
+        if official_url:
+            row["official_page_probe"] = _probe_official_page(match, str(official_url))
+        return row
     finally:
         if tab:
             try:

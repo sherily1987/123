@@ -85,6 +85,11 @@ def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Pat
     snap_dir.mkdir(parents=True)
     (snap_dir / "sporttery-2041021.json").write_text(json.dumps({
         "match_id": "sporttery-2041021",
+        "official_page_probe": {
+            "status": "ok", "source_url": "https://official.example/match/1",
+            "identity_status": "MATCHED", "schedule_status": "MATCHED",
+            "lineup_status": "LINEUP_PENDING", "content_hash": "sha256:test",
+        },
         "evidence_audit": {
             "browser_evidence_ref": "F:/forward/2026-08-24/evidence_snapshots/bb-browser/sporttery-2041021.json",
             "entries": {
@@ -120,6 +125,8 @@ def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Pat
     assert "starting_xi: status=PREDICTED" in rendered
     assert matches[0]["evidence_snapshot_ref"].endswith("sporttery-2041021.json")
     assert matches[0]["browser_evidence_ref"].endswith("bb-browser/sporttery-2041021.json")
+    assert matches[0]["official_page_probe"]["lineup_status"] == "LINEUP_PENDING"
+    assert "official_page_probe: status=ok" in rendered
 
 
 def test_attach_reports_missing_snapshot_ids(tmp_path: Path):

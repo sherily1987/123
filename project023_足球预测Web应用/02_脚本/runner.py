@@ -378,6 +378,8 @@ def attach_collected_evidence(
                 )
                 match["evidence_snapshot_audit"] = browser_audit
                 match["evidence_audit"] = blob.get("evidence_audit") or {}
+                if blob.get("official_page_probe"):
+                    match["official_page_probe"] = blob["official_page_probe"]
                 attached += 1
         else:
             missing_snapshot_ids.append(mid)
