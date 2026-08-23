@@ -654,6 +654,70 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
     return n
 
 
+def backfill_llm_job_evidence_metadata(
+    kickoff_date: str, *, forward_root: Path | None = None
+) -> dict:
+    """Add evidence metadata to existing LLM jobs without changing predictions.
+
+    This is intentionally a metadata-only migration for jobs written before
+    evidence freshness fields were added.  The LLM output values are copied
+    verbatim and the normal job validator still runs through ``upsert_job``.
+    """
+    from job_ticket import identity_from, jobs_root, upsert_job
+
+    base = Path(forward_root or forward_work_dir()) / kickoff_date
+    snapshot_dir = base / "evidence_snapshots"
+    root = jobs_root()
+    updated = 0
+    skipped = 0
+    for path in sorted((root / kickoff_date).glob("sporttery-*.json")):
+        try:
+            job = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            skipped += 1
+            continue
+        outputs = [item for item in (job.get("outputs") or []) if item.get("track") == "llm"]
+        identity = job.get("identity") or {}
+        mid = str(identity.get("match_id") or "")
+        if not outputs or not mid:
+            continue
+        snap = snapshot_dir / f"{mid}.json"
+        if not snap.is_file():
+            skipped += 1
+            continue
+        try:
+            snapshot = json.loads(snap.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            skipped += 1
+            continue
+        audit = snapshot.get("evidence_audit") or {}
+        evidence_collected_at = audit.get("collected_at") or snapshot.get("collected_at")
+        prediction_at = outputs[0].get("llm_prediction_as_of")
+        collected_dt = sv.parse_dt(evidence_collected_at)
+        prediction_dt = sv.parse_dt(prediction_at)
+        age = None
+        if collected_dt is not None and prediction_dt is not None:
+            age = round(max(0.0, (prediction_dt - collected_dt).total_seconds() / 60.0), 2)
+        chain = (snapshot.get("facts") or {}).get("evidence_chain") or {}
+        # The canonical snapshot stores fields under evidence_audit.entries;
+        # use that as the authoritative chain-field list when available.
+        fields = sorted((audit.get("entries") or {}).keys())
+        llm = dict(outputs[0])
+        llm.update({
+            "evidence_status": audit.get("evidence_status"),
+            "evidence_missing_fields": list(audit.get("missing_fields") or []),
+            "evidence_collected_at": evidence_collected_at,
+            "evidence_age_minutes": age,
+            "evidence_refs": {
+                "evidence_snapshot_ref": str(snap),
+            },
+            "evidence_chain_fields": fields or sorted(chain.keys()),
+        })
+        upsert_job(root, identity_from(identity), llm=llm)
+        updated += 1
+    return {"kickoff_date": kickoff_date, "updated": updated, "skipped": skipped}
+
+
 def _ensure_prematch(kickoff_date: str, work: Path) -> Path:
     inp = work / "inputs_prematch.json"
     if inp.exists():

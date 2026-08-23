@@ -313,6 +313,43 @@ def test_write_llm_jobs_persists_evidence_age_and_missing_fields(tmp_path, monke
     assert captured["llm"]["evidence_refs"]["evidence_snapshot_ref"].endswith("2041028.json")
 
 
+def test_backfill_llm_job_evidence_metadata_preserves_prediction(tmp_path, monkeypatch):
+    import job_ticket
+
+    jobs = tmp_path / "jobs" / "2026-08-24"
+    jobs.mkdir(parents=True)
+    snapshots = tmp_path / "forward" / "2026-08-24" / "evidence_snapshots"
+    snapshots.mkdir(parents=True)
+    job = {
+        "schema": "football-job-1.0",
+        "identity": {"match_id": "sporttery-2041028", "match_num": "周一001",
+                     "sales_day": "2026-08-24", "home": "主队", "away": "客队",
+                     "competition": "测试", "kickoff": "2026-08-25T00:30:00+08:00"},
+        "outputs": [{"track": "llm", "model_id": "deepseek/deepseek-v4-flash",
+                     "llm_prediction_as_of": "2026-08-24T01:00:00+00:00",
+                     "direction": "主胜", "action": "skip", "evidence_gap": True,
+                     "strength": {"type": "vote_share", "value": 0.0}}],
+    }
+    path = jobs / "sporttery-2041028.json"
+    path.write_text(json.dumps(job, ensure_ascii=False), encoding="utf-8")
+    (snapshots / "sporttery-2041028.json").write_text(json.dumps({
+        "match_id": "sporttery-2041028", "collected_at": "2026-08-24T00:00:00+00:00",
+        "evidence_audit": {"evidence_status": "GAP", "missing_fields": ["starting_xi"],
+                            "collected_at": "2026-08-24T00:00:00+00:00",
+                            "entries": {"recent_form": {"status": "VALID"}}},
+    }), encoding="utf-8")
+    monkeypatch.setattr(job_ticket, "jobs_root", lambda: tmp_path / "jobs")
+    got = runner.backfill_llm_job_evidence_metadata(
+        "2026-08-24", forward_root=tmp_path / "forward"
+    )
+    assert got["updated"] == 1
+    updated = json.loads(path.read_text(encoding="utf-8"))
+    out = next(x for x in updated["outputs"] if x["track"] == "llm")
+    assert out["direction"] == "主胜"
+    assert out["evidence_missing_fields"] == ["starting_xi"]
+    assert out["evidence_age_minutes"] == 60.0
+
+
 def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeypatch):
     src = tmp_path / "src"
     src.mkdir()
