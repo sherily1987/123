@@ -54,8 +54,14 @@ def test_llm_parsed_preserves_model_id_for_calibration_provenance():
         "dir": "主胜",
         "strength": 0.8,
         "action": "skip",
+        "probs_1x2": [50, 30, 20],
+        "confidence": 0.55,
+        "top_scores": ["1-0", "2-0", "1-1"],
     })
     assert row["model_id"] == "moonshot/kimi-k3"
+    assert row["llm_probs_1x2"] == [50.0, 30.0, 20.0]
+    assert row["llm_confidence"] == 0.55
+    assert row["llm_top_scores"] == ["1-0", "2-0", "1-1"]
 
 
 def test_normalize_match_id_accepts_int_str_and_prefixed():

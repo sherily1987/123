@@ -415,9 +415,28 @@ def llm_from_parsed(row: dict) -> dict:
         gap = "缺口" in str(gate.get("reason") or "")
     direction_obj = row.get("direction") if isinstance(row.get("direction"), dict) else {}
     scores = row.get("score_picks") or []
+    raw_probs = row.get("probs_1x2") or row.get("probs")
+    llm_probs = None
+    if isinstance(raw_probs, (list, tuple)) and len(raw_probs) == 3:
+        try:
+            values = [float(value) for value in raw_probs]
+            total = sum(values)
+            if total > 0 and all(value >= 0 for value in values):
+                llm_probs = [round(value / total * 100.0, 1) for value in values]
+                llm_probs[2] = round(100.0 - llm_probs[0] - llm_probs[1], 1)
+        except (TypeError, ValueError):
+            llm_probs = None
     return {
         "track": "llm",
         "model_id": row.get("model_id") or row.get("model"),
+        # Explicit llm_ prefix prevents this self-reported vector from being
+        # mistaken for the calibrated quant track probability.
+        "llm_probs_1x2": llm_probs,
+        "llm_confidence": row.get("confidence"),
+        "llm_decision": row.get("decision"),
+        "llm_top_scores": row.get("top_scores") or row.get("score_picks") or [],
+        "llm_ou25": row.get("ou25"),
+        "llm_hafu": row.get("hafu"),
         "direction": direction,
         "alt_direction": alt,
         "strength": packed,
