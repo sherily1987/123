@@ -96,6 +96,11 @@ python $cli llm-evidence --input match.json --out-dir evidence
 时间戳。该投影只扩大证据可见性，不改变 LLM 的票数语义，也不把 LLM 输出写成量化概率；
 `PREDICTED` 首发必须继续标注为预计而非官方确认。
 
+BB-browser/Scrapling 成功行还会在输出目录生成
+`evidence_<场次>_<主队>_<客队>_browser.md`。`predict.py` 将这类文件作为补充证据拼入主证据或
+在没有主证据时作为受限主证据，并重新执行开球时间、来源、缺口和完整哈希门禁；因此只保存
+JSON 路径不会被 LLM 当成事实，必须把该 Markdown 目录作为 `--evidence-dir` 输入。
+
 证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发；官方首发未发布时可采集预计首发并标记 `starting_xi.status=PREDICTED`，不得改写为官方确认。
 本地 HTTP/Playwright 优先；失败项写入 `browser_tasks.json`，由当前 Codex 浏览器回补并落成可审计快照。
 BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射至少包含该场 URL 和

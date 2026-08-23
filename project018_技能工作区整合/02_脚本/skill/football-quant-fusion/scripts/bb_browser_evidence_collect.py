@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Collect optional third-party pre-match evidence through BB-browser.
 
-BB-browser reuses the user's real browser session. This adapter deliberately
-requires a per-match source mapping; it never guesses a fixture from a search
-snippet. FotMob uses its structured endpoint when available, while a mapped
+BB-browser reuses the user's real browser session. A per-match source mapping
+is preferred, but evidence gaps can also trigger identity-based discovery of
+official/known football sources; the adapter never trusts a search snippet as
+fact. FotMob uses its structured endpoint when available, while a mapped
 ``scrapling_url`` can use the generic dynamic parser for other league sources.
 The result is research evidence only and cannot replace the official Sporttery
 market or an official starting-XI confirmation. A non-empty predicted lineup
 is retained as explicit ``PREDICTED`` evidence; it is usable for pre-match
-research but is never labelled as confirmed.
+research but is never labelled as confirmed. Successful rows also emit an
+``evidence_*_browser.md`` supplement that the LLM predictor can append after
+its primary evidence and re-audit.
 """
 from __future__ import annotations
 
