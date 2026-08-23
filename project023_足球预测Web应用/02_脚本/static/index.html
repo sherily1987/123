@@ -73,6 +73,34 @@ tr.clickable { cursor: pointer; }
 .drawer-panel h3 { color: var(--gold); margin: 16px 0 8px; font-size: 15px; }
 .drawer-panel p, .drawer-panel li { color: var(--ink); font-size: 13px; line-height: 1.5; }
 .drawer-panel ul { padding-left: 18px; }
+.daily-strategy-card { margin: 14px 0 22px; padding: 16px; border: 1px solid #7a5d22; border-radius: 12px; background: linear-gradient(135deg, #183d2d 0%, #142d23 100%); box-shadow: 0 10px 30px rgba(0,0,0,.16); }
+.strategy-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 12px; }
+.strategy-head h2 { margin: 0 0 5px; font-size: 19px; }
+.strategy-head p { color: var(--muted); font-size: 12px; }
+.strategy-badges { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+.strategy-badges span { border: 1px solid #56785f; border-radius: 14px; padding: 4px 9px; color: #bbf7d0; background: #173d29; font-size: 12px; white-space: nowrap; }
+.strategy-badges span.risk { color: #fcd34d; border-color: #7a5d22; background: #342813; }
+.strategy-budget { display: grid; grid-template-columns: repeat(4, minmax(110px, 1fr)); gap: 8px; margin: 0 0 14px; }
+.strategy-budget div { border: 1px solid var(--line); background: rgba(13,31,23,.62); border-radius: 8px; padding: 9px 12px; }
+.strategy-budget b { display: block; color: var(--gold); font-size: 19px; }
+.strategy-budget span { color: var(--muted); font-size: 11px; }
+.strategy-grid { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(260px, .8fr); gap: 12px; }
+.strategy-grid h3 { color: #cfe6d8; font-size: 14px; margin: 0 0 7px; }
+.strategy-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+.strategy-market { display: inline-block; color: #bbf7d0; background: #1b5035; border-radius: 10px; padding: 2px 7px; white-space: nowrap; }
+.strategy-match { min-width: 140px; }
+.strategy-combo { border: 1px solid var(--line); background: rgba(13,31,23,.62); border-radius: 8px; padding: 9px 11px; margin-bottom: 8px; }
+.strategy-combo > div { display: flex; justify-content: space-between; color: var(--gold); }
+.strategy-combo ul { padding: 6px 0 3px 17px; line-height: 1.55; font-size: 12px; }
+.strategy-combo p { color: var(--muted); font-size: 11px; }
+.strategy-warning { margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--line); color: #fcd34d; font-size: 12px; line-height: 1.5; }
+@media (max-width: 900px) {
+  main { padding: 12px; }
+  .strategy-head { flex-direction: column; }
+  .strategy-badges { justify-content: flex-start; }
+  .strategy-budget { grid-template-columns: repeat(2, 1fr); }
+  .strategy-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -93,6 +121,7 @@ tr.clickable { cursor: pointer; }
 <main>
   <div id="banner"></div>
   <div class="stats" id="stats"></div>
+  <div id="dailyStrategy"><div class="banner warn">正在生成今日购买策略…</div></div>
   <h2>已开售
     <span class="view-toggle">
       <button type="button" id="btnByLeague" class="on" onclick="setSaleView('league')">按联赛</button>
@@ -117,6 +146,7 @@ tr.clickable { cursor: pointer; }
 <div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
 <aside class="drawer-panel" id="drawerPanel"></aside>
 <footer>只读融合库 · 登记 market_only · 双轨不合并 · 回测手动 · 概率模型输出，非投注建议</footer>
+<script src="/daily_strategy.js"></script>
 <script>
 let pollTimer = null;
 
@@ -336,7 +366,12 @@ async function loadBoard(force) {
     banner("正在刷新看板和回测…", "ok");
   }
   try {
-    const d = await api("/api/board");
+    const selectedDay = document.getElementById("kickoffDate").value || todayStr();
+    const [d, strategy] = await Promise.all([
+      api("/api/board"),
+      api("/api/daily-strategy?day=" + encodeURIComponent(selectedDay))
+        .catch(error => ({ load_error: error.message })),
+    ]);
     lastBoard = d;
     const s = d.summary;
     document.getElementById("stats").innerHTML = `
@@ -347,6 +382,9 @@ async function loadBoard(force) {
       <div class="stat"><b>${s.no_odds}</b><span>开售无 HAD</span></div>
       <div class="stat"><b>${s.llm_collected || 0}</b><span>LLM 证据已采集</span></div>
       <div class="stat"><b>${s.llm_predicted || 0}</b><span>LLM 已出方向</span></div>`;
+    document.getElementById("dailyStrategy").innerHTML = strategy.load_error
+      ? `<div class="banner err">每日策略加载失败：${strategy.load_error}</div>`
+      : DailyStrategyView.formatDailyStrategyHtml(strategy);
     const late = d.late_info || {};
     document.getElementById("late").innerHTML =
       `<div class="banner warn">伤停有效 ${late.injury_valid || 0} · 首发有效 ${late.lineup_valid || 0} · 过门事件 ${late.late_events || 0} · 研究门槛 ${late.toward_200} 场。${late.note || ""}</div>`;

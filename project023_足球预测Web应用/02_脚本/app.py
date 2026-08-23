@@ -10,18 +10,18 @@ from pydantic import BaseModel
 
 HERE = Path(__file__).resolve().parent
 import db
+import daily_strategy_view as dsv
 import runner
 import store_view as sv
 
 db.init()
-app = FastAPI(title="足球预测工作台", version="0.2.0")
+app = FastAPI(title="足球预测工作台", version="0.3.0")
 
 
 @app.middleware("http")
-async def no_store_api(request, call_next):
+async def no_store_workbench(request, call_next):
     response = await call_next(request)
-    if request.url.path.startswith("/api/"):
-        response.headers["Cache-Control"] = "no-store"
+    response.headers["Cache-Control"] = "no-store"
     return response
 
 
@@ -44,6 +44,7 @@ def health():
         "manual_backtest": True,
         "quant_mode": "market_only",
         "llm_track": True,
+        "daily_strategy": "budgeted_action",
     }
 
 
@@ -69,6 +70,16 @@ def matches(sales_day: str | None = None):
 def late_info():
     _, summary = sv.load_late_info()
     return summary
+
+
+@app.get("/api/daily-strategy")
+def daily_strategy_api(day: str | None = None):
+    try:
+        return dsv.daily_strategy(day)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(500, f"每日策略生成失败: {exc}") from exc
 
 
 @app.get("/api/history")

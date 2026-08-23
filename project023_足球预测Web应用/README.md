@@ -15,12 +15,15 @@
 - **刷新看板**：拉体彩已开售场次，对照 `backtest/registry.jsonl` 正式登记
 - **采集开球日**：`fusion_cli collect --kickoff-date`，写入 fusion `forward/`
 - **补登记未预测**：只对「有 HAD、未开球、还没登记」的场次跑 `fusion_cli record`，`mode=market_only`
+- **每日100元购买策略**：随看板刷新，按所选日期显示胜平负、进球数、半全场、比分单关及 2串1/3串1；已开球自动排除
 - **手动结算**：`fusion_cli settle`，读 `results/`
 - LLM 列只显示工单里的证据方向，**不当概率，不和量化合成**
 - 底部研究库：盘后伤停 / T-75 首发计数，不进 1X2
 
 事实源：`project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/`  
 SQLite 只记后台任务进度，不是预测库。
+
+每日策略属于用户授权的固定娱乐预算模式，未验证正EV，也不是已发布的生产胆项或凯利仓位；候选不足时保留余额，不用缺失数据强行凑满。
 
 ## 不做
 

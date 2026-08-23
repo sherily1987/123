@@ -9,20 +9,20 @@ import store_view as sv
 CST = timezone(timedelta(hours=8))
 
 
-def test_light_evidence_defaults_two_source_xi_and_opener_form():
+def test_light_evidence_discloses_uncollected_lineup_and_form():
     import light_evidence as le
     text = le.build_one(1, {
         "match_num": "周日022", "home": "西班牙人", "away": "莱万特",
         "league": "西甲", "kickoff_iso": "2026-08-17T01:00:00+08:00",
         "match_id": 2040907, "model_odds": [1.85, 3.18, 3.65],
     }, "C")
-    assert "两个独立媒体" in text
-    assert "20个独立主机投票" in text
-    assert "得票最高的缺阵名单直接当可用伤停" in text
-    assert "对其他对手" in text
+    assert "以上仅为采集规则，不是本场事实" in text
+    assert "未深度搜索" in text
+    assert "双方近况/轮次背景未抓取" in text
+    assert "两个独立媒体" not in text
+    assert "20个独立主机投票" not in text
     assert "getLeagueData/La_liga/2025" in text
     assert "以赛前官方名单为准" not in text
-    assert "未抓取双方近 5 场" not in text
 
 
 def test_classify_evidence_two_source_and_previous_form():
