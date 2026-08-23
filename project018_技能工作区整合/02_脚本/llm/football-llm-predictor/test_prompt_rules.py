@@ -230,6 +230,18 @@ def test_prompt_uses_evidence_collection_timestamp_not_hardcoded_date():
     assert "采集时间 2026-08-05" not in prompt
     assert "来源/时间门禁" in prompt
     assert "不得用投票" in prompt
+    assert "字段级时间规则" in prompt
+
+
+def test_evidence_catalog_preserves_field_level_timestamp_and_source_id():
+    text = "- 首发预计为4-3-3 | source(https://example.test/lineup) | collected_at(2026-08-10T09:30:00+08:00) | source_id(fotmob.scrapling)"
+    catalog = pr.build_evidence_catalog(text)
+    assert catalog == [{
+        "id": "E1", "status": "SINGLE_SOURCE", "fact": "首发预计为4-3-3",
+        "source": "https://example.test/lineup",
+        "collected_at": "2026-08-10T09:30:00+08:00",
+        "source_id": "fotmob.scrapling",
+    }]
 
 
 def test_cli_missing_evidence_is_json_and_never_initializes_llm(tmp_path, monkeypatch, capsys):

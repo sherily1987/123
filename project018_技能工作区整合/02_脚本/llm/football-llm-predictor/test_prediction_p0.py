@@ -315,6 +315,7 @@ def test_prompt_assigns_evidence_ids_without_claiming_cross_verification():
         "status": "UNAVAILABLE",
         "fact": "接口返回0条，不能解读为无伤停",
         "source": "https://example.test/injuries",
+        "collected_at": "2026-08-15T10:00:00+08:00",
     }]
     prompt = predict.build_evidence_prompt({"home": "A", "away": "B"}, text, 1)
     assert "E1" in prompt

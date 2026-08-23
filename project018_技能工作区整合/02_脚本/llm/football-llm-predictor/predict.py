@@ -263,6 +263,8 @@ def build_evidence_catalog(evidence_text):
         source_match = re.search(r"source\(\s*(https?://[^)\s]+)\s*\)", stripped, re.I)
         if not fact or not source_match:
             continue
+        collected_match = re.search(r"collected_at\(\s*([^)]*?)\s*\)", stripped, re.I)
+        source_id_match = re.search(r"source_id\(\s*([^)]*?)\s*\)", stripped, re.I)
         lowered = fact.lower()
         status_match = re.search(r"(?:status|状态)\s*[=:]\s*([A-Z_]+)", fact, re.I)
         explicit_status = status_match.group(1).upper() if status_match else ""
@@ -287,12 +289,20 @@ def build_evidence_catalog(evidence_text):
             status = "VERIFIED_MULTI_SOURCE"
         else:
             status = "SINGLE_SOURCE"
-        catalog.append({
+        item = {
             "id": f"E{len(catalog) + 1}",
             "status": status,
             "fact": fact,
             "source": source_match.group(1),
-        })
+        }
+        # Preserve field-level freshness and provenance in the prompt.  The
+        # global evidence timestamp is insufficient when, for example, a
+        # lineup refresh is newer than the form snapshot.
+        if collected_match:
+            item["collected_at"] = collected_match.group(1).strip()
+        if source_id_match:
+            item["source_id"] = source_id_match.group(1).strip()
+        catalog.append(item)
     # Mark repeated provider domains conservatively.  This does not delete
     # facts—each item remains auditable—but prevents the prompt/auditor from
     # treating several pages from one supplier as independent confirmation.
@@ -358,6 +368,10 @@ def build_evidence_prompt(match, evidence_text, match_idx):
     catalog = build_evidence_catalog(evidence_text)
     lines.append(f"\n=== 结构化证据（{evidence_collection_label(evidence_text)}） ===")
     lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
+    lines.append(
+        "字段级时间规则：优先使用每条证据自身的 collected_at；若同一维度冲突，较新的开球前事实优先，"
+        "但仍须保留 SOURCE_CONFLICT。全局采集时间不能覆盖字段级时间。"
+    )
     if any(item.get("independence") == "DUPLICATE_SOURCE_GROUP" for item in catalog):
         lines.append(
             "\n来源独立性提示：标记为 DUPLICATE_SOURCE_GROUP 的证据来自同一来源组，"
