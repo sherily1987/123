@@ -678,6 +678,10 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         )
         repo = llm_repo()
         log_path = work / "llm_predictions.txt"
+        # Keep the historical fixed filename for the workbench, but also
+        # persist an immutable per-run copy.  Re-running the same day must not
+        # erase the evidence needed to compare pre/post refresh predictions.
+        immutable_log_path = work / f"llm_predictions_run_{run_id}.txt"
         env = _no_proxy_env()
         env["PYTHONUNBUFFERED"] = "1"
         proc = subprocess.Popen(
@@ -701,6 +705,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         rc = proc.wait(timeout=7200)
         log = "".join(chunks)
         log_path.write_text(log, encoding="utf-8")
+        immutable_log_path.write_text(log, encoding="utf-8")
         if rc != 0:
             db.run_update(run_id, status="error", message=f"predict.py 退出 {rc}，见 {log_path.name}")
             return
@@ -722,7 +727,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             f"- 复用深度证据 {reused}，轻量证据 {light}",
             f"- 出方向 {parsed['ok']}，门禁/审计跳过 {parsed['skipped']}",
             f"- 工单写入 {jobs_n}",
-            f"- 日志 `{log_path.name}`",
+            f"- 最新日志 `{log_path.name}`；不可变运行副本 `{immutable_log_path.name}`",
             "",
             "| 场次 | 比赛 | 方向 | 强度 | 比分 |",
             "|---|---|---|---|---|",
