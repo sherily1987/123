@@ -121,7 +121,7 @@ def fold_side(block: dict) -> dict:
     return {
         "team": (block or {}).get("teamShortName"),
         "count": len(lst),
-        "status": "VALID" if lst else "UNAVAILABLE",
+        "status": "VALID" if lst else "VALID_EMPTY",
         "attack_absence": clip(atk),
         "defense_absence": clip(dfs),
         "gk_absence": clip(gk),
@@ -368,7 +368,7 @@ def collect_one(rec, snapshot, want_injury, want_lineup, events_path):
             row["status"] = "UNAVAILABLE"
         else:
             folded = fold_injuries(raw)
-            row["status"] = "VALID" if (folded["home"]["count"] or folded["away"]["count"]) else "UNAVAILABLE"
+            row["status"] = "VALID" if (folded["home"]["count"] or folded["away"]["count"]) else "VALID_EMPTY"
             row["absence"] = folded
         append_jsonl(events_path, row)
         out.append(row)
@@ -491,6 +491,7 @@ def main() -> None:
         "due_n": len(due),
         "wrote": len(collected),
         "injury_valid": sum(1 for r in collected if r.get("kind") == "injury" and r.get("status") == "VALID"),
+        "injury_cleared": sum(1 for r in collected if r.get("kind") == "injury" and r.get("status") == "VALID_EMPTY"),
         "lineup_valid": sum(1 for r in collected if r.get("kind") == "lineup" and r.get("status") == "VALID"),
         "lineup_no_api_id": sum(1 for r in collected if r.get("status") == "NO_API_ID"),
     }

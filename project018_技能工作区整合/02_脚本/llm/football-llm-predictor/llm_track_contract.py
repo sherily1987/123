@@ -96,7 +96,7 @@ def _section_status(name: str, evidence: dict[str, Any], raw_match: dict[str, An
         # not equivalent to an official team sheet.  Keep the distinction in
         # the manifest so prompts can cite the risk without calling it official.
         return "PREDICTED"
-    if status in {"OK", "AVAILABLE", "VALID"}:
+    if status in {"OK", "AVAILABLE", "VALID", "VALID_EMPTY"}:
         return "AVAILABLE"
     if status == "PARTIAL":
         return "PARTIAL"

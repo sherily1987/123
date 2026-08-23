@@ -43,6 +43,21 @@ def test_fold_injuries_caps_and_splits_attack_defense():
     assert folded["away"]["count"] == 0
 
 
+def test_empty_successful_injury_response_is_cleared_not_unavailable(tmp_path: Path, monkeypatch):
+    rec = {
+        "sporttery_meta": {"match_id": 2041028},
+        "home": "博洛尼亚", "away": "拉齐奥",
+        "kickoff": "2026-08-25T00:30:00+08:00",
+    }
+    monkeypatch.setattr(mod, "fetch_injury", lambda _: {"home": {}, "away": {}})
+
+    rows = mod.collect_one(rec, "initial_prematch", want_injury=True,
+                           want_lineup=False, events_path=tmp_path / "events.jsonl")
+
+    assert rows[0]["status"] == "VALID_EMPTY"
+    assert rows[0]["absence"]["home"]["status"] == "VALID_EMPTY"
+
+
 def test_t75_window_only_inside_75_minutes():
     kick = datetime(2026, 8, 17, 10, 0, tzinfo=UTC)
     assert mod.in_t75_window(kick, kick - timedelta(minutes=30))

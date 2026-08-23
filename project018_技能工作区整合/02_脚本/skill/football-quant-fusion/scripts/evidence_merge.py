@@ -5,7 +5,7 @@ from copy import deepcopy
 from typing import Any
 
 
-VALID = {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}
+VALID = {"VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}
 FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
 
 

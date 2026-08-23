@@ -48,7 +48,7 @@ EVIDENCE_FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starti
 # PREDICTED is an explicit, time-stamped probable-XI state.  It clears the
 # field-presence gate but remains distinguishable from an official XI so
 # downstream reports can apply a risk tag and refresh it near kickoff.
-_EVIDENCE_VALID = {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG"}
+_EVIDENCE_VALID = {"VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG"}
 _EVIDENCE_BAD = {"MISSING", "UNAVAILABLE", "UNVERIFIED", "OUTDATED", "ASSUMED", "POST_KICKOFF"}
 
 
