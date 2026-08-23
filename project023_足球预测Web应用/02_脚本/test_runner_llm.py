@@ -98,6 +98,36 @@ def test_attach_reports_missing_snapshot_ids(tmp_path: Path):
     assert got["missing_snapshot_ids"] == ["sporttery-2041999", "sporttery-2042000"]
 
 
+def test_attach_rejects_snapshot_collected_after_kickoff(tmp_path: Path):
+    snap_dir = tmp_path / "2026-08-24" / "evidence_snapshots"
+    snap_dir.mkdir(parents=True)
+    (snap_dir / "sporttery-2041999.json").write_text(json.dumps({
+        "match_id": "sporttery-2041999",
+        "collected_at": "2026-08-24T04:00:00+00:00",
+        "evidence_audit": {"collected_at": "2026-08-24T04:00:00+00:00", "entries": {}},
+    }), encoding="utf-8")
+    matches = [{"match_id": 2041999, "kickoff_iso": "2026-08-24T03:00:00+08:00"}]
+    got = runner.attach_collected_evidence(matches, "2026-08-24", forward_root=tmp_path)
+    assert got["snapshots_attached"] == 0
+    assert got["missing_snapshot_ids"] == ["sporttery-2041999"]
+    assert got["snapshot_rejections"] == [{"match_id": "sporttery-2041999", "reason": "SNAPSHOT_AFTER_KICKOFF"}]
+
+
+def test_fusion_evidence_markdown_exposes_audit_summary():
+    import light_evidence
+    text = light_evidence.render_fusion_evidence({
+        "kickoff_iso": "2026-08-24T03:00:00+08:00",
+        "evidence_audit": {
+            "evidence_status": "GAP", "missing_fields": ["starting_xi"],
+            "collected_at": "2026-08-23T12:00:00+00:00",
+            "kickoff": "2026-08-24T03:00:00+08:00",
+        },
+        "evidence_chain": {"starting_xi": {"status": "PENDING_REFRESH", "source_id": "official.lineup.pending"}},
+    })
+    assert "evidence_audit: status=GAP" in text
+    assert "missing_fields=starting_xi" in text
+
+
 def test_auto_collect_prematch_evidence_is_id_scoped(tmp_path: Path, monkeypatch):
     seen = {}
 

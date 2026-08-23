@@ -298,6 +298,7 @@ def attach_collected_evidence(
     attached = 0
     late_merged = 0
     missing_snapshot_ids: list[str] = []
+    snapshot_rejections: list[dict] = []
     for match in matches:
         mid = sv.sporttery_id(match.get("match_id"))
         if not mid:
@@ -306,12 +307,18 @@ def attach_collected_evidence(
         chain = match.get("evidence_chain") or {}
         if snapshot:
             path, blob = snapshot
-            chain, browser_audit = merge_browser_audit(chain, blob.get("evidence_audit"))
-            match["evidence_snapshot_ref"] = str(path)
-            match["browser_evidence_ref"] = str(path)
-            match["evidence_snapshot_audit"] = browser_audit
-            match["evidence_audit"] = blob.get("evidence_audit") or {}
-            attached += 1
+            kickoff = sv.parse_dt(match.get("kickoff_iso") or match.get("kickoff"))
+            collected = sv.parse_dt(blob.get("collected_at") or (blob.get("evidence_audit") or {}).get("collected_at"))
+            if kickoff and collected and collected > kickoff:
+                snapshot_rejections.append({"match_id": mid, "reason": "SNAPSHOT_AFTER_KICKOFF"})
+                missing_snapshot_ids.append(mid)
+            else:
+                chain, browser_audit = merge_browser_audit(chain, blob.get("evidence_audit"))
+                match["evidence_snapshot_ref"] = str(path)
+                match["browser_evidence_ref"] = str(path)
+                match["evidence_snapshot_audit"] = browser_audit
+                match["evidence_audit"] = blob.get("evidence_audit") or {}
+                attached += 1
         else:
             missing_snapshot_ids.append(mid)
         if events_by_id.get(mid):
@@ -327,6 +334,7 @@ def attach_collected_evidence(
         "matches": len(matches),
         "snapshots_attached": attached,
         "missing_snapshot_ids": missing_snapshot_ids,
+        "snapshot_rejections": snapshot_rejections,
         "late_info_matches_merged": late_merged,
     }
 

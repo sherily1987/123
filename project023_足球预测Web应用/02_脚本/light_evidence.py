@@ -37,6 +37,14 @@ def render_fusion_evidence(m: dict) -> str:
     if not chain:
         return ""
     lines = ["## 已采集证据快照（LLM可引用）"]
+    audit = m.get("evidence_audit") or {}
+    if isinstance(audit, dict):
+        missing = ",".join(audit.get("missing_fields") or []) or "无"
+        lines.append(
+            f"- evidence_audit: status={audit.get('evidence_status') or 'UNKNOWN'}；"
+            f"missing_fields={missing}；collected_at={audit.get('collected_at') or 'unknown'}；"
+            f"kickoff={audit.get('kickoff') or m.get('kickoff_iso') or 'unknown'}"
+        )
     for name in ("team_stats", "recent_form", "injury", "suspensions", "starting_xi"):
         item = chain.get(name)
         if not isinstance(item, dict):
