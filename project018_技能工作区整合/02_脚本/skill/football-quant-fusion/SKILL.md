@@ -85,7 +85,7 @@ python C:\Users\Administrator\.codex\skills\football-quant-fusion\scripts\fusion
 
 `--research-route` 的输出必须带 `research_only=true`，不能写入正式预测登记库或 current cohort。`--production-route` 仅运行生产安全路由和 shadow 候选，不表示候选模型已获准融合。
 
-LLM轨只负责证据整理和定性分析。生产默认只调用 Kimi K3；其它模型只能显式传参做隔离实验，不能把票数当概率或共识。每条输出必须展示来源、缺口、`action` 和 `reason`。真实生产 LLM 工程位于本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/`（2026-08-16 迁入），可用环境变量 `FOOTBALL_LLM_ROOT` 覆盖：
+LLM轨只负责证据整理和定性分析。生产默认只调用 DeepSeek V4 Flash（`deepseek/deepseek-v4-flash`）；Kimi K3 仅保留为历史兼容或显式隔离实验模型，不能把票数当概率或共识。每条输出必须展示来源、缺口、`action` 和 `reason`。真实生产 LLM 工程位于本仓库 `project018_技能工作区整合/02_脚本/llm/football-llm-predictor/`（2026-08-16 迁入），可用环境变量 `FOOTBALL_LLM_ROOT` 覆盖：
 
 ```powershell
 python $cli llm-evidence --input match.json --out-dir evidence
@@ -104,7 +104,7 @@ BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射
 真实来源身份，不能把其他联赛页面标成 `fotmob.bb_browser`。来源候选只是待审计入口，未取得
 带时间戳的字段事实前不得提升为 `VALID`，也不得进入生产概率。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
-仅剩体彩赔率时 K3 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
+仅剩体彩赔率时 DeepSeek V4 Flash 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
 禁止 EV/Kelly/下注推荐。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。
 
 ## 凯利研究路径（2026-08-18 固化）

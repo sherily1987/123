@@ -119,7 +119,7 @@ python evaluate_llm_track.py \
 浏览器结果可用 `evidence_orchestrator.write_browser_snapshot(...)` 写成统一 JSON 快照，
 再重新运行编排器合并。
 浏览器快照必须通过身份、域名、关键词和开球前时间门禁后才能进主证据。无法回补就保留缺口。
-仅剩体彩赔率时仍允许 K3 输出观察性研究意见，但强制 `evidence_gap=true`、`confidence=null`、
+仅剩体彩赔率时仍允许 DeepSeek V4 Flash 输出观察性研究意见，但强制 `evidence_gap=true`、`confidence=null`、
 `action=observe`，不计算 EV/Kelly、不生成下注推荐。旧 canonical 证据仍归档至 `snapshots/`。
 
 `predict.py` 会把官方赔率（胜平负/让球/总进球/比分/半全场）+ 六类证据拼进每个模型的提示词，
