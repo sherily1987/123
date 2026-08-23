@@ -249,7 +249,9 @@ class OddsApiAdapter:
             report["matches"].append(entry)
 
         # 3) 落盘：快照 JSON + 追加 JSONL（dry-run 不写）
-        if not dry_run and store_dir:
+        # 没有绑定到体彩 match_id 的批量请求只能证明接口可达，不能算研究样本。
+        # 不要把 matches=[] 的空行追加到研究库，否则下游按快照行数统计会虚增分母。
+        if not dry_run and store_dir and report["matches"]:
             store = Path(store_dir)
             store.mkdir(parents=True, exist_ok=True)
             line = {"schema": report["schema"], "provider": report["provider"],
@@ -258,6 +260,8 @@ class OddsApiAdapter:
             with open(store / "intl_production.jsonl", "a", encoding="utf-8") as f:
                 f.write(json.dumps(line, ensure_ascii=False) + "\n")
             report["store_file"] = str((store / "intl_production.jsonl").resolve())
+        elif not dry_run and store_dir and not report["matches"]:
+            report["write_skipped_reason"] = "no_matched_sporttery_matches"
         if out_path:
             Path(out_path).write_text(
                 json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
