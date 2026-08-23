@@ -259,6 +259,20 @@ def test_parse_llm_log_preserves_model_timestamp_for_calibration():
     assert row["top_scores"] == ["1-0", "2-0", "1-1"]
 
 
+def test_parse_llm_log_keeps_deepseek_single_model_json_without_legacy_banner():
+    text = '''
+⚽ 第1/1场 [周一001] 博洛尼亚 VS 拉齐奥 | 意甲 | 2026-08-25 00:30
+{"direction":"主胜","votes":0.85,"total_votes":1.275,"strength":null,"top_score_pref":"1-0","top_scores":["1-0","1-1","2-1"],"alt_direction":"平局","evidence_gap":true,"models_used":["deepseek/deepseek-v4-flash"],"prediction_as_of":"2026-08-23T15:28:43+00:00"}
+'''
+    row = runner.parse_llm_log(text)["rows"][0]
+    assert row["num"] == "周一001"
+    assert row["dir"] == "主胜"
+    assert row["strength"] is None
+    assert row["score"] == "1-0"
+    assert row["model_id"] == "deepseek/deepseek-v4-flash"
+    assert row["evidence_gap"] is True
+
+
 def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeypatch):
     src = tmp_path / "src"
     src.mkdir()

@@ -464,8 +464,6 @@ def parse_llm_log(text: str) -> dict:
     rows = []
     for blk in re.split(r"(?=⚽ 第)", text or ""):
         dm = _LLM_DIR.search(blk)
-        if not dm:
-            continue
         hm = _LLM_HEAD.search(blk)
         sm = _LLM_SCORE.search(blk)
         am = _LLM_ALT.search(blk)
@@ -480,6 +478,14 @@ def parse_llm_log(text: str) -> dict:
             ):
                 audit = candidate
                 break
+        # DeepSeek V4 Flash is intentionally a single research voter. Its
+        # output has no legacy "综合方向" banner, so derive the row from the
+        # durable JSON audit instead of silently dropping the prediction.
+        if not dm and not isinstance(audit, dict):
+            continue
+        audit_direction = (audit or {}).get("direction") if isinstance(audit, dict) else None
+        if not dm and not audit_direction:
+            continue
         individual = (audit or {}).get("individual") if isinstance(audit, dict) else None
         models_used = (audit or {}).get("models_used") if isinstance(audit, dict) else None
         logged_model_id = (
@@ -499,18 +505,26 @@ def parse_llm_log(text: str) -> dict:
                 if token and token not in ("分散", "-", "比分Top3"):
                     scores.append(token)
         score = scores[0] if scores else None
+        if not scores and isinstance(audit, dict):
+            scores = list(audit.get("top_scores") or [])
+            score = scores[0] if scores else (audit.get("top_score_pref") or None)
+        direction = dm.group(1) if dm else audit_direction
+        votes = float(dm.group(2)) if dm else float((audit or {}).get("votes") or 0)
+        total_votes = float(dm.group(3)) if dm else float((audit or {}).get("total_votes") or 0)
+        strength = int(dm.group(4)) if dm else (audit or {}).get("strength")
+        alt_direction = am.group(2) if am else (audit or {}).get("alt_direction")
         rows.append({
             "num": hm.group(1) if hm else "",
             "home": hm.group(2) if hm else "",
             "away": hm.group(3) if hm else "",
-            "dir": dm.group(1),
-            "votes": float(dm.group(2)),
-            "total_votes": float(dm.group(3)),
-            "strength": int(dm.group(4)),
+            "dir": direction,
+            "votes": votes,
+            "total_votes": total_votes,
+            "strength": strength,
             "score": score,
             "top_scores": scores[:3],
-            "alt": am.group(2) if am else None,
-            "evidence_gap": ("证据存在缺口" in blk) or ("证据缺口" in blk),
+            "alt": alt_direction,
+            "evidence_gap": bool((audit or {}).get("evidence_gap")) or ("证据存在缺口" in blk) or ("证据缺口" in blk),
             # Preserve historical single-model logs; only new/unlabelled logs
             # use the current DeepSeek V4 Flash default.
             "model_id": logged_model_id or DEFAULT_LLM_MODEL_ID,
@@ -548,7 +562,7 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
         strength = (row.get("strength") or 0) / 100.0
         upsert_job(root, ident, llm={
             "track": "llm",
-            "model_id": DEFAULT_LLM_MODEL_ID,
+            "model_id": row.get("model_id") or DEFAULT_LLM_MODEL_ID,
             "llm_prediction_as_of": row.get("prediction_as_of"),
             "direction": row.get("dir"),
             "alt_direction": row.get("alt"),
