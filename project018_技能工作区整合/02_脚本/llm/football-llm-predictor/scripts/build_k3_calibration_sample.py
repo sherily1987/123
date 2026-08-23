@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -62,6 +63,53 @@ def _llm_output(job: dict[str, Any]) -> dict[str, Any] | None:
     rows = [row for row in (job.get("outputs") or [])
             if isinstance(row, dict) and row.get("track") == "llm"]
     return rows[-1] if rows else None
+
+
+def _metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    direction_rows = [row for row in rows if row.get("direction") in {"H", "D", "A"}]
+    probability_rows = []
+    for row in rows:
+        values = row.get("llm_probs_1x2")
+        if not isinstance(values, list) or len(values) != 3:
+            continue
+        try:
+            probs = [float(value) / 100.0 for value in values]
+        except (TypeError, ValueError):
+            continue
+        if any(value < 0 for value in probs) or sum(probs) <= 0:
+            continue
+        total = sum(probs)
+        probability_rows.append((row, [value / total for value in probs]))
+    brier = []
+    logloss = []
+    index = {"H": 0, "D": 1, "A": 2}
+    for row, probs in probability_rows:
+        actual = index.get(row.get("actual_direction"))
+        if actual is None:
+            continue
+        brier.append(sum((prob - (1.0 if i == actual else 0.0)) ** 2
+                         for i, prob in enumerate(probs)))
+        logloss.append(-math.log(max(probs[actual], 1e-15)))
+    ou_rows = [row for row in rows if row.get("llm_ou25") in {"大", "大2.5", "小", "小2.5"}]
+    ou_correct = sum(
+        (row["llm_ou25"] in {"大", "大2.5"}) == (int(row["total_goals"]) >= 3)
+        for row in ou_rows
+    )
+    return {
+        "direction_n": len(direction_rows),
+        "direction_accuracy_pct": round(
+            sum(row.get("direction_correct") is True for row in direction_rows)
+            / len(direction_rows) * 100.0, 2) if direction_rows else None,
+        "probability_n": len(probability_rows),
+        "brier": round(sum(brier) / len(brier), 8) if brier else None,
+        "log_loss": round(sum(logloss) / len(logloss), 8) if logloss else None,
+        "score_n": len(rows),
+        "score_exact_accuracy_pct": round(
+            sum(row.get("score_exact") is True for row in rows) / len(rows) * 100.0, 2)
+        if rows else None,
+        "ou25_n": len(ou_rows),
+        "ou25_accuracy_pct": round(ou_correct / len(ou_rows) * 100.0, 2) if ou_rows else None,
+    }
 
 
 def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
@@ -143,6 +191,7 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
         "llm_rows": llm_count,
         "eligible_settled_rows": len(rows),
         "excluded_by_reason": dict(sorted(reasons.items())),
+        "metrics": _metrics(rows),
         "rows": rows,
     }
 

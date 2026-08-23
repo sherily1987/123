@@ -7,6 +7,17 @@
   "llm_rows": 1,
   "eligible_settled_rows": 1,
   "excluded_by_reason": {},
+  "metrics": {
+    "direction_n": 1,
+    "direction_accuracy_pct": 0.0,
+    "probability_n": 0,
+    "brier": null,
+    "log_loss": null,
+    "score_n": 1,
+    "score_exact_accuracy_pct": 0.0,
+    "ou25_n": 0,
+    "ou25_accuracy_pct": null
+  },
   "rows": [
     {
       "model": "moonshot/kimi-k3",
@@ -19,6 +30,12 @@
       "direction": "D",
       "alt_direction": null,
       "vote_share": 0.5714,
+      "llm_probs_1x2": null,
+      "llm_confidence": null,
+      "llm_decision": null,
+      "llm_top_scores": [],
+      "llm_ou25": null,
+      "llm_hafu": null,
       "score_prediction": "1-1",
       "ou25_prediction": null,
       "hafu_prediction": null,

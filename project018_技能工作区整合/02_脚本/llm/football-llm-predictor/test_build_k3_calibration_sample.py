@@ -50,6 +50,8 @@ def test_build_sample_requires_pre_kickoff_and_official_result(tmp_path: Path):
     assert report["rows"][0]["direction_correct"] is True
     assert report["rows"][0]["score_exact"] is False
     assert report["excluded_by_reason"] == {"pending_or_missing_official_result": 1}
+    assert report["metrics"]["direction_accuracy_pct"] == 100.0
+    assert report["metrics"]["probability_n"] == 0
 
 
 def test_build_sample_rejects_post_kickoff_prediction(tmp_path: Path):
@@ -63,3 +65,21 @@ def test_build_sample_rejects_post_kickoff_prediction(tmp_path: Path):
 
     assert report["eligible_settled_rows"] == 0
     assert report["excluded_by_reason"] == {"post_kickoff_prediction": 1}
+
+
+def test_build_sample_scores_self_reported_probability_separately(tmp_path: Path):
+    jobs = tmp_path / "jobs"
+    results = tmp_path / "results"
+    jobs.mkdir()
+    results.mkdir()
+    job = _job(4)
+    job["outputs"][0]["llm_probs_1x2"] = [60, 25, 15]
+    (jobs / "sporttery-4.json").write_text(json.dumps(job), encoding="utf-8")
+    (results / "4.json").write_text(json.dumps({
+        "match_id": "4", "status": "finished", "score_90": {"home": 1, "away": 0}
+    }), encoding="utf-8")
+
+    report = build_sample(jobs, results)
+
+    assert report["metrics"]["probability_n"] == 1
+    assert report["metrics"]["brier"] == 0.245
