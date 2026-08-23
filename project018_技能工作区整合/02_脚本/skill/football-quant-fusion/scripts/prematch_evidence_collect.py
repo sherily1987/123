@@ -174,7 +174,20 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
     if kickoff:
         for minutes in (120, 90, 60, 45, 30, 15):
             refresh_points.append((kickoff - timedelta(minutes=minutes)).isoformat())
-    lineup_status = "VALID" if any(row.get("startXI") for row in api_lineups if isinstance(row, dict)) else "PENDING_REFRESH"
+    # Keep the provider's completeness verdict when available.  Older test
+    # doubles/sidecars may omit it, so derive the same two-sided rule locally:
+    # one non-empty team sheet is partial evidence, never a complete XI.
+    provider_lineup_status = str(api.get("lineups_status") or "").upper()
+    lineup_sides_with_xi = sum(
+        1 for row in api_lineups
+        if isinstance(row, dict) and len(row.get("startXI") or []) > 0
+    )
+    if provider_lineup_status in {"", "OK", "VALID"} and lineup_sides_with_xi >= 2:
+        lineup_status = "VALID"
+    elif provider_lineup_status == "PARTIAL" or 0 < lineup_sides_with_xi < 2:
+        lineup_status = "PARTIAL"
+    else:
+        lineup_status = "PENDING_REFRESH"
     lineup_source_id = "api-sports.io" if api_lineups else "official.lineup.pending"
     lineup_source_url = f"https://v3.football.api-sports.io/fixtures/lineups?fixture={api.get('fixture_id')}" if api_lineups else source_url
     entries = {

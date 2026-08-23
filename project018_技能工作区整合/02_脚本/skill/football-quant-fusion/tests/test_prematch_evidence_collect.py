@@ -111,3 +111,28 @@ def test_api_sports_enrichment_fills_form_injury_and_confirmed_lineups(monkeypat
     assert entries["injury"]["status"] == "VALID"
     assert entries["starting_xi"]["status"] == "VALID"
     assert row["facts"]["api_sports"]["fixture_id"] == 42
+
+
+def test_audit_does_not_upgrade_one_sided_api_lineup_to_valid(monkeypatch):
+    monkeypatch.setenv("ENABLE_API_SPORTS_EVIDENCE", "1")
+    monkeypatch.setenv("API_FOOTBALL_KEY", "test-key")
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def collect_match(self, *args, **kwargs):
+            return {
+                "status": "ok", "fixture_id": 43,
+                "recent": {"home": [{"league": "英超"}] * 5,
+                            "away": [{"league": "英超"}] * 5},
+                "injuries": [],
+                "lineups": [{"team": {"id": 10}, "startXI": [{"player": {"name": "A1"}}]}],
+                "lineups_status": "PARTIAL",
+            }
+
+    monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
+    row = pec.collect_one({"match_id": "sporttery-4", "home": "A", "away": "B",
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
+    entry = row["evidence_audit"]["entries"]["starting_xi"]
+    assert entry["status"] == "PARTIAL"
+    assert "starting_xi" in row["evidence_audit"]["missing_fields"]
