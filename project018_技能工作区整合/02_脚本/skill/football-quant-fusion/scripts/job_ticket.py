@@ -404,6 +404,14 @@ def llm_from_parsed(row: dict) -> dict:
         if value > 1:
             value = value / 100.0
         packed = {"type": "vote_share", "value": round(value, 4)}
+    # A single DeepSeek run is a research opinion, not a consensus vote.  A
+    # legacy projection sometimes encoded its missing strength as 0.0, which
+    # looked like a measured zero-confidence vote and polluted reports.  Keep
+    # the semantic absence as null while retaining the explicit reason/action.
+    reason_text = str(row.get("reason") or gate.get("reason") or "")
+    if (row.get("single_model") is True or "single_model_no_consensus" in reason_text) and (
+            packed is None or float(packed.get("value", 0.0)) == 0.0):
+        packed = None
     action = row.get("ev_action") or row.get("action") or gate.get("action")
     if row.get("sp_skip") and not action:
         action = "skip"

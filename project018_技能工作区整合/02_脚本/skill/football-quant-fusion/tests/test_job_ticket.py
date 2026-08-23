@@ -77,6 +77,16 @@ def test_llm_parsed_keeps_raw_abstained_markets_in_research_namespace():
     assert row["llm_raw_hafu"] == "胜胜"
 
 
+def test_single_model_no_consensus_does_not_project_missing_strength_as_zero():
+    row = jt.llm_from_parsed({
+        "model_id": "deepseek/deepseek-v4-flash", "direction": "主胜",
+        "single_model": True, "strength": {"type": "vote_share", "value": 0.0},
+        "action": "skip", "reason": "single_model_no_consensus",
+    })
+    assert row["strength"] is None
+    assert row["action"] == "skip"
+
+
 def test_normalize_match_id_accepts_int_str_and_prefixed():
     assert jt.normalize_match_id(2040898) == "sporttery-2040898"
     assert jt.normalize_match_id("2040898") == "sporttery-2040898"
