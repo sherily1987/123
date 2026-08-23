@@ -160,3 +160,36 @@ def test_api_sports_recent_form_excludes_friendlies_and_keeps_official_matches()
     assert "排除友谊赛5场" in lee.render_recent_form(
         result["recent"], COLLECTED, result["recent_meta"]
     )
+
+
+def test_api_sports_recent_form_excludes_future_and_unplayed_rows():
+    def fixture(when, status, score=(1, 0)):
+        return {
+            "fixture": {"date": when, "status": {"short": status}},
+            "league": {"name": "Serie A", "type": "League"},
+            "teams": {"home": {"name": "Home"}, "away": {"name": "Away"}},
+            "score": {"fulltime": {"home": score[0], "away": score[1]}},
+        }
+
+    def transport(path, params):
+        if path == "/fixtures" and "date" in params:
+            return {"response": [{
+                "fixture": {"id": 8, "date": "2026-08-24T16:30:00+00:00"},
+                "teams": {"home": {"id": 1, "name": "Home"},
+                          "away": {"id": 2, "name": "Away"}},
+            }]}
+        if path == "/fixtures" and "last" in params:
+            return {"response": [
+                fixture("2026-08-23T12:00:00+00:00", "FT"),
+                fixture("2026-08-25T12:00:00+00:00", "NS"),
+                fixture("2026-08-22T12:00:00+00:00", "PST"),
+                fixture("2026-08-21T12:00:00+00:00", "FT", (None, None)),
+            ]}
+        if path in ("/injuries", "/fixtures/lineups"):
+            return {"response": []}
+        raise AssertionError((path, params))
+
+    result = lee.ApiSportsClient(transport=transport).collect_match(
+        "Home", "Away", "2026-08-24T16:30:00+00:00")
+    assert all(len(result["recent"][side]) == 1 for side in ("home", "away"))
+    assert result["recent"]["home"][0]["date"].startswith("2026-08-23")

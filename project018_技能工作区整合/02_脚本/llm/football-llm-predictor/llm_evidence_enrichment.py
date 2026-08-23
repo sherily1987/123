@@ -139,6 +139,25 @@ def _normalize_fixture(row):
     }
 
 
+_COMPLETED_STATUSES = {"FT", "AET", "PEN", "AWD", "WO"}
+
+
+def _usable_recent_fixture(row, kickoff):
+    """Reject future/unplayed fixtures before they enter recent-form evidence."""
+    normalized = _normalize_fixture(row)
+    status = str(normalized.get("status") or "").upper()
+    if status not in _COMPLETED_STATUSES:
+        return False
+    try:
+        event_time = _dt(normalized.get("date"))
+    except (TypeError, ValueError):
+        return False
+    if event_time >= kickoff:
+        return False
+    score = str(normalized.get("score_90") or "")
+    return bool(re.fullmatch(r"\d+-\d+", score))
+
+
 class ApiSportsClient:
     def __init__(self, transport=None, api_key=None, timeout=30):
         self.transport = transport
@@ -223,7 +242,9 @@ class ApiSportsClient:
                     "team": team_id, "last": 20, "timezone": "UTC",
                 }).get("response", [])
                 normalized = [_normalize_fixture(row) for row in rows]
-                recent[side] = [row for row in normalized if not row["is_friendly"]][:5]
+                recent[side] = [row for raw, row in zip(rows, normalized)
+                                if not row["is_friendly"]
+                                and _usable_recent_fixture(raw, kick)][:5]
                 recent_meta[side] = {
                     "friendly_excluded": sum(1 for row in normalized if row["is_friendly"]),
                 }
