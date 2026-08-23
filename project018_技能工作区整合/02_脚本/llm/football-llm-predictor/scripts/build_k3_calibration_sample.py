@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Build an auditable single-model calibration sample from job tickets.
 
+The filename is retained for backward compatibility. Samples are always
+filtered by the explicit model id, so K3 and DeepSeek V4 Flash cannot mix.
+
 The builder deliberately does not infer results from external aggregates.  A
 row is scored only when its job has a pre-kickoff timestamp and a verified
 Sporttery 90-minute result in the shared results store (or an equivalent

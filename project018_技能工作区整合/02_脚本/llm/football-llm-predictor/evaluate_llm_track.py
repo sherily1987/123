@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate registered K3 research predictions against verified 90-minute results."""
+"""Evaluate registered single-model LLM research predictions against verified 90-minute results."""
 
 from __future__ import annotations
 
@@ -57,4 +57,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

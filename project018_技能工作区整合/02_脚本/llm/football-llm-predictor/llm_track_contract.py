@@ -1,4 +1,4 @@
-"""Pure contracts for the K3 research track.
+"""Pure contracts for the single-model LLM research track.
 
 This module deliberately has no network, registry, or model dependencies.  It
 normalizes match identity and makes evidence gaps explicit so callers can
