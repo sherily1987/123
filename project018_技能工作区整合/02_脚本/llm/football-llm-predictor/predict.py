@@ -249,6 +249,13 @@ def build_evidence_catalog(evidence_text):
     catalog = []
     for line in (evidence_text or "").splitlines():
         stripped = re.sub(r"^\s*>\s?", "", line).strip()
+        # light_evidence.render_fusion_evidence emits the structured payload
+        # on the line immediately following its status bullet.  Preserve it in
+        # the LLM catalog; status-only metadata tells the model that facts
+        # exist but is not enough to analyze form, injuries, or lineups.
+        if stripped.lower().startswith("facts=") and catalog:
+            catalog[-1]["facts"] = stripped[6:].strip()[:2400]
+            continue
         if not stripped.startswith(("-", "*")):
             continue
         fact = stripped[1:].strip().split("| source(", 1)[0].strip()

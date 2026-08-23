@@ -6,6 +6,17 @@ import mcp_evidence as me
 import predict
 
 
+def test_evidence_catalog_preserves_structured_snapshot_facts():
+    text = (
+        "> - recent_form: status=VALID；source=league.example.preview；"
+        "facts_available=true | source(https://league.example/match/1)\n"
+        ">   facts={\"raw_rows\":[\"A 2-1 B (W)\",\"A 1-0 C (W)\"]}\n"
+    )
+    catalog = predict.build_evidence_catalog(text)
+    assert catalog[0]["status"] == "SINGLE_SOURCE"
+    assert "A 2-1 B" in catalog[0]["facts"]
+
+
 def test_deepseek_retries_structured_parse_failure(monkeypatch):
     class Chat:
         def __init__(self):
