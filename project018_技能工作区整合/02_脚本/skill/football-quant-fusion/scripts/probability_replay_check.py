@@ -37,7 +37,12 @@ from runtime_paths import backtest_store
 
 HERE = Path(__file__).resolve().parent
 PY = resolve_python()
-COMPARE_FIELDS = ("final_1x2_pct", "model_1x2_pct")
+# 生产主概率 + 已有衍生市场概率/排序；只比较实际存在的字段，避免旧样本因
+# 新增纯展示字段被误判为变化。HAFU/TTG/CRS 的状态与概率一并纳入重放边界。
+COMPARE_FIELDS = (
+    "final_1x2_pct", "model_1x2_pct", "ou_2_5", "ou_3_5", "btts",
+    "hafu_model", "ttg_score_consistency", "top_scores", "score_matrix",
+)
 
 
 def replay_one(record: dict) -> dict:

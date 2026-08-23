@@ -30,6 +30,27 @@
       ],
       "evidence": "40/40 场重放 final_1x2_pct 与 model_1x2_pct 完全一致；team_strength.py 增加比分 Top-K 指标为纯增量输出，不改任何概率数值。",
       "note": "别名只在 (model_version, probability_signature) 精确成对匹配时生效，且必须先跑重放等价性验证；未经验证的旧版本不得写进这里。"
+    },
+    {
+      "model_version": "m4",
+      "probability_signature": "5c34721daa91a0232805bbcaa7b1cfebcbfb57dc32c0a2b1e63c4662ceb17197",
+      "equivalent_to_model_version": "m4",
+      "verified_at": "2026-08-23",
+      "verified_by": "scripts/probability_replay_check.py --model-version m4 --limit 25",
+      "verified_scope": [
+        "market_only",
+        "final_1x2_pct",
+        "model_1x2_pct",
+        "ou_2_5",
+        "ou_3_5",
+        "btts",
+        "hafu_model",
+        "ttg_score_consistency",
+        "top_scores",
+        "score_matrix"
+      ],
+      "evidence": "25/25 场重放主概率与已记录衍生市场概率/比分矩阵完全一致；当前代码仅新增证据审计字段，未改变概率输出。报告：project018_技能工作区整合/06_复盘/2026-08-23_M4重放/m4_probability_replay.json",
+      "note": "别名只在 (model_version, probability_signature) 精确成对匹配时生效；等价结论仅覆盖上述 market_only 路由和字段，不外推到 hybrid 或未重放市场。"
     }
   ],
   "probability_files": [
