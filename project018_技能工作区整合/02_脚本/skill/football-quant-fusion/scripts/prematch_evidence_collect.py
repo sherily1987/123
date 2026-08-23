@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -24,8 +26,50 @@ if not SPEC or not SPEC.loader:
 preview = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(preview)
 
+ENRICHMENT = HERE.parents[2] / "llm" / "football-llm-predictor" / "llm_evidence_enrichment.py"
+ENRICHMENT_SPEC = importlib.util.spec_from_file_location("llm_evidence_enrichment", ENRICHMENT)
+if not ENRICHMENT_SPEC or not ENRICHMENT_SPEC.loader:
+    raise RuntimeError(f"API-Sports enrichment unavailable: {ENRICHMENT}")
+enrichment = importlib.util.module_from_spec(ENRICHMENT_SPEC)
+ENRICHMENT_SPEC.loader.exec_module(enrichment)
+
 UTC = timezone.utc
 REQUIRED = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
+
+
+def _load_team_aliases() -> dict[str, list[str]]:
+    path = HERE.parent / "config" / "intl_odds_sources.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    aliases = payload.get("team_aliases") or {}
+    return aliases if isinstance(aliases, dict) else {}
+
+
+def _api_sports_payload(match: dict[str, Any]) -> dict[str, Any] | None:
+    """Fetch optional independent pre-match enrichment when an API key exists.
+
+    Sporttery remains the production odds source. API-Sports is evidence-only;
+    a missing key or provider failure is returned as a traceable gap rather
+    than treated as a healthy squad.
+    """
+    if os.environ.get("ENABLE_API_SPORTS_EVIDENCE", "0") != "1":
+        return None
+    if not os.environ.get("API_FOOTBALL_KEY", "").strip():
+        return None
+    try:
+        client = enrichment.ApiSportsClient(timeout=20)
+        kickoff = str(match.get("kickoff") or match.get("kickoff_iso") or "")
+        # Sporttery's kickoff field is local China time without an offset.
+        if kickoff and not re.search(r"(?:Z|[+-]\d{2}:?\d{2})$", kickoff):
+            kickoff = kickoff + "+08:00"
+        return client.collect_match(
+            match.get("home"), match.get("away"), kickoff,
+            aliases=_load_team_aliases(),
+        )
+    except Exception as exc:
+        return {"status": "UNAVAILABLE", "reason": f"collector:{type(exc).__name__}"}
 
 
 def _feature_analysis(feature: dict[str, Any]) -> dict[str, Any]:
@@ -73,31 +117,56 @@ def _entry(status: str, value: Any, *, source_id: str, source_url: str, collecte
 def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> dict[str, Any]:
     source_id = "sporttery.preview"
     source_url = f"https://m.sporttery.cn/zqlszl/bssj/?mid={match.get('match_id')}"
+    api = facts.get("api_sports") or {}
+    api_ok = api.get("status") == "ok"
+    api_recent = api.get("recent") or {}
+    api_injuries = api.get("injuries") or []
+    api_lineups = api.get("lineups") or []
     feature = facts.get("feature") or {}
     feature_analysis = _feature_analysis(feature)
     strength = facts.get("strength")
-    recent_home = (facts.get("recent_home") or [])[:5]
-    recent_away = (facts.get("recent_away") or [])[:5]
+    recent_home = (api_recent.get("home") or facts.get("recent_home") or [])[:5]
+    recent_away = (api_recent.get("away") or facts.get("recent_away") or [])[:5]
+    recent_source_id = "api-sports.io" if api_recent.get("home") and api_recent.get("away") else source_id
+    recent_source_url = "https://v3.football.api-sports.io/fixtures" if recent_source_id == "api-sports.io" else source_url
     injuries = facts.get("injuries") or {}
+    if api_ok:
+        team_ids = api.get("team_ids") or {}
+        api_injuries_by_side = {"home": [], "away": []}
+        for item in api_injuries:
+            team_id = (item.get("team") or {}).get("id")
+            side = "home" if team_id == team_ids.get("home") else "away" if team_id == team_ids.get("away") else None
+            if side:
+                api_injuries_by_side[side].append(item)
+        injuries = api_injuries_by_side
     team_stats = {"strength": strength, "feature": feature,
                   "feature_analysis": feature_analysis,
                   "home_standing": (facts.get("tables") or [])[:1]}
     has_stats = bool(strength or feature)
     has_form = bool(recent_home and recent_away)
-    scope_verified = all((item.get("league_id") is not None) for item in [*recent_home, *recent_away])
+    # Sporttery preview carries numeric league_id; API-Sports normalization
+    # carries the league name. Either is a traceable competition scope.
+    scope_verified = all(
+        (item.get("league_id") is not None or item.get("league"))
+        for item in [*recent_home, *recent_away]
+    )
     home_inj, away_inj = injuries.get("home") or {}, injuries.get("away") or {}
     injury_value = {"home": home_inj, "away": away_inj}
     has_injury = bool(home_inj or away_inj)
     injury_response_present = isinstance(injuries, dict) and any(
         side in injuries for side in ("home", "away")
     )
-    suspension_value = {
-        "home": [p for p in (home_inj.get("list") or []) if p.get("suspensionFlag")],
-        "away": [p for p in (away_inj.get("list") or []) if p.get("suspensionFlag")],
-    }
+    def _suspensions(value):
+        if isinstance(value, dict):
+            return [p for p in (value.get("list") or []) if p.get("suspensionFlag")]
+        if isinstance(value, list):
+            return [p for p in value if "susp" in str((p.get("player") or {}).get("type") or p.get("reason") or "").casefold()]
+        return []
+    suspension_value = {"home": _suspensions(home_inj), "away": _suspensions(away_inj)}
     has_suspension = bool(suspension_value["home"] or suspension_value["away"])
-    injury_status = "VALID" if has_injury else "EMPTY_UNCONFIRMED" if injury_response_present else "UNAVAILABLE"
-    suspension_status = "VALID" if has_suspension else "EMPTY_UNCONFIRMED" if injury_response_present else "UNAVAILABLE"
+    api_injury_source = api_ok and bool(api.get("injuries") is not None)
+    injury_status = "VALID" if has_injury else "EMPTY_UNCONFIRMED" if injury_response_present or api_injury_source else "UNAVAILABLE"
+    suspension_status = "VALID" if has_suspension else "EMPTY_UNCONFIRMED" if injury_response_present or api_injury_source else "UNAVAILABLE"
     # Sporttery preview exposes roster/absence information, not an official
     # starting XI.  XI is therefore pending for the rolling near-kickoff pass.
     kickoff = _parse(match.get("kickoff"))
@@ -105,23 +174,30 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
     if kickoff:
         for minutes in (120, 90, 60, 45, 30, 15):
             refresh_points.append((kickoff - timedelta(minutes=minutes)).isoformat())
+    lineup_status = "VALID" if any(row.get("startXI") for row in api_lineups if isinstance(row, dict)) else "PENDING_REFRESH"
+    lineup_source_id = "api-sports.io" if api_lineups else "official.lineup.pending"
+    lineup_source_url = f"https://v3.football.api-sports.io/fixtures/lineups?fixture={api.get('fixture_id')}" if api_lineups else source_url
     entries = {
         "team_stats": _entry("VALID" if has_stats else "UNAVAILABLE", team_stats,
                              source_id=source_id, source_url=source_url, collected_at=collected_at,
                              reason=None if has_stats else "PREVIEW_STATS_EMPTY"),
         "recent_form": _entry("VALID" if has_form and scope_verified and len(recent_home) >= 5 and len(recent_away) >= 5 else "PARTIAL" if has_form else "UNAVAILABLE",
-                              {"home": recent_home, "away": recent_away}, source_id=source_id,
-                              source_url=source_url, collected_at=collected_at,
+                              {"home": recent_home, "away": recent_away}, source_id=recent_source_id,
+                              source_url=recent_source_url, collected_at=collected_at,
                               reason=None if has_form and scope_verified and len(recent_home) >= 5 and len(recent_away) >= 5 else "RECENT_FORM_SCOPE_UNVERIFIED" if has_form and not scope_verified else "RECENT_FORM_LT_5"),
-        "injury": _entry(injury_status, injury_value,
-                             source_id=source_id, source_url=source_url, collected_at=collected_at,
+            "injury": _entry(injury_status, injury_value,
+                             source_id="api-sports.io" if api_injury_source else source_id,
+                             source_url=f"https://v3.football.api-sports.io/injuries?fixture={api.get('fixture_id')}" if api_injury_source else source_url,
+                             collected_at=collected_at,
                              reason=None if has_injury or injury_response_present else "INJURY_ENDPOINT_UNAVAILABLE"),
-        "suspensions": _entry(suspension_status, suspension_value,
-                               source_id=source_id, source_url=source_url, collected_at=collected_at,
-                               reason=None if has_suspension or injury_response_present else "SUSPENSION_ENDPOINT_UNAVAILABLE"),
-        "starting_xi": _entry("PENDING_REFRESH", None, source_id="official.lineup.pending",
-                              source_url=source_url, collected_at=collected_at,
-                              reason="OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"),
+            "suspensions": _entry(suspension_status, suspension_value,
+                                   source_id="api-sports.io" if api_injury_source else source_id,
+                                   source_url=f"https://v3.football.api-sports.io/injuries?fixture={api.get('fixture_id')}" if api_injury_source else source_url,
+                                   collected_at=collected_at,
+                                   reason=None if has_suspension or injury_response_present else "SUSPENSION_ENDPOINT_UNAVAILABLE"),
+        "starting_xi": _entry(lineup_status, api_lineups or None, source_id=lineup_source_id,
+                              source_url=lineup_source_url, collected_at=collected_at,
+                              reason=None if lineup_status == "VALID" else "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"),
     }
     missing = [name for name, item in entries.items() if item["status"] not in {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
     return {"schema_version": "evidence-audit-1.1", "critical_fields": list(REQUIRED),
@@ -154,6 +230,11 @@ def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5) -> dic
                 "collected_at": collected_at, "facts": {}, "evidence_audit": audit,
                 "collection_guard": "POST_KICKOFF_NOT_USABLE"}
     facts = preview.collect(int(str(mid).replace("sporttery-", "")), terms=terms, hist=hist)
+    # Optional independent API-Sports enrichment. It is evidence-only and is
+    # never allowed to replace Sporttery odds or mutate a production model.
+    api_payload = _api_sports_payload(match)
+    if api_payload is not None:
+        facts["api_sports"] = api_payload
     audit = _audit(match, facts, collected_at)
     facts = {**facts, "feature_analysis": _feature_analysis(facts.get("feature") or {})}
     return {"schema_version": "prematch-evidence-snapshot-1.0", "match_id": mid,

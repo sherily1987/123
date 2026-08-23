@@ -18,7 +18,25 @@ def _dt(value):
     if isinstance(value, datetime):
         parsed = value
     else:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        text = str(value).strip().replace("Z", "+00:00")
+        try:
+            parsed = datetime.fromisoformat(text)
+        except ValueError:
+            # Sporttery's mobile feed sometimes emits ``YYYY/M/D H:MM:SS``.
+            normalized = text.replace("/", "-")
+            try:
+                parsed = datetime.fromisoformat(normalized)
+            except ValueError:
+                parsed = None
+                for fmt in ("%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d %H:%M%z",
+                            "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+                    try:
+                        parsed = datetime.strptime(normalized, fmt)
+                        break
+                    except ValueError:
+                        continue
+                if parsed is None:
+                    raise
     if parsed.tzinfo is None or parsed.utcoffset() is None:
         raise ValueError("timezone-aware datetime required")
     return parsed
@@ -149,9 +167,14 @@ class ApiSportsClient:
         with urllib.request.urlopen(req, timeout=self.timeout) as response:
             return json.load(response)
 
-    def collect_match(self, home, away, kickoff):
+    def collect_match(self, home, away, kickoff, *, aliases=None):
         kick = _dt(kickoff)
-        home_names, away_names = _normal_names(home), _normal_names(away)
+        aliases = aliases or {}
+        home_values = list(home) if isinstance(home, (list, tuple, set)) else [home]
+        away_values = list(away) if isinstance(away, (list, tuple, set)) else [away]
+        home_values += [alias for value in home_values for alias in (aliases.get(str(value)) or [])]
+        away_values += [alias for value in away_values for alias in (aliases.get(str(value)) or [])]
+        home_names, away_names = _normal_names(home_values), _normal_names(away_values)
         try:
             fixtures = self._request("/fixtures", {
                 "date": kick.astimezone(timezone.utc).date().isoformat(), "timezone": "UTC",

@@ -41,6 +41,10 @@ def _no_proxy_env():
     env = dict(os.environ)
     for k in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"):
         env.pop(k, None)
+    # Enable the bounded, evidence-only API-Sports enrichment stage for
+    # production collector jobs. Unit tests and direct collector calls remain
+    # deterministic unless they explicitly opt in.
+    env.setdefault("ENABLE_API_SPORTS_EVIDENCE", "1")
     return env
 
 
@@ -642,9 +646,15 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             "late_info_projection": late_info_stats,
         }
         evidence_stats = attach_collected_evidence(matches, day)
-        auto_collect = auto_collect_prematch_evidence(
-            inp, day, evidence_stats.get("missing_snapshot_ids") or []
-        )
+        refresh_ids = evidence_stats.get("missing_snapshot_ids") or []
+        # When API-Sports credentials are available, refresh every fixture in
+        # this bounded batch so recent form/injury state is not frozen in a
+        # stale browser snapshot. Without credentials retain the cheap
+        # missing-snapshot retry behavior.
+        if os.environ.get("API_FOOTBALL_KEY", "").strip():
+            refresh_ids = [sv.sporttery_id(match.get("match_id")) for match in matches]
+            refresh_ids = [mid for mid in refresh_ids if mid]
+        auto_collect = auto_collect_prematch_evidence(inp, day, refresh_ids)
         if auto_collect.get("attempted"):
             # Re-project after the bounded collector so the exact same batch
             # (and no unrelated fixture) becomes the LLM evidence input.

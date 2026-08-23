@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime
 from typing import Any
 
 
@@ -13,6 +14,18 @@ VALID_EVENT_STATUSES = {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING
 def _same(left: dict[str, Any], right: dict[str, Any]) -> bool:
     return (left.get("status"), left.get("source_id"), left.get("value")) == (
         right.get("status"), right.get("source_id"), right.get("value"))
+
+
+def _newer(candidate: dict[str, Any], current: dict[str, Any]) -> bool:
+    """True only when both timestamps parse and candidate is strictly newer."""
+    try:
+        left = datetime.fromisoformat(str(candidate.get("refreshed_at")).replace("Z", "+00:00"))
+        right = datetime.fromisoformat(str(current.get("refreshed_at")).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return False
+    if left.tzinfo is None or right.tzinfo is None:
+        return False
+    return left > right
 
 
 def merge_browser_audit(chain: dict[str, Any] | None, browser_audit: dict[str, Any] | None):
@@ -38,6 +51,17 @@ def merge_browser_audit(chain: dict[str, Any] | None, browser_audit: dict[str, A
         current_status = str(current.get("status") or "").upper()
         browser_status = str(browser.get("status") or "").upper()
         if current_status not in VALID and browser_status in VALID:
+            old = deepcopy(current)
+            merged[name] = deepcopy(browser)
+            merged[name]["alternatives"] = [old]
+            audit["browser_fields_merged"].append(name)
+            continue
+        # A later API-Sports snapshot is a refreshed observation, not merely a
+        # conflicting browser opinion. Promote it while retaining the prior
+        # value for audit/replay. Untimestamped legacy conflicts keep the
+        # original primary source for backwards compatibility.
+        if (browser_status in VALID and browser.get("source_id") == "api-sports.io"
+                and _newer(browser, current)):
             old = deepcopy(current)
             merged[name] = deepcopy(browser)
             merged[name]["alternatives"] = [old]

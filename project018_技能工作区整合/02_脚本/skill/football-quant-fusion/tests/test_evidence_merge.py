@@ -34,6 +34,18 @@ def test_conflict_preserves_both_sources_without_silent_overwrite():
     assert audit["conflicts"] == ["injury"]
 
 
+def test_newer_api_snapshot_replaces_stale_preview_but_keeps_alternative():
+    chain = {"injury": {"status": "VALID", "source_id": "sporttery.preview",
+                         "value": {"home": []}, "refreshed_at": "2026-08-23T13:00:00+00:00"}}
+    browser = {"entries": {"injury": {"status": "VALID", "source_id": "api-sports.io",
+                                        "value": {"home": ["A1"]},
+                                        "refreshed_at": "2026-08-23T15:00:00+00:00"}}}
+    merged, audit = em.merge_browser_audit(chain, browser)
+    assert merged["injury"]["source_id"] == "api-sports.io"
+    assert merged["injury"]["alternatives"][0]["source_id"] == "sporttery.preview"
+    assert audit["browser_fields_merged"] == ["injury"]
+
+
 def test_late_info_fills_unusable_injury_and_preserves_post_kickoff_event():
     chain = {
         "injury": {"status": "UNAVAILABLE", "source_id": "sporttery.preview"},
