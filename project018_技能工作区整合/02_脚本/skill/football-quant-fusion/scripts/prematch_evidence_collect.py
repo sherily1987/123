@@ -376,9 +376,13 @@ def main() -> int:
     ap.add_argument("--match-id", action="append")
     ap.add_argument("--terms", type=int, default=10)
     ap.add_argument("--hist", type=int, default=5)
+    ap.add_argument("--enable-api-sports-evidence", action="store_true",
+                    help="启用 API-Sports 近期赛果/伤停/首发证据（研究源，消耗配额）")
     ap.add_argument("--scrapling-url-map", type=Path,
                     help="optional match_id -> Scrapling source mapping; used only after API gaps")
     args = ap.parse_args()
+    if args.enable_api_sports_evidence:
+        os.environ["ENABLE_API_SPORTS_EVIDENCE"] = "1"
     print(json.dumps(collect_file(args.input, args.output_dir, match_ids=set(args.match_id or []),
                                   terms=args.terms, hist=args.hist,
                                   scrapling_url_map=args.scrapling_url_map), ensure_ascii=False))

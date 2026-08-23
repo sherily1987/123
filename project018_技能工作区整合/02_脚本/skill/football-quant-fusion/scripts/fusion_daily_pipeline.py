@@ -255,6 +255,8 @@ def main():
                     help='证据存在缺口时自动发现来源并尝试Scrapling（默认开启；可用--no-bb-browser-auto关闭）')
     ap.add_argument('--apifootball-fallback', action='store_true',
                     help='体彩官方赛果缺失时显式启用 APIFootball 欧冠补全')
+    ap.add_argument('--api-sports-evidence', action='store_true',
+                    help='证据缺口时启用 API-Sports 近期赛果/伤停/首发补充（研究源，消耗配额）')
     a = ap.parse_args()
     try:
         a.store = assert_writable_target(a.store, a.allow_legacy_write)
@@ -343,7 +345,8 @@ def main():
     # the official odds and registered prediction identity remain unchanged.
     evidence_dir = d / "evidence_snapshots"
     er = run([HERE / 'prematch_evidence_collect.py', '--input', batch,
-              '--output-dir', evidence_dir])
+              '--output-dir', evidence_dir]
+             + (['--enable-api-sports-evidence'] if a.api_sports_evidence else []))
     try:
         report['prematch_evidence'] = json.loads(er.stdout.strip().splitlines()[-1])
     except (ValueError, IndexError, AttributeError):
