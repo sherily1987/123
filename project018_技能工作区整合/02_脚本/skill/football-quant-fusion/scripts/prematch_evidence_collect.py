@@ -72,6 +72,65 @@ def _api_sports_payload(match: dict[str, Any]) -> dict[str, Any] | None:
         return {"status": "UNAVAILABLE", "reason": f"collector:{type(exc).__name__}"}
 
 
+def _scrapling_fallback(match: dict[str, Any], audit: dict[str, Any]) -> dict[str, Any] | None:
+    """Use Scrapling after the structured API pass leaves critical gaps.
+
+    This is deliberately evidence-only.  It consumes a match-embedded source
+    map (``evidence_sources``/``scrapling_sources``) and never invents a URL;
+    daily discovery remains the caller's responsibility when no source map is
+    available.  Valid API fields win, while missing/partial fields can be
+    filled by the browser snapshot with field-level provenance.
+    """
+    if not (audit.get("missing_fields") or audit.get("evidence_gap")):
+        return None
+    sources = match.get("evidence_sources")
+    mapping: dict[str, Any] = dict(sources) if isinstance(sources, dict) else {}
+    for key in ("scrapling_url", "scrapling_sources", "fotmob_match_id",
+                "predicted_xi_source_url", "official_url"):
+        if match.get(key) is not None:
+            mapping[key] = match[key]
+    if not (mapping.get("scrapling_url") or mapping.get("scrapling_sources")
+            or mapping.get("url") or mapping.get("fotmob_match_id")):
+        return None
+    try:
+        script = HERE / "bb_browser_evidence_collect.py"
+        spec = importlib.util.spec_from_file_location("bb_browser_evidence_collect", script)
+        if not spec or not spec.loader:
+            return {"status": "UNAVAILABLE", "reason": "scrapling_adapter_missing"}
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        snapshot = module.collect_one({**match, "evidence_sources": mapping}, mapping)
+        snapshot["route"] = "api_missing_or_gap_then_scrapling"
+        snapshot["research_only"] = True
+        return snapshot
+    except Exception as exc:
+        return {"status": "UNAVAILABLE", "reason": f"scrapling:{type(exc).__name__}",
+                "research_only": True}
+
+
+def _merge_scrapling_audit(primary: dict[str, Any], fallback: dict[str, Any]) -> None:
+    """Project fallback fields into the unified audit without API overwrite."""
+    fb_audit = fallback.get("evidence_audit") or {}
+    primary_entries = primary.setdefault("entries", {})
+    for name, item in (fb_audit.get("entries") or {}).items():
+        if not isinstance(item, dict):
+            continue
+        current = primary_entries.get(name) or {}
+        current_status = str(current.get("status") or "UNAVAILABLE").upper()
+        if current_status not in {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}:
+            primary_entries[name] = item
+    missing = [name for name, item in primary_entries.items()
+               if str((item or {}).get("status") or "").upper() not in
+               {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
+    primary["missing_fields"] = missing
+    primary["evidence_gap"] = bool(missing)
+    primary["evidence_status"] = "GAP" if missing else "OK"
+    primary["evidence_gap_reasons"] = [
+        f"{name.upper()}_{(primary_entries[name].get('missing_reason') or primary_entries[name].get('status') or 'UNKNOWN')}"
+        for name in missing
+    ]
+
+
 def _feature_analysis(feature: dict[str, Any]) -> dict[str, Any]:
     """Expose the mobile preview's feature panels without relabeling facts.
 
@@ -249,6 +308,15 @@ def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5) -> dic
     if api_payload is not None:
         facts["api_sports"] = api_payload
     audit = _audit(match, facts, collected_at)
+    # API first, Scrapling second: only the still-missing fields are projected
+    # from a browser snapshot.  The snapshot stays embedded for the LLM
+    # evidence chain and is explicitly marked research-only.
+    scrapling = _scrapling_fallback(match, audit)
+    if scrapling and scrapling.get("status") != "UNAVAILABLE":
+        facts["scrapling"] = scrapling
+        _merge_scrapling_audit(audit, scrapling)
+    elif scrapling:
+        facts["scrapling"] = scrapling
     facts = {**facts, "feature_analysis": _feature_analysis(facts.get("feature") or {})}
     return {"schema_version": "prematch-evidence-snapshot-1.0", "match_id": mid,
             "identity": {k: match.get(k) for k in ("home", "away", "competition", "kickoff", "match_num")},

@@ -136,3 +136,32 @@ def test_audit_does_not_upgrade_one_sided_api_lineup_to_valid(monkeypatch):
     entry = row["evidence_audit"]["entries"]["starting_xi"]
     assert entry["status"] == "PARTIAL"
     assert "starting_xi" in row["evidence_audit"]["missing_fields"]
+
+
+def test_api_gap_routes_to_scrapling_and_projects_only_missing_fields(monkeypatch):
+    monkeypatch.setattr(pec.preview, "collect", lambda mid, terms, hist: {
+        "feature": {}, "strength": None, "recent_home": [], "recent_away": [],
+        "injuries": {}, "tables": [],
+    })
+    calls = []
+    def fake_scrapling(match, audit):
+        calls.append((match["match_id"], tuple(audit["missing_fields"])))
+        return {
+            "status": "ok", "provider": "scrapling_generic", "research_only": True,
+            "evidence_audit": {"entries": {
+                "recent_form": {"status": "VALID", "value": {"home": [1] * 5, "away": [2] * 5},
+                                 "source_id": "sportsmole.preview", "source_url": "https://example.test"},
+                "starting_xi": {"status": "PREDICTED", "value": {"home": ["A"], "away": ["B"]},
+                                "source_id": "sportsmole.preview", "source_url": "https://example.test"},
+            }}
+        }
+    monkeypatch.setattr(pec, "_scrapling_fallback", fake_scrapling)
+    row = pec.collect_one({"match_id": "sporttery-5", "home": "A", "away": "B",
+                           "kickoff": "2026-08-25T20:00:00+08:00",
+                           "evidence_sources": {"scrapling_url": "https://example.test"}})
+    assert calls and calls[0][0] == "sporttery-5"
+    assert row["facts"]["scrapling"]["research_only"] is True
+    # PREDICTED is intentionally not promoted to VALID; API/official evidence
+    # remains authoritative for production gating.
+    assert row["evidence_audit"]["entries"]["recent_form"]["status"] == "VALID"
+    assert row["evidence_audit"]["entries"]["starting_xi"]["status"] == "PREDICTED"
