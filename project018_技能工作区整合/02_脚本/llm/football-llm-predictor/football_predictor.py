@@ -62,6 +62,18 @@ DEFAULT_MODELS = [
 TIMEOUT = 180         # 单模型调用超时(秒)；推理模型可能超过 90s
 TEMPERATURE = 0.8     # 温度: 让各模型略有差异, 避免全部雷同
 
+
+def output_token_budget(model):
+    """为推理型模型预留最终 JSON 的输出空间。"""
+    return 4096 if strip_provider(model) == "deepseek-v4-flash" else 1024
+
+
+def model_request_options(model):
+    """DeepSeek V4 Flash 关闭思考通道，避免只返回 reasoning_content。"""
+    if strip_provider(model) == "deepseek-v4-flash":
+        return {"extra_body": {"thinking": {"type": "disabled"}}}
+    return {}
+
 # 共享提示词/反坍缩规则（2026-08-08 全面优化）
 try:
     import llm_prompt_rules as lpr
@@ -365,6 +377,8 @@ def call_model(client, model, prompt, models_used=None):
                     {"role": "user", "content": use_prompt},
                 ],
                 temperature=temperature,
+                max_tokens=output_token_budget(model),
+                **model_request_options(model),
             )
             content = resp.choices[0].message.content
             if content is None or not str(content).strip():

@@ -6,6 +6,39 @@ import mcp_evidence as me
 import predict
 
 
+def test_deepseek_retries_structured_parse_failure(monkeypatch):
+    class Chat:
+        def __init__(self):
+            self.calls = 0
+
+        def create(self, **kwargs):
+            self.calls += 1
+            content = (
+                "not-json"
+                if self.calls == 1
+                else '{"decision":"opinion","direction":"主胜",'
+                     '"probs_1x2":[50,25,25],"top_scores":["1-0","2-0","1-1"],'
+                     '"ou25":"小","hafu":"胜胜","evidence_gap":true,'
+                     '"evidence_ids":[],"summary":"仅作观察性研究意见。"}'
+            )
+            return SimpleNamespace(
+                choices=[SimpleNamespace(message=SimpleNamespace(content=content))],
+                usage=None,
+            )
+
+    chat = Chat()
+    monkeypatch.setattr(predict.time, "sleep", lambda *_args: None)
+    model, result = predict.call_evidence_model(
+        SimpleNamespace(chat=SimpleNamespace(completions=chat)),
+        "deepseek/deepseek-v4-flash",
+        "E1: 已核验事实",
+        evidence_catalog=None,
+    )
+    assert model == "deepseek/deepseek-v4-flash"
+    assert chat.calls == 2
+    assert result["direction"] == "主胜"
+
+
 def primary_evidence(collected_at="2026-08-10T20:00:00+08:00"):
     rows = []
     for number, title in (

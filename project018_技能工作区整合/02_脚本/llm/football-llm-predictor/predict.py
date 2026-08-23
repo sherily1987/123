@@ -593,17 +593,18 @@ def call_evidence_model(client, model, prompt, models_used=None, evidence_catalo
     err = "未知错误"
     real_model = fp.strip_provider(model)
     temperature = fp.MODEL_TEMPERATURE_OVERRIDES.get(real_model, 0.3)
+    request_prompt = prompt
     for i in range(3):
         try:
             if model.startswith("zhipu/"):
-                prompt = sanitize_for_zhipu(prompt)
+                request_prompt = sanitize_for_zhipu(request_prompt)
             sys_prompt = lpr.system_prompt_evidence(model, models_used)
             request_options = model_request_options(model)
             resp = client.chat.completions.create(
                 model=real_model,
                 messages=[
                     {"role": "system", "content": sys_prompt},
-                    {"role": "user", "content": prompt},
+                    {"role": "user", "content": request_prompt},
                 ],
                 temperature=temperature,
                 max_tokens=output_token_budget(model),
@@ -613,7 +614,21 @@ def call_evidence_model(client, model, prompt, models_used=None, evidence_catalo
             if content is None or not str(content).strip():
                 err = _empty_response_diagnostic(resp)
             else:
-                return model, parse_evidence_prediction(content, evidence_catalog)
+                parsed = parse_evidence_prediction(content, evidence_catalog)
+                if not parsed.get("error"):
+                    return model, parsed
+                err = str(parsed["error"])[:160]
+                # DeepSeek occasionally emits a nearly-correct answer with a
+                # malformed/partial JSON object. Give it one explicit repair
+                # instruction instead of treating the first parse failure as
+                # a permanent model failure. A valid abstain is returned
+                # normally and is never retried here.
+                if i < 2:
+                    request_prompt = (
+                        f"{prompt}\n\n上一次输出未通过结构化校验（{err}）。"
+                        "请重新检查证据编号、字段完整性和 JSON 语法；只输出一个完整 JSON 对象，"
+                        "不要 Markdown、解释文字或代码围栏。"
+                    )
         except Exception as e:
             err = str(e)[:120]
             if "429" in err or "Rate limit" in err:
