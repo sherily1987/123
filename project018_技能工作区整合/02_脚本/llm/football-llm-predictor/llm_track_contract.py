@@ -91,6 +91,11 @@ def _section_status(name: str, evidence: dict[str, Any], raw_match: dict[str, An
     if name in {"crs", "ttg", "hafu"}:
         return _status_from_presence(raw_match.get(name) or evidence.get(name))
     status = str(evidence.get(f"{name}_status") or "").upper()
+    if status == "PREDICTED":
+        # A multi-source expected XI is usable pre-match evidence, but it is
+        # not equivalent to an official team sheet.  Keep the distinction in
+        # the manifest so prompts can cite the risk without calling it official.
+        return "PREDICTED"
     if status in {"OK", "AVAILABLE", "VALID"}:
         return "AVAILABLE"
     if status == "PARTIAL":
@@ -105,7 +110,11 @@ def build_evidence_manifest(raw_match: dict[str, Any], evidence: dict[str, Any])
         name: {"status": _section_status(name, evidence, raw_match)}
         for name in REQUIRED_EVIDENCE_SECTIONS
     }
-    gaps = [name for name, item in sections.items() if item["status"] != "AVAILABLE"]
+    # Predicted lineups are not a missing section.  They carry a separate risk
+    # flag and keep the model from silently upgrading them to official XI.
+    gaps = [name for name, item in sections.items()
+            if item["status"] in {"UNAVAILABLE", "PARTIAL"}]
+    risks = [name for name, item in sections.items() if item["status"] == "PREDICTED"]
     if not gaps:
         overall = "COMPLETE"
     elif all(item["status"] == "UNAVAILABLE" for item in sections.values()):
@@ -114,7 +123,7 @@ def build_evidence_manifest(raw_match: dict[str, Any], evidence: dict[str, Any])
         overall = "PARTIAL"
     independent = [name for name, item in sections.items()
                    if name not in {"crs", "ttg", "hafu"}
-                   and item["status"] in {"AVAILABLE", "PARTIAL"}]
+                   and item["status"] in {"AVAILABLE", "PARTIAL", "PREDICTED"}]
     has_markets = any(raw_match.get(name) or evidence.get(name)
                       for name in ("crs", "ttg", "hafu"))
     if overall != "COMPLETE" and has_markets and not independent:
@@ -130,5 +139,6 @@ def build_evidence_manifest(raw_match: dict[str, Any], evidence: dict[str, Any])
         "collection_status": collection_status,
         "required_sections": list(REQUIRED_EVIDENCE_SECTIONS),
         "gap_sections": gaps,
+        "risk_sections": risks,
         "sections": sections,
     }

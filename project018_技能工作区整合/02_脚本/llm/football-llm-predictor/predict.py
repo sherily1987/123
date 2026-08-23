@@ -1039,8 +1039,11 @@ def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
         "hafu": match.get("hafu") or ([1] if has("HAFU", "半全场赔率") else []),
         "injuries_status": "UNAVAILABLE" if has("伤停状态=UNAVAILABLE", "伤停=UNAVAILABLE")
         else ("AVAILABLE" if has_usable("伤停", "缺阵") else "UNAVAILABLE"),
-        "lineups_status": "UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
-        else ("AVAILABLE" if has_usable("首发", "阵容") else "UNAVAILABLE"),
+        "lineups_status": (
+            "UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
+            else ("PREDICTED" if has("首发状态=PREDICTED", "首发状态 | PREDICTED", "预计首发")
+                  else ("AVAILABLE" if has_usable("首发", "阵容") else "UNAVAILABLE"))
+        ),
         "collected_at": evidence_status.get("evidence_collected_at_max"),
     }
     manifest = ltc.build_evidence_manifest(match, evidence)

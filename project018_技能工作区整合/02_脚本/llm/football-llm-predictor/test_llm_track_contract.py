@@ -73,3 +73,28 @@ def test_evidence_manifest_preserves_unavailable_sections_without_t75_state():
     assert manifest["collection_status"] == "PARTIAL"
     assert manifest["gap_sections"] == ["recent_form", "crs", "ttg", "hafu", "injuries", "lineups"]
     assert "t75_refresh" not in manifest
+
+
+def test_predicted_lineup_is_usable_but_keeps_unconfirmed_risk():
+    raw_match = {
+        "match_id": "sporttery-2040999",
+        "kickoff_iso": "2026-08-22T20:00:00+08:00",
+        "crs": [{"score": "1-0", "odds": 5.0}],
+        "ttg": [{"total": "2", "odds": 3.5}],
+        "hafu": [{"result": "平胜", "odds": 4.0}],
+    }
+    evidence = {
+        "recent_form": {
+            "home": [{"result": "W"}] * 5,
+            "away": [{"result": "L"}] * 5,
+        },
+        "injuries_status": "AVAILABLE",
+        "lineups_status": "PREDICTED",
+    }
+
+    manifest = contract.build_evidence_manifest(raw_match, evidence)
+
+    assert manifest["sections"]["lineups"]["status"] == "PREDICTED"
+    assert manifest["gap_sections"] == []
+    assert manifest["risk_sections"] == ["lineups"]
+    assert manifest["overall_status"] == "COMPLETE"

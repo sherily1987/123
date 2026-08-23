@@ -256,13 +256,13 @@ JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外
 仅赔率示例（仍给研究意见，但绝不下注）:
 {"decision":"opinion","direction":"主胜","alt_direction":"平局","probs_1x2":[45.0,30.0,25.0],"top_scores":["1-0","1-1","0-0"],"ou25":"小","hafu":"平胜","evidence_gap":true,"evidence_ids":["E5"],"unsupported_assumptions":["缺少近况、伤停、首发和战意的独立事实"],"reason_codes":["ONLY_ODDS"],"summary":"仅依据E5体彩市场作观察性研究意见；独立证据缺口，禁止下注。"}
 有足够证据示例（阵容有缺口仍须给方向）:
-{"decision":"opinion","direction":"主胜","alt_direction":"平局","probs_1x2":[48.0,28.0,24.0],"top_scores":["1-0","2-0","1-1"],"ou25":"小","hafu":"平胜","evidence_gap":true,"evidence_ids":["E2","E4"],"unsupported_assumptions":[],"reason_codes":["LINEUP_UNAVAILABLE"],"summary":"E2近况与E4主场支持主胜；官方首发未出，已标缺口。"}
+{"decision":"opinion","direction":"主胜","alt_direction":"平局","probs_1x2":[48.0,28.0,24.0],"top_scores":["1-0","2-0","1-1"],"ou25":"小","hafu":"平胜","evidence_gap":false,"evidence_ids":["E2","E4"],"unsupported_assumptions":[],"reason_codes":["LINEUP_PREDICTED_NOT_CONFIRMED"],"summary":"E2近况与E4主场支持主胜；E4为预计首发，尚非官方首发，按风险项处理。"}
 
 规则:
 1. decision 只能是 opinion 或 abstain。仅赔率时仍输出 opinion；只有身份无法核验或没有任何可审计证据时才 abstain。abstain 时 direction 与四个市场字段必须为 null。
 2. opinion 时必须同时给出：direction（主胜/平局/客胜）、probs_1x2（主/平/客三位合计100）、top_scores（恰好3个比分）、ou25（大或小）、hafu（九宫格）。这五项禁止 null。
 3. evidence_ids 只能引用提示词中存在的 E 编号。UNAVAILABLE 和 SOURCE_CONFLICT 只能证明缺口/冲突；ONLY_ODDS 只能引用官方体彩市场，不得声称有独立基本面支持。
-4. 不得编造伤停、赛果或队名事实。必须假设的内容写入 unsupported_assumptions。官方首发未出、用上季近5场，不算必须弃权的未支持假设。
+4. 不得编造伤停、赛果或队名事实。必须假设的内容写入 unsupported_assumptions。预计首发可以作为赛前阵容证据使用，但必须保留 `PREDICTED` 状态，写明“预计、非官方”，不得改写成已确认首发。
 5. probs_1x2 由第9条多维加权换算，一位小数，argmax 必须等于 direction。这是本模型的判断概率，不是量化轨校准概率，禁止冒充 xG 或精确到多位小数。
 6. top_scores 按可能性从高到低恰好3个竞彩比分；第1个必须与 direction 同向（主胜则主>客，客胜则客>主，平局则平局比分）。ou25 只能大/小。hafu 必须是胜胜/胜平/胜负/平胜/平平/平负/负胜/负平/负负之一。
 7. 口径仅为90分钟含补时，不含加时和点球。summary 限两句。
@@ -271,7 +271,7 @@ JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外
    近况0.30 / 阵容0.22 / 战意0.15 / 赔率0.15 / 主客环境0.13。身份核验是门禁不是权重。
    各维对主队打 -2..+2，只能引用 E 编号事实。近况内部近5场按新到旧 5>4>3>2>1 加权（Dixon-Coles 1997 时间衰减的短窗近似）。
    将加权和换算为 probs_1x2 并必须输出；仅赔率时只能按官方市场做观察性研究，不得把它当量化概率。
-10. 只允许写入页面或 API 快照中实际出现、且通过身份/时间/来源门禁的首发和伤停。不得用模型投票、占位文本或“通常首发”补齐。LINEUP_UNAVAILABLE / FORM_UNAVAILABLE 进 reason_codes 并 evidence_gap=true；仅赔率时仍输出观察意见，但不得把赔率外推成基本面事实。"""
+10. 只允许写入页面或 API 快照中实际出现、且通过身份/时间/来源门禁的首发和伤停。不得用模型投票、占位文本或“通常首发”补齐。官方首发缺失时，若有合格来源的预计首发，使用 `LINEUP_PREDICTED_NOT_CONFIRMED` 风险码并在摘要注明非官方；只有完全没有首发资料才使用 `LINEUP_UNAVAILABLE` 并 `evidence_gap=true`。`FORM_UNAVAILABLE` 仍须 `evidence_gap=true`；仅赔率时仍输出观察意见，但不得把赔率外推成基本面事实。"""
 
 EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据可用性，不做比赛预测。
 不得输出胜平负、比分、大小球或半全场的任何方向。

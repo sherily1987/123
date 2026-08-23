@@ -30,6 +30,23 @@ def test_collection_is_single_pass_and_never_emits_t75_fields():
     assert "refresh_before_minutes" not in manifest
 
 
+def test_predicted_lineup_is_complete_with_explicit_risk_status():
+    manifest = eo.collection_manifest(
+        RAW,
+        {
+            "recent_form": {"home": [{"result": "W"}] * 5,
+                            "away": [{"result": "L"}] * 5},
+            "injuries_status": "AVAILABLE",
+            "lineups_status": "PREDICTED",
+        },
+        collected_at="2099-08-22T12:00:00+08:00",
+    )
+
+    assert manifest["collection_status"] == "COMPLETE_PREDICTED"
+    assert manifest["gap_sections"] == []
+    assert manifest["risk_sections"] == ["lineups"]
+
+
 def test_browser_tasks_are_explicit_and_match_bound(tmp_path):
     sources = [{
         "sporttery_match_id": 2040999,

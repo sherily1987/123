@@ -38,7 +38,8 @@ def _independent_section_statuses(manifest: dict[str, Any]) -> list[str]:
     sections = manifest.get("sections") or {}
     return [name for name, item in sections.items()
             if name not in {"crs", "ttg", "hafu"}
-            and isinstance(item, dict) and item.get("status") in {"AVAILABLE", "PARTIAL"}]
+            and isinstance(item, dict)
+            and item.get("status") in {"AVAILABLE", "PARTIAL", "PREDICTED"}]
 
 
 def collection_manifest(
@@ -56,7 +57,7 @@ def collection_manifest(
     base = contract.build_evidence_manifest(raw_match, evidence)
     independent = _independent_section_statuses(base)
     if base["overall_status"] == "COMPLETE":
-        status = "COMPLETE"
+        status = "COMPLETE_PREDICTED" if base.get("risk_sections") else "COMPLETE"
     elif _market_present(raw_match, evidence) and not independent:
         status = "ONLY_ODDS"
     elif independent:
@@ -70,6 +71,7 @@ def collection_manifest(
         "collection_mode": COLLECTION_MODE,
         "collection_status": status,
         "gap_sections": list(base.get("gap_sections") or []),
+        "risk_sections": list(base.get("risk_sections") or []),
         "required_sections": list(base.get("required_sections") or []),
         "sections": base.get("sections") or {},
     }

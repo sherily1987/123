@@ -59,6 +59,30 @@ def test_success_audit_record_carries_llm_contract_and_evidence_manifest():
     assert record["prediction_as_of"]
 
 
+def test_manifest_keeps_predicted_xi_distinct_from_official_lineup():
+    match = {
+        "match_id": "sporttery-2040999",
+        "crs": [{"score": "1-0", "odds": 5.0}],
+        "ttg": [{"total": "2", "odds": 3.5}],
+        "hafu": [{"result": "平胜", "odds": 4.0}],
+    }
+    status = {
+        "evidence_collected_at_max": "2099-08-22T12:00:00+08:00",
+        "collection_status": "COMPLETE_PREDICTED",
+    }
+    text = (
+        "- 近期状态 | source(https://example.test/form)\n"
+        "- 伤停状态 | AVAILABLE | source(https://example.test/injuries)\n"
+        "- 首发状态 | PREDICTED | 预计首发，非官方首发 | source(https://example.test/xi)"
+    )
+
+    manifest = predict._build_llm_evidence_manifest(match, status, text)
+
+    assert manifest["sections"]["lineups"]["status"] == "PREDICTED"
+    assert manifest["risk_sections"] == ["lineups"]
+    assert manifest["gap_sections"] == ["recent_form"]
+
+
 def test_skip_audit_record_keeps_match_identity():
     record = predict.build_skip_audit_record(
         {},
