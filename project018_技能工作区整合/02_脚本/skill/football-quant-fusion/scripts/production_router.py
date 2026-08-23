@@ -11,6 +11,7 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timezone
 import json
+import re
 from pathlib import Path
 from statistics import mean
 from typing import Any
@@ -219,7 +220,32 @@ def _event_score(row: dict) -> tuple[int, int] | None:
             return int(row[home_key]), int(row[away_key])
         except (TypeError, ValueError):
             return None
+    # Normalized API-Sports rows may retain the explicit 90-minute score or
+    # the provider's nested fulltime object.  Never fall back to penalties or
+    # an aggregate score when those are present.
+    nested = row.get("score")
+    if isinstance(nested, dict):
+        fulltime = nested.get("fulltime") or nested.get("full_time") or {}
+        if isinstance(fulltime, dict) and fulltime.get("home") is not None and fulltime.get("away") is not None:
+            try:
+                return int(fulltime["home"]), int(fulltime["away"])
+            except (TypeError, ValueError):
+                return None
+    raw = row.get("score_90") or row.get("fulltime_score")
+    if isinstance(raw, str):
+        found = re.match(r"^\s*(\d+)\s*[-:]\s*(\d+)\s*$", raw)
+        if found:
+            return int(found.group(1)), int(found.group(2))
     return None
+
+
+def _is_finished_status(value: Any) -> bool:
+    """Accept provider completion labels while excluding abandoned fixtures."""
+    status = str(value or "").strip().casefold().replace("_", " ")
+    return status in {
+        "finished", "ft", "full time", "ended", "complete", "completed",
+        "after pen.", "after pen", "after extra time", "aet", "pen", "a.pen.",
+    }
 
 
 def _league_spec(spec: Any) -> dict:
@@ -297,7 +323,7 @@ def _rolling_goals(events: list[dict], home: str, away: str, kickoff: datetime, 
             continue
         if not _event_in_league(row, spec):
             continue
-        if str(row.get("status", "")).lower() != "finished":
+        if not _is_finished_status(row.get("status")):
             continue
         if any(_same_team(row.get(side), target) for side in ("home", "away") for target in (home, away)):
             score = _event_score(row)

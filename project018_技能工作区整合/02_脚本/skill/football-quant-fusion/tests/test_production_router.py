@@ -122,6 +122,18 @@ class ProductionRouterTests(unittest.TestCase):
         self.assertEqual(match["research_candidate"]["lambda_prior"]["source"], "apifootball_events_goals_only")
         self.assertEqual(match["field_meta"]["production_router"]["route"], "apifootball_goals_only")
 
+    def test_goals_only_accepts_api_sports_completion_labels_and_90_minute_score(self):
+        events = []
+        for i in range(1, 7):
+            day = f"2026-08-0{i}"
+            events.append({"date": day, "status": "FT", "home": "Ajax", "away": f"Club{i}", "score_90": "2-0"})
+            events.append({"date": day, "status": "After Pen.", "home": f"Club{i}", "away": "PSV",
+                           "score": {"fulltime": {"home": 0, "away": 1}}, "score_penalty": {"home": 4, "away": 3}})
+        result = route_matches({"matches": [base_match("荷甲", "Ajax", "PSV")]}, [], events, min_history=5)
+        match = result["matches"][0]
+        self.assertEqual(match["mode"], "market_only")
+        self.assertEqual(match["research_candidate"]["lambda_prior"]["source"], "apifootball_events_goals_only")
+
     def test_goals_only_accepts_configured_chinese_team_alias(self):
         events = []
         for i in range(1, 7):
