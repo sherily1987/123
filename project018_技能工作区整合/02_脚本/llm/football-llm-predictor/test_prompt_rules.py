@@ -74,6 +74,13 @@ def test_evidence_prompts_are_neutral_and_allow_observe_only_odds():
             assert biased not in prompt
 
 
+def test_evidence_prompt_keeps_market_odds_separate():
+    prompt = lpr.system_prompt_evidence("test", fp.DEFAULT_MODELS)
+    assert "1X2 赔率只可支持胜平负" in prompt
+    assert "禁止用 1X2 反推 CRS、TTG 或 HAFU" in prompt
+    assert "各市场独立判断" in lpr.system_prompt_four_market("test", fp.DEFAULT_MODELS)
+
+
 def test_deepseek_audit_prompt_has_no_result_direction_fields():
     prompt = lpr.system_prompt_evidence_audit()
     assert '"usable_evidence_ids"' not in prompt
