@@ -217,11 +217,14 @@ def _scrapling_fotmob_snapshot(match: dict[str, Any], mapping: dict[str, Any],
     try:
         url = str(mapping.get("url") or "")
         proc = subprocess.run(
+            # Do not wait for network-idle on editorial pages: ad/analytics
+            # connections can remain open indefinitely and make the fallback
+            # look like an API failure.  DOM readiness plus a bounded wait is
+            # enough for the rendered article and is much more reliable.
             ["scrapling", "extract", "fetch", url, str(output_path),
-             "--ai-targeted", "--network-idle", "--wait", "2000",
-             "--timeout", "60000"],
+             "--ai-targeted", "--wait", "1000", "--timeout", "45000"],
             capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=180,
+            timeout=90,
         )
         if proc.returncode != 0:
             raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_FETCH_FAILED")[-300:])
@@ -249,10 +252,9 @@ def _scrapling_generic_snapshot(match: dict[str, Any], mapping: dict[str, Any],
     try:
         proc = subprocess.run(
             ["scrapling", "extract", "fetch", url, str(output_path),
-             "--ai-targeted", "--network-idle", "--wait", "2000",
-             "--timeout", "60000"],
+             "--ai-targeted", "--wait", "1000", "--timeout", "45000"],
             capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=180,
+            timeout=90,
         )
         if proc.returncode != 0:
             raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_FETCH_FAILED")[-300:])

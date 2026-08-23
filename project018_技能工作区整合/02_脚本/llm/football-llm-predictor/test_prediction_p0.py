@@ -460,6 +460,27 @@ def test_aggregation_preserves_market_gap_codes():
     assert "OU25_UNAVAILABLE_OR_INVALID" in result["market_gap_codes"]
 
 
+def test_manifest_projects_english_scrapling_fields_and_keeps_partial_status():
+    text = (
+        "- recent_form: status=VALID; facts_available=true; * L * D * W * W * L "
+        "| source(https://preview.example/form) | collected_at(2026-08-24T04:00:00+00:00)\n"
+        "- starting_xi: status=PREDICTED; facts_available=true; possible starting lineup "
+        "| source(https://preview.example/lineup) | collected_at(2026-08-24T04:00:00+00:00)\n"
+        "- injury: status=VALID; facts_available=true; absences listed "
+        "| source(https://preview.example/injury) | collected_at(2026-08-24T04:00:00+00:00)"
+    )
+    manifest = predict._build_llm_evidence_manifest(
+        {"match_id": "sporttery-1", "kickoff": "2026-08-25T00:00:00+08:00",
+         "crs": {}, "ttg": {}, "hafu": {}},
+        {"evidence_collected_at_max": "2026-08-24T04:00:00+00:00", "collection_status": "ONLY_ODDS"},
+        text,
+    )
+    assert manifest["sections"]["recent_form"]["status"] in {"AVAILABLE", "PARTIAL"}
+    assert manifest["sections"]["lineups"]["status"] == "PREDICTED"
+    assert manifest["sections"]["injuries"]["status"] == "AVAILABLE"
+    assert manifest["collection_status"] != "ONLY_ODDS"
+
+
 def test_parser_accepts_abstain_and_nullable_markets():
     payload = {
         "decision": "abstain", "direction": None, "alt_direction": None,

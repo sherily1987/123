@@ -1221,21 +1221,28 @@ def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
         return False
 
     evidence = {
-        "recent_form": {"home": [1] if has_usable("近5场", "最近5场", "近况") else [],
-                        "away": [1] if has_usable("近5场", "最近5场", "近况") else []},
+        "recent_form": {"home": [1] if has_usable(
+            "近5场", "最近5场", "近况", "recent_form", "recent form",
+            "pre-season form", "form (all competitions)"
+        ) else [],
+                        "away": [1] if has_usable(
+            "近5场", "最近5场", "近况", "recent_form", "recent form",
+            "pre-season form", "form (all competitions)"
+        ) else []},
         "crs": match.get("crs") or ([1] if has("CRS", "比分赔率") else []),
         "ttg": match.get("ttg") or ([1] if has("TTG", "总进球赔率") else []),
         "hafu": match.get("hafu") or ([1] if has("HAFU", "半全场赔率") else []),
         "injuries_status": (
             "EMPTY_UNCONFIRMED" if has("伤停状态=EMPTY_UNCONFIRMED", "伤停=EMPTY_UNCONFIRMED")
             else ("UNAVAILABLE" if has("伤停状态=UNAVAILABLE", "伤停=UNAVAILABLE")
-                  else ("AVAILABLE" if has_usable("伤停", "缺阵") else "UNAVAILABLE"))
+            else ("AVAILABLE" if has_usable("伤停", "缺阵", "injury", "injuries", "absences") else "UNAVAILABLE"))
         ),
         "lineups_status": (
             "EMPTY_UNCONFIRMED" if has("首发状态=EMPTY_UNCONFIRMED", "首发=EMPTY_UNCONFIRMED")
-            else ("UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
-            else ("PREDICTED" if has("首发状态=PREDICTED", "首发状态 | PREDICTED", "预计首发")
-                  else ("AVAILABLE" if has_usable("首发", "阵容") else "UNAVAILABLE")))
+            else ("UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE", "starting_xi: status=UNAVAILABLE")
+            else ("PREDICTED" if has("首发状态=PREDICTED", "首发状态 | PREDICTED", "预计首发",
+                                      "starting_xi: status=PREDICTED", "predicted lineup", "possible starting lineup")
+                  else ("AVAILABLE" if has_usable("首发", "阵容", "starting_xi", "starting lineup") else "UNAVAILABLE")))
         ),
         "collected_at": evidence_status.get("evidence_collected_at_max"),
     }
@@ -1267,8 +1274,9 @@ def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
         else:
             evidence[key] = state or "UNAVAILABLE"
     manifest = ltc.build_evidence_manifest(match, evidence)
-    if evidence_status.get("collection_status") == "ONLY_ODDS":
-        manifest["collection_status"] = "ONLY_ODDS"
+    # Do not overwrite the manifest with the pre-browser assessment.  The
+    # combined text may contain Scrapling/MCP evidence added after the initial
+    # API-only gate; the manifest must reflect that final audited payload.
     return manifest
 
 
