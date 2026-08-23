@@ -91,6 +91,37 @@ def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Pat
     assert matches[0]["evidence_snapshot_ref"].endswith("sporttery-2041021.json")
 
 
+def test_attach_reports_missing_snapshot_ids(tmp_path: Path):
+    matches = [{"match_id": 2041999}, {"match_id": 2042000}]
+    got = runner.attach_collected_evidence(matches, "2026-08-24", forward_root=tmp_path)
+    assert got["snapshots_attached"] == 0
+    assert got["missing_snapshot_ids"] == ["sporttery-2041999", "sporttery-2042000"]
+
+
+def test_auto_collect_prematch_evidence_is_id_scoped(tmp_path: Path, monkeypatch):
+    seen = {}
+
+    class Result:
+        returncode = 0
+        stdout = '{"count": 1, "rows": []}\n'
+        stderr = ""
+
+    def fake_cli(args, timeout=0):
+        seen["args"] = args
+        seen["timeout"] = timeout
+        return Result()
+
+    monkeypatch.setattr(runner, "_cli", fake_cli)
+    monkeypatch.setattr(runner, "forward_work_dir", lambda: tmp_path / "forward")
+    got = runner.auto_collect_prematch_evidence(
+        tmp_path / "inputs.json", "2026-08-24", ["sporttery-2", "sporttery-1", "sporttery-2"]
+    )
+    assert got["status"] == "ok"
+    assert got["attempted"] == 2
+    assert seen["args"][:3] == ["prematch-evidence", "--input", str((tmp_path / "inputs.json").resolve())]
+    assert seen["args"].count("--match-id") == 2
+
+
 def test_parse_llm_log_extracts_direction_and_skips():
     text = """
 ⚽ 第1/2场 [周一002] 赫根 VS 哈尔姆斯 | 瑞超 | 2026-08-18 01:00

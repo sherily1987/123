@@ -297,6 +297,7 @@ def attach_collected_evidence(
 
     attached = 0
     late_merged = 0
+    missing_snapshot_ids: list[str] = []
     for match in matches:
         mid = sv.sporttery_id(match.get("match_id"))
         if not mid:
@@ -311,6 +312,8 @@ def attach_collected_evidence(
             match["evidence_snapshot_audit"] = browser_audit
             match["evidence_audit"] = blob.get("evidence_audit") or {}
             attached += 1
+        else:
+            missing_snapshot_ids.append(mid)
         if events_by_id.get(mid):
             chain, late_audit = merge_late_info_events(chain, events_by_id[mid])
             match["late_info_merge_audit"] = late_audit
@@ -323,7 +326,42 @@ def attach_collected_evidence(
         "snapshots_available": len(snapshots),
         "matches": len(matches),
         "snapshots_attached": attached,
+        "missing_snapshot_ids": missing_snapshot_ids,
         "late_info_matches_merged": late_merged,
+    }
+
+
+def auto_collect_prematch_evidence(input_path: Path, day: str, match_ids: list[str]) -> dict:
+    """Fetch missing official preview snapshots for the current LLM batch.
+
+    This is intentionally a bounded, ID-scoped retry.  The collector writes
+    sidecars only; a failed provider call is reported and remains a gap.
+    """
+    if not match_ids:
+        return {"attempted": 0, "status": "not_needed"}
+    input_path = Path(input_path).resolve()
+    output_dir = (forward_work_dir() / day / "evidence_snapshots").resolve()
+    args = ["prematch-evidence", "--input", str(input_path), "--output-dir", str(output_dir)]
+    for mid in sorted(set(match_ids)):
+        args += ["--match-id", mid]
+    try:
+        result = _cli(args, timeout=1200)
+    except Exception as exc:
+        return {"attempted": len(set(match_ids)), "status": "error", "error": str(exc)[:240]}
+    payload = None
+    for line in reversed((result.stdout or "").splitlines()):
+        try:
+            payload = json.loads(line)
+            break
+        except ValueError:
+            continue
+    return {
+        "attempted": len(set(match_ids)),
+        "status": "ok" if result.returncode == 0 else "error",
+        "returncode": result.returncode,
+        "report": payload,
+        "error_tail": ((result.stderr or result.stdout or "")[-500:]
+                       if result.returncode else ""),
     }
 
 
@@ -450,6 +488,14 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             "matches": matches,
         }
         evidence_stats = attach_collected_evidence(matches, day)
+        auto_collect = auto_collect_prematch_evidence(
+            inp, day, evidence_stats.get("missing_snapshot_ids") or []
+        )
+        if auto_collect.get("attempted"):
+            # Re-project after the bounded collector so the exact same batch
+            # (and no unrelated fixture) becomes the LLM evidence input.
+            evidence_stats = attach_collected_evidence(matches, day)
+        evidence_stats["auto_collect"] = auto_collect
         raw["matches"] = matches
         raw["evidence_projection"] = evidence_stats
         raw_path = work / "llm_raw.json"
@@ -462,6 +508,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             run_id, total=len(matches),
             message=(f"证据就绪 快照{evidence_stats['snapshots_attached']}/"
                      f"{len(matches)}，晚到合并{evidence_stats['late_info_matches_merged']}，"
+                     f"自动补采{auto_collect.get('attempted', 0)}，"
                      f"复用{reused} 轻量{light}，开始跑 {len(matches)} 场…"),
         )
         repo = llm_repo()
@@ -499,7 +546,9 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             "证据方向，不是概率。不与量化轨合成。采集器快照按体彩 ID 自动投影到 LLM Markdown。",
             "",
             f"- 待跑 {len(matches)} 场，侧车快照接入 {evidence_stats['snapshots_attached']}，"
-            f"晚到信息合并 {evidence_stats['late_info_matches_merged']}",
+            f"晚到信息合并 {evidence_stats['late_info_matches_merged']}，"
+            f"自动补采 {auto_collect.get('attempted', 0)}，"
+            f"补采后仍缺 {len(evidence_stats.get('missing_snapshot_ids') or [])}",
             f"- 复用深度证据 {reused}，轻量证据 {light}",
             f"- 出方向 {parsed['ok']}，门禁/审计跳过 {parsed['skipped']}",
             f"- 工单写入 {jobs_n}",
