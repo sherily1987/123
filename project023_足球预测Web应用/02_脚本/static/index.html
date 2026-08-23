@@ -395,8 +395,11 @@ async function loadBoard(force) {
       ? `<div class="banner err">每日策略加载失败：${strategy.load_error}</div>`
       : DailyStrategyView.formatDailyStrategyHtml(strategy);
     const late = d.late_info || {};
+    const nextRefresh = late.next_refresh_at
+      ? ` · 下次刷新 ${late.next_refresh_at}（待刷新 ${late.scheduled_refresh_pending || 0} 场）`
+      : "";
     document.getElementById("late").innerHTML =
-      `<div class="banner warn">伤停有效 ${late.injury_valid || 0} · 首发有效 ${late.lineup_valid || 0} · 过门事件 ${late.late_events || 0} · 研究门槛 ${late.toward_200} 场。${late.note || ""}</div>`;
+      `<div class="banner warn">伤停有效 ${late.injury_valid || 0} · 首发有效 ${late.lineup_valid || 0} · 过门事件 ${late.late_events || 0} · 研究门槛 ${late.toward_200} 场${nextRefresh}。${late.note || ""}</div>`;
     renderSaleBoard(d);
     if (force || !lastHistFull) await loadHistory(!!force);
     banner(`已刷新 ${d.as_of || ""} · ${d.note || ""}`, "ok");

@@ -680,6 +680,34 @@ def load_late_info(root: Path | None = None) -> tuple[dict[str, dict], dict]:
                 n_inj += 1
             if kind == "lineup" and rec.get("status") == "VALID":
                 n_xi += 1
+    now = datetime.now(timezone.utc)
+    scheduled = []
+    due_root = root / "forward"
+    if due_root.is_dir():
+        for due_path in due_root.glob("*/late_info_due.json"):
+            try:
+                due_blob = json.loads(due_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            for item in due_blob.get("matches") or []:
+                raw_next = item.get("next_refresh_at")
+                if not raw_next:
+                    continue
+                try:
+                    parsed_next = datetime.fromisoformat(str(raw_next).replace("Z", "+00:00"))
+                except ValueError:
+                    continue
+                if parsed_next.tzinfo is None:
+                    parsed_next = parsed_next.replace(tzinfo=timezone.utc)
+                parsed_next = parsed_next.astimezone(timezone.utc)
+                if parsed_next > now:
+                    scheduled.append({
+                        "next_refresh_at": parsed_next.isoformat(),
+                        "match_id": item.get("match_id"),
+                        "home": item.get("home"),
+                        "away": item.get("away"),
+                    })
+    scheduled.sort(key=lambda item: item["next_refresh_at"])
     summary = {
         "events_file": str(path),
         "injury_valid": n_inj,
@@ -687,6 +715,9 @@ def load_late_info(root: Path | None = None) -> tuple[dict[str, dict], dict]:
         "late_events": n_late,
         "unique_matches": len(by),
         "toward_200": LATE_TARGET,
+        "scheduled_refresh_pending": len(scheduled),
+        "next_refresh_at": scheduled[0]["next_refresh_at"] if scheduled else None,
+        "next_refresh_match_id": scheduled[0]["match_id"] if scheduled else None,
         "note": "研究库，不进生产 1X2",
     }
     return by, summary

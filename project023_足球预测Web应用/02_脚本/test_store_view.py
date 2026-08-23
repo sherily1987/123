@@ -104,6 +104,26 @@ def test_status_zh_unavailable_is_chinese():
     assert sv.status_zh("MARKET_BASELINE") == "市场基线"
 
 
+def test_load_late_info_exposes_next_scheduled_refresh(tmp_path: Path):
+    due = tmp_path / "forward" / "2026-08-24"
+    due.mkdir(parents=True)
+    next_refresh = "2999-08-24T00:00:00+00:00"
+    (due / "late_info_due.json").write_text(json.dumps({
+        "matches": [{
+            "match_id": "sporttery-2040999",
+            "home": "主队",
+            "away": "客队",
+            "next_refresh_at": next_refresh,
+        }],
+    }), encoding="utf-8")
+
+    _, summary = sv.load_late_info(tmp_path)
+
+    assert summary["scheduled_refresh_pending"] == 1
+    assert summary["next_refresh_at"] == next_refresh
+    assert summary["next_refresh_match_id"] == "sporttery-2040999"
+
+
 def test_extract_quant_reads_registry_output_block():
     got = sv.extract_quant({
         "mode": "market_only",
