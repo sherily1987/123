@@ -278,6 +278,11 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
             "evidence_gap_reasons": [f"{n.upper()}_{entries[n]['missing_reason'] or entries[n]['status']}" for n in missing],
             "kickoff": match.get("kickoff"), "collected_at": collected_at,
             "lineup_refresh_schedule": refresh_points,
+            "api_sports_attempt": {
+                "status": api.get("status", "NOT_REQUESTED"),
+                "reason": api.get("reason") if api else "NOT_REQUESTED",
+                "research_only": True,
+            },
             "source_policy": {
                 "sporttery_preview": "official mobile endpoint",
                 "third_party_content_notice": "page-level notice may apply; preserve field-level provenance",

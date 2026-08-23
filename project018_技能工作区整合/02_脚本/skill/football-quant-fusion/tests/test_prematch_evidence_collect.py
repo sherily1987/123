@@ -75,6 +75,7 @@ def test_missing_injury_payload_remains_unavailable(monkeypatch):
                            "kickoff": "2026-08-25T20:00:00+08:00"})
     assert row["evidence_audit"]["entries"]["injury"]["status"] == "UNAVAILABLE"
     assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "UNAVAILABLE"
+    assert row["evidence_audit"]["api_sports_attempt"]["status"] == "NOT_REQUESTED"
 
 
 def test_api_sports_enrichment_fills_form_injury_and_confirmed_lineups(monkeypatch):
@@ -111,6 +112,7 @@ def test_api_sports_enrichment_fills_form_injury_and_confirmed_lineups(monkeypat
     assert entries["injury"]["status"] == "VALID"
     assert entries["starting_xi"]["status"] == "VALID"
     assert row["facts"]["api_sports"]["fixture_id"] == 42
+    assert row["evidence_audit"]["api_sports_attempt"]["status"] == "ok"
 
 
 def test_audit_does_not_upgrade_one_sided_api_lineup_to_valid(monkeypatch):
