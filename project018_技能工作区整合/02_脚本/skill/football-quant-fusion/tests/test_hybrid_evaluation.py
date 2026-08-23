@@ -59,6 +59,10 @@ def test_evaluation_only_counts_independent_prematch_hybrid_pairs(tmp_path):
     report = evaluation.evaluate_jobs(tmp_path)
 
     assert report["n"] == 1
+    assert report["coverage"]["scanned_jobs"] == 4
+    assert report["coverage"]["hybrid_sidecars"] == 4
+    assert report["coverage"]["hybrid_ok_sidecars"] == 4
+    assert report["coverage"]["router_audited_sidecars"] == 4
     assert report["excluded"] == {
         "market_derived": 1,
         "missing_independent_prior": 1,

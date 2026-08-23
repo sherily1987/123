@@ -171,12 +171,24 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
     rows: list[dict] = []
     sweep_rows: dict[str, list[dict]] = {}
     excluded: dict[str, int] = {}
+    scanned_jobs = 0
+    hybrid_sidecars = 0
+    hybrid_ok_sidecars = 0
+    router_audited_sidecars = 0
     for path in sorted(root.rglob("sporttery-*.json")):
+        scanned_jobs += 1
         try:
             job = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             excluded["unreadable_job"] = excluded.get("unreadable_job", 0) + 1
             continue
+        hybrid = ((job.get("research") or {}).get("hybrid") or {})
+        if isinstance(hybrid, dict) and hybrid:
+            hybrid_sidecars += 1
+            if hybrid.get("status") == "ok" and hybrid.get("research_only") is True:
+                hybrid_ok_sidecars += 1
+            if isinstance(hybrid.get("routing_audit"), dict):
+                router_audited_sidecars += 1
         row, reason = _eligible(job, root)
         if reason:
             excluded[reason] = excluded.get(reason, 0) + 1
@@ -230,6 +242,13 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
         "research_only": True,
         "bootstrap": {"samples": bootstrap_samples, "seed": bootstrap_seed},
         "n": len(rows),
+        "coverage": {
+            "scanned_jobs": scanned_jobs,
+            "hybrid_sidecars": hybrid_sidecars,
+            "hybrid_ok_sidecars": hybrid_ok_sidecars,
+            "router_audited_sidecars": router_audited_sidecars,
+            "note": "覆盖率只描述工单证据完整度，不改变有效样本资格或生产门禁",
+        },
         "excluded": excluded,
         "rows": rows,
     }
