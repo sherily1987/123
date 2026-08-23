@@ -191,6 +191,7 @@ def main() -> None:
     grid = sorted(set(grid))
     independent = [row for row in rows if row.get("route") in {"model_first", "hybrid"}]
     market_only = [row for row in rows if row.get("route") == "market_only"]
+    independent_model_rows = [row for row in independent if isinstance(row.get("model_probs"), list)]
     report = {
         "schema_version": "research-parameter-scan-1.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -219,6 +220,10 @@ def main() -> None:
             "paired_market": fb.paired_market_comparison(market_only, iterations=2000, seed=20260823),
         },
         "kt_scan_on_market_anchor": _scan([r for r in rows if isinstance(r.get("market_probs"), list)], grid, "market_probs"),
+        # This is the only K/T scan that can inform the independent model
+        # route.  The market-anchor scan remains a calibration diagnostic and
+        # must not be presented as evidence of model improvement.
+        "kt_scan_on_independent_model": _scan(independent_model_rows, grid, "model_probs"),
         "guardrails": [
             "研究结果不得写入生产配置、正式预测登记或 current cohort。",
             "market_only 样本是市场校准诊断，不证明独立模型增益。",
@@ -230,6 +235,7 @@ def main() -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     selected = report["kt_scan_on_market_anchor"]["selected_by_train_objective"]
+    independent_selected = report["kt_scan_on_independent_model"].get("selected_by_train_objective", {})
     print(json.dumps({
         "status": "ok",
         "research_only": True,
@@ -237,6 +243,9 @@ def main() -> None:
         "route_counts": report["route_counts"],
         "independent_n": len(independent),
         "selected": {k: {"draw_k": v["draw_k"], "temperature": v["temperature"], "test": v["test"]} for k, v in selected.items()},
+        "independent_model_n": len(independent_model_rows),
+        "independent_selected": {k: {"draw_k": v["draw_k"], "temperature": v["temperature"], "test": v["test"]}
+                                 for k, v in independent_selected.items()},
         "output": str(output),
     }, ensure_ascii=False, indent=2))
 

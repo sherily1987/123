@@ -334,6 +334,28 @@ class BacktestSamplingTests(unittest.TestCase):
         self.assertIsNone(error)
         self.assertEqual(row["prediction_as_of"], "2026-08-21T14:00:00Z")
 
+    def test_scored_row_exposes_independent_model_probabilities_for_research_scan(self):
+        with tempfile.TemporaryDirectory(prefix="fusion-score-model-probs-") as td:
+            root = Path(td)
+            (root / "results").mkdir()
+            (root / "results" / "m1.json").write_text(
+                json.dumps({"score_90": {"home": 1, "away": 0}}), encoding="utf-8"
+            )
+            record = {
+                "match_id": "m1", "prediction_id": "m1-p",
+                "match": {"kickoff": "2026-08-22T00:00:00Z"},
+                "model": {"mode": "hybrid"},
+                "input": {"odds": [2.0, 3.0, 4.0]},
+                "output": {
+                    "final_1x2_pct": [50.0, 30.0, 20.0],
+                    "model_1x2_pct": [45.0, 25.0, 30.0],
+                },
+            }
+            row, error = backtest.score_record(record, root)
+
+        self.assertIsNone(error)
+        self.assertEqual(row["model_probs"], [0.45, 0.25, 0.30])
+
     def test_dedupe_keeps_same_snapshot_when_probability_versions_differ(self):
         """A post-release m4 prediction is a distinct evaluable record from m3."""
         rows = [

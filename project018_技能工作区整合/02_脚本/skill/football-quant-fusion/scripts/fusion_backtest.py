@@ -496,6 +496,9 @@ def score_record(rec, root):
         return None, "missing_1x2"
     h, a = int(s90["home"]), int(s90["away"])
     probs = [x / 100.0 for x in probs_pct]
+    model_pct = find(out, "model_1x2_pct") or find(core, "model_1x2_pct")
+    model_probs = ([float(x) / 100.0 for x in model_pct]
+                   if isinstance(model_pct, list) and len(model_pct) == 3 else None)
     market_pct = find(out, "market_prob_pct") or find(core, "market_prob_pct")
     if isinstance(market_pct, list) and len(market_pct) == 3:
         market_probs = [float(x) / 100.0 for x in market_pct]
@@ -555,6 +558,7 @@ def score_record(rec, root):
         "core_engine_version": (rec.get("output") or {}).get("core_engine_version"),
         "league": ((rec.get("match") or {}).get("competition")) or ((rec.get("match") or {}).get("stage")) or "?",
         "probs": probs,
+        "model_probs": model_probs,
         "market_probs": market_probs,
         "actual_idx": idx,
         "actual_score": actual_score,
@@ -645,6 +649,9 @@ def main():
                 "model": it.get("model") or {},
                 "league": str(it.get("competition") or it.get("stage") or "?"),
                 "probs": [x / 100.0 for x in probs_pct],
+                "model_probs": ([x / 100.0 for x in (find(out, "model_1x2_pct") or [])]
+                                if isinstance(find(out, "model_1x2_pct"), list)
+                                and len(find(out, "model_1x2_pct")) == 3 else None),
                 "market_probs": ([x / 100.0 for x in market_pct]
                                    if isinstance(market_pct, list) and len(market_pct) == 3 else None),
                 "actual_idx": actual_1x2(int(s90[0]), int(s90[1])),
