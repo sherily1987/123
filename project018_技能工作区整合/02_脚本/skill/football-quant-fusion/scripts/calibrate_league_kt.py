@@ -91,6 +91,17 @@ def run_league(rows, method="power"):
     def_te = metrics([calibrate_1x2(p, 1.14, 0.96) for p in te_p], te_i)
     nocal_te = metrics([calibrate_1x2(p, 1.0, 1.0) for p in te_p], te_i)
     raw_te = metrics(te_p, te_i)
+    # A calibration candidate must not regress on any held-out metric.  The
+    # small tolerance prevents floating-point/sample noise from becoming a
+    # false rejection, while keeping the decision auditable and research-only.
+    delta_vs_raw = {
+        metric: round(cal_te[metric] - raw_te[metric], 6)
+        for metric in ("brier_mean", "log_loss", "ece")
+    }
+    regression_tolerance = 0.0005
+    admission = "candidate" if all(
+        delta <= regression_tolerance for delta in delta_vs_raw.values()
+    ) else "hold"
     return {
         "league": rows[0]["league"], "n": len(rows), "train_n": len(train), "test_n": len(test),
         "date_range": [datetime.fromordinal(rows[0]["day"]).strftime("%Y-%m-%d"),
@@ -99,6 +110,15 @@ def run_league(rows, method="power"):
         "default_other": {"draw_k": 1.14, "temperature": 0.96, "test_metrics": def_te},
         "no_cal": {"draw_k": 1.0, "temperature": 1.0, "test_metrics": nocal_te},
         "raw_market": {"test_metrics": raw_te},
+        "candidate_review": {
+            "decision": admission,
+            "delta_fitted_minus_raw": delta_vs_raw,
+            "regression_tolerance": regression_tolerance,
+            "production_authorized": False,
+            "reason": ("all held-out Brier/LogLoss/ECE deltas within tolerance; "
+                       "requires separate release review" if admission == "candidate" else
+                       "at least one held-out metric regressed beyond tolerance"),
+        },
     }
 
 
