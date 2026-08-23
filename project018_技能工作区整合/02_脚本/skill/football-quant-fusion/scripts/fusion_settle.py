@@ -22,12 +22,15 @@ def build_commands(
     date: str | None,
     dry_run: bool,
     apifootball_fallback: bool,
+    include_llm_jobs: bool = False,
 ) -> list[dict[str, Any]]:
     common = ["--store", str(store)]
     if date:
         common.extend(["--date", date])
     if dry_run:
         common.append("--dry-run")
+    if include_llm_jobs:
+        common.append("--include-llm-jobs")
     commands = [{
         "source": "official",
         "cmd": [sys.executable, str(core_scripts_dir() / "settle_from_sporttery.py"), *common],
@@ -103,9 +106,11 @@ def main() -> None:
     parser.add_argument("--date")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apifootball-fallback", action="store_true")
+    parser.add_argument("--include-llm-jobs", action="store_true",
+                        help="为 LLM 研究工单查询官方赛果，用于独立校准")
     args = parser.parse_args()
     commands = build_commands(args.store, args.date, args.dry_run,
-                              args.apifootball_fallback)
+                              args.apifootball_fallback, args.include_llm_jobs)
     official = run_command(commands[0]["cmd"])
     provider = run_command(commands[1]["cmd"]) if len(commands) == 2 else None
     print(json.dumps(combine_reports(official, provider), ensure_ascii=False, indent=2))

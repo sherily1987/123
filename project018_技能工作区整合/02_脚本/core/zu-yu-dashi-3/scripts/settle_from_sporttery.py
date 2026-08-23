@@ -83,12 +83,45 @@ def filter_pending_by_date(pending, only_date):
     return [row for row in pending
             if str(row.get("kickoff") or "")[:10] == str(only_date)]
 
+
+def load_llm_pending(root, existing_ids, only_date=None):
+    """Load LLM-only job identities for official result settlement."""
+    jobs_root = Path(root).parent / "jobs"
+    rows = []
+    if not jobs_root.is_dir():
+        return rows
+    for path in jobs_root.glob("**/sporttery-*.json"):
+        try:
+            job = json.load(open(path, encoding="utf-8-sig"))
+        except (OSError, ValueError):
+            continue
+        if not any(isinstance(item, dict) and item.get("track") == "llm"
+                   for item in (job.get("outputs") or [])):
+            continue
+        identity = job.get("identity") or {}
+        mid = str(identity.get("match_id") or path.stem)
+        if not mid.startswith("sporttery-"):
+            mid = "sporttery-" + mid
+        if mid in existing_ids:
+            continue
+        suffix = mid.removeprefix("sporttery-")
+        if not suffix.isdigit():
+            continue
+        rows.append({"match_id": mid, "home": identity.get("home"),
+                     "away": identity.get("away"),
+                     "kickoff": identity.get("kickoff") or
+                     (job.get("input") or {}).get("kickoff") or "",
+                     "path": str(path), "sporttery_id": suffix})
+    return filter_pending_by_date(rows, only_date)
+
 # [中文功能] 按官方赛果自动回填登记库
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--store', default='C:/Users/Administrator/.codex/skills/football-quant-fusion-suite/shared/zu-yu-dashi-3/backtest')
     ap.add_argument('--date', help='只回填该 business_date')
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--include-llm-jobs', action='store_true',
+                    help='同时为 LLM 研究工单查询官方赛果，用于独立校准')
     a = ap.parse_args()
     root = Path(a.store)
 
@@ -117,6 +150,8 @@ def main():
     # Apply the date scope before both date queries and matchId direct lookup.
     # The direct lookup is authoritative, but must not bypass --date.
     pending = filter_pending_by_date(pending, a.date)
+    if a.include_llm_jobs:
+        pending.extend(load_llm_pending(root, {row['match_id'] for row in pending}, a.date))
 
     # 按待回填场次的开球日期逐日查询，覆盖官方滚动窗口之外的历史场次
     if a.date:

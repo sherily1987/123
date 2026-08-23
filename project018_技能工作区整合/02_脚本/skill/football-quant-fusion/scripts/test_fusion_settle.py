@@ -22,3 +22,8 @@ def test_combined_report_does_not_hide_official_success_when_provider_fails():
     )
     assert report["settled"] == 2
     assert report["official"]["settled"] == 2
+
+
+def test_build_commands_can_include_llm_jobs_for_calibration(tmp_path):
+    commands = fusion_settle.build_commands(tmp_path, "2026-08-24", True, False, True)
+    assert "--include-llm-jobs" in commands[0]["cmd"]

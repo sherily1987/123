@@ -170,7 +170,7 @@ def task_predict(run_id: int, kickoff_date: str | None = None):
 def task_settle(run_id: int, date: str | None = None):
     try:
         db.run_update(run_id, message="手动结算（fusion_cli settle）…")
-        args = ["settle", "--store", str(backtest_store())]
+        args = ["settle", "--store", str(backtest_store()), "--include-llm-jobs"]
         if date:
             args += ["--date", date]
         r = _cli(args, timeout=600)
