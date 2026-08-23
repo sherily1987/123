@@ -68,11 +68,21 @@ def _llm_output(job: dict[str, Any]) -> dict[str, Any] | None:
 def _metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     direction_rows = [row for row in rows if row.get("direction") in {"H", "D", "A"}]
     probability_rows = []
+    probability_source_counts = {
+        "production_llm_probs": 0,
+        "research_raw_llm_probs": 0,
+    }
     for row in rows:
+        production_values = row.get("llm_probs_1x2")
+        raw_values = row.get("llm_raw_probs_1x2")
         # A rejected/abstained prediction may still contain a normalized raw
         # self-report.  It is research-only and must never be promoted to the
         # production ``llm_probs_1x2`` field.
-        values = row.get("llm_probs_1x2") or row.get("llm_raw_probs_1x2")
+        values = production_values or raw_values
+        if production_values:
+            probability_source_counts["production_llm_probs"] += 1
+        elif raw_values:
+            probability_source_counts["research_raw_llm_probs"] += 1
         if not isinstance(values, list) or len(values) != 3:
             continue
         try:
@@ -104,6 +114,7 @@ def _metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
             sum(row.get("direction_correct") is True for row in direction_rows)
             / len(direction_rows) * 100.0, 2) if direction_rows else None,
         "probability_n": len(probability_rows),
+        "probability_source_counts": probability_source_counts,
         "brier": round(sum(brier) / len(brier), 8) if brier else None,
         "log_loss": round(sum(logloss) / len(logloss), 8) if logloss else None,
         "score_n": len(rows),

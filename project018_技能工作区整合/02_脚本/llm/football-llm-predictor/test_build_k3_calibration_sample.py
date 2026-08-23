@@ -52,6 +52,10 @@ def test_build_sample_requires_pre_kickoff_and_official_result(tmp_path: Path):
     assert report["excluded_by_reason"] == {"pending_or_missing_official_result": 1}
     assert report["metrics"]["direction_accuracy_pct"] == 100.0
     assert report["metrics"]["probability_n"] == 0
+    assert report["metrics"]["probability_source_counts"] == {
+        "production_llm_probs": 0,
+        "research_raw_llm_probs": 0,
+    }
 
 
 def test_build_sample_rejects_post_kickoff_prediction(tmp_path: Path):
@@ -83,6 +87,7 @@ def test_build_sample_scores_self_reported_probability_separately(tmp_path: Path
 
     assert report["metrics"]["probability_n"] == 1
     assert report["metrics"]["brier"] == 0.245
+    assert report["metrics"]["probability_source_counts"]["production_llm_probs"] == 1
 
 
 def test_build_sample_scores_raw_markets_without_promoting_them(tmp_path: Path):
@@ -106,3 +111,4 @@ def test_build_sample_scores_raw_markets_without_promoting_them(tmp_path: Path):
     assert report["metrics"]["probability_n"] == 1
     assert report["rows"][0]["llm_probs_1x2"] is None
     assert report["rows"][0]["llm_raw_probs_1x2"] == [60, 25, 15]
+    assert report["metrics"]["probability_source_counts"]["research_raw_llm_probs"] == 1
