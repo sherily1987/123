@@ -1,0 +1,416 @@
+{
+  "schema": "market-pool-calibration-research-1.0",
+  "generated_at": "2026-08-23T12:29:18.103731+00:00",
+  "research_only": true,
+  "production_change_allowed": false,
+  "input": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\datasets\\sporttery_all_leagues_history_2026.json",
+  "markets": {
+    "HAD": {
+      "schema": "three-way-market-calibration-backtest-1.0",
+      "probability_input": "same_market_odds_power_devig_plus_historical_class_bias",
+      "class_bias_fit_used_final_period": false,
+      "selected_on": "validation_only",
+      "fit_until": "2026-05-18",
+      "test_from": "2026-06-24",
+      "fit_n": 949,
+      "validation_n": 199,
+      "test_n": 200,
+      "fit_class_counts": [
+        388,
+        257,
+        304
+      ],
+      "test_class_counts": [
+        78,
+        58,
+        64
+      ],
+      "class_bias_factors": [
+        0.92279181,
+        1.16292372,
+        0.9897998
+      ],
+      "direct_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.57639848,
+        "log_loss": 0.96317338,
+        "top1_accuracy_pct": 53.5
+      },
+      "calibrated_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.56988707,
+        "log_loss": 0.953453,
+        "top1_accuracy_pct": 53.0
+      },
+      "paired_calibrated_minus_direct": {
+        "n": 200,
+        "brier_ci95": [
+          -0.0143691,
+          0.00164221
+        ],
+        "logloss_ci95": [
+          -0.02274905,
+          0.00301969
+        ]
+      },
+      "selected_policy": {
+        "minimum_raw_ev": 0.0,
+        "maximum_odds": 3.0
+      },
+      "validation_bets": {
+        "n": 29,
+        "wins": 10,
+        "hit_rate": 0.34482759,
+        "profit_units": -1.09,
+        "roi": -0.03758621,
+        "max_drawdown_units": 6.14,
+        "largest_winner_profit_share": 0.10887772
+      },
+      "final_test_bets": {
+        "n": 19,
+        "wins": 8,
+        "hit_rate": 0.42105263,
+        "profit_units": 2.26,
+        "roi": 0.11894737,
+        "max_drawdown_units": 5.0,
+        "largest_winner_profit_share": 0.14932127
+      },
+      "decision": "hold",
+      "reason": "insufficient_final_test_bets"
+    },
+    "TTG": {
+      "schema": "three-way-market-calibration-backtest-1.0",
+      "probability_input": "same_market_odds_power_devig_plus_historical_class_bias",
+      "class_bias_fit_used_final_period": false,
+      "selected_on": "validation_only",
+      "fit_until": "2026-05-18",
+      "test_from": "2026-06-24",
+      "fit_n": 949,
+      "validation_n": 199,
+      "test_n": 200,
+      "fit_class_counts": [
+        67,
+        153,
+        214,
+        219,
+        142,
+        100,
+        33,
+        21
+      ],
+      "test_class_counts": [
+        17,
+        23,
+        56,
+        53,
+        31,
+        14,
+        3,
+        3
+      ],
+      "class_bias_factors": [
+        1.26632631,
+        1.04865088,
+        0.97632463,
+        0.96257584,
+        0.94385338,
+        1.23749293,
+        0.79318696,
+        0.70261575
+      ],
+      "direct_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.80059178,
+        "log_loss": 1.77394831,
+        "top1_accuracy_pct": 30.5
+      },
+      "calibrated_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.80170595,
+        "log_loss": 1.76778945,
+        "top1_accuracy_pct": 30.5
+      },
+      "paired_calibrated_minus_direct": {
+        "n": 200,
+        "brier_ci95": [
+          -0.00206583,
+          0.00416598
+        ],
+        "logloss_ci95": [
+          -0.02126341,
+          0.00834225
+        ]
+      },
+      "selected_policy": null,
+      "validation_bets": {
+        "n": 0,
+        "wins": 0,
+        "hit_rate": null,
+        "profit_units": 0.0,
+        "roi": null,
+        "max_drawdown_units": 0.0,
+        "largest_winner_profit_share": null
+      },
+      "final_test_bets": {
+        "n": 0,
+        "wins": 0,
+        "hit_rate": null,
+        "profit_units": 0.0,
+        "roi": null,
+        "max_drawdown_units": 0.0,
+        "largest_winner_profit_share": null
+      },
+      "decision": "hold",
+      "reason": "insufficient_validation_bets"
+    },
+    "CRS": {
+      "schema": "three-way-market-calibration-backtest-1.0",
+      "probability_input": "same_market_odds_power_devig_plus_historical_class_bias",
+      "class_bias_fit_used_final_period": false,
+      "selected_on": "validation_only",
+      "fit_until": "2026-05-18",
+      "test_from": "2026-06-24",
+      "fit_n": 949,
+      "validation_n": 199,
+      "test_n": 200,
+      "fit_class_counts": [
+        10,
+        0,
+        5,
+        67,
+        74,
+        35,
+        22,
+        3,
+        7,
+        79,
+        119,
+        75,
+        30,
+        9,
+        2,
+        60,
+        79,
+        65,
+        25,
+        8,
+        4,
+        43,
+        27,
+        33,
+        6,
+        17,
+        18,
+        8,
+        8,
+        8,
+        3
+      ],
+      "test_class_counts": [
+        1,
+        1,
+        1,
+        17,
+        8,
+        11,
+        8,
+        4,
+        0,
+        15,
+        30,
+        18,
+        6,
+        3,
+        1,
+        15,
+        19,
+        9,
+        3,
+        1,
+        0,
+        8,
+        6,
+        7,
+        1,
+        6,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "class_bias_factors": [
+        1.06239315,
+        0.05005005,
+        0.38356988,
+        1.25355085,
+        1.05819665,
+        0.75889896,
+        0.96488328,
+        0.36008674,
+        2.00230897,
+        0.94300937,
+        1.12111942,
+        1.03877557,
+        0.98655227,
+        0.8204823,
+        0.53278645,
+        0.90770309,
+        0.91275056,
+        1.27214271,
+        1.16055267,
+        1.09621822,
+        1.55696454,
+        1.14139027,
+        0.65096783,
+        1.29113954,
+        0.57122804,
+        1.03131654,
+        1.03886251,
+        0.84124417,
+        1.23655116,
+        1.21209376,
+        0.84199706
+      ],
+      "direct_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.91618748,
+        "log_loss": 2.75794305,
+        "top1_accuracy_pct": 15.0
+      },
+      "calibrated_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.91549839,
+        "log_loss": 2.78516747,
+        "top1_accuracy_pct": 15.0
+      },
+      "paired_calibrated_minus_direct": {
+        "n": 200,
+        "brier_ci95": [
+          -0.00397032,
+          0.00247236
+        ],
+        "logloss_ci95": [
+          -0.01274769,
+          0.07207839
+        ]
+      },
+      "selected_policy": {
+        "minimum_raw_ev": 0.0,
+        "maximum_odds": 1000.0
+      },
+      "validation_bets": {
+        "n": 48,
+        "wins": 0,
+        "hit_rate": 0.0,
+        "profit_units": -48.0,
+        "roi": -1.0,
+        "max_drawdown_units": 48.0,
+        "largest_winner_profit_share": null
+      },
+      "final_test_bets": {
+        "n": 58,
+        "wins": 0,
+        "hit_rate": 0.0,
+        "profit_units": -58.0,
+        "roi": -1.0,
+        "max_drawdown_units": 58.0,
+        "largest_winner_profit_share": null
+      },
+      "decision": "hold",
+      "reason": "calibrated_probability_not_significantly_better_than_market"
+    },
+    "HAFU": {
+      "schema": "three-way-market-calibration-backtest-1.0",
+      "probability_input": "same_market_odds_power_devig_plus_historical_class_bias",
+      "class_bias_fit_used_final_period": false,
+      "selected_on": "validation_only",
+      "fit_until": "2026-05-18",
+      "test_from": "2026-06-24",
+      "fit_n": 949,
+      "validation_n": 199,
+      "test_n": 200,
+      "fit_class_counts": [
+        224,
+        54,
+        22,
+        136,
+        147,
+        108,
+        28,
+        56,
+        174
+      ],
+      "test_class_counts": [
+        49,
+        10,
+        1,
+        22,
+        37,
+        28,
+        7,
+        11,
+        35
+      ],
+      "class_bias_factors": [
+        0.87124028,
+        1.25600954,
+        1.06049114,
+        0.96407565,
+        1.14039162,
+        0.99025043,
+        1.1675095,
+        1.3006747,
+        0.95933647
+      ],
+      "direct_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.78248041,
+        "log_loss": 1.81304178,
+        "top1_accuracy_pct": 33.0
+      },
+      "calibrated_final_test": {
+        "n": 200,
+        "multiclass_brier": 0.78042562,
+        "log_loss": 1.80572665,
+        "top1_accuracy_pct": 36.0
+      },
+      "paired_calibrated_minus_direct": {
+        "n": 200,
+        "brier_ci95": [
+          -0.00774471,
+          0.00359032
+        ],
+        "logloss_ci95": [
+          -0.02492417,
+          0.00982771
+        ]
+      },
+      "selected_policy": null,
+      "validation_bets": {
+        "n": 0,
+        "wins": 0,
+        "hit_rate": null,
+        "profit_units": 0.0,
+        "roi": null,
+        "max_drawdown_units": 0.0,
+        "largest_winner_profit_share": null
+      },
+      "final_test_bets": {
+        "n": 0,
+        "wins": 0,
+        "hit_rate": null,
+        "profit_units": 0.0,
+        "roi": null,
+        "max_drawdown_units": 0.0,
+        "largest_winner_profit_share": null
+      },
+      "decision": "hold",
+      "reason": "insufficient_validation_bets"
+    }
+  },
+  "admission": {
+    "decision": "hold",
+    "reason": "only individual markets with candidate_review may advance to paper staking"
+  }
+}
