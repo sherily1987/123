@@ -83,3 +83,26 @@ def test_build_sample_scores_self_reported_probability_separately(tmp_path: Path
 
     assert report["metrics"]["probability_n"] == 1
     assert report["metrics"]["brier"] == 0.245
+
+
+def test_build_sample_scores_raw_markets_without_promoting_them(tmp_path: Path):
+    jobs = tmp_path / "jobs"
+    results = tmp_path / "results"
+    jobs.mkdir()
+    results.mkdir()
+    job = _job(5)
+    job["outputs"][0].update({
+        "llm_decision": "abstain",
+        "llm_raw_probs_1x2": [60, 25, 15],
+        "llm_probs_1x2": None,
+    })
+    (jobs / "sporttery-5.json").write_text(json.dumps(job), encoding="utf-8")
+    (results / "5.json").write_text(json.dumps({
+        "match_id": "5", "status": "finished", "score_90": {"home": 1, "away": 0}
+    }), encoding="utf-8")
+
+    report = build_sample(jobs, results)
+
+    assert report["metrics"]["probability_n"] == 1
+    assert report["rows"][0]["llm_probs_1x2"] is None
+    assert report["rows"][0]["llm_raw_probs_1x2"] == [60, 25, 15]

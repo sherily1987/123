@@ -480,6 +480,13 @@ def parse_llm_log(text: str) -> dict:
             ):
                 audit = candidate
                 break
+        individual = (audit or {}).get("individual") if isinstance(audit, dict) else None
+        raw_audit = {}
+        if isinstance(individual, dict):
+            for item in individual.values():
+                if isinstance(item, dict) and item.get("raw_llm_probs_1x2"):
+                    raw_audit = item
+                    break
         scores = []
         if sm:
             for part in re.split(r"[,，/]", sm.group(1)):
@@ -502,11 +509,15 @@ def parse_llm_log(text: str) -> dict:
             "model_id": K3_MODEL_ID,
             "prediction_as_of": (audit or {}).get("prediction_as_of"),
             "probs_1x2": (audit or {}).get("probs_1x2"),
+            "raw_llm_probs_1x2": (audit or {}).get("raw_llm_probs_1x2") or raw_audit.get("raw_llm_probs_1x2"),
             "confidence": (audit or {}).get("confidence"),
             "decision": (audit or {}).get("decision"),
             "top_scores": (audit or {}).get("top_scores") or scores[:3],
             "ou25": (audit or {}).get("top_ou25") or (audit or {}).get("ou25"),
             "hafu": (audit or {}).get("top_hafu") or (audit or {}).get("hafu"),
+            "raw_llm_top_scores": raw_audit.get("raw_llm_top_scores"),
+            "raw_llm_ou25": raw_audit.get("raw_llm_ou25"),
+            "raw_llm_hafu": raw_audit.get("raw_llm_hafu"),
         })
     skipped = len(re.findall(
         r'"status":\s*"(evidence_insufficient|evidence_audit_failed)"', text or ""

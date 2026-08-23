@@ -426,6 +426,17 @@ def llm_from_parsed(row: dict) -> dict:
                 llm_probs[2] = round(100.0 - llm_probs[0] - llm_probs[1], 1)
         except (TypeError, ValueError):
             llm_probs = None
+    raw_llm_probs_input = row.get("raw_llm_probs_1x2")
+    llm_raw_probs = None
+    if isinstance(raw_llm_probs_input, (list, tuple)) and len(raw_llm_probs_input) == 3:
+        try:
+            values = [float(value) for value in raw_llm_probs_input]
+            total = sum(values)
+            if total > 0 and all(value >= 0 for value in values):
+                llm_raw_probs = [round(value / total * 100.0, 1) for value in values]
+                llm_raw_probs[2] = round(100.0 - llm_raw_probs[0] - llm_raw_probs[1], 1)
+        except (TypeError, ValueError):
+            llm_raw_probs = None
     return {
         "track": "llm",
         "model_id": row.get("model_id") or row.get("model"),
@@ -438,6 +449,12 @@ def llm_from_parsed(row: dict) -> dict:
         "llm_top_scores": row.get("top_scores") or row.get("score_picks") or [],
         "llm_ou25": row.get("ou25"),
         "llm_hafu": row.get("hafu"),
+        # Raw model self-report retained for research calibration only. It is
+        # intentionally separate from llm_probs_1x2 and never gates betting.
+        "llm_raw_probs_1x2": llm_raw_probs,
+        "llm_raw_top_scores": row.get("raw_llm_top_scores") or [],
+        "llm_raw_ou25": row.get("raw_llm_ou25"),
+        "llm_raw_hafu": row.get("raw_llm_hafu"),
         "direction": direction,
         "alt_direction": alt,
         "strength": packed,

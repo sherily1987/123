@@ -69,7 +69,10 @@ def _metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     direction_rows = [row for row in rows if row.get("direction") in {"H", "D", "A"}]
     probability_rows = []
     for row in rows:
-        values = row.get("llm_probs_1x2")
+        # A rejected/abstained prediction may still contain a normalized raw
+        # self-report.  It is research-only and must never be promoted to the
+        # production ``llm_probs_1x2`` field.
+        values = row.get("llm_probs_1x2") or row.get("llm_raw_probs_1x2")
         if not isinstance(values, list) or len(values) != 3:
             continue
         try:
@@ -167,11 +170,15 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
             "alt_direction": output.get("alt_direction"),
             "vote_share": (output.get("strength") or {}).get("value"),
             "llm_probs_1x2": output.get("llm_probs_1x2"),
+            "llm_raw_probs_1x2": output.get("llm_raw_probs_1x2"),
             "llm_confidence": output.get("llm_confidence"),
             "llm_decision": output.get("llm_decision"),
             "llm_top_scores": output.get("llm_top_scores") or [],
             "llm_ou25": output.get("llm_ou25"),
             "llm_hafu": output.get("llm_hafu"),
+            "llm_raw_top_scores": output.get("llm_raw_top_scores") or [],
+            "llm_raw_ou25": output.get("llm_raw_ou25"),
+            "llm_raw_hafu": output.get("llm_raw_hafu"),
             "score_prediction": output.get("score"),
             "ou25_prediction": output.get("ou25"),
             "hafu_prediction": output.get("hafu"),

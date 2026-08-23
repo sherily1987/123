@@ -64,6 +64,19 @@ def test_llm_parsed_preserves_model_id_for_calibration_provenance():
     assert row["llm_top_scores"] == ["1-0", "2-0", "1-1"]
 
 
+def test_llm_parsed_keeps_raw_abstained_markets_in_research_namespace():
+    row = jt.llm_from_parsed({
+        "model_id": "moonshot/kimi-k3", "decision": "abstain",
+        "raw_llm_probs_1x2": [55, 25, 20],
+        "raw_llm_top_scores": ["1-0", "2-0", "1-1"],
+        "raw_llm_ou25": "小2.5", "raw_llm_hafu": "胜胜",
+    })
+    assert row["llm_raw_probs_1x2"] == [55.0, 25.0, 20.0]
+    assert row["llm_raw_top_scores"] == ["1-0", "2-0", "1-1"]
+    assert row["llm_raw_ou25"] == "小2.5"
+    assert row["llm_raw_hafu"] == "胜胜"
+
+
 def test_normalize_match_id_accepts_int_str_and_prefixed():
     assert jt.normalize_match_id(2040898) == "sporttery-2040898"
     assert jt.normalize_match_id("2040898") == "sporttery-2040898"

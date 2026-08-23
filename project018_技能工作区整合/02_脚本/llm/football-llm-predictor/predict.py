@@ -458,6 +458,13 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     reasoning = str(data.get("summary") or data.get("reasoning") or "").strip()[:220]
     ou25 = lpr.normalize_ou25(data.get("ou25"))
     hafu = lpr.normalize_hafu(data.get("hafu"))
+    # Preserve the model's normalized self-report for research auditing even
+    # when evidence gates later force the decision to abstain.  These fields
+    # are deliberately prefixed raw_llm_ and never feed production gates.
+    raw_llm_probs = list(probs) if probs else None
+    raw_llm_top_scores = list(top_scores) if top_scores else None
+    raw_llm_ou25 = ou25
+    raw_llm_hafu = hafu
     egap = bool(data.get("evidence_gap", False))
     evidence_ids = [str(value).strip() for value in (data.get("evidence_ids") or []) if str(value).strip()]
     reason_codes = [str(value).strip() for value in (data.get("reason_codes") or []) if str(value).strip()]
@@ -493,6 +500,10 @@ def parse_evidence_prediction(content, evidence_catalog=None):
         "probs_1x2": probs,
         "ou25": ou25,
         "hafu": hafu,
+        "raw_llm_probs_1x2": raw_llm_probs,
+        "raw_llm_top_scores": raw_llm_top_scores,
+        "raw_llm_ou25": raw_llm_ou25,
+        "raw_llm_hafu": raw_llm_hafu,
         "evidence_gap": egap,
         "evidence_ids": evidence_ids,
         "invalid_evidence_ids": invalid_ids,

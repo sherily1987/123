@@ -347,6 +347,27 @@ def test_parser_downgrades_opinion_with_unknown_or_unusable_evidence_ids(evidenc
     assert out["evidence_gap"] is True
 
 
+def test_parser_preserves_raw_markets_when_evidence_forces_abstain():
+    payload = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": "平局",
+        "probs_1x2": [55, 25, 20], "top_scores": ["1-0", "2-0", "1-1"],
+        "ou25": "小", "hafu": "胜胜", "evidence_gap": False,
+        "evidence_ids": ["E404"], "unsupported_assumptions": [],
+        "reason_codes": [], "summary": "模型给出研究判断",
+    }
+    out = predict.parse_evidence_prediction(
+        __import__("json").dumps(payload, ensure_ascii=False),
+        [{"id": "E1", "status": "UNAVAILABLE"}],
+    )
+    assert out["decision"] == "abstain"
+    assert out["direction"] is None
+    assert out["probs_1x2"] is None
+    assert out["raw_llm_probs_1x2"] == [55, 25, 20]
+    assert out["raw_llm_top_scores"] == ["1-0", "2-0", "1-1"]
+    assert out["raw_llm_ou25"] == "小2.5"
+    assert out["raw_llm_hafu"] == "胜胜"
+
+
 def test_abstentions_do_not_vote_but_remain_auditable():
     abstain = {
         "decision": "abstain", "direction": None, "alt_direction": None,
