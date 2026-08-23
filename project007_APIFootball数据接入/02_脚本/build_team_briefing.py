@@ -59,6 +59,23 @@ def recent_fixtures(team_id: int, league_id: int, season: int, n: int = 5) -> li
     return out
 
 
+def recent_form_with_fallback(team_id: int, league_id: int, season: int, n: int = 5) -> tuple[list[dict], int, str]:
+    """Return recent form with an explicit prior-season fallback label.
+
+    Season openers legitimately have fewer than five current-season matches.
+    A same-league prior-season sample can be useful context, but it is older
+    and must never be silently presented as current form.
+    """
+    current = recent_fixtures(team_id, league_id, season, n=n)
+    if len(current) >= n:
+        return current, season, "VALID"
+    if season > 0:
+        previous = recent_fixtures(team_id, league_id, season - 1, n=n)
+        if len(previous) >= n:
+            return previous, season - 1, "AGING"
+    return current, season, "PARTIAL"
+
+
 def standings_row(league_id: int, season: int, team_id: int) -> dict | None:
     data = adapter.get("/standings", {"league": league_id, "season": season})
     for grp in data.get("response", []):
@@ -109,6 +126,27 @@ def h2h(home_id: int, away_id: int, n: int = 5) -> list[dict]:
     return out
 
 
+def safe_recent_form(team_id: int, league_id: int, season: int, n: int = 5) -> tuple[list[dict], int, str]:
+    try:
+        return recent_form_with_fallback(team_id, league_id, season, n=n)
+    except Exception:
+        return [], season, "UNAVAILABLE"
+
+
+def safe_standing(league_id: int, season: int, team_id: int) -> dict | None:
+    try:
+        return standings_row(league_id, season, team_id)
+    except Exception:
+        return None
+
+
+def safe_h2h(home_id: int, away_id: int) -> list[dict]:
+    try:
+        return h2h(home_id, away_id)
+    except Exception:
+        return []
+
+
 def _bullet(fact: str, note: str, ts: str) -> str:
     return f"- {fact} | source({SRC}) | collected_at({ts})"
 
@@ -140,7 +178,9 @@ def render_section_motive(label: str, row: dict | None, ts: str) -> list[str]:
 
 def build_markdown(home: str, away: str, match_num: str, kickoff: str,
                     home_form, away_form, home_absence, away_absence,
-                    home_standing, away_standing, h2h_rows, ts: str) -> str:
+                    home_standing, away_standing, h2h_rows, ts: str,
+                    home_form_season: int | None = None, away_form_season: int | None = None,
+                    home_form_status: str = "PARTIAL", away_form_status: str = "PARTIAL") -> str:
     lines = [f"# {match_num} {home} vs {away}｜赛前证据（api-sports.io）", "",
               f"> 数据源：api-sports.io，非网页检索证据；仅覆盖该源实际提供的字段，"
               f"缺口如实标注不编造。开球时间 {kickoff}。", ""]
@@ -149,7 +189,10 @@ def build_markdown(home: str, away: str, match_num: str, kickoff: str,
     lines += ["## 2. 战意/动机（积分榜位置推断，非战意本身的直接证据）"] \
               + render_section_motive(f"{home}(主)", home_standing, ts) \
               + render_section_motive(f"{away}(客)", away_standing, ts) + [""]
-    lines += ["## 3. 近况/状态"] + render_section_form(f"{home}(主)", home_form, ts) \
+    lines += ["## 3. 近况/状态",
+              _bullet(f"{home}(主) form_status={home_form_status}, season={home_form_season}", "form_age", ts)] \
+              + render_section_form(f"{home}(主)", home_form, ts) \
+              + [_bullet(f"{away}(客) form_status={away_form_status}, season={away_form_season}", "form_age", ts)] \
               + render_section_form(f"{away}(客)", away_form, ts) + [""]
     lines += ["## 4. 主客/旅行/天气",
               _bullet("证据缺口：api-sports.io 不提供天气/差旅数据，本节留空，不得由 LLM 臆测填补", "unavailable", ts), ""]
@@ -178,23 +221,29 @@ def main() -> None:
     a = ap.parse_args()
 
     ts = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
-    home_form = recent_fixtures(a.home_id, a.league_id, a.season)
-    away_form = recent_fixtures(a.away_id, a.league_id, a.season)
-    home_standing = standings_row(a.league_id, a.season, a.home_id)
-    away_standing = standings_row(a.league_id, a.season, a.away_id)
+    home_form, home_form_season, home_form_status = safe_recent_form(a.home_id, a.league_id, a.season)
+    away_form, away_form_season, away_form_status = safe_recent_form(a.away_id, a.league_id, a.season)
+    home_standing = safe_standing(a.league_id, a.season, a.home_id)
+    away_standing = safe_standing(a.league_id, a.season, a.away_id)
     home_absence = injuries_for_team(a.league_id, a.season, a.home_id)
     away_absence = injuries_for_team(a.league_id, a.season, a.away_id)
-    h2h_rows = h2h(a.home_id, a.away_id)
+    h2h_rows = safe_h2h(a.home_id, a.away_id)
 
     md = build_markdown(a.home_name, a.away_name, a.match_num, a.kickoff,
                          home_form, away_form, home_absence, away_absence,
-                         home_standing, away_standing, h2h_rows, ts)
+                         home_standing, away_standing, h2h_rows, ts,
+                         home_form_season, away_form_season,
+                         home_form_status, away_form_status)
 
     briefing = {
         "match_num": a.match_num, "home": a.home_name, "away": a.away_name, "kickoff": a.kickoff,
         "source": SRC, "collected_at": ts, "home_id": a.home_id, "away_id": a.away_id,
         "league_id": a.league_id, "season": a.season,
         "home_recent_form": home_form, "away_recent_form": away_form,
+        "home_recent_form_season": home_form_season,
+        "away_recent_form_season": away_form_season,
+        "home_recent_form_status": home_form_status,
+        "away_recent_form_status": away_form_status,
         "home_standing": home_standing, "away_standing": away_standing,
         "home_injuries": home_absence, "away_injuries": away_absence, "h2h": h2h_rows,
         # 明确不生成的字段，留给专门的校准工作，防止被误以为"已经算好了"
