@@ -12,6 +12,22 @@ assert SPEC and SPEC.loader
 SPEC.loader.exec_module(pipeline)
 
 
+def test_needs_browser_evidence_only_triggers_on_missing_critical_fields():
+    assert pipeline.needs_browser_evidence([{
+        "evidence_chain": {
+            "starting_xi": {"status": "PREDICTED"},
+            "injury": {"status": "VALID"},
+        }
+    }]) is False
+    assert pipeline.needs_browser_evidence([{
+        "evidence_chain": {
+            "starting_xi": {"status": "PENDING_REFRESH"},
+        }
+    }]) is True
+    assert pipeline.needs_browser_evidence([{}]) is True
+    assert pipeline.needs_browser_evidence([]) is False
+
+
 def test_hybrid_shadow_uses_the_exact_collected_batch_and_sales_day(monkeypatch, tmp_path):
     """保护：双轨必须共享同一次采集市场快照，不能用隔日输入补跑。"""
     batch = tmp_path / "inputs_T-7h.json"

@@ -110,6 +110,10 @@ API/结构化端点失败或关键字段缺失后，采集器按映射顺序调�
 启用 `daily-pipeline --bb-browser-discover` 时，发现到的官方候选优先、已知第三方候选其次，
 会自动进入 Scrapling 有序尝试；只有页面解析出带时间戳的字段事实才写入快照，失败仍保留
 `browser_tasks.json` 待人工复核。这样 API 不可用时会实际执行回退，而不是只记录搜索链接。
+日常流水线默认还会在 API 证据出现 `UNAVAILABLE`、`PARTIAL`、`PENDING_REFRESH` 或
+`EMPTY_UNCONFIRMED` 时自动开启同一发现→Scrapling路径；完整证据批次不会重复搜索。
+如需严格离线运行，可传 `--no-bb-browser-auto`，但这会把缺口留给 `browser_tasks.json`，
+不得把它当作已采集事实。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
 仅剩体彩赔率时 DeepSeek V4 Flash 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
 禁止 EV/Kelly/下注推荐。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。

@@ -82,6 +82,27 @@ def run(cmd, retries=0):
     return r
 
 
+def needs_browser_evidence(matches: list[dict]) -> bool:
+    """Return whether the current batch has an auditable evidence gap.
+
+    Automatic discovery is limited to missing/partial critical fields.  A
+    complete API snapshot therefore avoids an unnecessary browser search,
+    while an API failure or missing lineup/injury data triggers the generic
+    Scrapling route.  No field values are inferred here.
+    """
+    gap_statuses = {"UNAVAILABLE", "PARTIAL", "PENDING_REFRESH", "EMPTY_UNCONFIRMED"}
+    for match in matches or []:
+        if not isinstance(match, dict):
+            continue
+        chain = match.get("evidence_chain") or {}
+        if not chain:
+            return True
+        if any(isinstance(entry, dict) and str(entry.get("status", "")).upper() in gap_statuses
+               for entry in chain.values()):
+            return True
+    return False
+
+
 def run_hybrid_shadow(batch: Path, sales_day: str, day_dir: Path, snapshot: str) -> dict:
     """Run research-only hybrid from the exact market batch just collected.
 
@@ -230,6 +251,8 @@ def main():
                     help='可选：BB-browser/FotMob URL映射JSON；仅追加research-only证据')
     ap.add_argument('--bb-browser-discover', action='store_true',
                     help='可选：按比赛身份发现来源，并按官方→第三方顺序尝试Scrapling；失败写browser_tasks.json')
+    ap.add_argument('--bb-browser-auto', action=argparse.BooleanOptionalAction, default=True,
+                    help='证据存在缺口时自动发现来源并尝试Scrapling（默认开启；可用--no-bb-browser-auto关闭）')
     ap.add_argument('--apifootball-fallback', action='store_true',
                     help='体彩官方赛果缺失时显式启用 APIFootball 欧冠补全')
     a = ap.parse_args()
@@ -345,13 +368,14 @@ def main():
         or mm.get('fotmob_match_id')
         for mm in matches if isinstance(mm, dict)
     )
-    if a.bb_browser_url_map or a.bb_browser_discover or embedded_browser_sources:
+    auto_browser_discover = bool(a.bb_browser_auto and needs_browser_evidence(matches))
+    if a.bb_browser_url_map or a.bb_browser_discover or auto_browser_discover or embedded_browser_sources:
         browser_dir = evidence_dir / 'bb-browser'
         browser_args = [HERE / 'bb_browser_evidence_collect.py', '--input', batch,
                          '--output-dir', browser_dir]
         if a.bb_browser_url_map:
             browser_args += ['--url-map', a.bb_browser_url_map]
-        if a.bb_browser_discover:
+        if a.bb_browser_discover or auto_browser_discover:
             browser_args += ['--discover', '--scrape-discovered']
         br = run(browser_args)
         try:
