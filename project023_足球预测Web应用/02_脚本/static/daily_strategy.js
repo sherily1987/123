@@ -43,6 +43,19 @@
     </article>`;
   }
 
+  function backtestBlock(report) {
+    if (!report) return "";
+    const s = report.summary || {};
+    if (!report.snapshot_count) {
+      return `<div class="strategy-backtest"><strong>长期策略收益回测</strong><span>暂无已持久化的每日策略快照，后续每日打开工作台后开始累计。</span></div>`;
+    }
+    const profit = Number(s.profit || 0);
+    const color = profit > 0 ? "profit" : profit < 0 ? "loss" : "flat";
+    const rows = (report.daily || []).flatMap(day => (day.records || []).map(row => ({...row, selected_day: day.selected_day}))).slice(-30).reverse();
+    const detail = rows.map(row => `<div class="strategy-backtest-row"><span>${esc(row.selected_day || "")} ${esc(row.market || "")}</span><span>${esc(row.selection || row.combo_id || "-")}</span><b class="${row.status === "won" ? "profit" : row.status === "lost" ? "loss" : "flat"}">${row.status === "won" ? "中了" : row.status === "lost" ? "没中" : "待结算"} ${row.profit == null ? "" : esc(amount(row.profit)) + "元"}</b></div>`).join("");
+    return `<div class="strategy-backtest"><div><strong>长期策略收益回测</strong><span>${esc(report.snapshot_count)} 个策略日</span></div><div class="strategy-backtest-metrics"><span>已结算 ${esc(s.settled_count || 0)} 注</span><span>中 ${esc(s.won_count || 0)} / 未中 ${esc(s.lost_count || 0)}</span><span>待结算 ${esc(s.pending_count || 0)}</span><b class="${color}">${amount(profit)}元 · ROI ${s.roi_pct == null ? "-" : esc(s.roi_pct) + "%"}</b></div>${detail ? `<div class="strategy-backtest-details">${detail}</div>` : ""}<small>仅按体彩官方赛果结算；历史策略回测，不代表未来收益。</small></div>`;
+  }
+
   function formatDailyStrategyHtml(plan) {
     const display = plan.display || {};
     const budget = plan.budget || {};
@@ -71,7 +84,7 @@
     return `<section class="daily-strategy-card">
       <div class="strategy-head">
         <div>
-          <h2>今日100元购买策略</h2>
+          <h2>今日100元娱乐策略</h2>
           <p>${esc(plan.selected_day || "")} · 决策时间 ${esc(display.decision_time || plan.generated_at || "-")}</p>
         </div>
         <div class="strategy-badges"><span>${esc(display.strategy_type || "固定娱乐预算")}</span><span class="risk">${esc(display.edge_label || "未验证正EV")}</span></div>
@@ -84,6 +97,7 @@
       </div>
       ${evidenceBlock}
       ${body}
+      ${backtestBlock(plan.backtest)}
       <p class="strategy-evidence-warning">${esc(display.evidence_warning || "")}</p>
       <p class="strategy-warning">${esc(display.warning || "固定预算策略不代表统计优势，请勿追损。")}</p>
     </section>`;

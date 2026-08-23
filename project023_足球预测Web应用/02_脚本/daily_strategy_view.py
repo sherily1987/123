@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -38,17 +39,43 @@ def _load_jobs(folder: Path) -> list[dict]:
     ]
 
 
+def _attach_evidence_sidecars(jobs: list[dict], store: Path, day: str) -> list[dict]:
+    """Attach the latest audited sidecar without rewriting prediction tickets."""
+    evidence_root = store / "research" / "evidence" / day
+    sidecars = {}
+    for path in sorted(evidence_root.rglob("sporttery-*.json")) if evidence_root.is_dir() else []:
+        try:
+            blob = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        sidecars[str(blob.get("match_id") or path.stem)] = blob
+    enriched = []
+    for job in jobs:
+        mid = str(job.get("match_id") or (job.get("identity") or {}).get("match_id") or "")
+        blob = sidecars.get(mid) or sidecars.get(f"sporttery-{mid}")
+        if not blob:
+            enriched.append(job)
+            continue
+        audit = blob.get("evidence_audit") or {}
+        item = dict(job)
+        item["evidence_audit"] = audit
+        item["evidence_snapshot_ref"] = str(next((p for p in evidence_root.rglob(f"{mid}.json")), ""))
+        enriched.append(item)
+    return enriched
+
+
 def daily_strategy(
     day: str | None = None,
     *,
     root: Path | None = None,
     now: datetime | None = None,
+    persist: bool = False,
 ) -> dict:
-    """Return a fresh, non-persisted strategy projection for one sales day."""
+    """Return the fixed-budget plan; optionally persist one immutable daily snapshot."""
     current = now or datetime.now(CST)
     selected_day = _validated_day(day, current)
     store = root or sv.store_root()
-    jobs = _load_jobs(store / "jobs" / selected_day)
+    jobs = _attach_evidence_sidecars(_load_jobs(store / "jobs" / selected_day), store, selected_day)
     plan = build_daily_strategy(
         jobs,
         load_policy(),
@@ -56,18 +83,36 @@ def daily_strategy(
         execution_mode="budgeted_action",
         as_of=current,
     )
-    return {
+    output = {
         **plan,
         "selected_day": selected_day,
         "source_job_count": len(jobs),
         "display": {
-            "strategy_type": "固定娱乐预算",
+            "strategy_type": "固定娱乐预算（放宽门禁）",
             "edge_label": "未验证正EV",
             "decision_time": current.astimezone(CST).isoformat(),
-            "warning": "这是用户授权的每日固定预算清单，不是已通过样本外验证的生产胆项或凯利仓位。",
+            "warning": "这是与生产购买门禁分离的固定娱乐预算清单，不代表正EV、凯利仓位或生产推荐；单日最大损失不超过预算。",
             "evidence_warning": (
                 f"{plan.get('evidence_gap_summary', {}).get('evidence_gap_market_rows', 0)} 个市场行存在证据缺口；"
-                "缺口场次不会进入购买候选。"
+                "仅允许低风险市场在规定证据状态下放宽，HAFU/CRS等衍生市场仍会因缺口排除。"
             ),
         },
     }
+    if persist:
+        snapshot_dir = store / "daily_strategy_plans"
+        snapshot_dir.mkdir(parents=True, exist_ok=True)
+        snapshot_path = snapshot_dir / f"{selected_day}.json"
+        if snapshot_path.exists():
+            try:
+                existing = json.loads(snapshot_path.read_text(encoding="utf-8-sig"))
+                output["snapshot_id"] = existing.get("snapshot_id")
+                output["snapshot_path"] = str(snapshot_path)
+                return output
+            except (OSError, json.JSONDecodeError):
+                pass
+        core = json.dumps(output, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        output["snapshot_schema"] = "daily_strategy_plan.v1"
+        output["snapshot_id"] = hashlib.sha256(core.encode("utf-8")).hexdigest()[:16]
+        snapshot_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        output["snapshot_path"] = str(snapshot_path)
+    return output

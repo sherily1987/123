@@ -236,3 +236,27 @@ def test_budgeted_action_mode_never_selects_started_matches():
         for leg in combo["legs"]
     }
     assert "sporttery-started" not in selected_ids
+
+
+def test_recreational_gate_allows_low_risk_markets_with_lineup_pending(monkeypatch):
+    job = _job("sporttery-recreational")
+    job["outputs"][0]["evidence_audit"] = {
+        "evidence_gap": True,
+        "evidence_status": "GAP",
+        "evidence_gap_reasons": ["STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"],
+        "entries": {
+            "team_stats": {"status": "VALID"},
+            "recent_form": {"status": "PARTIAL"},
+            "injury": {"status": "VALID"},
+            "suspensions": {"status": "UNAVAILABLE"},
+            "starting_xi": {"status": "PENDING_REFRESH"},
+        },
+    }
+    policy = {**_disabled_policy(), "recreational_strategy_enabled": True}
+    plan = dsp.build_daily_strategy(
+        [job], policy, bankroll=100, execution_mode="budgeted_action",
+        as_of=datetime.fromisoformat("2026-08-23T08:00:00+08:00"),
+    )
+    assert {row["market"] for row in plan["single_purchase_recommendations"]} <= {"HAD", "TTG"}
+    assert plan["budget"]["allocated_amount"] > 0
+    assert all(row["edge_claim"] is False for row in plan["single_purchase_recommendations"])

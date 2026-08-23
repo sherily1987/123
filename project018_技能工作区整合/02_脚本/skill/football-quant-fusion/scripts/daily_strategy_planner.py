@@ -210,6 +210,7 @@ def _market_rows(
             "evidence_gap": evidence_gap,
             "evidence_status": evidence.get("evidence_status"),
             "evidence_gap_reasons": evidence_reasons,
+            "evidence_entries": evidence.get("entries") or {},
             "risk_tags": ["EVIDENCE_GAP"] if evidence_gap else [],
             "note": "对应市场官方赔率仅作为市场基线；没有获批的独立校准概率时不得转成购买建议。",
         })
@@ -250,8 +251,15 @@ def _aware_time(value: Any) -> datetime | None:
 
 
 def _recreational_candidates(
-    market_audit: list[dict[str, Any]], *, as_of: datetime
+    market_audit: list[dict[str, Any]], *, as_of: datetime, policy: dict[str, Any]
 ) -> list[dict[str, Any]]:
+    # Backward-compatible default: callers with the legacy production-only
+    # policy still get the explicitly separate entertainment budget planner.
+    if policy.get("recreational_strategy_enabled", True) is not True:
+        return []
+    allowed_pending = set(policy.get("recreational_allowed_markets_with_pending_lineup") or {"HAD", "TTG"})
+    required = policy.get("recreational_required_evidence_statuses") or {}
+    blocked = set(policy.get("recreational_block_reasons") or {"POST_KICKOFF_NOT_USABLE", "EVIDENCE_AUDIT_MISSING"})
     candidates = []
     for row in market_audit:
         market = str(row.get("market") or "")
@@ -259,8 +267,26 @@ def _recreational_candidates(
         kickoff = _aware_time(row.get("kickoff"))
         if limits is None or kickoff is None or kickoff <= as_of:
             continue
+        gate_reasons = []
         if row.get("evidence_gap") is True:
-            continue
+            # A pending official lineup is expected before kickoff.  Keep only
+            # low-risk markets with verified team context and recent form;
+            # HAFU/CRS remain closed until the evidence gap is resolved.
+            if market not in allowed_pending:
+                continue
+            gap_reasons = set(row.get("evidence_gap_reasons") or [])
+            if gap_reasons & blocked:
+                continue
+            entries = row.get("evidence_entries") or {}
+            for field, allowed_statuses in required.items():
+                status = str((entries.get(field) or {}).get("status") or "").upper()
+                if status not in {str(item).upper() for item in allowed_statuses}:
+                    break
+            else:
+                gate_reasons.append("EVIDENCE_GAP_RELAXED_FOR_ENTERTAINMENT")
+                gate_reasons.extend(sorted(gap_reasons))
+            if not gate_reasons:
+                continue
         probability = row.get("market_top_probability_pct")
         odds = row.get("market_top_odds")
         overround = row.get("market_overround_pct")
@@ -295,6 +321,9 @@ def _recreational_candidates(
             "edge_claim": False,
             "expected_value_status": "NOT_VALIDATED",
             "purchase_basis": "market_consensus_plus_model_agreement_recreational_budget",
+            "recreational_gate": "OPEN_RELAXED",
+            "recreational_gate_reasons": gate_reasons or ["EVIDENCE_COMPLETE"],
+            "production_authorized": False,
         })
     return sorted(
         candidates,
@@ -303,11 +332,12 @@ def _recreational_candidates(
 
 
 def build_budgeted_action_plan(
-    market_audit: list[dict[str, Any]], *, bankroll: float, as_of: datetime
+    market_audit: list[dict[str, Any]], *, bankroll: float, as_of: datetime,
+    policy: dict[str, Any]
 ) -> dict[str, Any]:
     if as_of.tzinfo is None:
         raise ValueError("as_of must be timezone-aware")
-    candidates = _recreational_candidates(market_audit, as_of=as_of)
+    candidates = _recreational_candidates(market_audit, as_of=as_of, policy=policy)
     singles = []
     used_matches: set[str] = set()
     for market, quota in RECREATIONAL_QUOTAS.items():
@@ -445,6 +475,7 @@ def build_daily_strategy(
             market_audit,
             bankroll=float(bankroll),
             as_of=as_of or datetime.now().astimezone(),
+            policy=policy,
         )
         allocated = action["allocated"]
         preserved = round(float(bankroll) - allocated, 2)
@@ -457,7 +488,7 @@ def build_daily_strategy(
             "action_authorized_by_user_budget_mode": True,
             "decision": {
                 "action": "purchase_recreational_budget" if allocated > 0 else "preserve_bankroll",
-                "reason": "用户要求固定预算购买；本层按市场共识与模型同向度控制风险，不声明统计优势。"
+                "reason": "用户要求固定娱乐预算；本层按市场共识与模型同向度控制风险，不声明统计优势。"
                 if allocated > 0 else "没有足够的未开赛低风险候选",
                 "full_budget_allocated": complete_budget,
             },
@@ -479,6 +510,8 @@ def build_daily_strategy(
             "combo_purchase_recommendations": action["combos"],
             "release_gates": {
                 "statistical_edge": "CLOSED",
+                "production_recommendation": "CLOSED",
+                "recreational_gate": "OPEN_RELAXED",
                 "recreational_directional_recommendation": "OPEN",
                 "fixed_budget_stake_sizing": "OPEN",
                 "two_leg_combo": "OPEN" if any(row["legs_count"] == 2 for row in action["combos"]) else "CLOSED",

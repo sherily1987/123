@@ -68,7 +68,7 @@ def test_daily_strategy_view_builds_user_authorized_100_yuan_plan(tmp_path: Path
     assert len(got["single_purchase_recommendations"]) == 7
     assert {row["legs_count"] for row in got["combo_purchase_recommendations"]} == {2, 3}
     assert got["risk_disclosure"]["edge_verified"] is False
-    assert got["display"]["strategy_type"] == "固定娱乐预算"
+    assert got["display"]["strategy_type"] == "固定娱乐预算（放宽门禁）"
     assert got["display"]["edge_label"] == "未验证正EV"
 
 
@@ -146,7 +146,7 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
     run = subprocess.run(["node", "-e", script], capture_output=True, text=True, encoding="utf-8")
 
     assert run.returncode == 0, run.stderr
-    assert "今日100元购买策略" in run.stdout
+    assert "今日100元娱乐策略" in run.stdout
     assert "固定娱乐预算" in run.stdout
     assert "未验证正EV" in run.stdout
     assert "进球数" in run.stdout

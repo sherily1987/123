@@ -2,6 +2,13 @@
  "calibration_status": "LEGACY_RESEARCH_ONLY",
  "production_recommendations_enabled": false,
  "production_recommendations_disabled_reason": "当前版本及各独立市场尚未分别满足样本量、样本外校准、收益稳定性与发布门禁",
+ "recreational_strategy_enabled": true,
+ "recreational_allowed_markets_with_pending_lineup": ["HAD", "TTG"],
+ "recreational_required_evidence_statuses": {
+  "team_stats": ["VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"],
+  "recent_form": ["VALID", "PARTIAL", "OK", "AVAILABLE", "FRESH", "AGING"]
+ },
+ "recreational_block_reasons": ["POST_KICKOFF_NOT_USABLE", "EVIDENCE_AUDIT_MISSING"],
  "max_market_dependency_pct": 80.0,
  "hhad_calibration_status": "UNFITTED",
  "min_samples_for_recalibration": 100,
