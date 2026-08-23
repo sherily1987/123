@@ -152,3 +152,21 @@ def test_snapshot_keeps_missing_stats_and_suspensions_as_gaps():
     )
     assert row["evidence_audit"]["entries"]["team_stats"]["status"] == "UNAVAILABLE"
     assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "EMPTY_UNCONFIRMED"
+
+
+def test_discover_sources_accepts_match_specific_official_domains(monkeypatch):
+    def fake_run(args):
+        if args[0] == "open":
+            return "tab: discover2\n"
+        if args[0] == "eval":
+            return json.dumps(["https://www.example-league.org/matches/a-vs-b",
+                               "https://www.fotmob.com/matches/a-vs-b/x"])
+        return "closed\n"
+
+    monkeypatch.setattr(bec, "_run_browser", fake_run)
+    row = bec.discover_sources({
+        "competition": "Example League", "home": "A", "away": "B",
+        "kickoff": "2026-08-26T03:00:00+08:00",
+        "official_domains": ["example-league.org"],
+    })
+    assert row["official_candidates"] == ["https://www.example-league.org/matches/a-vs-b"]

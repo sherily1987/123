@@ -24,6 +24,15 @@ from typing import Any
 
 UTC = timezone.utc
 
+# Defaults are only hints for candidate classification.  A league-specific
+# input may add its own official domains; no URL is promoted to production by
+# this list.
+DEFAULT_OFFICIAL_DOMAINS = (
+    "uefa.com/", "premierleague.com/", "laliga.com/", "bundesliga.com/",
+    "ligue1.com/", "seriea.com/", "eredivisie.eu/", "ligaportugal.pt/",
+    "jleague.jp/", "mlssoccer.com/", "fifa.com/",
+)
+
 
 def _parse(value: Any) -> datetime | None:
     try:
@@ -168,8 +177,11 @@ def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
         if isinstance(links, str):
             links = json.loads(links)
         links = list(dict.fromkeys(str(link) for link in (links or []) if str(link).startswith("http")))
-        official = [link for link in links if any(domain in link for domain in
-                    ("uefa.com/", "premierleague.com/", "laliga.com/", "bundesliga.com/", "ligue1.com/"))]
+        custom_domains = tuple(str(domain).lower().strip().rstrip("/") + "/"
+                              for domain in (match.get("official_domains") or [])
+                              if str(domain).strip())
+        official_domains = DEFAULT_OFFICIAL_DOMAINS + custom_domains
+        official = [link for link in links if any(domain in link.lower() for domain in official_domains)]
         third_party = [link for link in links if link not in official and any(domain in link for domain in
                       ("fotmob.com/", "sofascore.com/"))]
         unclassified = [link for link in links if link not in official and link not in third_party]
