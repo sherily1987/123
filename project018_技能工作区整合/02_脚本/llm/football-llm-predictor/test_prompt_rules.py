@@ -127,6 +127,19 @@ def test_parse_four_market_anti_collapse():
     assert weak["confidence"] <= 0.45 and weak["reasoning_ok"] is False
 
 
+def test_parse_does_not_derive_independent_markets_from_score_or_half_result():
+    parsed = fp.parse_prediction(
+        '{"home_score":2,"away_score":0,"result":"主胜","total_goals":"2",'
+        '"half_result":"主胜","confidence":0.7,"reasoning":"【近况:主队较佳】"}'
+    )
+    assert parsed["ou25"] is None
+    assert parsed["hafu"] is None
+    assert set(parsed["market_gap_codes"]) == {
+        "OU25_UNAVAILABLE_OR_INVALID", "HAFU_UNAVAILABLE_OR_INVALID"
+    }
+    assert parsed["evidence_gap"] is True
+
+
 def test_aggregate_dual_and_ou():
     preds = {
         "a": fp.parse_prediction(

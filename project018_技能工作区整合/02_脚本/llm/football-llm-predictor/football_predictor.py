@@ -313,21 +313,22 @@ def parse_prediction(text: str):
     else:
         rq = {"ok": "【" in reasoning, "invalid_reason": None}
 
-    # 若未给 hafu 但有 half_result，可推导（降级）
-    if not hafu and hr:
-        hafu = hafu_result(hr, result)
-
-    # 若未给 ou25，不从比分强制大球——仅作弱默认且标记
+    # 衍生市场必须独立。过去这里曾用半场+全场反推 HAFU、用比分反推 OU，
+    # 会把缺盘口/缺证据伪装成完整预测，污染回测分母。现在缺失就保留 null，
+    # 由下游按市场级缺口处理。
     ou_from_score = False
+    market_gap_codes = []
     if not ou25:
-        n = hs + as_
-        ou25 = "大2.5" if n >= 3 else "小2.5"
-        ou_from_score = True
+        market_gap_codes.append("OU25_UNAVAILABLE_OR_INVALID")
+    if not hafu:
+        market_gap_codes.append("HAFU_UNAVAILABLE_OR_INVALID")
 
     alt = str(data.get("alt_direction") or "").strip() or None
     if alt not in (None, "主胜", "平局", "客胜"):
         alt = None
     egap = bool(data.get("evidence_gap", False))
+    if market_gap_codes:
+        egap = True
     if not rq.get("ok"):
         conf = min(conf, 0.45)
         egap = True
@@ -342,6 +343,7 @@ def parse_prediction(text: str):
         "total_goals": tg, "half_result": hr,
         "ou25": ou25, "hafu": hafu,
         "ou_from_score": ou_from_score,
+        "market_gap_codes": market_gap_codes,
         "alt_direction": alt, "evidence_gap": egap,
         "confidence": conf, "reasoning": reasoning,
         "reasoning_ok": bool(rq.get("ok")),
@@ -428,8 +430,8 @@ def aggregate(predictions, models_used):
             tg_counter[p["total_goals"]] += w
         if p.get("half_result"):
             hr_counter[p["half_result"]] += w
-        # HAFU: 优先显式字段
-        hf = p.get("hafu") or (hafu_result(p["half_result"], p["result"]) if p.get("half_result") else None)
+        # HAFU 只接受模型显式输出；不得从半场/全场结果反推。
+        hf = p.get("hafu")
         if hf:
             hafu_counter[hf] += w
         ou = p.get("ou25")
@@ -541,7 +543,11 @@ def print_report(home, away, agg):
         print(f"  ⏱️ 半全场:        {agg['top_hafu']}")
     if agg.get("collapse_flags"):
         print(f"  ⚠️ 坍缩标记:      {', '.join(agg['collapse_flags'])}")
-    print(f"  🎯 平均置信度:    {agg['avg_confidence']*100:.0f}%")
+    avg_confidence = agg.get("avg_confidence")
+    if avg_confidence is None:
+        print("  🎯 平均置信度:    不可用（未形成多模型共识）")
+    else:
+        print(f"  🎯 平均置信度:    {avg_confidence*100:.0f}%")
     dis = agg["disagreement"]
     if dis <= 0.35:
         print(f"  🤝 模型分歧度:    {dis:.0%}  (低 — 模型意见较一致)")
