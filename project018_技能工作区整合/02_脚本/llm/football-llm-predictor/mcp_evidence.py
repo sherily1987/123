@@ -904,7 +904,7 @@ def build_block(raw_m, cand, odds_list, pred, standings, h2h, mid, lineups=None,
     lineup_status = str(late_status.get("lineups_status") or "UNAVAILABLE")
     lineup_note = (
         "伤停或首发尚不可用，属于证据缺口，不能解读为无人缺阵或首发已确认。"
-        if "UNAVAILABLE" in (injury_status, lineup_status)
+        if any(status in {"UNAVAILABLE", "EMPTY_UNCONFIRMED"} for status in (injury_status, lineup_status))
         else "伤停与首发状态已随下方结构化数据保留，仍须按各来源时点核验。"
     )
     # MCP 可在没有网页抓取主证据时作为研究主证据，但必须显式覆盖与网页证据相同的

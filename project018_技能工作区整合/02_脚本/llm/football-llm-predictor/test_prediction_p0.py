@@ -257,6 +257,19 @@ def test_prompt_assigns_evidence_ids_without_claiming_cross_verification():
     assert "来源已交叉验证" not in prompt
 
 
+def test_empty_unconfirmed_status_is_a_gap_not_a_clear_injury_claim():
+    text = """## 1. 伤停/阵容
+- 伤停状态 | EMPTY_UNCONFIRMED | source(https://example.test/injuries) | collected_at(2026-08-15T10:00:00+08:00)
+"""
+    status = predict._build_llm_evidence_manifest(
+        {"match_id": "sporttery-1", "crs": [], "ttg": [], "hafu": []},
+        {"evidence_collected_at_max": "2026-08-15T10:00:00+08:00"},
+        text,
+    )
+    assert status["sections"]["injuries"]["status"] == "UNAVAILABLE"
+    assert "injuries" in status["gap_sections"]
+
+
 def test_catalog_marks_vote_slot_placeholders_unavailable():
     text = """## 1. 伤停/阵容
 - 源17 besoccer.com：封锁源占槽、不采正文 | source(https://www.besoccer.com/x) | collected_at(t)

@@ -84,7 +84,7 @@ REQUIRED_EVIDENCE_SECTIONS = {
 }
 EVIDENCE_GAP_MARKERS = (
     "证据缺口", "未检索到", "未拿到", "未做", "不足", "缺失",
-    "UNAVAILABLE", "FORM_UNAVAILABLE", "LINEUP_UNAVAILABLE",
+    "UNAVAILABLE", "EMPTY_UNCONFIRMED", "FORM_UNAVAILABLE", "LINEUP_UNAVAILABLE",
 )
 AGGREGATION_RULE_VERSION = "evidence-direction-v1"
 AGGREGATION_RULE_SPEC = {
@@ -1037,12 +1037,16 @@ def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
         "crs": match.get("crs") or ([1] if has("CRS", "比分赔率") else []),
         "ttg": match.get("ttg") or ([1] if has("TTG", "总进球赔率") else []),
         "hafu": match.get("hafu") or ([1] if has("HAFU", "半全场赔率") else []),
-        "injuries_status": "UNAVAILABLE" if has("伤停状态=UNAVAILABLE", "伤停=UNAVAILABLE")
-        else ("AVAILABLE" if has_usable("伤停", "缺阵") else "UNAVAILABLE"),
+        "injuries_status": (
+            "EMPTY_UNCONFIRMED" if has("伤停状态=EMPTY_UNCONFIRMED", "伤停=EMPTY_UNCONFIRMED")
+            else ("UNAVAILABLE" if has("伤停状态=UNAVAILABLE", "伤停=UNAVAILABLE")
+                  else ("AVAILABLE" if has_usable("伤停", "缺阵") else "UNAVAILABLE"))
+        ),
         "lineups_status": (
-            "UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
+            "EMPTY_UNCONFIRMED" if has("首发状态=EMPTY_UNCONFIRMED", "首发=EMPTY_UNCONFIRMED")
+            else ("UNAVAILABLE" if has("首发状态=UNAVAILABLE", "首发=UNAVAILABLE")
             else ("PREDICTED" if has("首发状态=PREDICTED", "首发状态 | PREDICTED", "预计首发")
-                  else ("AVAILABLE" if has_usable("首发", "阵容") else "UNAVAILABLE"))
+                  else ("AVAILABLE" if has_usable("首发", "阵容") else "UNAVAILABLE")))
         ),
         "collected_at": evidence_status.get("evidence_collected_at_max"),
     }
