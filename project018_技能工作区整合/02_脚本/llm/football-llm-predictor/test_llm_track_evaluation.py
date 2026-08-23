@@ -49,6 +49,20 @@ def test_evaluation_reports_1x2_draw_and_score_metrics_separately():
     assert report["hafu"]["n"] == 2
 
 
+def test_missing_derived_markets_are_reported_outside_their_denominator():
+    records = [{
+        "match_id": "sporttery-1", "direction": "主胜", "top_scores": ["1-0"],
+        "ou25": None, "hafu": None,
+        "market_gap_codes": ["OU25_UNAVAILABLE_OR_INVALID", "HAFU_UNAVAILABLE_OR_INVALID"],
+        "evidence_gap": True,
+    }]
+    results = {"sporttery-1": {"score_90": [1, 0], "score_90_status": "verified"}}
+    report = evaluation.evaluate_llm_records(records, results)
+    assert report["ou25"] == {"n": 0, "missing": 1, "hits": 0, "accuracy_pct": None}
+    assert report["hafu"] == {"n": 0, "missing": 1, "hits": 0, "accuracy_pct": None}
+    assert report["evidence_gap_rows"] == 1
+
+
 def test_cli_loaders_accept_records_and_result_maps(tmp_path):
     predictions = tmp_path / "predictions.json"
     results = tmp_path / "results.json"

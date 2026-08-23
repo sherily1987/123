@@ -80,6 +80,9 @@ def settle_llm_records(records: list[dict[str, Any]], results: dict[str, dict[st
             "top_scores": list(record.get("top_scores") or record.get("top3_scores") or []),
             "predicted_ou25": _ou(record.get("top_ou25") or record.get("ou25")),
             "predicted_hafu": str(record.get("top_hafu") or record.get("hafu") or "") or None,
+            "market_gap_codes": list(record.get("market_gap_codes") or []),
+            "evidence_gap": bool(record.get("evidence_gap", False)),
+            "action": record.get("action"),
             "actual_score": list(full),
             "actual_result": _result(full),
             "actual_ou25": "大" if sum(full) >= 3 else "小",
@@ -107,19 +110,26 @@ def evaluate_llm_records(records: list[dict[str, Any]], results: dict[str, dict[
     )
     ou_rows = [r for r in rows if r["predicted_ou25"] is not None]
     hafu_rows = [r for r in rows if r["predicted_hafu"] and r["actual_hafu"]]
+    market_missing = {
+        "one_x_two": sum(r["predicted_direction"] is None for r in rows),
+        "score": sum(not r["top_scores"] for r in rows),
+        "ou25": sum(r["predicted_ou25"] is None for r in rows),
+        "hafu": sum(r["predicted_hafu"] is None for r in rows),
+    }
     pct = lambda hits, count: round(hits / count * 100, 3) if count else None
     return {
         "n": n,
         "audit": settled["audit"],
-        "one_x_two": {"n": len(direction_rows), "hits": direction_hits,
+        "one_x_two": {"n": len(direction_rows), "missing": market_missing["one_x_two"], "hits": direction_hits,
                        "accuracy_pct": pct(direction_hits, len(direction_rows))},
         "draw": {"actual_draws": draw_actual, "predicted_draws": draw_predicted,
                  "hits": draw_hits, "precision_pct": pct(draw_hits, draw_predicted),
                  "recall_pct": pct(draw_hits, draw_actual)},
-        "score": {"n": len(score_rows), "top1_hits": score_hits,
+        "score": {"n": len(score_rows), "missing": market_missing["score"], "top1_hits": score_hits,
                   "top1_accuracy_pct": pct(score_hits, len(score_rows))},
-        "ou25": {"n": len(ou_rows), "hits": sum(r["predicted_ou25"] == r["actual_ou25"] for r in ou_rows),
+        "ou25": {"n": len(ou_rows), "missing": market_missing["ou25"], "hits": sum(r["predicted_ou25"] == r["actual_ou25"] for r in ou_rows),
                  "accuracy_pct": pct(sum(r["predicted_ou25"] == r["actual_ou25"] for r in ou_rows), len(ou_rows))},
-        "hafu": {"n": len(hafu_rows), "hits": sum(r["predicted_hafu"] == r["actual_hafu"] for r in hafu_rows),
+        "hafu": {"n": len(hafu_rows), "missing": market_missing["hafu"], "hits": sum(r["predicted_hafu"] == r["actual_hafu"] for r in hafu_rows),
                  "accuracy_pct": pct(sum(r["predicted_hafu"] == r["actual_hafu"] for r in hafu_rows), len(hafu_rows))},
+        "evidence_gap_rows": sum(r["evidence_gap"] for r in rows),
     }
