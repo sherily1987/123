@@ -59,7 +59,7 @@ def test_collect_one_accepts_predicted_xi_as_explicit_nonofficial_evidence(monke
     assert row["evidence_audit"]["entries"]["starting_xi"]["status"] == "PREDICTED"
     assert row["evidence_audit"]["entries"]["starting_xi"]["missing_reason"] == "PREDICTED_XI_NOT_CONFIRMED"
     assert "starting_xi" not in row["evidence_audit"]["missing_fields"]
-    assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "UNAVAILABLE"
+    assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "EMPTY_UNCONFIRMED"
     assert any(args[0] == "eval" for args in calls)
     assert any(args[0] == "close" for args in calls)
 
@@ -114,3 +114,41 @@ def test_discover_sources_uses_match_identity_not_fixed_league_url(monkeypatch):
     assert row["official_candidates"][0].startswith("https://www.uefa.com/")
     assert row["third_party_candidates"][0].startswith("https://www.fotmob.com/")
     assert any(args[0] == "close" for args in calls)
+
+
+def test_snapshot_extracts_team_stats_and_suspensions_without_inventing_clear_status():
+    payload = _payload()
+    payload["content"]["stats"] = {
+        "periods": [{"period": "ALL", "stats": [
+            {"title": "Expected goals (xG)", "stats": [
+                {"key": "home", "value": "1.42"},
+                {"key": "away", "value": "0.87"},
+            ]}
+        ]}]
+    }
+    payload["content"]["lineup"]["homeTeam"]["unavailable"] = [
+        {"name": "Home Suspended", "unavailability": {"type": "suspension"}}
+    ]
+    row = bec._snapshot(
+        {"match_id": "sporttery-4", "home": "A", "away": "B"},
+        payload,
+        "https://www.fotmob.com/matches/a-vs-b/x",
+        "2026-08-23T17:45:00+00:00",
+    )
+    stats = row["evidence_audit"]["entries"]["team_stats"]
+    suspensions = row["evidence_audit"]["entries"]["suspensions"]
+    assert stats["status"] == "VALID"
+    assert stats["value"]["xg"]["home"] == "1.42"
+    assert suspensions["status"] == "VALID"
+    assert suspensions["value"]["home"][0]["player"] == "Home Suspended"
+
+
+def test_snapshot_keeps_missing_stats_and_suspensions_as_gaps():
+    row = bec._snapshot(
+        {"match_id": "sporttery-5", "home": "A", "away": "B"},
+        _payload(),
+        "https://www.fotmob.com/matches/a-vs-b/x",
+        "2026-08-23T17:45:00+00:00",
+    )
+    assert row["evidence_audit"]["entries"]["team_stats"]["status"] == "UNAVAILABLE"
+    assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "EMPTY_UNCONFIRMED"

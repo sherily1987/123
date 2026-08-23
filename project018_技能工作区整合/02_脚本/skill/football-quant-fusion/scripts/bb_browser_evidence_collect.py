@@ -102,6 +102,47 @@ def _unavailable(team: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
+def _absence_rows(team: dict[str, Any], kind: str) -> list[dict[str, Any]]:
+    """Split the provider's unavailable list without treating empty as clear."""
+    out = []
+    for player in team.get("unavailable") or []:
+        info = player.get("unavailability") or {}
+        type_name = str(info.get("type") or "").lower()
+        is_suspension = "susp" in type_name or bool(player.get("suspensionFlag"))
+        if (kind == "suspension") != is_suspension:
+            continue
+        out.append({"player": player.get("name"), "type": info.get("type") or
+                    ("suspension" if is_suspension else "injury"),
+                    "return": info.get("expectedReturn")})
+    return out
+
+
+def _match_xg(payload: dict[str, Any]) -> dict[str, Any] | None:
+    """Extract explicit xG values when the browser provider exposes them."""
+    content = payload.get("content") or {}
+    candidates = [content.get("stats"), (content.get("matchFacts") or {}).get("stats")]
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        direct = candidate.get("xg") or candidate.get("expectedGoals")
+        if isinstance(direct, dict) and ("home" in direct or "away" in direct):
+            return {"home": direct.get("home"), "away": direct.get("away")}
+        periods = candidate.get("periods") or []
+        for period in periods if isinstance(periods, list) else []:
+            for stat in (period.get("stats") or []) if isinstance(period, dict) else []:
+                title = str(stat.get("title") or stat.get("name") or "").lower()
+                if "xg" not in title and "expected goal" not in title:
+                    continue
+                values = stat.get("stats") or stat.get("values") or []
+                result = {}
+                for value in values if isinstance(values, list) else []:
+                    if isinstance(value, dict) and value.get("key") in {"home", "away"}:
+                        result[value["key"]] = value.get("value")
+                if set(result) == {"home", "away"}:
+                    return result
+    return None
+
+
 def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
     """Discover candidate official/secondary pages from fixture identity.
 
@@ -163,16 +204,21 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
     home_form, away_form = (_team_form(forms[0]) if len(forms) > 0 else [],
                             _team_form(forms[1]) if len(forms) > 1 else [])
     home_absences, away_absences = _unavailable(home_team), _unavailable(away_team)
+    home_suspensions, away_suspensions = (_absence_rows(home_team, "suspension"),
+                                          _absence_rows(away_team, "suspension"))
     absence_field_present = "unavailable" in home_team or "unavailable" in away_team
     absence_rows_present = bool(home_absences or away_absences)
+    suspension_rows_present = bool(home_suspensions or away_suspensions)
+    xg = _match_xg(payload)
     lineup_source = str(lineup.get("source") or "")
     official_xi = lineup_source.lower() in {"official", "confirmed", "startingxi"}
     has_predicted_xi = bool(home_team.get("starters") or away_team.get("starters"))
     xi_status = "VALID" if official_xi else "PREDICTED" if has_predicted_xi else "PENDING_REFRESH"
     xi_reason = None if official_xi else "PREDICTED_XI_NOT_CONFIRMED" if has_predicted_xi else "LAST_STARTING_LINEUPS_NOT_OFFICIAL_XI"
     entries = {
-        "team_stats": _entry("UNAVAILABLE", None, source_url=source_url, collected_at=collected_at,
-                             reason="FOTMOB_MATCH_DETAIL_HAS_NO_OFFICIAL_TEAM_XG_STATS"),
+        "team_stats": _entry("VALID" if xg else "UNAVAILABLE", {"xg": xg} if xg else None,
+                              source_url=source_url, collected_at=collected_at,
+                              reason=None if xg else "FOTMOB_MATCH_DETAIL_HAS_NO_TEAM_XG_STATS"),
         "recent_form": _entry("VALID" if len(home_form) >= 5 and len(away_form) >= 5 else "PARTIAL",
                               {"home": home_form, "away": away_form}, source_url=source_url,
                               collected_at=collected_at,
@@ -181,8 +227,13 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
                           {"home": home_absences, "away": away_absences}, source_url=source_url,
                           collected_at=collected_at,
                           reason=None if absence_rows_present else "EMPTY_ABSENCE_FIELD_NOT_PROOF_OF_CLEAR" if absence_field_present else "LINEUP_ABSENCE_FIELD_MISSING"),
-        "suspensions": _entry("UNAVAILABLE", None, source_url=source_url, collected_at=collected_at,
-                               reason="NO_SEPARATE_SUSPENSION_CONFIRMATION"),
+        "suspensions": _entry("VALID" if suspension_rows_present else
+                               "EMPTY_UNCONFIRMED" if absence_field_present else "UNAVAILABLE",
+                               {"home": home_suspensions, "away": away_suspensions},
+                               source_url=source_url, collected_at=collected_at,
+                               reason=None if suspension_rows_present else
+                               "EMPTY_SUSPENSION_FIELD_NOT_PROOF_OF_CLEAR" if absence_field_present
+                               else "LINEUP_ABSENCE_FIELD_MISSING"),
         "starting_xi": _entry(xi_status,
                               {"source": lineup_source, "home": home_team.get("starters") or [],
                                "away": away_team.get("starters") or []}, source_url=source_url,
