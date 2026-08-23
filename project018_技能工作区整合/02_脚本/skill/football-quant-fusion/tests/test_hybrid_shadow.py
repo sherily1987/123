@@ -124,10 +124,25 @@ def test_run_one_persists_router_time_audit_with_research_sidecar(monkeypatch, t
 
     hs.run_one(None, {}, {
         "match_id": "sporttery-1", "home": "主队", "away": "客队", "competition": "英超",
-        "kickoff": "2026-08-22T00:00:00+00:00", "prediction_as_of": "2026-08-21T20:00:00+00:00",
+        "kickoff": "2026-08-25T00:00:00+00:00", "prediction_as_of": "2026-08-21T20:00:00+00:00",
     }, [], [], 5, "2026-08-22")
 
     hybrid = captured["research"]
     assert hybrid["routing_audit"] == router_audit
     assert hybrid["market_input_as_of"] == "2026-08-21T20:00:00+00:00"
     assert hybrid["research_run_at"].endswith("+00:00")
+
+
+def test_kickoff_gate_rejects_local_time_after_kickoff():
+    reason = hs.post_kickoff_reason(
+        {"kickoff": "2026/8/23 18:15:00"},
+        now=hs._parse_kickoff("2026-08-23T12:00:00+00:00"),
+    )
+    assert reason == "POST_KICKOFF_NOT_USABLE"
+
+
+def test_kickoff_gate_allows_future_local_time():
+    assert hs.post_kickoff_reason(
+        {"kickoff": "2026/8/23 18:15:00"},
+        now=hs._parse_kickoff("2026-08-23T09:00:00+00:00"),
+    ) is None

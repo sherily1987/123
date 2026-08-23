@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fusion_predict_core import load_core, predict_one
@@ -28,6 +28,34 @@ from sales_day_collect import build_field_meta
 
 
 WEIGHT_SWEEP = (0.40, 0.50, 0.60, 0.70, 0.80)
+LOCAL_MATCH_TZ = timezone(timedelta(hours=8))
+
+
+def _parse_kickoff(value) -> datetime | None:
+    """Parse Sporttery local timestamps and ISO timestamps into aware UTC time."""
+    if not value:
+        return None
+    text = str(value).strip().replace("/", "-")
+    try:
+        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        try:
+            dt = datetime.strptime(text, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=LOCAL_MATCH_TZ)
+    return dt.astimezone(timezone.utc)
+
+
+def post_kickoff_reason(match: dict, *, now: datetime | None = None) -> str | None:
+    kickoff = _parse_kickoff(match.get("kickoff") or match.get("kickoff_iso"))
+    if kickoff is None:
+        return "KICKOFF_TIME_UNPARSEABLE"
+    observed = now or datetime.now(timezone.utc)
+    if observed.tzinfo is None:
+        observed = observed.replace(tzinfo=timezone.utc)
+    return "POST_KICKOFF_NOT_USABLE" if observed.astimezone(timezone.utc) >= kickoff else None
 
 
 def intl_store() -> Path:
@@ -182,6 +210,9 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
     ident = identity_from(match)
     if sales_day:
         ident["sales_day"] = sales_day
+    gate_reason = post_kickoff_reason(match)
+    if gate_reason:
+        return {"match_id": ident.get("match_id"), "status": "skipped", "reason": gate_reason}
     skip = in_scope(match)
     if skip:
         upsert_job(jobs_root(), ident, input_obj=match,

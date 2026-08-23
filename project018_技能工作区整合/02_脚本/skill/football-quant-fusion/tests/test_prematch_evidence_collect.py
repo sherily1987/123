@@ -19,7 +19,7 @@ def test_audit_has_recent_form_injuries_and_dynamic_lineup_schedule(monkeypatch)
         "tables": [],
     })
     row = pec.collect_one({"match_id": "sporttery-1", "home": "A", "away": "B",
-                           "competition": "英超", "kickoff": "2026-08-23T20:00:00+08:00"})
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
     audit = row["evidence_audit"]
     assert audit["entries"]["team_stats"]["status"] == "VALID"
     assert audit["entries"]["recent_form"]["status"] == "VALID"
@@ -31,7 +31,7 @@ def test_audit_has_recent_form_injuries_and_dynamic_lineup_schedule(monkeypatch)
 
 def test_collect_file_writes_sidecar_without_mutating_input(tmp_path, monkeypatch):
     source = tmp_path / "input.json"
-    source.write_text('{"matches":[{"match_id":"sporttery-1","home":"A","away":"B","kickoff":"2026-08-23T20:00:00+08:00"}]}', encoding="utf-8")
+    source.write_text('{"matches":[{"match_id":"sporttery-1","home":"A","away":"B","kickoff":"2026-08-25T20:00:00+08:00"}]}', encoding="utf-8")
     monkeypatch.setattr(pec.preview, "collect", lambda mid, terms, hist: {"feature": {}, "strength": None,
         "recent_home": [], "recent_away": [], "injuries": {}, "tables": []})
     out = pec.collect_file(source, tmp_path / "out")
@@ -56,7 +56,7 @@ def test_audit_exposes_mobile_feature_analysis_without_guessing_labels(monkeypat
         "injuries": {"home": {}, "away": {}}, "tables": [],
     })
     row = pec.collect_one({"match_id": "sporttery-1", "home": "A", "away": "B",
-                           "competition": "日职", "kickoff": "2026-08-23T20:00:00+08:00"})
+                           "competition": "日职", "kickoff": "2026-08-25T20:00:00+08:00"})
     analysis = row["facts"]["feature_analysis"]
     assert analysis["source_field_map"]["h2h_last7"] == "feature.last"
     assert analysis["h2h_last7"]["totalLegCnt"] == 7
@@ -72,6 +72,6 @@ def test_missing_injury_payload_remains_unavailable(monkeypatch):
         "injuries": {}, "tables": [],
     })
     row = pec.collect_one({"match_id": "sporttery-2", "home": "A", "away": "B",
-                           "kickoff": "2026-08-23T20:00:00+08:00"})
+                           "kickoff": "2026-08-25T20:00:00+08:00"})
     assert row["evidence_audit"]["entries"]["injury"]["status"] == "UNAVAILABLE"
     assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "UNAVAILABLE"
