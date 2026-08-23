@@ -247,6 +247,16 @@ NEUTRAL_EVIDENCE_ROLE = (
 )
 ROLE_PROMPTS: Dict[str, str] = {}
 
+# DeepSeek V4 Flash is the current single-model research voter.  Keep this
+# addendum separate from the shared rules so changing its response discipline
+# cannot silently alter other providers' prompts.
+DEEPSEEK_V4_FLASH_ADDENDUM = """DeepSeek V4 Flash 专用执行附录：
+1. 先检查证据目录的 status、refreshed_at 和 evidence_gap；GAP、PARTIAL、EMPTY_UNCONFIRMED、PENDING_REFRESH 只能降低对应维度权重，不能被解释成“没有伤停”或“已确认首发”。
+2. 预计首发只能作为 PREDICTED 先验，官方首发只能在目录明确标记 VALID/CONFIRMED 时使用；不得把预计首发改写为官方首发。
+3. 四个市场完全独立：1X2 只用 1X2 赔率/胜平负证据，比分只用 CRS/攻防证据，大小球只用 TTG/进球证据，半全场只用 HAFU/半场证据；缺对应来源就保留缺口，不得用 1X2 反推。
+4. 只输出规则要求的单个 JSON 对象；不要输出 Markdown、解释段、代码围栏或额外键。概率只保留一位小数并合计 100；这是研究判断概率，不是已校准生产概率。
+5. 证据不足时仍可给 opinion 供研究记录，但必须 evidence_gap=true、明确 unsupported_assumptions，并避免高置信表述；不得生成下注、EV、Kelly 或“推荐购买”字段。"""
+
 def role_prompt_for(model: str, models_used: Optional[Sequence[str]] = None) -> str:
     return NEUTRAL_EVIDENCE_ROLE
 
@@ -320,6 +330,8 @@ EVIDENCE_SYSTEM_PROMPT = (
 
 def system_prompt_evidence(model: str, models_used: Optional[Sequence[str]] = None) -> str:
     role = role_prompt_for(model, models_used)
+    if str(model).strip().casefold().endswith("deepseek-v4-flash"):
+        role = (role + "\n\n" + DEEPSEEK_V4_FLASH_ADDENDUM).strip()
     if role:
         return role + "\n\n" + JSON_RULES_EVIDENCE
     return EVIDENCE_SYSTEM_PROMPT
@@ -327,6 +339,8 @@ def system_prompt_evidence(model: str, models_used: Optional[Sequence[str]] = No
 
 def system_prompt_four_market(model: str, models_used: Optional[Sequence[str]] = None) -> str:
     role = role_prompt_for(model, models_used)
+    if str(model).strip().casefold().endswith("deepseek-v4-flash"):
+        role = (role + "\n\n" + DEEPSEEK_V4_FLASH_ADDENDUM).strip()
     if role:
         return role + "\n\n" + JSON_RULES_FOUR_MARKET
     return JSON_RULES_FOUR_MARKET

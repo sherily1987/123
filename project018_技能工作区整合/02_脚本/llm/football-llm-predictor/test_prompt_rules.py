@@ -81,6 +81,15 @@ def test_evidence_prompt_keeps_market_odds_separate():
     assert "各市场独立判断" in lpr.system_prompt_four_market("test", fp.DEFAULT_MODELS)
 
 
+def test_deepseek_v4_flash_prompt_addendum_is_model_scoped():
+    deepseek = lpr.system_prompt_evidence("deepseek/deepseek-v4-flash")
+    other = lpr.system_prompt_evidence("some-other-model")
+    assert "DeepSeek V4 Flash 专用执行附录" in deepseek
+    assert "不得把预计首发改写为官方首发" in deepseek
+    assert "四个市场完全独立" in deepseek
+    assert "DeepSeek V4 Flash 专用执行附录" not in other
+
+
 def test_deepseek_audit_prompt_has_no_result_direction_fields():
     prompt = lpr.system_prompt_evidence_audit()
     assert '"usable_evidence_ids"' not in prompt
