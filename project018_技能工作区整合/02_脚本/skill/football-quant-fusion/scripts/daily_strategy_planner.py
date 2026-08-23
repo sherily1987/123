@@ -164,6 +164,20 @@ def _market_rows(
     evidence = _job_evidence_audit(job)
     evidence_gap = bool(evidence.get("evidence_gap"))
     evidence_reasons = list(evidence.get("evidence_gap_reasons") or [])
+    raw_age = evidence.get("evidence_freshness_hours")
+    try:
+        evidence_age_hours = round(float(raw_age), 2) if raw_age is not None else None
+    except (TypeError, ValueError):
+        evidence_age_hours = None
+    # Age is exposed as a risk signal for the strategy page.  It is not
+    # silently converted into a production bet/skip decision here; the
+    # recommendation policy remains the single authority for that gate.
+    evidence_age_status = (
+        "UNKNOWN" if evidence_age_hours is None else
+        "FRESH" if evidence_age_hours <= 6 else
+        "AGING" if evidence_age_hours <= 48 else
+        "STALE"
+    )
     rows = []
     for market, pool in pools.items():
         baseline = _market_baseline(pool)
@@ -197,6 +211,9 @@ def _market_rows(
         )
         if strategy_eligible:
             reasons = []
+        risk_tags = ["EVIDENCE_GAP"] if evidence_gap else []
+        if evidence_age_status in {"AGING", "STALE"}:
+            risk_tags.append(f"EVIDENCE_{evidence_age_status}")
         rows.append({
             **common,
             "candidate_id": f"{match_id}:{market}" if match_id else None,
@@ -219,9 +236,11 @@ def _market_rows(
             "block_reasons": reasons,
             "evidence_gap": evidence_gap,
             "evidence_status": evidence.get("evidence_status"),
+            "evidence_age_hours": evidence_age_hours,
+            "evidence_age_status": evidence_age_status,
             "evidence_gap_reasons": evidence_reasons,
             "evidence_entries": evidence.get("entries") or {},
-            "risk_tags": ["EVIDENCE_GAP"] if evidence_gap else [],
+            "risk_tags": risk_tags,
             "note": "对应市场官方赔率仅作为市场基线；没有获批的独立校准概率时不得转成购买建议。",
         })
     return rows

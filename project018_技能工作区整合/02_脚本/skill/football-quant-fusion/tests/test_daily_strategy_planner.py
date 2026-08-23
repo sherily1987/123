@@ -116,6 +116,16 @@ def test_each_market_is_audited_against_its_own_official_odds():
     assert all(row["official_pool_used"] is True for row in by_market.values())
 
 
+def test_strategy_rows_expose_evidence_age_without_spending_budget():
+    job = _job()
+    job["outputs"][0]["evidence_audit"]["evidence_freshness_hours"] = 55.5
+    plan = dsp.build_daily_strategy([job], _disabled_policy(), bankroll=100)
+    assert {row["evidence_age_hours"] for row in plan["market_audit"]} == {55.5}
+    assert {row["evidence_age_status"] for row in plan["market_audit"]} == {"STALE"}
+    assert all("EVIDENCE_STALE" in row["risk_tags"] for row in plan["market_audit"])
+    assert plan["budget"]["allocated_amount"] == 0.0
+
+
 def test_market_conditioned_model_directions_are_visible_but_not_independent():
     """Catches model distributions being hidden or promoted to independent edge."""
     plan = dsp.build_daily_strategy([_job()], _disabled_policy(), bankroll=100)
