@@ -48,3 +48,35 @@ def test_parse_markdown_does_not_promote_unlabelled_text():
     assert entries["injury"]["status"] == "UNAVAILABLE"
     assert entries["suspensions"]["status"] == "UNAVAILABLE"
     assert row["evidence_audit"]["evidence_gap"] is True
+
+
+def test_parse_markdown_supports_chinese_sections_and_explicit_strength():
+    text = """# 比赛前瞻
+## 近期状态
+- 主队 2：1 客队（胜）
+- 主队 1-0 甲队（胜）
+- 主队 0：0 乙队（平）
+- 主队 1-2 丙队（负）
+- 主队 3：1 丁队（胜）
+## 预计首发
+- 门将：主队门将
+## 伤停
+- 主队中场：肌肉伤势
+## 停赛
+- 客队后卫：累计黄牌
+## xG与攻防强度
+- 主队 xG 1.72，防守强度 0.91
+- 客队 xG 1.18，进攻强度 1.03
+"""
+    row = sg.parse_markdown(
+        text, {"match_id": "sporttery-cn-1", "home": "主队", "away": "客队"},
+        "https://league.example/cn/1", "2026-08-24T00:00:00Z",
+        source_id="league.example.cn", provider="league_preview",
+    )
+    entries = row["evidence_audit"]["entries"]
+    assert entries["team_stats"]["status"] == "VALID"
+    assert entries["recent_form"]["status"] == "VALID"
+    assert entries["starting_xi"]["status"] == "PREDICTED"
+    assert entries["injury"]["status"] == "VALID"
+    assert entries["suspensions"]["status"] == "VALID"
+    assert "xG" in entries["team_stats"]["value"]["raw_rows"][0]

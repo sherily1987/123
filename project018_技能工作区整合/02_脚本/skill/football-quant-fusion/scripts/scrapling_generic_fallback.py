@@ -43,7 +43,7 @@ def _find(sections: dict[str, list[str]], labels: tuple[str, ...]) -> list[str]:
 
 def _form(rows: list[str]) -> list[str]:
     return [row for row in rows
-            if re.search(r"\b\d+\s*[-:]\s*\d+\b", row)][:10]
+            if re.search(r"\b\d+\s*[-:：]\s*\d+\b", row)][:10]
 
 
 def _clean_rows(rows: list[str]) -> list[str]:
@@ -53,13 +53,20 @@ def _clean_rows(rows: list[str]) -> list[str]:
 def parse_markdown(text: str, match: dict[str, Any], source_url: str,
                    collected_at: str, *, source_id: str, provider: str) -> dict[str, Any]:
     sections = _sections(text)
-    form_rows = _form(_find(sections, ("recent form", "team form", "last matches", "recent results")))
-    lineup_rows = _clean_rows(_find(sections, ("predicted lineup", "expected lineup", "starting xi", "line-up")))
-    injury_rows = _clean_rows(_find(sections, ("injuries", "injury", "unavailable", "absences")))
-    suspension_rows = _clean_rows(_find(sections, ("suspensions", "suspended")))
+    form_rows = _form(_find(sections, ("recent form", "team form", "last matches", "recent results",
+                                        "近期状态", "近期战绩", "近况", "最近比赛", "近5场", "近十场")))
+    lineup_rows = _clean_rows(_find(sections, ("predicted lineup", "expected lineup", "starting xi", "line-up",
+                                                "预计首发", "预测首发", "首发阵容", "首发")))
+    injury_rows = _clean_rows(_find(sections, ("injuries", "injury", "unavailable", "absences",
+                                                "伤停", "伤病", "缺阵", "伤缺")))
+    suspension_rows = _clean_rows(_find(sections, ("suspensions", "suspended", "停赛", "禁赛")))
+    team_stats_rows = _clean_rows(_find(sections, ("xg", "expected goals", "attack strength", "defence strength",
+                                                   "进攻强度", "防守强度", "预期进球", "球队统计", "数据统计")))
     entries = {
-        "team_stats": _entry("UNAVAILABLE", None, url=source_url, collected_at=collected_at,
-                              source_id=source_id, reason="GENERIC_PAGE_HAS_NO_STRUCTURED_XG"),
+        "team_stats": _entry("VALID" if team_stats_rows else "UNAVAILABLE",
+                              {"raw_rows": team_stats_rows}, url=source_url, collected_at=collected_at,
+                              source_id=source_id,
+                              reason=None if team_stats_rows else "GENERIC_PAGE_HAS_NO_EXPLICIT_XG_OR_STRENGTH"),
         "recent_form": _entry("VALID" if len(form_rows) >= 5 else "PARTIAL" if form_rows else "UNAVAILABLE",
                               {"raw_rows": form_rows}, url=source_url, collected_at=collected_at,
                               source_id=source_id,
@@ -83,7 +90,7 @@ def parse_markdown(text: str, match: dict[str, Any], source_url: str,
         "identity": {key: match.get(key) for key in ("home", "away", "competition", "kickoff")},
         "collected_at": collected_at,
         "source_url": source_url,
-        "facts": {"recent_form": form_rows, "injuries": injury_rows,
+        "facts": {"team_stats": team_stats_rows, "recent_form": form_rows, "injuries": injury_rows,
                   "suspensions": suspension_rows, "predicted_lineup": lineup_rows},
         "evidence_audit": {
             "schema_version": "evidence-audit-1.1",
