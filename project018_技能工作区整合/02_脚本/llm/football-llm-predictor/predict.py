@@ -1407,7 +1407,8 @@ def main():
             print(json.dumps(build_audit_record(
                 agg, voter_models, voter_prompt, evidence_status,
                 ev_recommendation={"action": "skip", "reason": "single_model_no_consensus"},
-                single_pick={"pick": None, "confidence": None, "reason": "single_model_no_consensus", "skip": True},
+                single_pick={"pick": None, "confidence": None, "reason": "single_model_no_consensus",
+                             "skip": True, "action": "observe", "bettable": False},
                 evidence_audit=evidence_audit, consensus_gate=consensus_gate,
                 match=m,
             ), ensure_ascii=False))

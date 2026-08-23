@@ -159,6 +159,7 @@ def test_k3_only_main_skips_ev_and_single_pick(tmp_path, monkeypatch, capsys):
     assert "single_model_no_consensus" in output
     assert "💰 下注推荐" not in output
     assert '"action": "observe"' in output
+    assert '"bettable": false' in output
 
 
 def test_k3_only_main_uses_valid_mcp_as_primary_when_web_evidence_is_absent(tmp_path, monkeypatch, capsys):
