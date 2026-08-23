@@ -41,7 +41,7 @@ def render_fusion_evidence(m: dict) -> str:
     if isinstance(audit, dict):
         missing = ",".join(audit.get("missing_fields") or []) or "无"
         lines.append(
-            f"- evidence_audit: status={audit.get('evidence_status') or 'UNKNOWN'}；"
+            f"> evidence_audit: status={audit.get('evidence_status') or 'UNKNOWN'}；"
             f"missing_fields={missing}；collected_at={audit.get('collected_at') or 'unknown'}；"
             f"kickoff={audit.get('kickoff') or m.get('kickoff_iso') or 'unknown'}"
         )
@@ -54,14 +54,14 @@ def render_fusion_evidence(m: dict) -> str:
         refreshed = item.get("refreshed_at") or item.get("collected_at") or "unknown"
         reason = item.get("missing_reason")
         suffix = f"；reason={reason}" if reason else ""
-        lines.append(f"- {name}: status={status}；source={source}；refreshed_at={refreshed}{suffix}")
+        lines.append(f"> - {name}: status={status}；source={source}；refreshed_at={refreshed}{suffix}")
         value = item.get("value")
         if value not in (None, "", [], {}):
             blob = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
-            lines.append(f"  - facts={blob[:2400]}")
+            lines.append(f">   facts={blob[:2400]}")
     for key in ("evidence_snapshot_ref", "browser_evidence_ref"):
         if m.get(key):
-            lines.append(f"- {key}: {m[key]}")
+            lines.append(f"> - {key}: {m[key]}")
     lines.append("> 说明：以上是采集器快照事实；预计首发仍是预测值，不等同官方确认首发；LLM票数不得当作概率。")
     return "\n".join(lines)
 

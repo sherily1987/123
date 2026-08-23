@@ -128,6 +128,28 @@ def test_fusion_evidence_markdown_exposes_audit_summary():
     assert "missing_fields=starting_xi" in text
 
 
+def test_fusion_evidence_blockquotes_do_not_break_llm_source_gate():
+    import light_evidence
+    llm = runner.llm_repo()
+    import sys
+    if str(llm) not in sys.path:
+        sys.path.insert(0, str(llm))
+    import predict
+    match = {
+        "match_num": "周一001", "home": "甲", "away": "乙", "league": "测试联赛",
+        "kickoff_iso": "2026-08-25T03:00:00+08:00", "match_id": 1,
+        "model_odds": [2, 3, 4], "team_ids": {"home_full": "甲", "away_full": "乙"},
+        "evidence_chain": {
+            "team_stats": {"status": "VALID", "source_id": "api", "refreshed_at": "2026-08-24T12:00:00+00:00", "value": {"sample": 5}},
+            "recent_form": {"status": "VALID", "source_id": "api", "refreshed_at": "2026-08-24T12:00:00+00:00", "value": {"home": ["W"], "away": ["L"]}},
+        },
+        "evidence_audit": {"evidence_status": "OK", "missing_fields": [], "collected_at": "2026-08-24T12:00:00+00:00", "kickoff": "2026-08-25T03:00:00+00:00"},
+    }
+    text = light_evidence.build_one(1, match, "C")
+    result = predict.assess_evidence(text, kickoff=match["kickoff_iso"], now="2026-08-24T20:00:00+08:00")
+    assert result["ok"] is True
+
+
 def test_auto_collect_prematch_evidence_is_id_scoped(tmp_path: Path, monkeypatch):
     seen = {}
 
