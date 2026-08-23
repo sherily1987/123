@@ -227,6 +227,29 @@ def test_collect_file_normalizes_nested_sporttery_identity_for_pending_tasks(tmp
     assert task["match_id"] == "sporttery-2040999"
 
 
+def test_collect_file_uses_match_embedded_scrapling_source_without_url_map(monkeypatch, tmp_path):
+    def fake_generic(match, mapping, collected_at):
+        assert mapping["source_id"] == "league.preview"
+        return {"provider": "league_preview", "research_only": True,
+                "match_id": match["match_id"],
+                "evidence_audit": {"missing_fields": [], "evidence_gap": False}}
+
+    monkeypatch.setattr(bec, "_scrapling_generic_snapshot", fake_generic)
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps({"matches": [{
+        "match_id": "sporttery-2041001", "home": "A", "away": "B",
+        "kickoff": "2026-08-26T03:00:00+08:00",
+        "evidence_sources": {"scrapling_url": "https://league.example/preview/1",
+                              "source_id": "league.preview"},
+    }]}), encoding="utf-8")
+
+    report = bec.collect_file(source, tmp_path / "out", None, discover=False)
+    assert report["ok"] == 1
+    saved = json.loads((tmp_path / "out" / "sporttery-2041001.json").read_text(encoding="utf-8"))
+    assert saved["provider"] == "league_preview"
+    assert saved["scrapling_attempts"][0]["status"] == "ok"
+
+
 def test_collect_file_discovery_keeps_nested_identity(monkeypatch, tmp_path):
     source = tmp_path / "input.json"
     source.write_text(json.dumps({"matches": [{

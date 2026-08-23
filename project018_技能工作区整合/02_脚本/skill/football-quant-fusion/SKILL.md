@@ -103,6 +103,10 @@ BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射
 用于跨联赛来源发现和 provenance。自定义来源复用统一 `evidence_audit` 契约时，必须保留
 真实来源身份，不能把其他联赛页面标成 `fotmob.bb_browser`。来源候选只是待审计入口，未取得
 带时间戳的字段事实前不得提升为 `VALID`，也不得进入生产概率。
+API/结构化端点失败或关键字段缺失后，采集器按映射顺序调用 Scrapling 动态页面回退；
+映射既可由 `--url-map` 提供，也可随单场输入放在 `evidence_sources` 中。回退结果始终
+带 `research_only=true`、`scrapling_attempts` 和字段级来源，不会覆盖已有有效 API 字段；
+未提供经过审计的页面映射时只生成待处理任务，不会把搜索候选直接当作事实来源。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
 仅剩体彩赔率时 DeepSeek V4 Flash 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
 禁止 EV/Kelly/下注推荐。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。

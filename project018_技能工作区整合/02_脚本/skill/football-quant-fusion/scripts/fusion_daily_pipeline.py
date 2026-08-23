@@ -298,7 +298,14 @@ def main():
         chain = {name: (audit.get('entries') or {}).get(name) for name in audit.get('critical_fields') or []}
         mm['evidence_chain'] = {k: v for k, v in chain.items() if v}
         mm['evidence_snapshot_ref'] = str(sidecar)
-    if a.bb_browser_url_map or a.bb_browser_discover:
+    embedded_browser_sources = any(
+        isinstance(mm.get('evidence_sources'), dict)
+        or mm.get('scrapling_url')
+        or mm.get('scrapling_sources')
+        or mm.get('fotmob_match_id')
+        for mm in matches if isinstance(mm, dict)
+    )
+    if a.bb_browser_url_map or a.bb_browser_discover or embedded_browser_sources:
         browser_dir = evidence_dir / 'bb-browser'
         browser_args = [HERE / 'bb_browser_evidence_collect.py', '--input', batch,
                          '--output-dir', browser_dir]

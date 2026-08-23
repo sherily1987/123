@@ -622,6 +622,19 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
         match = dict(match)
         match["match_id"] = mid
         mapping = mappings.get(mid) or mappings.get(mid.removeprefix("sporttery-"))
+        # Allow a producer to carry its per-match source candidates with the
+        # fixture itself.  This removes a fragile sidecar join while keeping
+        # provenance explicit; arbitrary search results are still rejected.
+        if not mapping:
+            embedded = match.get("evidence_sources")
+            if isinstance(embedded, dict):
+                mapping = embedded
+            elif any(match.get(name) for name in ("url", "fotmob_match_id",
+                                                   "scrapling_url", "scrapling_sources")):
+                mapping = {name: match.get(name) for name in (
+                    "url", "fotmob_match_id", "scrapling_url", "scrapling_sources",
+                    "source_id", "provider", "official_url", "official_domains",
+                    "predicted_xi", "predicted_xi_source_url") if match.get(name) is not None}
         if isinstance(mapping, dict):
             mapping = dict(mapping)
             mapping.setdefault("scrapling_fallback", True)
