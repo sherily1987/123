@@ -75,6 +75,21 @@ def test_collect_one_without_mapping_emits_browser_task():
     assert row["browser_task"]["reason"] == "FOTMOB_MATCH_URL_REQUIRED"
 
 
+def test_empty_unavailable_fields_are_not_confirmed_clear():
+    payload = _payload()
+    payload["content"]["lineup"]["homeTeam"]["unavailable"] = []
+    payload["content"]["lineup"]["awayTeam"]["unavailable"] = []
+    row = bec._snapshot(
+        {"match_id": "sporttery-3", "home": "A", "away": "B"},
+        payload,
+        "https://www.fotmob.com/matches/a-vs-b/x",
+        "2026-08-23T17:45:00+08:00",
+    )
+    injury = row["evidence_audit"]["entries"]["injury"]
+    assert injury["status"] == "EMPTY_UNCONFIRMED"
+    assert "injury" in row["evidence_audit"]["missing_fields"]
+
+
 def test_discover_sources_uses_match_identity_not_fixed_league_url(monkeypatch):
     calls = []
 

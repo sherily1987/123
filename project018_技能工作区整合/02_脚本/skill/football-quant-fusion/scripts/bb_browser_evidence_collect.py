@@ -163,6 +163,8 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
     home_form, away_form = (_team_form(forms[0]) if len(forms) > 0 else [],
                             _team_form(forms[1]) if len(forms) > 1 else [])
     home_absences, away_absences = _unavailable(home_team), _unavailable(away_team)
+    absence_field_present = "unavailable" in home_team or "unavailable" in away_team
+    absence_rows_present = bool(home_absences or away_absences)
     lineup_source = str(lineup.get("source") or "")
     official_xi = lineup_source.lower() in {"official", "confirmed", "startingxi"}
     has_predicted_xi = bool(home_team.get("starters") or away_team.get("starters"))
@@ -175,10 +177,10 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
                               {"home": home_form, "away": away_form}, source_url=source_url,
                               collected_at=collected_at,
                               reason=None if len(home_form) >= 5 and len(away_form) >= 5 else "FORM_LT_5"),
-        "injury": _entry("VALID" if "unavailable" in home_team or "unavailable" in away_team else "UNAVAILABLE",
+        "injury": _entry("VALID" if absence_rows_present else "EMPTY_UNCONFIRMED" if absence_field_present else "UNAVAILABLE",
                           {"home": home_absences, "away": away_absences}, source_url=source_url,
                           collected_at=collected_at,
-                          reason=None if "unavailable" in home_team or "unavailable" in away_team else "LINEUP_ABSENCE_FIELD_MISSING"),
+                          reason=None if absence_rows_present else "EMPTY_ABSENCE_FIELD_NOT_PROOF_OF_CLEAR" if absence_field_present else "LINEUP_ABSENCE_FIELD_MISSING"),
         "suspensions": _entry("UNAVAILABLE", None, source_url=source_url, collected_at=collected_at,
                                reason="NO_SEPARATE_SUSPENSION_CONFIRMATION"),
         "starting_xi": _entry(xi_status,
