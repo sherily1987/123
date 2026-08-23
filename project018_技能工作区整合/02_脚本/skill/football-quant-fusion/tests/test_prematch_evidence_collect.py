@@ -62,3 +62,16 @@ def test_audit_exposes_mobile_feature_analysis_without_guessing_labels(monkeypat
     assert analysis["h2h_last7"]["totalLegCnt"] == 7
     assert analysis["goals_avg"]["homeGoalAvgCnt"] == "1.8"
     assert row["evidence_audit"]["entries"]["team_stats"]["value"]["feature_analysis"] == analysis
+    assert row["evidence_audit"]["entries"]["injury"]["status"] == "VALID_EMPTY"
+    assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "VALID_EMPTY"
+
+
+def test_missing_injury_payload_remains_unavailable(monkeypatch):
+    monkeypatch.setattr(pec.preview, "collect", lambda mid, terms, hist: {
+        "feature": {}, "strength": None, "recent_home": [], "recent_away": [],
+        "injuries": {}, "tables": [],
+    })
+    row = pec.collect_one({"match_id": "sporttery-2", "home": "A", "away": "B",
+                           "kickoff": "2026-08-23T20:00:00+08:00"})
+    assert row["evidence_audit"]["entries"]["injury"]["status"] == "UNAVAILABLE"
+    assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "UNAVAILABLE"

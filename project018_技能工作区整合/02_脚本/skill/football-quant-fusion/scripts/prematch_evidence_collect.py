@@ -88,11 +88,16 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
     home_inj, away_inj = injuries.get("home") or {}, injuries.get("away") or {}
     injury_value = {"home": home_inj, "away": away_inj}
     has_injury = bool(home_inj or away_inj)
+    injury_response_present = isinstance(injuries, dict) and any(
+        side in injuries for side in ("home", "away")
+    )
     suspension_value = {
         "home": [p for p in (home_inj.get("list") or []) if p.get("suspensionFlag")],
         "away": [p for p in (away_inj.get("list") or []) if p.get("suspensionFlag")],
     }
     has_suspension = bool(suspension_value["home"] or suspension_value["away"])
+    injury_status = "VALID" if has_injury else "VALID_EMPTY" if injury_response_present else "UNAVAILABLE"
+    suspension_status = "VALID" if has_suspension else "VALID_EMPTY" if injury_response_present else "UNAVAILABLE"
     # Sporttery preview exposes roster/absence information, not an official
     # starting XI.  XI is therefore pending for the rolling near-kickoff pass.
     kickoff = _parse(match.get("kickoff"))
@@ -108,17 +113,17 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
                               {"home": recent_home, "away": recent_away}, source_id=source_id,
                               source_url=source_url, collected_at=collected_at,
                               reason=None if has_form and scope_verified and len(recent_home) >= 5 and len(recent_away) >= 5 else "RECENT_FORM_SCOPE_UNVERIFIED" if has_form and not scope_verified else "RECENT_FORM_LT_5"),
-        "injury": _entry("VALID" if has_injury else "UNAVAILABLE", injury_value,
-                          source_id=source_id, source_url=source_url, collected_at=collected_at,
-                          reason=None if has_injury else "INJURY_ENDPOINT_EMPTY"),
-        "suspensions": _entry("VALID" if has_suspension else "UNAVAILABLE", suspension_value,
+        "injury": _entry(injury_status, injury_value,
+                             source_id=source_id, source_url=source_url, collected_at=collected_at,
+                             reason=None if has_injury or injury_response_present else "INJURY_ENDPOINT_UNAVAILABLE"),
+        "suspensions": _entry(suspension_status, suspension_value,
                                source_id=source_id, source_url=source_url, collected_at=collected_at,
-                               reason=None if has_suspension else "SUSPENSION_ENDPOINT_EMPTY"),
+                               reason=None if has_suspension or injury_response_present else "SUSPENSION_ENDPOINT_UNAVAILABLE"),
         "starting_xi": _entry("PENDING_REFRESH", None, source_id="official.lineup.pending",
                               source_url=source_url, collected_at=collected_at,
                               reason="OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"),
     }
-    missing = [name for name, item in entries.items() if item["status"] not in {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
+    missing = [name for name, item in entries.items() if item["status"] not in {"VALID", "VALID_EMPTY", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
     return {"schema_version": "evidence-audit-1.1", "critical_fields": list(REQUIRED),
             "entries": entries, "missing_fields": missing, "evidence_gap": bool(missing),
             "evidence_status": "GAP" if missing else "OK",
