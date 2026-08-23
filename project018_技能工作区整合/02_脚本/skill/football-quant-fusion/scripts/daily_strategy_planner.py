@@ -24,6 +24,10 @@ HAFU_LABELS = ["胜胜", "胜平", "胜负", "平胜", "平平", "平负", "负�
 HAD_LABELS = ["胜", "平", "负"]
 RECREATIONAL_QUOTAS = {"HAD": 3, "TTG": 2, "HAFU": 1, "CRS": 1}
 RECREATIONAL_SINGLE_STAKES = {"HAD": 14.0, "TTG": 10.0, "HAFU": 8.0, "CRS": 6.0}
+DEFAULT_RECREATIONAL_REQUIRED_EVIDENCE_STATUSES = {
+    "team_stats": {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"},
+    "recent_form": {"VALID", "PARTIAL", "OK", "AVAILABLE", "FRESH", "AGING"},
+}
 RECREATIONAL_LIMITS = {
     "HAD": {"minimum_probability_pct": 42.0, "minimum_odds": 1.30, "maximum_odds": 2.8, "maximum_overround_pct": 16.0},
     "TTG": {"minimum_probability_pct": 18.0, "minimum_odds": 2.50, "maximum_odds": 6.0, "maximum_overround_pct": 30.0},
@@ -258,7 +262,7 @@ def _recreational_candidates(
     if policy.get("recreational_strategy_enabled", True) is not True:
         return []
     allowed_pending = set(policy.get("recreational_allowed_markets_with_pending_lineup") or {"HAD", "TTG"})
-    required = policy.get("recreational_required_evidence_statuses") or {}
+    required = policy.get("recreational_required_evidence_statuses") or DEFAULT_RECREATIONAL_REQUIRED_EVIDENCE_STATUSES
     blocked = set(policy.get("recreational_block_reasons") or {"POST_KICKOFF_NOT_USABLE", "EVIDENCE_AUDIT_MISSING"})
     candidates = []
     for row in market_audit:
@@ -278,6 +282,11 @@ def _recreational_candidates(
             if gap_reasons & blocked:
                 continue
             entries = row.get("evidence_entries") or {}
+            # An empty provider field is not proof of a cleared injury report.
+            # Keep this ambiguity out of even the relaxed entertainment plan.
+            if any(str((entries.get(field) or {}).get("status") or "").upper() == "EMPTY_UNCONFIRMED"
+                   for field in ("injury", "suspensions")):
+                continue
             for field, allowed_statuses in required.items():
                 status = str((entries.get(field) or {}).get("status") or "").upper()
                 if status not in {str(item).upper() for item in allowed_statuses}:

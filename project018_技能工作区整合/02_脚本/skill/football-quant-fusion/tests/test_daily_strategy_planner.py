@@ -260,3 +260,26 @@ def test_recreational_gate_allows_low_risk_markets_with_lineup_pending(monkeypat
     assert {row["market"] for row in plan["single_purchase_recommendations"]} <= {"HAD", "TTG"}
     assert plan["budget"]["allocated_amount"] > 0
     assert all(row["edge_claim"] is False for row in plan["single_purchase_recommendations"])
+
+
+def test_recreational_gate_rejects_unconfirmed_empty_injury_field():
+    job = _job("sporttery-empty-injury")
+    job["outputs"][0]["evidence_audit"] = {
+        "evidence_gap": True,
+        "evidence_status": "GAP",
+        "evidence_gap_reasons": ["INJURY_EMPTY_UNCONFIRMED"],
+        "entries": {
+            "team_stats": {"status": "VALID"},
+            "recent_form": {"status": "VALID"},
+            "injury": {"status": "EMPTY_UNCONFIRMED"},
+            "suspensions": {"status": "VALID"},
+            "starting_xi": {"status": "PREDICTED"},
+        },
+    }
+    policy = {**_disabled_policy(), "recreational_strategy_enabled": True}
+    plan = dsp.build_daily_strategy(
+        [job], policy, bankroll=100, execution_mode="budgeted_action",
+        as_of=datetime.fromisoformat("2026-08-23T08:00:00+08:00"),
+    )
+    assert plan["budget"]["allocated_amount"] == 0.0
+    assert plan["single_purchase_recommendations"] == []
