@@ -27,6 +27,37 @@ import evidence_collect_defaults as ecd
 NOW_STR = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%dT%H:%M:%S+08:00")
 
 
+def render_fusion_evidence(m: dict) -> str:
+    """Render already-collected fusion evidence for LLM citation.
+
+    This is a provenance-preserving projection: it does not turn evidence into
+    probabilities and does not hide partial/unconfirmed states.
+    """
+    chain = m.get("evidence_chain") or {}
+    if not chain:
+        return ""
+    lines = ["## 已采集证据快照（LLM可引用）"]
+    for name in ("team_stats", "recent_form", "injury", "suspensions", "starting_xi"):
+        item = chain.get(name)
+        if not isinstance(item, dict):
+            continue
+        status = item.get("status") or "UNKNOWN"
+        source = item.get("source_id") or item.get("source") or "unknown"
+        refreshed = item.get("refreshed_at") or item.get("collected_at") or "unknown"
+        reason = item.get("missing_reason")
+        suffix = f"；reason={reason}" if reason else ""
+        lines.append(f"- {name}: status={status}；source={source}；refreshed_at={refreshed}{suffix}")
+        value = item.get("value")
+        if value not in (None, "", [], {}):
+            blob = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+            lines.append(f"  - facts={blob[:2400]}")
+    for key in ("evidence_snapshot_ref", "browser_evidence_ref"):
+        if m.get(key):
+            lines.append(f"- {key}: {m[key]}")
+    lines.append("> 说明：以上是采集器快照事实；预计首发仍是预测值，不等同官方确认首发；LLM票数不得当作概率。")
+    return "\n".join(lines)
+
+
 def _iso8(ts):
     return NOW_STR
 
@@ -102,9 +133,12 @@ def build_one(idx: int, m: dict, quant_tier: str) -> str:
         f"- 体彩官方全名：主队\"{tid.get('home_full') or home}\"、客队\"{tid.get('away_full') or away}\" | source({src_tc}) | collected_at({collected})")
     lines.append(
         f"- 联赛：{league}（体彩联赛名口径）；开球时间 {kick} 与体彩列表接口一致 | source(https://webapi.sporttery.cn/gateway/uniform/fb/getMatchDataPageListV1.qry) | collected_at({collected})")
+    fusion_evidence = render_fusion_evidence(m)
+    if fusion_evidence:
+        lines += ["", fusion_evidence]
     lines += ["", "## 证据缺口"]
     lines.append(
-        "> 说明：轻量证据自动生成（project023）：①伤停/首发名单未发布且未深度搜索；②双方近况/轮次背景未抓取；③天气/旅行距离未抓取；④外部欧赔未抓取。可上传深度证据覆盖后重跑预测。")
+        "> 说明：轻量证据自动生成（project023）。若上方存在融合采集器快照，则优先引用其来源、状态和时间戳；预计首发标记为 PREDICTED，不等同官方确认。未采集或状态不完整的字段继续保留缺口，不能用常识补齐。")
     return "\n".join(lines)
 
 

@@ -55,7 +55,7 @@
 - reliability_flags：原样列出（HIGH_MARKET_DEPENDENCY/TTG_SCORE_CONFLICT/EXTREME_*/...）
 - sensitivity：λ扰动±10%下各概率区间
 - recommendation_gate：production_recommendations_enabled / banker_allowed / raw_primary_probability / calibrated_primary_probability / confidence_pct / stale_pools / reasons
-- evidence_audit：统一记录 `team_stats` / `recent_form` / `injury` / `suspensions` / `starting_xi` 的 status、source_id、source_url、refreshed_at、age_hours；任一关键字段缺失、未验证或赛后采集时 `evidence_gap=true`，推荐门禁必须关闭并保留 `evidence_gap_reasons`。
+- evidence_audit：统一记录 `team_stats` / `recent_form` / `injury` / `suspensions` / `starting_xi` 的 status、source_id、source_url、refreshed_at、age_hours。`starting_xi.status=PREDICTED` 表示来源明确的预计首发：可作为赛前输入并不再单独触发 `evidence_gap`，但必须保留 `PREDICTED_XI_NOT_CONFIRMED` 风险标签，且不得在报告中称为官方确认首发；官方名单发布后应生成新快照。其它关键字段缺失、未验证或赛后采集时 `evidence_gap=true`，推荐门禁按缺口处理并保留 `evidence_gap_reasons`。
 - market_source_policy：HAD/TTG/HAFU/CRS 生产基准均为 Sporttery 官方赔率；国际赔率只能写入 `research_only` 侧车。
 - recommendation_gate.hhad_recommendation：让球轨独立研究字段；在独立校准完成前 `calibration_status=UNFITTED`、`banker_allowed=false`
 

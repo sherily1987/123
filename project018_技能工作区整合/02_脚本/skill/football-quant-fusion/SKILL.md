@@ -73,7 +73,7 @@ python $cli --help
 - `UNFITTED`：能计算研究值，但没有足够的独立校准；
 - `NOT_OFFERED`：目标市场本身未开售或不适用。
 
-伤停、首发、天气等不可得时写 `UNAVAILABLE`，不能解释为“没有风险”。所有人员、战意和环境数值调整必须进入 `adjustment_ledger`，包含事实、来源、采集时间、映射依据和验证状态。
+伤停、天气等不可得时写 `UNAVAILABLE`，不能解释为“没有风险”。首发分为 `VALID`（官方确认）和 `PREDICTED`（来源明确、时间戳明确的预计首发）；预计首发可以进入赛前研究输入，但必须保留“未确认”风险标签，并在临场官方名单出现后刷新。所有人员、战意和环境数值调整必须进入 `adjustment_ledger`，包含事实、来源、采集时间、映射依据和验证状态。
 
 ## 研究路由与双轨纪律
 
@@ -91,7 +91,12 @@ LLM轨只负责证据整理和定性分析。生产默认只调用 Kimi K3；其
 python $cli llm-evidence --input match.json --out-dir evidence
 ```
 
-证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发。
+量化采集器已经保存的 `evidence_chain`、`evidence_snapshot_ref` 和
+`browser_evidence_ref` 会先由 `evidence_merge.py` 合并，再自动投影到 LLM 的证据 Markdown；LLM 可以引用其中的事实、来源和
+时间戳。该投影只扩大证据可见性，不改变 LLM 的票数语义，也不把 LLM 输出写成量化概率；
+`PREDICTED` 首发必须继续标注为预计而非官方确认。
+
+证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发；官方首发未发布时可采集预计首发并标记 `starting_xi.status=PREDICTED`，不得改写为官方确认。
 本地 HTTP/Playwright 优先；失败项写入 `browser_tasks.json`，由当前 Codex 浏览器回补并落成可审计快照。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
 仅剩体彩赔率时 K3 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
@@ -120,6 +125,15 @@ python $cli odds-intl --match-file raw.json --dry-run
 ```
 
 `record` 只接受单场裸对象；批量 `{matches:[...]}` 使用 `daily-pipeline` 或拆分后逐场登记。APIFootball fallback 只有显式启用且 `score_90_status=verified` 才能进入结算分母。
+
+## 已有预测的重新采集与重预测
+
+同一场比赛需要更新盘口或赛前证据时，必须遵循
+`references/reprediction_workflow.md`：保留旧登记，生成带新
+`prediction_as_of` 的替代快照并出具新旧对比。预计首发可以用
+`starting_xi.status=PREDICTED` 进入证据链，但不得冒充官方确认；官方名单发布后再生成
+`VALID` 快照。生产仍跑 `market_only`，独立信息只进入研究/影子路由。报告必须同时列出
+概率差异、盘口差异、证据缺口、`model_version` 和 `probability_signature`，不能只展示新预测。
 
 ## 版本、样本与结论纪律
 

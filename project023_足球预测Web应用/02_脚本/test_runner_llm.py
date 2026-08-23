@@ -30,6 +30,8 @@ def test_fusion_to_llm_match_maps_sporttery_meta():
             "away_full": "哈尔姆斯塔德",
         },
         "hhad": {"line": -1.0, "odds": [1.71, 4.0, 3.4]},
+        "evidence_chain": {"starting_xi": {"status": "PREDICTED", "source_id": "fotmob", "refreshed_at": "2026-08-18T00:00:00+08:00"}},
+        "evidence_snapshot_ref": "F:/evidence/sporttery-2040915.json",
     })
     assert got["match_id"] == 2040915
     assert got["match_num"] == "周一002"
@@ -37,6 +39,8 @@ def test_fusion_to_llm_match_maps_sporttery_meta():
     assert got["model_odds"] == [1.21, 5.6, 8.05]
     assert got["kickoff_iso"] == "2026-08-18T01:00:00+08:00"
     assert got["team_ids"]["away_full"] == "哈尔姆斯塔德"
+    assert got["evidence_chain"]["starting_xi"]["status"] == "PREDICTED"
+    assert got["evidence_snapshot_ref"].endswith("sporttery-2040915.json")
 
 
 def test_future_llm_matches_skips_kicked_off():
@@ -100,7 +104,9 @@ def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeyp
         {"match_id": 2040915, "home": "赫根", "away": "哈尔姆斯",
          "league": "瑞超", "kickoff_iso": "2026-08-20T01:00:00+08:00",
          "model_odds": [1.21, 5.6, 8.05], "hhad": {},
-         "team_ids": {"home_full": "赫根", "away_full": "哈尔姆斯塔德"}},
+         "team_ids": {"home_full": "赫根", "away_full": "哈尔姆斯塔德"},
+         "evidence_chain": {"starting_xi": {"status": "PREDICTED", "source_id": "fotmob", "refreshed_at": "2026-08-20T00:00:00+08:00", "value": {"home": ["A"], "away": ["B"]}}},
+         "evidence_snapshot_ref": "F:/evidence/sporttery-2040915.json"},
         {"match_id": 2999777, "home": "甲", "away": "乙",
          "league": "瑞超", "kickoff_iso": "2026-08-20T03:00:00+08:00",
          "model_odds": [2.1, 3.3, 3.4], "hhad": {},
@@ -108,6 +114,7 @@ def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeyp
     ], dest)
     assert [x["source"] for x in done] == ["reuse", "light"]
     assert "深度证据" in (dest / "evidence_001_赫根_哈尔姆斯.md").read_text(encoding="utf-8")
+    assert "PREDICTED" in (dest / "evidence_001_赫根_哈尔姆斯.md").read_text(encoding="utf-8")
     assert (dest / "evidence_001_赫根_哈尔姆斯_mcp.md").read_text(encoding="utf-8") == "mcp\n"
     light = (dest / "evidence_002_甲_乙.md").read_text(encoding="utf-8")
     assert "## 1. 伤停/阵容" in light

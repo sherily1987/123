@@ -29,6 +29,8 @@ MAP = {
     "kickoff-date-collect": "sales_day_collect.py",
     "record": "fusion_record.py",
     "daily-pipeline": "fusion_daily_pipeline.py",
+    "prematch-evidence": "prematch_evidence_collect.py",
+    "bb-browser-evidence": "bb_browser_evidence_collect.py",
 }
 
 HELP = """\
@@ -44,6 +46,8 @@ Supported commands:
   job | strategy-plan | independent-market-shadow
   hybrid-shadow | hybrid-evaluate | hybrid-admission
   late-info
+  prematch-evidence
+  bb-browser-evidence
 """
 
 
@@ -325,6 +329,14 @@ def main():
         return
     if cmd == "llm-evidence":
         run_llm_evidence(rest)
+        return
+    if cmd == "prematch-evidence":
+        # 赛前事实自动采集：只写 evidence sidecar，不改写已登记预测。
+        run_script("prematch_evidence_collect.py", rest)
+        return
+    if cmd == "bb-browser-evidence":
+        # BB-browser/FotMob 补充证据：research-only，要求显式 URL 映射。
+        run_script("bb_browser_evidence_collect.py", rest)
         return
     if cmd == "odds-intl":
         # 国际盘对照（可选，The Odds API）：仅 CLV/edge 研究，不参与概率建模。

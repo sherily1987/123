@@ -45,7 +45,10 @@ DERIVATIVE_PREFIXES = ("TTG_SCORE_CONFLICT", "HHAD_CONFLICT")
 market_freshness_meta = {}
 
 EVIDENCE_FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
-_EVIDENCE_VALID = {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG"}
+# PREDICTED is an explicit, time-stamped probable-XI state.  It clears the
+# field-presence gate but remains distinguishable from an official XI so
+# downstream reports can apply a risk tag and refresh it near kickoff.
+_EVIDENCE_VALID = {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG"}
 _EVIDENCE_BAD = {"MISSING", "UNAVAILABLE", "UNVERIFIED", "OUTDATED", "ASSUMED", "POST_KICKOFF"}
 
 

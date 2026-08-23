@@ -186,6 +186,10 @@ def fusion_to_llm_match(match: dict) -> dict:
             "home_full": meta.get("home_full") or match.get("home") or "",
             "away_full": meta.get("away_full") or match.get("away") or "",
         },
+        # 证据快照只作为 LLM 可引用事实，不改变 LLM 票数语义，也不进入量化概率。
+        "evidence_chain": match.get("evidence_chain") or {},
+        "evidence_snapshot_ref": match.get("evidence_snapshot_ref"),
+        "browser_evidence_ref": match.get("browser_evidence_ref"),
     }
 
 
@@ -232,6 +236,10 @@ def prepare_llm_evidence(matches: list[dict], ev_dir: Path) -> list[dict]:
                 dest.write_text(merged, encoding="utf-8")
             except Exception:
                 pass
+            fusion_text = light_evidence.render_fusion_evidence(m)
+            if fusion_text:
+                with dest.open("a", encoding="utf-8") as fh:
+                    fh.write("\n\n" + fusion_text + "\n")
             done.append({"match_index": i, "file": dest.name, "source": "reuse", "match_id": mid})
             continue
         tier = quant_annotation(m.get("league", ""), tiers)

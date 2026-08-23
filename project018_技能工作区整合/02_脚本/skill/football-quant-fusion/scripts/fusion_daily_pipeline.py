@@ -38,6 +38,7 @@ from runtime_paths import (
     forward_work_dir,
     odds_store,
 )
+from evidence_merge import merge_browser_audit
 
 # 统一解释器：当前为非 3.12 时，子进程改用内置 Python 3.12
 PY = resolve_python()
@@ -188,6 +189,10 @@ def main():
     ap.add_argument('--work-dir', type=Path, default=WORK)
     ap.add_argument('--allow-legacy-write', action='store_true', help=argparse.SUPPRESS)
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--bb-browser-url-map', type=Path,
+                    help='可选：BB-browser/FotMob URL映射JSON；仅追加research-only证据')
+    ap.add_argument('--bb-browser-discover', action='store_true',
+                    help='可选：按比赛身份发现官方/补充来源候选，写browser_tasks.json')
     ap.add_argument('--apifootball-fallback', action='store_true',
                     help='体彩官方赛果缺失时显式启用 APIFootball 欧冠补全')
     a = ap.parse_args()
@@ -270,6 +275,59 @@ def main():
         report['input_gate'] = {'status': 'skipped', 'reason': 'no formal Sporttery inputs (unopened or incomplete odds)'}
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return
+    # 3.4) Automatic pre-match evidence pass.  This writes immutable sidecars
+    # and attaches only the audited evidence fields to the in-memory input;
+    # the official odds and registered prediction identity remain unchanged.
+    evidence_dir = d / "evidence_snapshots"
+    er = run([HERE / 'prematch_evidence_collect.py', '--input', batch,
+              '--output-dir', evidence_dir])
+    try:
+        report['prematch_evidence'] = json.loads(er.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError, AttributeError):
+        report['prematch_evidence'] = {'status': 'error', 'error': (er.stderr or er.stdout)[-300:]}
+    for mm in matches:
+        mid = str(mm.get('match_id') or (mm.get('sporttery_meta') or {}).get('match_id') or '')
+        sidecar = evidence_dir / (mid if mid.startswith('sporttery-') else f'sporttery-{mid}')
+        if not sidecar.exists():
+            continue
+        try:
+            evidence = json.loads(sidecar.read_text(encoding='utf-8-sig'))
+        except (OSError, ValueError):
+            continue
+        audit = evidence.get('evidence_audit') or {}
+        chain = {name: (audit.get('entries') or {}).get(name) for name in audit.get('critical_fields') or []}
+        mm['evidence_chain'] = {k: v for k, v in chain.items() if v}
+        mm['evidence_snapshot_ref'] = str(sidecar)
+    if a.bb_browser_url_map or a.bb_browser_discover:
+        browser_dir = evidence_dir / 'bb-browser'
+        browser_args = [HERE / 'bb_browser_evidence_collect.py', '--input', batch,
+                         '--output-dir', browser_dir]
+        if a.bb_browser_url_map:
+            browser_args += ['--url-map', a.bb_browser_url_map]
+        if a.bb_browser_discover:
+            browser_args += ['--discover']
+        br = run(browser_args)
+        try:
+            report['bb_browser_evidence'] = json.loads(br.stdout.strip().splitlines()[-1])
+        except (ValueError, IndexError, AttributeError):
+            report['bb_browser_evidence'] = {'status': 'error', 'error': (br.stderr or br.stdout)[-300:]}
+        for mm in matches:
+            mid = str(mm.get('match_id') or (mm.get('sporttery_meta') or {}).get('match_id') or '')
+            browser_sidecar = browser_dir / f"{mid if mid.startswith('sporttery-') else f'sporttery-{mid}'}.json"
+            if browser_sidecar.exists():
+                mm['browser_evidence_ref'] = str(browser_sidecar)
+                try:
+                    browser_snapshot = json.loads(browser_sidecar.read_text(encoding='utf-8-sig'))
+                    merged_chain, merge_audit = merge_browser_audit(
+                        mm.get('evidence_chain') or {},
+                        browser_snapshot.get('evidence_audit') or {},
+                    )
+                    mm['evidence_chain'] = merged_chain
+                    mm['browser_evidence_merge_audit'] = merge_audit
+                except (OSError, ValueError, TypeError) as exc:
+                    mm['browser_evidence_merge_audit'] = {
+                        'status': 'ERROR', 'reason': str(exc)[:300]
+                    }
     if a.dry_run:
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return
