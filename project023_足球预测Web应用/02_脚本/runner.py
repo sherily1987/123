@@ -456,6 +456,36 @@ def auto_collect_late_info(input_path: Path, day: str, matches: list[dict], *, n
     }
 
 
+def build_deepseek_calibration_audit(output_path: Path) -> dict:
+    """Refresh the model-specific calibration audit without changing production."""
+    script = (llm_repo() / "scripts" / "build_deepseek_calibration_sample.py").resolve()
+    jobs_root = (backtest_store() / ".." / "jobs").resolve()
+    results_root = (backtest_store() / "results").resolve()
+    if not script.exists() or not jobs_root.is_dir() or not results_root.is_dir():
+        return {"status": "unavailable", "reason": "calibration_paths_missing"}
+    try:
+        proc = subprocess.run(
+            [PY, str(script), "--jobs-root", str(jobs_root),
+             "--results-root", str(results_root), "--output", str(output_path)],
+            capture_output=True, text=True, timeout=180,
+            env=_no_proxy_env(), cwd=str(script.parent),
+            encoding="utf-8", errors="replace",
+        )
+    except Exception as exc:
+        return {"status": "error", "reason": str(exc)[:240]}
+    if proc.returncode != 0:
+        return {"status": "error", "returncode": proc.returncode,
+                "reason": (proc.stderr or proc.stdout)[-300:]}
+    try:
+        report = json.loads(output_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return {"status": "error", "reason": f"audit_output_invalid:{exc}"}
+    return {"status": "ok", "model": report.get("model"),
+            "eligible_settled_rows": report.get("eligible_settled_rows", 0),
+            "metrics": report.get("metrics") or {},
+            "output": str(output_path)}
+
+
 _LLM_HEAD = re.compile(r"⚽ 第\d+/\d+场 \[([^\]]+)\]\s+(\S+)\s+VS\s+(\S+)")
 _LLM_DIR = re.compile(
     r"综合方向:\s+(\S+)\s+\((\d+(?:\.\d+)?)/(\d+(?:\.\d+)?)票,\s*强度(\d+)%\)"
@@ -714,6 +744,9 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             json.dumps(parsed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         jobs_n = write_llm_jobs(day, matches, parsed["rows"])
+        calibration_audit = build_deepseek_calibration_audit(
+            work / "deepseek_calibration_audit.json"
+        )
         report = [
             f"# LLM轨 {day}",
             "",
@@ -727,6 +760,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             f"- 复用深度证据 {reused}，轻量证据 {light}",
             f"- 出方向 {parsed['ok']}，门禁/审计跳过 {parsed['skipped']}",
             f"- 工单写入 {jobs_n}",
+            f"- DeepSeek 校准审计：{calibration_audit.get('eligible_settled_rows', 0)} 个可结算样本",
             f"- 最新日志 `{log_path.name}`；不可变运行副本 `{immutable_log_path.name}`",
             "",
             "| 场次 | 比赛 | 方向 | 强度 | 比分 |",
