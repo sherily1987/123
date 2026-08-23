@@ -76,7 +76,19 @@ def _extract_json_value(text: str) -> Any:
         end = max(raw.rfind("]"), raw.rfind("}"))
         if start < 0 or end <= start:
             raise ValueError("browser response is not JSON")
-        return json.loads(raw[start:end + 1])
+    return json.loads(raw[start:end + 1])
+
+
+def _is_search_engine_url(link: str) -> bool:
+    """Exclude search-engine navigation links from auditable source candidates."""
+    try:
+        host = (urllib.parse.urlparse(link).hostname or "").lower().rstrip(".")
+    except ValueError:
+        return True
+    return (host == "google.com" or host.endswith(".google.com") or
+            host == "google.com.hk" or host.endswith(".google.com.hk") or
+            host == "google.cn" or host.endswith(".google.cn") or
+            host == "googleusercontent.com" or host.endswith(".googleusercontent.com"))
 
 
 def _tab_id(output: str) -> str:
@@ -176,7 +188,10 @@ def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
         # JSON.stringify returns a JSON string, hence the second decode.
         if isinstance(links, str):
             links = json.loads(links)
-        links = list(dict.fromkeys(str(link) for link in (links or []) if str(link).startswith("http")))
+        links = list(dict.fromkeys(
+            str(link) for link in (links or [])
+            if str(link).startswith("http") and not _is_search_engine_url(str(link))
+        ))
         custom_domains = tuple(str(domain).lower().strip().rstrip("/") + "/"
                               for domain in (match.get("official_domains") or [])
                               if str(domain).strip())

@@ -152,6 +152,8 @@ def test_discover_sources_uses_match_identity_not_fixed_league_url(monkeypatch):
             return "tab: discover1\n"
         if args[0] == "eval":
             return json.dumps([
+                "https://www.google.com.hk/search?q=should-be-ignored",
+                "https://www.google.com/search?q=should-be-ignored-too",
                 "https://www.uefa.com/uefachampionsleague/match/2049221--bodo-glimt-vs-n-e-c/",
                 "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
             ])
@@ -166,6 +168,7 @@ def test_discover_sources_uses_match_identity_not_fixed_league_url(monkeypatch):
     assert row["status"] == "source_candidates_found"
     assert row["official_candidates"][0].startswith("https://www.uefa.com/")
     assert row["third_party_candidates"][0].startswith("https://www.fotmob.com/")
+    assert all("google" not in url for url in row["unclassified_candidates"])
     assert any(args[0] == "close" for args in calls)
 
 
