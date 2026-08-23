@@ -207,7 +207,9 @@ def _entry(status: str, value: Any, *, source_url: str, collected_at: str,
 
 def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
               collected_at: str, *, source_id: str = "fotmob.bb_browser",
-              provider: str = "fotmob_via_bb_browser") -> dict[str, Any]:
+              provider: str = "fotmob_via_bb_browser",
+              predicted_xi: dict[str, Any] | None = None,
+              predicted_xi_source_url: str | None = None) -> dict[str, Any]:
     general = payload.get("general") or {}
     facts = ((payload.get("content") or {}).get("matchFacts") or {})
     lineup = ((payload.get("content") or {}).get("lineup") or {})
@@ -224,6 +226,17 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
     suspension_rows_present = bool(home_suspensions or away_suspensions)
     xg = _match_xg(payload)
     lineup_source = str(lineup.get("source") or "")
+    if isinstance(predicted_xi, dict) and (predicted_xi.get("home") or predicted_xi.get("away")):
+        # A browser-captured media preview may provide an expected XI even
+        # when FotMob's structured endpoint has no lineup yet.  Preserve the
+        # explicit PREDICTED status and the media URL; never promote it to
+        # confirmed/official.
+        home_team = {**home_team, "starters": predicted_xi.get("home") or [],
+                     "formation": predicted_xi.get("home_formation") or home_team.get("formation")}
+        away_team = {**away_team, "starters": predicted_xi.get("away") or [],
+                     "formation": predicted_xi.get("away_formation") or away_team.get("formation")}
+        lineup_source = str(predicted_xi.get("source") or "predicted_media_preview")
+        source_url = predicted_xi_source_url or source_url
     official_xi = lineup_source.lower() in {"official", "confirmed", "startingxi"}
     has_predicted_xi = bool(home_team.get("starters") or away_team.get("starters"))
     xi_status = "VALID" if official_xi else "PREDICTED" if has_predicted_xi else "PENDING_REFRESH"
@@ -305,7 +318,12 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         tab = _tab_id(_run_browser(["open", str(url)]))
         # Function syntax survives the Windows bb-browser.cmd argument parser;
         # arrow functions are truncated by the shim in subprocess mode.
-        expression = f'fetch("/api/data/matchDetails?matchId={fotmob_id}").then(function(r){{return r.text()}})'
+        # Use an absolute origin: BB-browser may leave the tab on a consent or
+        # redirect page, and a relative fetch then has no valid base URL.  The
+        # explicit FotMob origin also prevents accidentally querying a prior
+        # tab's domain while preserving the same logged-in browser context.
+        api_url = "https://www.fotmob.com/api/data/matchDetails?matchId=" + urllib.parse.quote(str(fotmob_id), safe="")
+        expression = f'fetch("{api_url}").then(function(r){{return r.text()}})'
         payload = _extract_json(_run_browser(["eval", "--tab", tab, expression]))
         general = payload.get("general") or {}
         if general.get("started") or general.get("finished"):
@@ -315,6 +333,25 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
             match, payload, str(url), collected_at,
             source_id=str(mapping.get("source_id") or "fotmob.bb_browser"),
             provider=str(mapping.get("provider") or "fotmob_via_bb_browser"),
+            predicted_xi=mapping.get("predicted_xi"),
+            predicted_xi_source_url=mapping.get("predicted_xi_source_url"),
+        )}
+    except Exception:
+        # A source page can be reachable while its structured FotMob endpoint
+        # is blocked/rate-limited.  If a browser review already captured an
+        # explicit predicted XI in the mapping, retain that auditable fact
+        # instead of discarding it; leave other fields as unavailable.
+        predicted = mapping.get("predicted_xi") if isinstance(mapping, dict) else None
+        if not isinstance(predicted, dict) or not (predicted.get("home") or predicted.get("away")):
+            raise
+        payload = {"general": {"started": False, "finished": False},
+                   "content": {"matchFacts": {}, "lineup": {}}}
+        return {"status": "ok", **_snapshot(
+            match, payload, str(url), collected_at,
+            source_id=str(mapping.get("source_id") or "fotmob.bb_browser"),
+            provider=str(mapping.get("provider") or "fotmob_via_bb_browser"),
+            predicted_xi=predicted,
+            predicted_xi_source_url=mapping.get("predicted_xi_source_url"),
         )}
     finally:
         if tab:

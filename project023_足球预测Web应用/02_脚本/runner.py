@@ -263,6 +263,17 @@ def prepare_llm_evidence(matches: list[dict], ev_dir: Path) -> list[dict]:
         away = m.get("away") or "away"
         dest = ev_dir / f"evidence_{i:03d}_{home}_{away}.md"
         src = index.get(mid) if mid else None
+        # Never reuse a historical Markdown projection after a newer
+        # immutable snapshot has arrived.  Reusing by match ID alone can feed
+        # the LLM stale lineup/injury facts even though the collector just
+        # refreshed the evidence chain.
+        if src and src.is_file():
+            snapshot_ref = m.get("evidence_snapshot_ref")
+            try:
+                if snapshot_ref and Path(snapshot_ref).is_file() and Path(snapshot_ref).stat().st_mtime > src.stat().st_mtime:
+                    src = None
+            except OSError:
+                pass
         if src and src.is_file():
             shutil.copy2(src, dest)
             mcp = src.with_name(src.stem + "_mcp.md")
@@ -401,14 +412,53 @@ def auto_collect_prematch_evidence(input_path: Path, day: str, match_ids: list[s
             break
         except ValueError:
             continue
+    merge_report = _merge_browser_sidecars(day)
     return {
         "attempted": len(set(match_ids)),
         "status": "ok" if result.returncode == 0 else "error",
         "returncode": result.returncode,
         "report": payload,
+        "browser_merge": merge_report,
         "error_tail": ((result.stderr or result.stdout or "")[-500:]
                        if result.returncode else ""),
     }
+
+
+def _merge_browser_sidecars(day: str, *, forward_root: Path | None = None) -> dict:
+    """Merge browser sidecars after API refresh without losing provenance."""
+    root = Path(forward_root or forward_work_dir()) / day
+    primary_dir = root / "evidence_snapshots"
+    browser_dir = primary_dir / "bb-browser"
+    if not primary_dir.is_dir() or not browser_dir.is_dir():
+        return {"status": "not_found", "merged": 0, "conflicts": 0}
+    merged = conflicts = 0
+    usable = {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG", "PREDICTED"}
+    for browser_path in sorted(browser_dir.glob("sporttery-*.json")):
+        primary_path = primary_dir / browser_path.name
+        if not primary_path.is_file():
+            continue
+        try:
+            primary = json.loads(primary_path.read_text(encoding="utf-8"))
+            browser = json.loads(browser_path.read_text(encoding="utf-8"))
+            audit = primary.get("evidence_audit") or {}
+            chain = {k: v for k, v in (audit.get("entries") or {}).items() if v}
+            chain, merge_audit = merge_browser_audit(chain, browser.get("evidence_audit") or {})
+            missing = [k for k, value in chain.items()
+                       if str((value or {}).get("status") or "").upper() not in usable]
+            audit.update({"entries": chain, "missing_fields": missing,
+                          "evidence_gap": bool(missing),
+                          "evidence_status": "GAP" if missing else "OK",
+                          "merged_chain_fields": sorted(chain),
+                          "browser_evidence_ref": str(browser_path),
+                          "browser_merge_audit": merge_audit})
+            primary["evidence_audit"] = audit
+            primary["browser_evidence_ref"] = str(browser_path)
+            primary_path.write_text(json.dumps(primary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            merged += 1
+            conflicts += len(merge_audit.get("conflicts") or [])
+        except (OSError, TypeError, ValueError):
+            continue
+    return {"status": "ok", "merged": merged, "conflicts": conflicts}
 
 
 def auto_collect_late_info(input_path: Path, day: str, matches: list[dict], *, now: datetime | None = None) -> dict:

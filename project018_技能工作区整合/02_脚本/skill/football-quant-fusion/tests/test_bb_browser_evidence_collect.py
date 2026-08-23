@@ -64,6 +64,31 @@ def test_collect_one_accepts_predicted_xi_as_explicit_nonofficial_evidence(monke
     assert any(args[0] == "close" for args in calls)
 
 
+def test_mapping_predicted_xi_overlay_keeps_media_provenance(monkeypatch):
+    def fake_run(args):
+        if args[0] == "open":
+            return "tab: trial2\n"
+        if args[0] == "eval":
+            return json.dumps(_payload(), ensure_ascii=False)
+        return "closed\n"
+
+    monkeypatch.setattr(bec, "_run_browser", fake_run)
+    row = bec.collect_one(
+        {"match_id": "sporttery-3", "home": "Bodø/Glimt", "away": "NEC Nijmegen",
+         "kickoff": "2026-08-26T03:00:00+08:00"},
+        {"url": "https://www.fotmob.com/matches/x/abc", "fotmob_match_id": "5987811",
+         "predicted_xi": {"source": "sportsmole.predicted", "home": [{"name": "H"}],
+                          "away": [{"name": "A"}], "home_formation": "4-3-3"},
+         "predicted_xi_source_url": "https://example.test/preview"},
+        now=bec._parse("2026-08-23T17:45:00+08:00"),
+    )
+    xi = row["evidence_audit"]["entries"]["starting_xi"]
+    assert xi["status"] == "PREDICTED"
+    assert xi["source_id"] == "fotmob.bb_browser"
+    assert xi["source_url"] == "https://example.test/preview"
+    assert xi["value"]["home"] == [{"name": "H"}]
+
+
 def test_collect_file_normalizes_nested_sporttery_identity_for_pending_tasks(tmp_path):
     source = tmp_path / "input.json"
     source.write_text(json.dumps({"matches": [{

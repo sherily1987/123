@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -380,6 +381,27 @@ def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeyp
     light = (dest / "evidence_002_甲_乙.md").read_text(encoding="utf-8")
     assert "## 1. 伤停/阵容" in light
     assert "matchId=2999777" in light
+
+
+def test_prepare_does_not_reuse_markdown_older_than_snapshot(tmp_path: Path, monkeypatch):
+    src = tmp_path / "src"
+    src.mkdir()
+    deep = src / "evidence_001_主队_客队.md"
+    deep.write_text("旧证据\n", encoding="utf-8")
+    snapshot = tmp_path / "sporttery-1.json"
+    snapshot.write_text("{}\n", encoding="utf-8")
+    newer = deep.stat().st_mtime + 30
+    os.utime(snapshot, (newer, newer))
+    monkeypatch.setattr(runner, "existing_evidence_index",
+                        lambda exclude=None: {"sporttery-1": deep})
+    dest = tmp_path / "llm_evidence"
+    done = runner.prepare_llm_evidence([{
+        "match_id": 1, "home": "主队", "away": "客队", "league": "测试",
+        "kickoff_iso": "2026-08-25T03:00:00+08:00", "model_odds": [2, 3, 4],
+        "evidence_snapshot_ref": str(snapshot),
+    }], dest)
+    assert done[0]["source"] == "light"
+    assert "旧证据" not in (dest / "evidence_001_主队_客队.md").read_text(encoding="utf-8")
 
 
 def test_n8n_llm_workflow_posts_to_api_llm():
