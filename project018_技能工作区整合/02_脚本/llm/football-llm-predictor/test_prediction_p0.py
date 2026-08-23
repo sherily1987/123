@@ -269,6 +269,18 @@ def test_catalog_accepts_structured_snapshot_blockquotes_and_honors_status():
     assert catalog[1]["source"].endswith("fixture=1")
 
 
+def test_prompt_explicitly_downweights_predicted_xi():
+    text = (
+        "> - starting_xi: status=PREDICTED；source=fotmob.bb_browser；"
+        "source(https://example.test/match) | collected_at(2026-08-23T12:00:00+08:00)\n"
+        ">   facts={\"home\":[\"A\"],\"away\":[\"B\"]}\n"
+    )
+    prompt = predict.build_evidence_prompt({"home": "A", "away": "B"}, text, 1)
+    assert "预计首发/PREDICTED" in prompt
+    assert "权重低于官方已确认首发" in prompt
+    assert "不得写成‘官方首发’" in prompt
+
+
 def test_empty_unconfirmed_status_is_a_gap_not_a_clear_injury_claim():
     text = """## 1. 伤停/阵容
 - 伤停状态 | EMPTY_UNCONFIRMED | source(https://example.test/injuries) | collected_at(2026-08-15T10:00:00+08:00)

@@ -335,6 +335,17 @@ def build_evidence_prompt(match, evidence_text, match_idx):
     catalog = build_evidence_catalog(evidence_text)
     lines.append(f"\n=== 结构化证据（{evidence_collection_label(evidence_text)}） ===")
     lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
+    predicted_xi = any(item.get("status") == "SINGLE_SOURCE" and
+                       ("starting_xi" in str(item.get("fact", "")).lower() or
+                        "预计首发" in str(item.get("fact", "")) or
+                        "predicted" in str(item.get("fact", "")).lower())
+                       for item in catalog)
+    if predicted_xi:
+        lines.append(
+            "\n首发证据分级规则：目录中的预计首发/PREDICTED 只能作为赛前先验，权重低于官方已确认首发；"
+            "不得写成‘官方首发’或据此给出高置信结论。若预计首发与伤停、近期出场或其他来源冲突，"
+            "必须保留冲突并下调置信度；开球前未出现官方首发时，仍标记为预计首发。"
+        )
     lines.append(
         "\n只使用上述 E 编号。decision=opinion 时必须给出 probs_1x2、比分Top3、大小球、半全场，不得留空。"
         "近5场、首发和伤停只用目录中已通过来源/时间门禁的真实快照；未采集到就写缺口，不得用投票、占位文本或常识补齐。"
