@@ -1,0 +1,365 @@
+{
+  "schema_version": "league-kt-1.0",
+  "generated_at": "2026-08-24T02:30:18+08:00",
+  "devig_method": "power",
+  "protocol": "chronological 70/30; grid fit by train ECE; test reported",
+  "requested_leagues": [
+    "ENG",
+    "ESP",
+    "GER",
+    "ITA",
+    "FRA"
+  ],
+  "leagues": {
+    "ENG": {
+      "league": "ENG",
+      "n": 5150,
+      "train_n": 3604,
+      "test_n": 1546,
+      "date_range": [
+        "2012-08-18",
+        "2026-01-08"
+      ],
+      "fitted": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "train_metrics": {
+          "n": 3604,
+          "brier_mean": 0.563821,
+          "log_loss": 0.953978,
+          "accuracy_pct": 54.88,
+          "ece": 0.005904
+        },
+        "test_metrics": {
+          "n": 1546,
+          "brier_mean": 0.561609,
+          "log_loss": 0.947816,
+          "accuracy_pct": 56.02,
+          "ece": 0.006951
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1546,
+          "brier_mean": 0.563511,
+          "log_loss": 0.950661,
+          "accuracy_pct": 56.02,
+          "ece": 0.015717
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1546,
+          "brier_mean": 0.561609,
+          "log_loss": 0.947816,
+          "accuracy_pct": 56.02,
+          "ece": 0.006951
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1546,
+          "brier_mean": 0.561609,
+          "log_loss": 0.947816,
+          "accuracy_pct": 56.02,
+          "ece": 0.006951
+        }
+      },
+      "candidate_review": {
+        "decision": "candidate",
+        "delta_fitted_minus_raw": {
+          "brier_mean": 0.0,
+          "log_loss": 0.0,
+          "ece": 0.0
+        },
+        "regression_tolerance": 0.0005,
+        "production_authorized": false,
+        "reason": "all held-out Brier/LogLoss/ECE deltas within tolerance; requires separate release review"
+      }
+    },
+    "ESP": {
+      "league": "ESP",
+      "n": 5127,
+      "train_n": 3588,
+      "test_n": 1539,
+      "date_range": [
+        "2012-08-18",
+        "2026-01-12"
+      ],
+      "fitted": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "train_metrics": {
+          "n": 3588,
+          "brier_mean": 0.562733,
+          "log_loss": 0.94964,
+          "accuracy_pct": 54.68,
+          "ece": 0.006035
+        },
+        "test_metrics": {
+          "n": 1539,
+          "brier_mean": 0.56883,
+          "log_loss": 0.958621,
+          "accuracy_pct": 54.84,
+          "ece": 0.016849
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1539,
+          "brier_mean": 0.571648,
+          "log_loss": 0.962374,
+          "accuracy_pct": 54.71,
+          "ece": 0.026317
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1539,
+          "brier_mean": 0.56883,
+          "log_loss": 0.958621,
+          "accuracy_pct": 54.84,
+          "ece": 0.016849
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1539,
+          "brier_mean": 0.56883,
+          "log_loss": 0.958621,
+          "accuracy_pct": 54.84,
+          "ece": 0.016849
+        }
+      },
+      "candidate_review": {
+        "decision": "candidate",
+        "delta_fitted_minus_raw": {
+          "brier_mean": 0.0,
+          "log_loss": 0.0,
+          "ece": 0.0
+        },
+        "regression_tolerance": 0.0005,
+        "production_authorized": false,
+        "reason": "all held-out Brier/LogLoss/ECE deltas within tolerance; requires separate release review"
+      }
+    },
+    "GER": {
+      "league": "GER",
+      "n": 4126,
+      "train_n": 2888,
+      "test_n": 1238,
+      "date_range": [
+        "2012-08-24",
+        "2026-01-14"
+      ],
+      "fitted": {
+        "draw_k": 1.1,
+        "temperature": 0.95,
+        "train_metrics": {
+          "n": 2888,
+          "brier_mean": 0.58319,
+          "log_loss": 0.979923,
+          "accuracy_pct": 51.49,
+          "ece": 0.009881
+        },
+        "test_metrics": {
+          "n": 1238,
+          "brier_mean": 0.577824,
+          "log_loss": 0.971896,
+          "accuracy_pct": 54.28,
+          "ece": 0.0136
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1238,
+          "brier_mean": 0.577952,
+          "log_loss": 0.972027,
+          "accuracy_pct": 54.28,
+          "ece": 0.014842
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1238,
+          "brier_mean": 0.577936,
+          "log_loss": 0.97241,
+          "accuracy_pct": 54.28,
+          "ece": 0.007556
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1238,
+          "brier_mean": 0.577936,
+          "log_loss": 0.97241,
+          "accuracy_pct": 54.28,
+          "ece": 0.007556
+        }
+      },
+      "candidate_review": {
+        "decision": "hold",
+        "delta_fitted_minus_raw": {
+          "brier_mean": -0.000112,
+          "log_loss": -0.000514,
+          "ece": 0.006044
+        },
+        "regression_tolerance": 0.0005,
+        "production_authorized": false,
+        "reason": "at least one held-out metric regressed beyond tolerance"
+      }
+    },
+    "ITA": {
+      "league": "ITA",
+      "n": 5136,
+      "train_n": 3595,
+      "test_n": 1541,
+      "date_range": [
+        "2012-08-25",
+        "2026-01-14"
+      ],
+      "fitted": {
+        "draw_k": 0.95,
+        "temperature": 1.05,
+        "train_metrics": {
+          "n": 3595,
+          "brier_mean": 0.55653,
+          "log_loss": 0.940354,
+          "accuracy_pct": 56.58,
+          "ece": 0.006846
+        },
+        "test_metrics": {
+          "n": 1541,
+          "brier_mean": 0.583311,
+          "log_loss": 0.976776,
+          "accuracy_pct": 52.89,
+          "ece": 0.012982
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1541,
+          "brier_mean": 0.582101,
+          "log_loss": 0.974169,
+          "accuracy_pct": 52.69,
+          "ece": 0.016786
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1541,
+          "brier_mean": 0.582229,
+          "log_loss": 0.974955,
+          "accuracy_pct": 52.89,
+          "ece": 0.005917
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1541,
+          "brier_mean": 0.582229,
+          "log_loss": 0.974955,
+          "accuracy_pct": 52.89,
+          "ece": 0.005917
+        }
+      },
+      "candidate_review": {
+        "decision": "hold",
+        "delta_fitted_minus_raw": {
+          "brier_mean": 0.001082,
+          "log_loss": 0.001821,
+          "ece": 0.007065
+        },
+        "regression_tolerance": 0.0005,
+        "production_authorized": false,
+        "reason": "at least one held-out metric regressed beyond tolerance"
+      }
+    },
+    "FRA": {
+      "league": "FRA",
+      "n": 4844,
+      "train_n": 3390,
+      "test_n": 1454,
+      "date_range": [
+        "2012-08-10",
+        "2026-01-04"
+      ],
+      "fitted": {
+        "draw_k": 0.95,
+        "temperature": 0.95,
+        "train_metrics": {
+          "n": 3390,
+          "brier_mean": 0.588969,
+          "log_loss": 0.98665,
+          "accuracy_pct": 51.62,
+          "ece": 0.008176
+        },
+        "test_metrics": {
+          "n": 1454,
+          "brier_mean": 0.583449,
+          "log_loss": 0.979709,
+          "accuracy_pct": 53.03,
+          "ece": 0.006171
+        }
+      },
+      "default_other": {
+        "draw_k": 1.14,
+        "temperature": 0.96,
+        "test_metrics": {
+          "n": 1454,
+          "brier_mean": 0.585897,
+          "log_loss": 0.983513,
+          "accuracy_pct": 52.75,
+          "ece": 0.012237
+        }
+      },
+      "no_cal": {
+        "draw_k": 1.0,
+        "temperature": 1.0,
+        "test_metrics": {
+          "n": 1454,
+          "brier_mean": 0.583631,
+          "log_loss": 0.979928,
+          "accuracy_pct": 53.09,
+          "ece": 0.005071
+        }
+      },
+      "raw_market": {
+        "test_metrics": {
+          "n": 1454,
+          "brier_mean": 0.583631,
+          "log_loss": 0.979928,
+          "accuracy_pct": 53.09,
+          "ece": 0.005071
+        }
+      },
+      "candidate_review": {
+        "decision": "hold",
+        "delta_fitted_minus_raw": {
+          "brier_mean": -0.000182,
+          "log_loss": -0.000219,
+          "ece": 0.0011
+        },
+        "regression_tolerance": 0.0005,
+        "production_authorized": false,
+        "reason": "at least one held-out metric regressed beyond tolerance"
+      }
+    }
+  }
+}

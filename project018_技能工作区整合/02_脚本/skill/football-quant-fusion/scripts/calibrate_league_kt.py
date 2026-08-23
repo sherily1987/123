@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""calibrate_league_kt — 芬超/瑞超/巴西甲 1X2 校准层（K/T）网格（R1③）。
+"""calibrate_league_kt — 联赛 1X2 校准层（K/T）研究网格。
 
 数据：fin_swe_bra_clean.jsonl（football-data /new/，Pinnacle 收盘 1X2 + 全场比分）。
 协议：按开球日期时间切分 70/30；train 上网格选优（draw_k × temperature），test 上报告。
@@ -163,6 +163,8 @@ def main():
     ap.add_argument("--input", required=True, help="fin_swe_bra_clean.jsonl")
     ap.add_argument("--sporttery-history", help="体彩历史 JSON（sanity）")
     ap.add_argument("--output", required=True)
+    ap.add_argument("--leagues", nargs="*", default=["FIN", "SWE", "BRA"],
+                    help="要评估的 league 代码；默认 FIN SWE BRA，可传 ENG ESP GER ITA FRA 等")
     a = ap.parse_args()
     rows = []
     for line in Path(a.input).read_text(encoding="utf-8").splitlines():
@@ -178,23 +180,46 @@ def main():
             continue
         rows.append({"league": r["league"], "day": day, "ft": [int(ft[0]), int(ft[1])],
                      "pinnacle_close": [float(x) for x in odds]})
+    requested = [str(league).upper() for league in a.leagues]
+    available = {lg: [r for r in rows if r["league"] == lg] for lg in requested}
+    # Keep small/empty queues visible rather than failing or silently dropping
+    # a league; a minimum of 20 is only a reporting floor, not an admission gate.
+    league_reports = {}
+    for lg, league_rows in available.items():
+        if len(league_rows) < 20:
+            league_reports[lg] = {
+                "league": lg, "n": len(league_rows), "candidate_review": {
+                    "decision": "insufficient_sample", "production_authorized": False,
+                    "reason": "fewer_than_20_rows_for_chronological_split",
+                }
+            }
+        else:
+            league_reports[lg] = run_league(league_rows)
     rep = {
         "schema_version": "league-kt-1.0",
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "devig_method": "power",
         "protocol": "chronological 70/30; grid fit by train ECE; test reported",
-        "leagues": {lg: run_league([r for r in rows if r["league"] == lg]) for lg in ("FIN", "SWE", "BRA")},
+        "requested_leagues": requested,
+        "leagues": league_reports,
     }
     if a.sporttery_history:
+        fitted = {
+            lg: (value["fitted"]["draw_k"], value["fitted"]["temperature"])
+            for lg, value in league_reports.items() if "fitted" in value
+        }
         rep["sporttery_sanity"] = sporttery_sanity(
             a.sporttery_history,
-            {"芬超": (rep["leagues"]["FIN"]["fitted"]["draw_k"], rep["leagues"]["FIN"]["fitted"]["temperature"]),
-             "瑞超": (rep["leagues"]["SWE"]["fitted"]["draw_k"], rep["leagues"]["SWE"]["fitted"]["temperature"])})
+            {"芬超": fitted["FIN"], "瑞超": fitted["SWE"]}
+            if "FIN" in fitted and "SWE" in fitted else {})
     Path(a.output).parent.mkdir(parents=True, exist_ok=True)
     Path(a.output).write_text(json.dumps(rep, ensure_ascii=False, indent=2), encoding="utf-8")
     for lg, v in rep["leagues"].items():
+        if "fitted" not in v:
+            print(f"{lg}: {v['candidate_review']['decision']} | n={v.get('n', 0)}")
+            continue
         f = v["fitted"]
-        print(f"{lg}: K={f['draw_k']} T={f['temperature']} | test ECE fitted={f['test_metrics']['ece']} "
+        print(f"{lg}: {v['candidate_review']['decision']} | K={f['draw_k']} T={f['temperature']} | test ECE fitted={f['test_metrics']['ece']} "
               f"default(1.14/0.96)={v['default_other']['test_metrics']['ece']} nocal={v['no_cal']['test_metrics']['ece']} "
               f"raw={v['raw_market']['test_metrics']['ece']} | n={v['n']}")
     print(json.dumps({"status": "ok", "output": a.output}, ensure_ascii=False))
