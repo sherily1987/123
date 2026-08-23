@@ -22,7 +22,7 @@ def test_run_league_emits_held_out_candidate_review():
         })
     result = cal.run_league(rows)
     review = result["candidate_review"]
-    assert review["decision"] in {"candidate", "hold"}
+    assert review["decision"] in {"candidate", "hold", "no_op"}
     assert set(review["delta_fitted_minus_raw"]) == {"brier_mean", "log_loss", "ece"}
     assert review["production_authorized"] is False
     assert review["regression_tolerance"] == 0.0005

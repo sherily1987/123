@@ -1,6 +1,6 @@
 {
   "schema_version": "league-kt-1.0",
-  "generated_at": "2026-08-24T02:30:18+08:00",
+  "generated_at": "2026-08-24T02:46:10+08:00",
   "devig_method": "power",
   "protocol": "chronological 70/30; grid fit by train ECE; test reported",
   "requested_leagues": [
@@ -70,7 +70,7 @@
         }
       },
       "candidate_review": {
-        "decision": "candidate",
+        "decision": "no_op",
         "delta_fitted_minus_raw": {
           "brier_mean": 0.0,
           "log_loss": 0.0,
@@ -78,7 +78,7 @@
         },
         "regression_tolerance": 0.0005,
         "production_authorized": false,
-        "reason": "all held-out Brier/LogLoss/ECE deltas within tolerance; requires separate release review"
+        "reason": "fitted parameters equal no-calibration baseline; no probability change"
       }
     },
     "ESP": {
@@ -140,7 +140,7 @@
         }
       },
       "candidate_review": {
-        "decision": "candidate",
+        "decision": "no_op",
         "delta_fitted_minus_raw": {
           "brier_mean": 0.0,
           "log_loss": 0.0,
@@ -148,7 +148,7 @@
         },
         "regression_tolerance": 0.0005,
         "production_authorized": false,
-        "reason": "all held-out Brier/LogLoss/ECE deltas within tolerance; requires separate release review"
+        "reason": "fitted parameters equal no-calibration baseline; no probability change"
       }
     },
     "GER": {

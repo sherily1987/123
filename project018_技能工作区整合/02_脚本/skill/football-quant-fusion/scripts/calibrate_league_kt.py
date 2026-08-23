@@ -99,9 +99,10 @@ def run_league(rows, method="power"):
         for metric in ("brier_mean", "log_loss", "ece")
     }
     regression_tolerance = 0.0005
-    admission = "candidate" if all(
+    no_op = k == 1.0 and t == 1.0
+    admission = "no_op" if no_op else ("candidate" if all(
         delta <= regression_tolerance for delta in delta_vs_raw.values()
-    ) else "hold"
+    ) else "hold")
     return {
         "league": rows[0]["league"], "n": len(rows), "train_n": len(train), "test_n": len(test),
         "date_range": [datetime.fromordinal(rows[0]["day"]).strftime("%Y-%m-%d"),
@@ -115,7 +116,9 @@ def run_league(rows, method="power"):
             "delta_fitted_minus_raw": delta_vs_raw,
             "regression_tolerance": regression_tolerance,
             "production_authorized": False,
-            "reason": ("all held-out Brier/LogLoss/ECE deltas within tolerance; "
+            "reason": ("fitted parameters equal no-calibration baseline; no probability change"
+                       if admission == "no_op" else
+                       "all held-out Brier/LogLoss/ECE deltas within tolerance; "
                        "requires separate release review" if admission == "candidate" else
                        "at least one held-out metric regressed beyond tolerance"),
         },
