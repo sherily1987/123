@@ -26,7 +26,7 @@ from pathlib import Path
 from fusion_backtest import (load_jsonl, load_version_aliases, resolve_path,
                              select_primary_rows)
 from fusion_predict_core import build_identity
-from runtime_paths import backtest_store
+from runtime_paths import backtest_store, data_root
 
 MIN_RECALIBRATION = 100
 THRESHOLD_REVIEW = 200
@@ -76,6 +76,12 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
     cur_sig = str(identity.get("probability_signature") or "")
 
     rows, unreadable = load_prediction_rows(root)
+    # Audit the production/main registry separately.  Never silently merge it
+    # into the backtest denominator: this section only exposes an unfinished
+    # handoff between the two stores.
+    main_root = data_root()
+    main_rows, main_unreadable = load_prediction_rows(main_root) if main_root != root else ([], 0)
+    backtest_prediction_ids = {str(row.get("prediction_id")) for row in rows if row.get("prediction_id")}
     primary = select_primary_rows(rows, snapshot_policy)
     status = settled_status(root)
     # 经重放验证等价的旧版本按 current 计（与 fusion_backtest.version_cohort 同一口径）
@@ -83,6 +89,14 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
                for a in load_version_aliases(cur_mv)
                if str(a.get("equivalent_to_model_version")) == cur_mv}
     alias_versions = sorted({mv for mv, _ in aliases})
+    # 按当前 model_version 审计主库全量记录；签名另行分布，避免把漂移样本隐藏。
+    main_current = [row for row in main_rows if row["model_version"] == cur_mv]
+    main_signature_counts = {}
+    for row in main_current:
+        sig = row["probability_signature"] or "(none)"
+        main_signature_counts[sig[:12]] = main_signature_counts.get(sig[:12], 0) + 1
+    main_not_in_backtest = [row for row in main_current
+                            if str(row.get("prediction_id")) not in backtest_prediction_ids]
 
     by_version: dict[str, dict] = {}
     signature_drift = []
@@ -137,6 +151,15 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         "by_model_version": {k: v for k, v in sorted(by_version.items())},
         "signature_drift": signature_drift,
         "unreadable_records": unreadable,
+        "main_registry_audit": {
+            "store": str(main_root),
+            "current_rows": len(main_current),
+            "current_signature": cur_sig[:12],
+            "signature_counts": main_signature_counts,
+            "current_not_in_backtest": len(main_not_in_backtest),
+            "unreadable_records": main_unreadable,
+            "note": "仅审计主库与回测库接续差异，不自动并入 current cohort",
+        },
         "note": "样本量只是复审触发点，不是统计证明；达标不等于可以解禁生产推荐。",
     }
 
@@ -165,6 +188,16 @@ def render(report: dict) -> str:
                      "同为当前版本但签名不同，这些样本不会计入 current cohort")
         for item in report["signature_drift"][:10]:
             lines.append(f"    {item['prediction_id']} 签名={item['signature']}")
+    audit = report.get("main_registry_audit") or {}
+    if audit.get("current_not_in_backtest"):
+        lines.append("")
+        lines.append(
+            f"⚠ 主登记库有 {audit['current_not_in_backtest']} 条当前版本记录尚未接续到回测库；"
+            "已独立计数，不自动并入 current cohort"
+        )
+        if audit.get("signature_counts"):
+            sigs = ", ".join(f"{sig}×{n}" for sig, n in sorted(audit["signature_counts"].items()))
+            lines.append(f"  主库该版本签名分布：{sigs}")
     if report["unreadable_records"]:
         lines.append("")
         lines.append(f"⚠ {report['unreadable_records']} 条登记记录无法读取预测文件")

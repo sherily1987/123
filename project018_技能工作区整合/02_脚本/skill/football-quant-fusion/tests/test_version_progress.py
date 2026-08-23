@@ -167,6 +167,31 @@ class VersionProgressTests(unittest.TestCase):
     def test_cli_help_lists_version_progress(self):
         self.assertIn("version-progress", fusion_cli.HELP)
 
+    def test_audits_current_rows_missing_from_main_to_backtest_handoff(self):
+        """主登记库的当前版本记录只提示差异，不改变回测分母。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            backtest = build_store(
+                Path(tmp) / "backtest-root",
+                [prediction("m-current", "2026-08-20T00:00:00Z", "m2", CURRENT_SIG)],
+                [],
+            )
+            main = build_store(
+                Path(tmp) / "main-root",
+                [prediction("m-current", "2026-08-20T00:00:00Z", "m2", CURRENT_SIG),
+                 prediction("m-main-only", "2026-08-21T00:00:00Z", "m2", CURRENT_SIG)],
+                [],
+            )
+            with patch.object(version_progress, "build_identity", return_value={
+                    "model_version": "m2", "probability_signature": CURRENT_SIG}), \
+                 patch.object(version_progress, "load_version_aliases", return_value=[]), \
+                 patch.object(version_progress, "data_root", return_value=main):
+                report = version_progress.build_report(backtest)
+
+        audit = report["main_registry_audit"]
+        self.assertEqual(audit["current_rows"], 2)
+        self.assertEqual(audit["current_not_in_backtest"], 1)
+        self.assertEqual(report["current"]["pending"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
