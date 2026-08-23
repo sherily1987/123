@@ -375,6 +375,82 @@ def _discovered_mapping(discovered: dict[str, Any]) -> dict[str, Any] | None:
             "scrapling_fallback": True}
 
 
+def _llm_md_value(value: Any) -> str:
+    """Keep structured Scrapling facts readable and bounded in Markdown."""
+    if value in (None, "", [], {}):
+        return "facts_available=false"
+    if isinstance(value, dict) and set(value) == {"raw_rows"}:
+        value = value.get("raw_rows")
+    try:
+        rendered = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    except (TypeError, ValueError):
+        rendered = str(value)
+    rendered = re.sub(r"\s+", " ", rendered).strip()
+    return "facts_available=true; " + rendered[:1800]
+
+
+def render_llm_markdown(row: dict[str, Any], match: dict[str, Any]) -> str:
+    """Render a browser sidecar as an auditable supplemental LLM evidence block.
+
+    This is deliberately a supplement, not a replacement for the human/web
+    primary evidence file.  Every promoted fact keeps field status, timestamp,
+    source identity, URL and source tier in the same line for the LLM catalog.
+    """
+    audit = row.get("evidence_audit") or {}
+    entries = audit.get("entries") or {}
+    collected_at = row.get("collected_at") or audit.get("collected_at") or ""
+    row_source_tier = str(row.get("source_tier") or "C").upper()
+    if row_source_tier not in {"A", "B", "C", "D"}:
+        row_source_tier = "C"
+    sections = {
+        "1. 伤停与阵容": ("injury", "suspensions", "starting_xi"),
+        "2. 战意与动机": (),
+        "3. 近况与状态": ("recent_form",),
+        "4. 主客/旅行/天气": (),
+        "5. 赔率": (),
+        "6. 身份核验": (),
+    }
+    lines = [
+        f"# 浏览器/Scrapling 补充证据: {match.get('home', '')} vs {match.get('away', '')}",
+        f"> match_identity(sporttery_match_id={match.get('match_id', '')};home={match.get('home', '')};away={match.get('away', '')};api_match_id=)",
+        f"> collected_at({collected_at}) | research_only=true | provider({row.get('provider', 'scrapling')})",
+        "",
+    ]
+    for title, fields in sections.items():
+        lines.append(f"## {title}")
+        if not fields:
+            lines.append("- 本补充源未提供该类事实，不能按无影响处理。")
+            continue
+        for field in fields:
+            entry = entries.get(field) or {}
+            status = str(entry.get("status") or "UNAVAILABLE").upper()
+            value = _llm_md_value(entry.get("value"))
+            source_url = entry.get("source_url") or row.get("source_url") or ""
+            source_id = entry.get("source_id") or row.get("provider") or "scrapling"
+            source_tier = str(entry.get("source_tier") or row_source_tier).upper()
+            refreshed = entry.get("refreshed_at") or collected_at
+            lines.append(
+                f"- {field}: status={status}; {value} | source({source_url}) "
+                f"| collected_at({refreshed}) | source_id({source_id}) | source_tier({source_tier})"
+            )
+    return "\n".join(lines) + "\n"
+
+
+def _write_llm_markdown(output_dir: Path, row: dict[str, Any], match: dict[str, Any], index: int) -> Path:
+    """Write a deterministic supplemental filename understood by predict.py."""
+    raw_num = match.get("match_num") or index
+    try:
+        number = int(str(raw_num))
+    except (TypeError, ValueError):
+        number = index
+    def safe(value: Any) -> str:
+        text = re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "_", str(value or "")).strip("_")
+        return text or "unknown"
+    path = output_dir / f"evidence_{number:03d}_{safe(match.get('home'))}_{safe(match.get('away'))}_browser.md"
+    path.write_text(render_llm_markdown(row, match), encoding="utf-8")
+    return path
+
+
 def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
     """Discover candidate official/secondary pages from fixture identity.
 
@@ -681,8 +757,9 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
                         path.write_text(json.dumps(row, ensure_ascii=False, indent=2) + "\n",
                                         encoding="utf-8")
                         row["path"] = str(path)
+                        row["markdown_path"] = str(_write_llm_markdown(output_dir, row, match, len(rows) + 1))
                         rows.append({k: row.get(k) for k in
-                                     ("match_id", "status", "reason", "path", "browser_task")
+                                     ("match_id", "status", "reason", "path", "markdown_path", "browser_task")
                                      if k in row})
                         continue
             row = {"status": "pending_browser_task", "match_id": mid,
@@ -720,7 +797,9 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
             path = output_dir / f"{mid}.json"
             path.write_text(json.dumps(row, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             row["path"] = str(path)
-        rows.append({k: row.get(k) for k in ("match_id", "status", "reason", "path", "browser_task") if k in row})
+            row["markdown_path"] = str(_write_llm_markdown(output_dir, row, match, len(rows) + 1))
+        rows.append({k: row.get(k) for k in
+                     ("match_id", "status", "reason", "path", "markdown_path", "browser_task") if k in row})
     tasks = [row for row in rows if row.get("status") == "pending_browser_task"]
     if tasks:
         (output_dir / "browser_tasks.json").write_text(json.dumps(tasks, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

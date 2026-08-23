@@ -248,6 +248,9 @@ def test_collect_file_uses_match_embedded_scrapling_source_without_url_map(monke
     saved = json.loads((tmp_path / "out" / "sporttery-2041001.json").read_text(encoding="utf-8"))
     assert saved["provider"] == "league_preview"
     assert saved["scrapling_attempts"][0]["status"] == "ok"
+    markdown = (tmp_path / "out" / "evidence_001_A_B_browser.md").read_text(encoding="utf-8")
+    assert "source_tier(C)" in markdown
+    assert "## 3. 近况与状态" in markdown
 
 
 def test_collect_file_discovery_keeps_nested_identity(monkeypatch, tmp_path):

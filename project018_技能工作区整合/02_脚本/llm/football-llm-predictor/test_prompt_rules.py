@@ -247,6 +247,16 @@ def test_evidence_catalog_preserves_field_level_timestamp_and_source_id():
     }]
 
 
+def test_browser_scrapling_files_are_supplements_not_ambiguous_primary_files():
+    files = {
+        "evidence_001_A_B.md": SIX_SECTIONS,
+        "evidence_001_A_B_browser.md": SIX_SECTIONS,
+        "evidence_001_A_B_mcp.md": SIX_SECTIONS,
+    }
+    assert pr.match_evidence_file(1, files) == "evidence_001_A_B.md"
+    assert pr.match_browser_files(1, files) == ["evidence_001_A_B_browser.md"]
+
+
 def test_cli_missing_evidence_is_json_and_never_initializes_llm(tmp_path, monkeypatch, capsys):
     raw = tmp_path / "raw.json"
     raw.write_text(json.dumps({"matches": [{"home": "A", "away": "B", "match_num": "001"}]}), encoding="utf-8")

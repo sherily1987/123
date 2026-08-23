@@ -44,10 +44,12 @@ def load_evidence(evidence_dir):
 
 
 def match_evidence_file(match_idx, evidence_files):
-    """按序号前缀匹配证据文件, 跳过 *_mcp.md (MCP 数据块, 由 match_mcp_file 单独取)。"""
+    """按序号前缀匹配主证据，跳过 MCP/浏览器补充块。"""
     pattern = re.compile(rf"^evidence_{match_idx:03d}(?:_|\.)", re.I)
     matches = [name for name in evidence_files
                if pattern.match(name) and not name.lower().endswith("_mcp.md")]
+    matches = [name for name in matches
+               if not name.lower().endswith(("_browser.md", "_scrapling.md"))]
     return matches[0] if len(matches) == 1 else None
 
 
@@ -73,6 +75,14 @@ def match_mcp_file(match_idx, evidence_files, match=None):
                    if (found := identity_pattern.search(evidence_files[name] or ""))
                    and tuple(part.strip() for part in found.groups()[:3]) == expected]
     return matches[0] if len(matches) == 1 else None
+
+
+def match_browser_files(match_idx, evidence_files):
+    """Find Scrapling/BB-browser supplements without making them primary evidence."""
+    pattern = re.compile(rf"^evidence_{match_idx:03d}(?:_|\.)", re.I)
+    return sorted(name for name in evidence_files
+                  if pattern.match(name) and
+                  name.lower().endswith(("_browser.md", "_scrapling.md")))
 
 
 REQUIRED_EVIDENCE_SECTIONS = {
@@ -1326,6 +1336,12 @@ def main():
         now = datetime.now(timezone.utc)
         ev_name = match_evidence_file(match_idx, evidence_files)
         mcp_name = match_mcp_file(match_idx, evidence_files, match=m)
+        browser_names = match_browser_files(match_idx, evidence_files)
+        browser_text = "\n\n".join(evidence_files[name] for name in browser_names)
+        browser_status = (assess_evidence(browser_text, kickoff=kickoff, now=now,
+                                          allow_odds_only=True)
+                          if browser_text else None)
+        browser_usable = bool(browser_status and browser_status.get("ok"))
         odds_available = bool(m.get("model_odds") or m.get("crs") or m.get("ttg") or m.get("hafu"))
         if ev_name:
             primary_evidence = evidence_files[ev_name]
@@ -1348,24 +1364,56 @@ def main():
                     print(f"   数据块: {mcp_name} (MCP 已拼入)")
                 else:
                     print(f"   ⚠️ MCP 数据块已拒绝: {mcp_status['reason']}")
+            if browser_usable:
+                ev_text += "\n\n" + browser_text
+                evidence_status["evidence_source"] += "_with_browser_scrapling"
+            elif browser_text:
+                print(f"   ⚠️ 浏览器补充证据已拒绝: {browser_status.get('reason')}")
         else:
-            if not mcp_name:
+            if not mcp_name and not browser_usable:
                 print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": "missing_evidence_file"}, ensure_ascii=False))
                 continue
-            mcp_status = assess_mcp_evidence(evidence_files[mcp_name], kickoff, match=m)
-            if not mcp_status["ok"]:
-                print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": mcp_status["reason"]}, ensure_ascii=False))
+            if mcp_name:
+                mcp_status = assess_mcp_evidence(evidence_files[mcp_name], kickoff, match=m)
+                if not mcp_status["ok"]:
+                    print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": mcp_status["reason"]}, ensure_ascii=False))
+                    continue
+                ev_text = evidence_files[mcp_name]
+            elif browser_usable:
+                ev_text = browser_text
+            else:
+                print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": browser_status.get("reason")}, ensure_ascii=False))
                 continue
-            ev_text = evidence_files[mcp_name]
             evidence_status = assess_evidence(
                 ev_text, kickoff=kickoff, now=now, allow_odds_only=odds_available
             )
             if not evidence_status["ok"]:
                 print(json.dumps({"match_index": i, "status": "evidence_insufficient", "reason": evidence_status["reason"]}, ensure_ascii=False))
                 continue
-            ev_name = mcp_name
-            evidence_status["evidence_source"] = "mcp_primary"
-            evidence_status["mcp_evidence_file_sha256"] = evidence_status["evidence_file_sha256"]
+            ev_name = mcp_name or browser_names[0]
+            evidence_status["evidence_source"] = "mcp_primary" if mcp_name else "browser_scrapling_primary"
+            if mcp_name:
+                evidence_status["mcp_evidence_file_sha256"] = evidence_status["evidence_file_sha256"]
+            if mcp_name and browser_usable:
+                ev_text += "\n\n" + browser_text
+                evidence_status["evidence_source"] += "_with_browser_scrapling"
+
+        # Revalidate and re-hash the combined payload.  The browser snapshot
+        # must participate in timestamp, kickoff and evidence-file auditing;
+        # retaining the primary-only hash would make the LLM input unverifiable.
+        source_label = evidence_status.get("evidence_source")
+        mcp_hash = evidence_status.get("mcp_evidence_file_sha256")
+        combined_status = assess_evidence(
+            ev_text, kickoff=kickoff, now=now, allow_odds_only=odds_available
+        )
+        if not combined_status.get("ok"):
+            print(json.dumps({"match_index": i, "status": "evidence_insufficient",
+                              "reason": combined_status.get("reason")}, ensure_ascii=False))
+            continue
+        combined_status["evidence_source"] = source_label
+        if mcp_hash:
+            combined_status["mcp_evidence_file_sha256"] = mcp_hash
+        evidence_status = combined_status
 
         # 仅在内存中交给契约清单生成器，正式记录仍保存哈希和时间戳，
         # 不把整篇原始证据重复嵌入预测 JSON。
