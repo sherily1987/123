@@ -893,6 +893,27 @@ def decide_single_pick(agg, ev_results, first_leg, match=None):
     }
 
 
+def annotate_single_pick_action(single_pick, ev_recommendation):
+    """Separate a research direction from an actionable betting decision.
+
+    ``decide_single_pick`` may still identify the strongest direction when the
+    EV/evidence gate is closed.  Keep that opinion for audit, but make the
+    non-bet state explicit so downstream reports cannot mistake it for a
+    purchase recommendation.
+    """
+    result = dict(single_pick or {})
+    action = str((ev_recommendation or {}).get("action") or "skip").lower()
+    bettable = action == "bet"
+    result["action"] = "bet" if bettable else "observe"
+    result["bettable"] = bettable
+    if not bettable and result.get("pick"):
+        reason = str(result.get("reason") or "").strip()
+        suffix = "非下注：EV/证据门禁未通过"
+        if suffix not in reason:
+            result["reason"] = f"{reason}；{suffix}" if reason else suffix
+    return result
+
+
 def aggregate_directions(predictions, *, allow_single_model_research=False):
     """单选1票/双选0.5; reasoning差与2-1坍缩降权; 强度<60%强制双选。"""
     valid = {md: p for md, p in predictions.items()
@@ -1465,6 +1486,7 @@ def main():
             sp = {"pick": None, "confidence": None, "reason": "odds_only_evidence", "skip": True}
         else:
             sp = decide_single_pick(agg, ev_results, fl, match=m)
+        sp = annotate_single_pick_action(sp, ev_rec)
         confidence_text = "—" if sp.get("confidence") is None else f"{sp['confidence']*100:.0f}%"
         print(f"  🎯 下注建议: {sp['pick'] or '观察'} (信心{confidence_text}) | {sp['reason']}")
         if fl.get("is_second_leg"):

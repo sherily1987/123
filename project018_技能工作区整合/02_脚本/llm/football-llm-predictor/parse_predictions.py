@@ -114,6 +114,8 @@ def parse_audits(audits, raw, start_index=1):
             "sp": sp.get("pick"),
             "sp_conf": round((sp.get("confidence") or 0) * 100),
             "sp_skip": sp.get("skip"),
+            "sp_action": sp.get("action") or ("observe" if sp.get("skip") else None),
+            "sp_bettable": sp.get("bettable"),
             "score": audit.get("top_score_pref"),
             "top_scores": audit.get("top_scores") or audit.get("score_prefs"),
             "score_prefs": audit.get("score_prefs"),

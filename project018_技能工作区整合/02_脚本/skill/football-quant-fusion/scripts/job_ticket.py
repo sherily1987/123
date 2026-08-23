@@ -462,6 +462,8 @@ def llm_from_parsed(row: dict) -> dict:
         "reason": row.get("ev_reason") or row.get("reason") or gate.get("reason"),
         "evidence_gap": bool(gap),
         "single_pick": row.get("sp") or row.get("single_pick") or direction_obj.get("single_preference"),
+        "single_pick_action": row.get("sp_action"),
+        "single_pick_bettable": row.get("sp_bettable"),
         "score": row.get("score") or row.get("top_score_pref") or (scores[0] if scores else None),
         "evs": evs,
     }

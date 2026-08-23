@@ -6,6 +6,26 @@ import mcp_evidence as me
 import predict
 
 
+def test_single_pick_is_observe_when_ev_gate_skips():
+    result = predict.annotate_single_pick_action(
+        {"pick": "主胜", "confidence": 0.62, "reason": "模型方向", "skip": False},
+        {"action": "skip", "reason": "证据存在缺口"},
+    )
+    assert result["action"] == "observe"
+    assert result["bettable"] is False
+    assert result["pick"] == "主胜"  # 研究意见保留，但不再伪装成下注建议
+    assert "非下注" in result["reason"]
+
+
+def test_single_pick_is_bet_only_when_ev_gate_allows():
+    result = predict.annotate_single_pick_action(
+        {"pick": "客胜", "confidence": 0.7, "reason": "独立 edge", "skip": False},
+        {"action": "bet"},
+    )
+    assert result["action"] == "bet"
+    assert result["bettable"] is True
+
+
 def test_evidence_catalog_preserves_structured_snapshot_facts():
     text = (
         "> - recent_form: status=VALID；source=league.example.preview；"

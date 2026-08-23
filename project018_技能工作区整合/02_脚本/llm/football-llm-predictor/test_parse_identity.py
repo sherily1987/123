@@ -52,3 +52,12 @@ def test_unmatched_id_is_skipped():
     raw = _raw()
     parsed = pp.parse_audits([_audit(9999999, "周日999")], raw)
     assert parsed == []
+
+
+def test_single_pick_action_is_carried_to_parsed_output():
+    raw = _raw()
+    audit = _audit(2040001, "周日001")
+    audit["single_pick"].update({"action": "observe", "bettable": False})
+    row = pp.parse_audits([audit], raw)[0]
+    assert row["sp_action"] == "observe"
+    assert row["sp_bettable"] is False
