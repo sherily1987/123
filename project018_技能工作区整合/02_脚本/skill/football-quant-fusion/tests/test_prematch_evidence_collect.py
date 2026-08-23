@@ -165,3 +165,16 @@ def test_api_gap_routes_to_scrapling_and_projects_only_missing_fields(monkeypatc
     # remains authoritative for production gating.
     assert row["evidence_audit"]["entries"]["recent_form"]["status"] == "VALID"
     assert row["evidence_audit"]["entries"]["starting_xi"]["status"] == "PREDICTED"
+
+
+def test_collect_file_injects_match_scoped_scrapling_url_map(tmp_path, monkeypatch):
+    source = tmp_path / "input.json"
+    source.write_text('{"matches":[{"match_id":"sporttery-6","home":"A","away":"B","kickoff":"2026-08-25T20:00:00+08:00"}]}', encoding="utf-8")
+    mapping = tmp_path / "sources.json"
+    mapping.write_text('{"sporttery-6":{"scrapling_url":"https://league.test/match/6","source_id":"league.preview"}}', encoding="utf-8")
+    seen = []
+    monkeypatch.setattr(pec, "collect_one", lambda match, **kwargs: (
+        seen.append(match) or {"evidence_audit": {"evidence_gap": True}}
+    ))
+    pec.collect_file(source, tmp_path / "out", scrapling_url_map=mapping)
+    assert seen[0]["evidence_sources"]["scrapling_url"] == "https://league.test/match/6"

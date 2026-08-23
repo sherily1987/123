@@ -324,7 +324,8 @@ def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5) -> dic
 
 
 def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | None = None,
-                 terms: int = 10, hist: int = 5) -> dict[str, Any]:
+                 terms: int = 10, hist: int = 5,
+                 scrapling_url_map: Path | None = None) -> dict[str, Any]:
     payload = json.loads(input_path.read_text(encoding="utf-8-sig"))
     if isinstance(payload, dict) and isinstance(payload.get("matches"), list):
         matches = payload["matches"]
@@ -333,6 +334,14 @@ def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | No
     else:
         matches = payload
     rows, statuses = [], []
+    source_map: dict[str, Any] = {}
+    if scrapling_url_map:
+        try:
+            loaded = json.loads(scrapling_url_map.read_text(encoding="utf-8-sig"))
+            if isinstance(loaded, dict):
+                source_map = loaded
+        except (OSError, ValueError):
+            source_map = {}
     output_dir.mkdir(parents=True, exist_ok=True)
     for match in matches if isinstance(matches, list) else []:
         key = str(match.get("match_id") or (match.get("sporttery_meta") or {}).get("match_id") or "")
@@ -340,6 +349,12 @@ def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | No
             key = f"sporttery-{key}"
         if key:
             match = {**match, "match_id": key}
+            mapped = source_map.get(key) or source_map.get(key.removeprefix("sporttery-"))
+            if isinstance(mapped, dict):
+                embedded = match.get("evidence_sources")
+                merged = dict(embedded) if isinstance(embedded, dict) else {}
+                merged.update(mapped)
+                match["evidence_sources"] = merged
         if match_ids and key not in match_ids and key.removeprefix("sporttery-") not in match_ids:
             continue
         try:
@@ -361,8 +376,12 @@ def main() -> int:
     ap.add_argument("--match-id", action="append")
     ap.add_argument("--terms", type=int, default=10)
     ap.add_argument("--hist", type=int, default=5)
+    ap.add_argument("--scrapling-url-map", type=Path,
+                    help="optional match_id -> Scrapling source mapping; used only after API gaps")
     args = ap.parse_args()
-    print(json.dumps(collect_file(args.input, args.output_dir, match_ids=set(args.match_id or []), terms=args.terms, hist=args.hist), ensure_ascii=False))
+    print(json.dumps(collect_file(args.input, args.output_dir, match_ids=set(args.match_id or []),
+                                  terms=args.terms, hist=args.hist,
+                                  scrapling_url_map=args.scrapling_url_map), ensure_ascii=False))
     return 0
 
 
