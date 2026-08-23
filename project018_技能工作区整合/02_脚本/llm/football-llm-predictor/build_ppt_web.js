@@ -33,12 +33,17 @@ const topEvOf = r => {
   if (!keys.length) return null;
   return keys.reduce((a, b) => Math.abs(evs[a]) > Math.abs(evs[b]) ? a : b);
 };
+// New records carry an explicit single_pick action.  Keep a compatibility
+// fallback for older parsed files, but never treat a positive EV alone as a
+// bettable pick.
+const isBettable = r => r.sp_bettable === true ||
+  (r.sp_bettable == null && r.ev_action === "bet" && !r.sp_skip);
 
 const nH = data.filter(r => r.dir === "主胜").length;
-const nBet = data.filter(r => !r.sp_skip).length;
+const nBet = data.filter(isBettable).length;
 const nCollapse = data.filter(r => (r.collapse_flags || []).length).length;
 const nGap = data.filter(r => r.evidence_gap).length;
-const posEv = data.filter(r => { const t = topEvOf(r); return t && r.evs[t] > 0 && !r.sp_skip; })
+const posEv = data.filter(r => { const t = topEvOf(r); return t && r.evs[t] > 0 && isBettable(r); })
   .sort((a, b) => b.evs[topEvOf(b)] - a.evs[topEvOf(a)]);
 
 // Slide 1 封面
@@ -110,7 +115,7 @@ function tableSlide(label, slice) {
       { text: r.league || "", options: { color: C.muted, fontSize: 9 } },
       { text: r.dir, options: { color: dirColor(r.dir), bold: true, fontSize: 10 } },
       { text: r.strength + "%", options: { color: C.ink, fontSize: 9 } },
-      { text: (r.sp || "-") + spMark + gapMark, options: { color: r.sp_skip ? C.muted : C.greenDeep, bold: true, fontSize: 10 } },
+      { text: (r.sp || "-") + spMark + gapMark, options: { color: isBettable(r) ? C.greenDeep : C.muted, bold: true, fontSize: 10 } },
       { text: r.score || "-", options: { color: C.ink, fontSize: 10 } },
       { text: r.ou25 || "-", options: { color: C.ink, fontSize: 9 } },
       { text: evTxt, options: { color: evColor, bold: true, fontSize: 9 } },
@@ -165,7 +170,7 @@ for (let pg = 0; pg < Math.ceil(data.length / perPage); pg++) {
     s.addText(r.num + " " + (r.league || ""), { x: x + 0.18, y: y + 0.08, w: 3.4, h: 0.35, fontFace: F.body, fontSize: 10, color: C.muted });
     s.addText(r.home + "  vs  " + r.away, { x: x + 0.18, y: y + 0.38, w: 4.0, h: 0.5, fontFace: F.head, fontSize: 15, color: C.ink, bold: true });
     const gapMark = r.evidence_gap ? " ⚠缺口" : "";
-    s.addText(r.sp || "-", { x: x + 0.18, y: y + 0.95, w: 1.5, h: 0.45, fontFace: F.head, fontSize: 17, color: r.sp_skip ? C.muted : dirColor(r.sp), bold: true });
+    s.addText(r.sp || "-", { x: x + 0.18, y: y + 0.95, w: 1.5, h: 0.45, fontFace: F.head, fontSize: 17, color: isBettable(r) ? dirColor(r.sp) : C.muted, bold: true });
     s.addText("强度 " + r.strength + "%" + gapMark, { x: x + 0.18, y: y + 1.42, w: 2.6, h: 0.35, fontFace: F.body, fontSize: 9.5, color: C.muted });
     s.addText(r.dir + (r.dir !== r.sp && r.sp ? "→改判" : ""), { x: x + 2.35, y: y + 0.98, w: 1.6, h: 0.4, fontFace: F.body, fontSize: 11, color: dirColor(r.dir) });
     s.addText(r.score || "-", { x: x + 4.15, y: y + 0.42, w: 1.0, h: 0.45, fontFace: F.head, fontSize: 16, color: C.ink, bold: true });

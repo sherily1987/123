@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS predictions (
     match_id TEXT,
     direction TEXT, strength REAL,
     single_pick TEXT, sp_conf REAL, sp_skip INTEGER,
+    sp_action TEXT, sp_bettable INTEGER,
     score TEXT, ou25 TEXT, hafu TEXT,
     evs TEXT,                 -- JSON {方向: ev}
     ev_action TEXT, ev_reason TEXT,
@@ -87,6 +88,8 @@ def init():
     with _lock, _conn() as c:
         c.executescript(SCHEMA)
         _ensure_column(c, "predictions", "match_id", "TEXT")
+        _ensure_column(c, "predictions", "sp_action", "TEXT")
+        _ensure_column(c, "predictions", "sp_bettable", "INTEGER")
         _ensure_column(c, "backtests", "match_id", "TEXT")
 
 
@@ -129,19 +132,22 @@ def upsert_predictions(sales_day: str, parsed: list[dict]):
         for p in parsed:
             c.execute(
                 """INSERT INTO predictions (sales_day, match_num, match_id, direction, strength, single_pick,
-                   sp_conf, sp_skip, score, ou25, hafu, evs, ev_action, ev_reason,
+                   sp_conf, sp_skip, sp_action, sp_bettable, score, ou25, hafu, evs, ev_action, ev_reason,
                    collapse_flags, evidence_gap, model_dirs, audit_json, created_at)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                    ON CONFLICT(sales_day, match_num) DO UPDATE SET
                    match_id=excluded.match_id,
                    direction=excluded.direction, strength=excluded.strength,
                    single_pick=excluded.single_pick, sp_conf=excluded.sp_conf, sp_skip=excluded.sp_skip,
+                   sp_action=excluded.sp_action, sp_bettable=excluded.sp_bettable,
                    score=excluded.score, ou25=excluded.ou25, hafu=excluded.hafu,
                    evs=excluded.evs, ev_action=excluded.ev_action, ev_reason=excluded.ev_reason,
                    collapse_flags=excluded.collapse_flags, evidence_gap=excluded.evidence_gap,
                    model_dirs=excluded.model_dirs, audit_json=excluded.audit_json, created_at=excluded.created_at""",
                 (sales_day, p["num"], p.get("match_id"), p.get("dir"), p.get("strength"), p.get("sp"),
-                 p.get("sp_conf"), 1 if p.get("sp_skip") else 0, p.get("score"), p.get("ou25"), p.get("hafu"),
+                 p.get("sp_conf"), 1 if p.get("sp_skip") else 0, p.get("sp_action"),
+                 (1 if p.get("sp_bettable") else 0) if p.get("sp_bettable") is not None else None,
+                 p.get("score"), p.get("ou25"), p.get("hafu"),
                  json.dumps(p.get("evs"), ensure_ascii=False) if p.get("evs") else None,
                  p.get("ev_action"), p.get("ev_reason"),
                  json.dumps(p.get("collapse_flags"), ensure_ascii=False) if p.get("collapse_flags") else None,
