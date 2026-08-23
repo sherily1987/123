@@ -402,7 +402,8 @@ def build_evidence_prompt(match, evidence_text, match_idx):
             "必须保留冲突并下调置信度；开球前未出现官方首发时，仍标记为预计首发。"
         )
     lines.append(
-        "\n只使用上述 E 编号。decision=opinion 时必须给出 probs_1x2、比分Top3、大小球、半全场，不得留空。"
+        "\n只使用上述 E 编号。decision=opinion 时，能由对应证据支持的市场才填写；"
+        "缺少对应盘口或独立证据的市场必须写 null，并在 market_gap_codes 写明缺口，禁止跨市场反推。"
         "近5场、首发和伤停只用目录中已通过来源/时间门禁的真实快照；未采集到就写缺口，不得用投票、占位文本或常识补齐。"
         "仅赔率时仍给观察性 opinion，但不得把赔率外推成基本面，且下游强制 observe。"
     )
@@ -535,6 +536,7 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     evidence_ids = [str(value).strip() for value in (data.get("evidence_ids") or []) if str(value).strip()]
     reason_codes = [str(value).strip() for value in (data.get("reason_codes") or []) if str(value).strip()]
     unsupported = [str(value).strip() for value in (data.get("unsupported_assumptions") or []) if str(value).strip()]
+    market_gap_codes = [str(value).strip() for value in (data.get("market_gap_codes") or []) if str(value).strip()]
     catalog_by_id = {str(item.get("id")): item for item in (evidence_catalog or [])}
     invalid_ids = [value for value in evidence_ids if evidence_catalog is not None and value not in catalog_by_id]
     usable_ids = [value for value in evidence_ids if catalog_by_id.get(value, {}).get("status") in (
@@ -559,8 +561,19 @@ def parse_evidence_prediction(content, evidence_catalog=None):
         reason_codes.append("INVALID_OR_UNUSABLE_EVIDENCE")
     elif decision == "opinion" and unsupported:
         egap = True
-    if decision == "opinion" and (not probs or not top_scores or not ou25 or not hafu):
-        return {"error": "missing_required_markets"}
+    # 市场字段按各自证据独立可空。缺口不能让模型整场失败，也不能触发
+    # 任何跨市场推导；下游会按市场单独计算分母，1X2/方向仍可保留为研究意见。
+    if decision == "opinion":
+        if not probs:
+            market_gap_codes.append("ONE_X_TWO_UNAVAILABLE_OR_INVALID")
+        if not top_scores:
+            market_gap_codes.append("SCORE_UNAVAILABLE_OR_INVALID")
+        if not ou25:
+            market_gap_codes.append("OU25_UNAVAILABLE_OR_INVALID")
+        if not hafu:
+            market_gap_codes.append("HAFU_UNAVAILABLE_OR_INVALID")
+        if market_gap_codes:
+            egap = True
     rq = lpr.reasoning_quality(reasoning)
     # The evidence contract carries auditable E-IDs.  A non-empty summary is
     # not evidence by itself: require the summary to cite at least one of the
@@ -604,6 +617,7 @@ def parse_evidence_prediction(content, evidence_catalog=None):
         "evidence_ids": evidence_ids,
         "invalid_evidence_ids": invalid_ids,
         "unsupported_assumptions": unsupported,
+        "market_gap_codes": list(dict.fromkeys(market_gap_codes)),
         "reason_codes": list(dict.fromkeys(reason_codes)),
         "reasoning": reasoning,
         "reasoning_ok": reasoning_ok,
@@ -981,9 +995,11 @@ def aggregate_directions(predictions, *, allow_single_model_research=False):
     score_prefs = Counter()
     ou_prefs = Counter()
     hafu_prefs = Counter()
+    market_gap_codes = set()
     prob_acc = [0.0, 0.0, 0.0]
     prob_w = 0.0
     for md, p in valid.items():
+        market_gap_codes.update(str(code) for code in (p.get("market_gap_codes") or []) if str(code).strip())
         w = model_w.get(md, 0.8)
         if p.get("reasoning_ok") is False:
             w *= 0.5
@@ -1030,6 +1046,7 @@ def aggregate_directions(predictions, *, allow_single_model_research=False):
             "top_score_pref": top_score, "top_scores": top3, "score_prefs": dict(score_prefs),
             "top_ou25": top_ou, "all_ou25": dict(ou_prefs),
             "top_hafu": top_hafu, "all_hafu": dict(hafu_prefs),
+            "market_gap_codes": sorted(market_gap_codes),
             "alt_direction": alt_dir, "caution": True,
             "single_model": True, "research_only": True, "action": "observe",
             "reason": "single_model_no_consensus",
@@ -1053,6 +1070,7 @@ def aggregate_directions(predictions, *, allow_single_model_research=False):
         "top_score_pref": top_score, "top_scores": top3, "score_prefs": dict(score_prefs),
         "top_ou25": top_ou, "all_ou25": dict(ou_prefs),
         "top_hafu": top_hafu, "all_hafu": dict(hafu_prefs),
+        "market_gap_codes": sorted(market_gap_codes),
         "alt_direction": alt_dir, "caution": caution,
         "valid_model_count": len(valid),
         "minimum_valid_models": MIN_VALID_EVIDENCE_MODELS,

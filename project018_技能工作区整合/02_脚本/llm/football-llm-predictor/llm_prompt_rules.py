@@ -274,10 +274,10 @@ JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外
 
 规则:
 1. decision 只能是 opinion 或 abstain。仅赔率时仍输出 opinion；只有身份无法核验或没有任何可审计证据时才 abstain。abstain 时 direction 与四个市场字段必须为 null。
-2. opinion 时必须同时给出：direction（主胜/平局/客胜）、probs_1x2（主/平/客三位合计100）、top_scores（恰好3个比分）、ou25（大或小）、hafu（九宫格）。这五项禁止 null；summary 必须至少出现一个实际引用的 E 编号，不能用无证据的泛泛分析代替引用。
+2. opinion 时必须给出 direction（主胜/平局/客胜）；能由对应证据支持的市场填写，缺少对应证据的市场写 null，并在 `market_gap_codes` 写明缺口。summary 必须至少出现一个实际引用的 E 编号，不能用无证据的泛泛分析代替引用。
 3. evidence_ids 只能引用提示词中存在的 E 编号。UNAVAILABLE、EMPTY_UNCONFIRMED 和 SOURCE_CONFLICT 只能证明缺口/冲突；ONLY_ODDS 只能引用官方体彩市场，不得声称有独立基本面支持。
 4. 不得编造伤停、赛果或队名事实。必须假设的内容写入 unsupported_assumptions。预计首发可以作为赛前阵容证据使用，但必须保留 `PREDICTED` 状态，写明“预计、非官方”，不得改写成已确认首发。
-5. probs_1x2 由第9条多维加权换算，一位小数，argmax 必须等于 direction。这是本模型的判断概率，不是量化轨校准概率，禁止冒充 xG 或精确到多位小数。
+5. 若输出 probs_1x2，必须由第9条多维加权换算，一位小数，argmax 必须等于 direction；没有可用1X2证据时写 null。这是本模型的判断概率，不是量化轨校准概率，禁止冒充 xG 或精确到多位小数。
 6. top_scores 按可能性从高到低恰好3个竞彩比分；第1个必须与 direction 同向（主胜则主>客，客胜则客>主，平局则平局比分）。ou25 只能大/小。hafu 必须是胜胜/胜平/胜负/平胜/平平/平负/负胜/负平/负负之一。
 7. 口径仅为90分钟含补时，不含加时和点球。summary 限两句。
 8. 近5场：只使用证据目录中逐场列出的正式赛果，必须引用【近况】；不得用投票、常识或占位文本补齐。若状态标为 AGING/PRIOR_SEASON，必须在摘要注明“上一赛季样本”，降低近况维度权重并写入 unsupported_assumptions；不得把它当作当前赛季近5场。完全检索不到正式赛果时写 FORM_UNAVAILABLE、evidence_gap=true，仍可给观察性 opinion。

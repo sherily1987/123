@@ -429,6 +429,37 @@ def test_parser_keeps_opinion_when_lineup_gap_is_only_reason_code():
     assert "LINEUP_UNAVAILABLE" in out["reason_codes"]
 
 
+def test_parser_keeps_direction_when_derived_markets_are_unavailable():
+    payload = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": "平局",
+        "probs_1x2": [52, 27, 21], "top_scores": ["1-0", "1-1"],
+        "ou25": None, "hafu": None, "evidence_gap": False,
+        "evidence_ids": ["E2"], "unsupported_assumptions": [],
+        "summary": "E2近况支持主胜。",
+    }
+    out = predict.parse_evidence_prediction(
+        __import__("json").dumps(payload, ensure_ascii=False),
+        [{"id": "E2", "status": "VERIFIED_MULTI_SOURCE"}],
+    )
+    assert out["decision"] == "opinion"
+    assert out["direction"] == "主胜"
+    assert out["ou25"] is None and out["hafu"] is None
+    assert out["evidence_gap"] is True
+    assert "OU25_UNAVAILABLE_OR_INVALID" in out["market_gap_codes"]
+
+
+def test_aggregation_preserves_market_gap_codes():
+    p = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": None,
+        "probs_1x2": [50, 30, 20], "top_scores": ["1-0"],
+        "score_pref": "1-0", "ou25": None, "hafu": None,
+        "market_gap_codes": ["OU25_UNAVAILABLE_OR_INVALID"],
+        "evidence_gap": True, "reasoning_ok": True, "collapse_score": False,
+    }
+    result = predict.aggregate_directions({"deepseek/deepseek-v4-flash": p}, allow_single_model_research=True)
+    assert "OU25_UNAVAILABLE_OR_INVALID" in result["market_gap_codes"]
+
+
 def test_parser_accepts_abstain_and_nullable_markets():
     payload = {
         "decision": "abstain", "direction": None, "alt_direction": None,

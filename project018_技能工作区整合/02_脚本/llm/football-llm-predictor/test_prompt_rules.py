@@ -65,7 +65,8 @@ def test_evidence_prompts_are_neutral_and_allow_observe_only_odds():
         assert "近况0.30" in prompt and "阵容0.22" in prompt
         assert "不得把缺维当 0 分中性" in prompt
         assert "probs_1x2" in prompt and "top_scores" in prompt
-        assert "这五项禁止 null" in prompt
+        assert "market_gap_codes" in prompt
+        assert "缺少对应证据的市场写 null" in prompt
         assert "量化轨校准概率" in prompt
         assert "下游会强制 confidence=null" in prompt
         assert "占位文本" in prompt
