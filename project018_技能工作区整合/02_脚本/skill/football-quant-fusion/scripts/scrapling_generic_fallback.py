@@ -14,8 +14,10 @@ _VALID = {"VALID", "PREDICTED", "PARTIAL", "OK"}
 
 
 def _entry(status: str, value: Any, *, url: str, collected_at: str,
-           source_id: str, reason: str | None = None) -> dict[str, Any]:
+           source_id: str, source_tier: str = "C",
+           reason: str | None = None) -> dict[str, Any]:
     return {"status": status, "value": value, "source_id": source_id,
+            "source_tier": source_tier,
             "source_url": url, "refreshed_at": collected_at,
             "missing_reason": reason}
 
@@ -88,7 +90,8 @@ def _clean_rows(rows: list[str]) -> list[str]:
 
 
 def parse_markdown(text: str, match: dict[str, Any], source_url: str,
-                   collected_at: str, *, source_id: str, provider: str) -> dict[str, Any]:
+                   collected_at: str, *, source_id: str, provider: str,
+                   source_tier: str = "C") -> dict[str, Any]:
     sections = _sections(text)
     form_rows = _form(_find(sections, ("recent form", "team form", "pre-season form", "form (all competitions)", "form",
                                         "last matches", "recent results",
@@ -111,20 +114,20 @@ def parse_markdown(text: str, match: dict[str, Any], source_url: str,
     entries = {
         "team_stats": _entry("VALID" if team_stats_rows else "UNAVAILABLE",
                               {"raw_rows": team_stats_rows}, url=source_url, collected_at=collected_at,
-                              source_id=source_id,
+                              source_id=source_id, source_tier=source_tier,
                               reason=None if team_stats_rows else "GENERIC_PAGE_HAS_NO_EXPLICIT_XG_OR_STRENGTH"),
         "recent_form": _entry("VALID" if len(form_rows) >= 5 else "PARTIAL" if form_rows else "UNAVAILABLE",
                               {"raw_rows": form_rows}, url=source_url, collected_at=collected_at,
-                              source_id=source_id,
+                              source_id=source_id, source_tier=source_tier,
                               reason=None if form_rows else "RECENT_FORM_SECTION_MISSING"),
         "injury": _entry("VALID" if injury_rows else "UNAVAILABLE", {"raw_rows": injury_rows},
-                          url=source_url, collected_at=collected_at, source_id=source_id,
+                          url=source_url, collected_at=collected_at, source_id=source_id, source_tier=source_tier,
                           reason=None if injury_rows else "INJURY_SECTION_MISSING"),
         "suspensions": _entry("VALID" if suspension_rows else "UNAVAILABLE", {"raw_rows": suspension_rows},
-                               url=source_url, collected_at=collected_at, source_id=source_id,
+                               url=source_url, collected_at=collected_at, source_id=source_id, source_tier=source_tier,
                                reason=None if suspension_rows else "SUSPENSION_SECTION_MISSING"),
         "starting_xi": _entry("PREDICTED" if lineup_rows else "UNAVAILABLE", {"raw_rows": lineup_rows},
-                               url=source_url, collected_at=collected_at, source_id=source_id,
+                               url=source_url, collected_at=collected_at, source_id=source_id, source_tier=source_tier,
                                reason=None if lineup_rows else "PREDICTED_LINEUP_SECTION_MISSING"),
     }
     missing = [name for name, entry in entries.items() if entry["status"] not in _VALID]

@@ -35,6 +35,7 @@ def test_parse_markdown_keeps_source_and_extracts_explicit_sections():
     assert entries["suspensions"]["status"] == "VALID"
     assert entries["injury"]["source_id"] == "league.example.preview"
     assert entries["starting_xi"]["source_url"] == "https://league.example/match/1"
+    assert entries["starting_xi"]["source_tier"] == "C"
 
 
 def test_parse_markdown_does_not_promote_unlabelled_text():

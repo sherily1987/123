@@ -265,6 +265,7 @@ def build_evidence_catalog(evidence_text):
             continue
         collected_match = re.search(r"collected_at\(\s*([^)]*?)\s*\)", stripped, re.I)
         source_id_match = re.search(r"source_id\(\s*([^)]*?)\s*\)", stripped, re.I)
+        source_tier_match = re.search(r"source_tier\(\s*([A-D])\s*\)", stripped, re.I)
         lowered = fact.lower()
         status_match = re.search(r"(?:status|状态)\s*[=:]\s*([A-Z_]+)", fact, re.I)
         explicit_status = status_match.group(1).upper() if status_match else ""
@@ -302,6 +303,8 @@ def build_evidence_catalog(evidence_text):
             item["collected_at"] = collected_match.group(1).strip()
         if source_id_match:
             item["source_id"] = source_id_match.group(1).strip()
+        if source_tier_match:
+            item["source_tier"] = source_tier_match.group(1).upper()
         catalog.append(item)
     # Mark repeated provider domains conservatively.  This does not delete
     # facts—each item remains auditable—but prevents the prompt/auditor from

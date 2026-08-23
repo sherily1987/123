@@ -255,9 +255,13 @@ def _scrapling_generic_snapshot(match: dict[str, Any], mapping: dict[str, Any],
             raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_FETCH_FAILED")[-300:])
         source_id = str(mapping.get("source_id") or urllib.parse.urlparse(url).netloc or "scrapling.generic")
         provider = str(mapping.get("provider") or source_id)
+        source_tier = str(mapping.get("source_tier") or "C").upper()
+        if source_tier not in {"A", "B", "C", "D"}:
+            source_tier = "C"
         text = output_path.read_text(encoding="utf-8", errors="replace")
         return module.parse_markdown(text, match, url, collected_at,
-                                     source_id=source_id, provider=provider)
+                                     source_id=source_id, provider=provider,
+                                     source_tier=source_tier)
     finally:
         output_path.unlink(missing_ok=True)
 
@@ -634,7 +638,7 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
                 mapping = {name: match.get(name) for name in (
                     "url", "fotmob_match_id", "scrapling_url", "scrapling_sources",
                     "source_id", "provider", "official_url", "official_domains",
-                    "predicted_xi", "predicted_xi_source_url") if match.get(name) is not None}
+                    "predicted_xi", "predicted_xi_source_url", "source_tier") if match.get(name) is not None}
         if isinstance(mapping, dict):
             mapping = dict(mapping)
             mapping.setdefault("scrapling_fallback", True)
@@ -649,11 +653,13 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
                 for url in (discovered.get("official_candidates") or []):
                     candidates.append({"scrapling_url": url,
                                        "source_id": "discovered.official",
-                                       "provider": "discovered_official"})
+                                       "provider": "discovered_official",
+                                       "source_tier": "A"})
                 for url in (discovered.get("third_party_candidates") or []):
                     candidates.append({"scrapling_url": url,
                                        "source_id": "discovered.third_party",
-                                       "provider": "discovered_third_party"})
+                                       "provider": "discovered_third_party",
+                                       "source_tier": "C"})
                 if candidates:
                     mapping = {"scrapling_sources": candidates,
                                "source_discovery": discovered,
