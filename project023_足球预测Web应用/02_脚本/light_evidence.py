@@ -137,8 +137,12 @@ def build_one(idx: int, m: dict, quant_tier: str) -> str:
     if fusion_evidence:
         lines += ["", fusion_evidence]
     lines += ["", "## 证据缺口"]
-    lines.append(
-        "> 说明：轻量证据自动生成（project023）。若上方存在融合采集器快照，则优先引用其来源、状态和时间戳；预计首发标记为 PREDICTED，不等同官方确认。未采集或状态不完整的字段继续保留缺口，不能用常识补齐。")
+    if not fusion_evidence:
+        lines.append(
+            "> 说明：轻量证据自动生成（project023），本场未深度搜索；双方近况/轮次背景未抓取。预计首发标记为 PREDICTED，不等同官方确认。未采集或状态不完整的字段继续保留缺口，不能用常识补齐。")
+    else:
+        lines.append(
+            "> 说明：轻量证据自动生成（project023）。上方融合采集器快照优先引用其来源、状态和时间戳；预计首发标记为 PREDICTED，不等同官方确认。未采集或状态不完整的字段继续保留缺口，不能用常识补齐。")
     return "\n".join(lines)
 
 

@@ -56,6 +56,41 @@ def test_future_llm_matches_skips_kicked_off():
     assert [m["match_id"] for m in rows] == [2]
 
 
+def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Path):
+    forward = tmp_path / "forward"
+    snap_dir = forward / "2026-08-24" / "evidence_snapshots"
+    snap_dir.mkdir(parents=True)
+    (snap_dir / "sporttery-2041021.json").write_text(json.dumps({
+        "match_id": "sporttery-2041021",
+        "evidence_audit": {
+            "entries": {
+                "recent_form": {"status": "VALID", "source_id": "sporttery.preview",
+                                 "refreshed_at": "2026-08-23T12:00:00+00:00",
+                                 "value": {"home": ["W"], "away": ["D"]}},
+                "starting_xi": {"status": "PENDING_REFRESH", "source_id": "official.lineup.pending"},
+            }
+        },
+    }), encoding="utf-8")
+    late = tmp_path / "late.jsonl"
+    late.write_text(json.dumps({
+        "match_id": 2041021, "kind": "lineup", "status": "PREDICTED",
+        "lineup": {"home": ["A"], "away": ["B"]},
+        "collected_at": "2026-08-23T20:00:00+08:00",
+        "gate": {"minutes_to_kickoff": 60},
+    }) + "\n", encoding="utf-8")
+    matches = [{"match_id": 2041021, "evidence_chain": {
+        "team_stats": {"status": "VALID", "source_id": "quant"}
+    }}]
+    got = runner.attach_collected_evidence(
+        matches, "2026-08-24", forward_root=forward, late_events_path=late
+    )
+    assert got["snapshots_attached"] == 1
+    assert got["late_info_matches_merged"] == 1
+    assert matches[0]["evidence_chain"]["recent_form"]["status"] == "VALID"
+    assert matches[0]["evidence_chain"]["starting_xi"]["status"] == "PREDICTED"
+    assert matches[0]["evidence_snapshot_ref"].endswith("sporttery-2041021.json")
+
+
 def test_parse_llm_log_extracts_direction_and_skips():
     text = """
 ⚽ 第1/2场 [周一002] 赫根 VS 哈尔姆斯 | 瑞超 | 2026-08-18 01:00

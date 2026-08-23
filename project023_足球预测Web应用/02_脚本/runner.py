@@ -20,6 +20,7 @@ if str(FUSION_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(FUSION_SCRIPTS))
 from runtime import resolve_python  # noqa: E402
 from runtime_paths import backtest_store, forward_work_dir  # noqa: E402
+from evidence_merge import merge_browser_audit, merge_late_info_events  # noqa: E402
 
 import db
 import store_view as sv
@@ -254,6 +255,78 @@ def prepare_llm_evidence(matches: list[dict], ev_dir: Path) -> list[dict]:
     return done
 
 
+def attach_collected_evidence(
+    matches: list[dict],
+    day: str,
+    *,
+    forward_root: Path | None = None,
+    late_events_path: Path | None = None,
+) -> dict:
+    """Attach the latest pre-match snapshot to each LLM input by Sporttery ID.
+
+    The collectors deliberately write immutable JSON sidecars.  This function
+    creates the LLM-facing projection at run time: browser/mobile evidence is
+    merged with provenance preserved, then valid pre-kickoff late-info events
+    are applied.  It never changes quant probabilities or treats search
+    candidates as facts.
+    """
+    root = Path(forward_root or forward_work_dir())
+    snapshot_dir = root / day / "evidence_snapshots"
+    snapshots: dict[str, tuple[Path, dict]] = {}
+    if snapshot_dir.is_dir():
+        for path in snapshot_dir.glob("sporttery-*.json"):
+            try:
+                blob = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            mid = sv.sporttery_id(blob.get("match_id"))
+            if mid:
+                snapshots[mid] = (path, blob)
+
+    event_path = Path(late_events_path or (root.parent / "late_info" / "events.jsonl"))
+    events_by_id: dict[str, list[dict]] = {}
+    if event_path.is_file():
+        for line in event_path.read_text(encoding="utf-8").splitlines():
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            mid = sv.sporttery_id(event.get("match_id"))
+            if mid:
+                events_by_id.setdefault(mid, []).append(event)
+
+    attached = 0
+    late_merged = 0
+    for match in matches:
+        mid = sv.sporttery_id(match.get("match_id"))
+        if not mid:
+            continue
+        snapshot = snapshots.get(mid)
+        chain = match.get("evidence_chain") or {}
+        if snapshot:
+            path, blob = snapshot
+            chain, browser_audit = merge_browser_audit(chain, blob.get("evidence_audit"))
+            match["evidence_snapshot_ref"] = str(path)
+            match["browser_evidence_ref"] = str(path)
+            match["evidence_snapshot_audit"] = browser_audit
+            match["evidence_audit"] = blob.get("evidence_audit") or {}
+            attached += 1
+        if events_by_id.get(mid):
+            chain, late_audit = merge_late_info_events(chain, events_by_id[mid])
+            match["late_info_merge_audit"] = late_audit
+            if late_audit.get("fields_merged"):
+                late_merged += 1
+        if chain:
+            match["evidence_chain"] = chain
+    return {
+        "snapshot_dir": str(snapshot_dir),
+        "snapshots_available": len(snapshots),
+        "matches": len(matches),
+        "snapshots_attached": attached,
+        "late_info_matches_merged": late_merged,
+    }
+
+
 _LLM_HEAD = re.compile(r"⚽ 第\d+/\d+场 \[([^\]]+)\]\s+(\S+)\s+VS\s+(\S+)")
 _LLM_DIR = re.compile(
     r"综合方向:\s+(\S+)\s+\((\d+(?:\.\d+)?)/(\d+(?:\.\d+)?)票,\s*强度(\d+)%\)"
@@ -376,6 +449,9 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             "count": len(matches),
             "matches": matches,
         }
+        evidence_stats = attach_collected_evidence(matches, day)
+        raw["matches"] = matches
+        raw["evidence_projection"] = evidence_stats
         raw_path = work / "llm_raw.json"
         raw_path.write_text(json.dumps(raw, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         ev_dir = work / "llm_evidence"
@@ -384,7 +460,9 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         light = sum(1 for x in prepared if x["source"] == "light")
         db.run_update(
             run_id, total=len(matches),
-            message=f"证据就绪 复用{reused} 轻量{light}，开始跑 {len(matches)} 场…",
+            message=(f"证据就绪 快照{evidence_stats['snapshots_attached']}/"
+                     f"{len(matches)}，晚到合并{evidence_stats['late_info_matches_merged']}，"
+                     f"复用{reused} 轻量{light}，开始跑 {len(matches)} 场…"),
         )
         repo = llm_repo()
         log_path = work / "llm_predictions.txt"
@@ -418,9 +496,11 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         report = [
             f"# LLM轨 {day}",
             "",
-            "证据方向，不是概率。不与量化轨合成。深度抓取不在本工作流里。",
+            "证据方向，不是概率。不与量化轨合成。采集器快照按体彩 ID 自动投影到 LLM Markdown。",
             "",
-            f"- 待跑 {len(matches)} 场，复用深度证据 {reused}，轻量证据 {light}",
+            f"- 待跑 {len(matches)} 场，侧车快照接入 {evidence_stats['snapshots_attached']}，"
+            f"晚到信息合并 {evidence_stats['late_info_matches_merged']}",
+            f"- 复用深度证据 {reused}，轻量证据 {light}",
             f"- 出方向 {parsed['ok']}，门禁/审计跳过 {parsed['skipped']}",
             f"- 工单写入 {jobs_n}",
             f"- 日志 `{log_path.name}`",
