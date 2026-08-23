@@ -77,9 +77,23 @@ def injuries_for_team(league_id: int, season: int, team_id: int) -> list[dict] |
         data = adapter.get("/injuries", {"league": league_id, "season": season, "team": team_id})
     except Exception:
         return None
-    rows = [{"player": x.get("player", {}).get("name"), "type": x.get("player", {}).get("type"),
-             "reason": x.get("player", {}).get("reason")}
-            for x in data.get("response", [])]
+    rows = []
+    seen = set()
+    for item in data.get("response", []):
+        player = item.get("player") or {}
+        row = {"player": player.get("name"), "type": player.get("type"),
+               "reason": player.get("reason")}
+        # API-Sports returns one row per affected fixture; the same absence can
+        # therefore appear dozens of times.  Deduplicate before exposing the
+        # evidence to LLMs or adjustment logic, while retaining distinct
+        # reasons (e.g. injury vs suspension) as separate facts.
+        key = (str(row["player"] or "").casefold(),
+               str(row["type"] or "").casefold(),
+               str(row["reason"] or "").casefold())
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(row)
     return rows
 
 
