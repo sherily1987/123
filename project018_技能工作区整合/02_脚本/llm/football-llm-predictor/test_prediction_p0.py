@@ -368,6 +368,24 @@ def test_parser_preserves_raw_markets_when_evidence_forces_abstain():
     assert out["raw_llm_hafu"] == "胜胜"
 
 
+def test_parser_rejects_direction_probability_conflict_but_keeps_raw_probability():
+    payload = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": None,
+        "probs_1x2": [20, 25, 55], "top_scores": ["1-0", "1-1", "0-1"],
+        "ou25": "小", "hafu": "胜胜", "evidence_gap": False,
+        "evidence_ids": ["E1"], "unsupported_assumptions": [],
+        "reason_codes": [], "summary": "方向与概率矛盾",
+    }
+    out = predict.parse_evidence_prediction(
+        __import__("json").dumps(payload, ensure_ascii=False),
+        [{"id": "E1", "status": "SINGLE_SOURCE"}],
+    )
+    assert out["decision"] == "abstain"
+    assert out["direction"] is None
+    assert "PROBABILITY_DIRECTION_CONFLICT" in out["reason_codes"]
+    assert out["raw_llm_probs_1x2"] == [20, 25, 55]
+
+
 def test_abstentions_do_not_vote_but_remain_auditable():
     abstain = {
         "decision": "abstain", "direction": None, "alt_direction": None,

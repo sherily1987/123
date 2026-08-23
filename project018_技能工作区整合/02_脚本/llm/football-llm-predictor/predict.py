@@ -474,6 +474,17 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     usable_ids = [value for value in evidence_ids if catalog_by_id.get(value, {}).get("status") in (
         "SINGLE_SOURCE", "VERIFIED_MULTI_SOURCE",
     )]
+    direction_index = {"主胜": 0, "平局": 1, "客胜": 2}
+    probability_conflict = (
+        decision == "opinion" and direction in direction_index and probs
+        and max(range(3), key=lambda index: probs[index]) != direction_index[direction]
+    )
+    if probability_conflict:
+        decision = "abstain"
+        direction = alt = sp = ou25 = hafu = None
+        top_scores = probs = None
+        egap = True
+        reason_codes.append("PROBABILITY_DIRECTION_CONFLICT")
     if decision == "opinion" and evidence_catalog is not None and (invalid_ids or not usable_ids):
         decision = "abstain"
         direction = alt = sp = ou25 = hafu = None
