@@ -409,8 +409,12 @@ def llm_from_parsed(row: dict) -> dict:
     # looked like a measured zero-confidence vote and polluted reports.  Keep
     # the semantic absence as null while retaining the explicit reason/action.
     reason_text = str(row.get("reason") or gate.get("reason") or "")
+    try:
+        packed_is_zero = isinstance(packed, dict) and float(packed.get("value", 0.0)) == 0.0
+    except (TypeError, ValueError):
+        packed_is_zero = False
     if (row.get("single_model") is True or "single_model_no_consensus" in reason_text) and (
-            packed is None or float(packed.get("value", 0.0)) == 0.0):
+            packed is None or packed_is_zero):
         packed = None
     action = row.get("ev_action") or row.get("action") or gate.get("action")
     if row.get("sp_skip") and not action:
