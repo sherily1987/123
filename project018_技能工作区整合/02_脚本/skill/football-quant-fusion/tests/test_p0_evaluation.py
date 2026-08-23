@@ -381,6 +381,54 @@ class BacktestSamplingTests(unittest.TestCase):
         self.assertEqual(len(primary), 2)
         self.assertEqual({r["prediction_id"] for r in primary}, {"m1-p", "m2-6"})
 
+    def test_latest_before_kickoff_uses_observed_at_and_rejects_post_kickoff(self):
+        """Backfilled records must use pre-kickoff market observation, never write time."""
+        rows = [
+            {
+                "match_id": "m1", "snapshot_type": "prematch",
+                "created_at": "2026-08-23T20:00:00Z",
+                "prediction_as_of": "",
+                "observed_at": "2026-08-23T08:00:00Z",
+                "kickoff": "2026-08-23T10:00:00Z", "prediction_id": "m1-pre",
+            },
+            {
+                "match_id": "m1", "snapshot_type": "closing",
+                "created_at": "2026-08-23T20:01:00Z",
+                "prediction_as_of": "",
+                "observed_at": "2026-08-23T11:00:00Z",
+                "kickoff": "2026-08-23T10:00:00Z", "prediction_id": "m1-post",
+            },
+        ]
+
+        primary = backtest.select_primary_rows(rows, "latest_before_kickoff")
+
+        assert [row["prediction_id"] for row in primary] == ["m1-pre"]
+
+    def test_score_record_retains_odds_observed_at_for_legacy_rows(self):
+        """Legacy rows without prediction_as_of still expose auditable pre-match time."""
+        with tempfile.TemporaryDirectory(prefix="fusion-score-observed-legacy-") as td:
+            root = Path(td)
+            (root / "results").mkdir()
+            (root / "results" / "m1.json").write_text(
+                json.dumps({"score_90": {"home": 1, "away": 0}}), encoding="utf-8"
+            )
+            record = {
+                "match_id": "m1", "prediction_id": "m1-p", "snapshot_type": "prematch",
+                "created_at": "2026-08-23T20:00:00Z",
+                "match": {"kickoff": "2026-08-23T10:00:00Z"},
+                "model": {"model_version": "m4", "probability_signature": "a" * 64},
+                "input": {
+                    "odds": [2.0, 3.0, 4.0],
+                    "field_meta": {"odds": {"observed_at": "2026-08-23T08:00:00Z"}},
+                },
+                "output": {"final_1x2_pct": [50.0, 30.0, 20.0]},
+            }
+
+            row, error = backtest.score_record(record, root)
+
+        assert error is None
+        assert row["observed_at"] == "2026-08-23T08:00:00Z"
+
     def test_version_cohort_requires_matching_hashes_for_current(self):
         current = {
             "model_version": "m1",

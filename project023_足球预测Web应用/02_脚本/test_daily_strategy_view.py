@@ -29,6 +29,7 @@ def _job(match_id: int) -> dict:
         },
         "outputs": [{
             "track": "quant",
+            "evidence_audit": {"evidence_gap": False, "evidence_status": "OK", "evidence_gap_reasons": []},
             "mode": "market_only",
             "final_1x2_pct": [70.0, 20.0, 10.0],
             "market_forecasts": {

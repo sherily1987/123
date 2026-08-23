@@ -16,7 +16,7 @@ import math
 import random
 import sys
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # 本模块常被 importlib.spec_from_file_location 直接加载（测试、外部工具），
@@ -84,24 +84,36 @@ def _snapshot_rank(snapshot_type):
     return 0
 
 
+_DEFAULT_OBSERVED_TZ = timezone(timedelta(hours=8))
+
+
+def _parse_auditable_time(raw):
+    """Parse an audit timestamp; legacy Sporttery observations are China-local."""
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=_DEFAULT_OBSERVED_TZ)
+    return parsed.astimezone(timezone.utc)
+
+
 def _selection_time(row):
     """Return the auditable prediction time used for primary-snapshot choice.
 
     ``snapshot_type`` is a label (for example, an older generic ``prematch``
     or a later ``T-7h``) and must not decide which deployed version is
-    evaluated.  Formal records carry ``prediction_as_of``; legacy records
-    fall back to their immutable registry creation time.
+    evaluated. Formal records carry ``prediction_as_of``; legacy Sporttery
+    records fall back to the odds observation time, then immutable registry
+    creation time as a last resort.
     """
-    raw = row.get("prediction_as_of") or row.get("created_at") or ""
-    if not isinstance(raw, str):
-        return datetime.min.replace(tzinfo=timezone.utc)
-    try:
-        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
-    except ValueError:
-        return datetime.min.replace(tzinfo=timezone.utc)
-    if parsed.tzinfo is None:
-        return datetime.min.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+    for raw in (row.get("prediction_as_of"), row.get("observed_at"), row.get("created_at")):
+        parsed = _parse_auditable_time(raw)
+        if parsed is not None:
+            return parsed
+    return datetime.min.replace(tzinfo=timezone.utc)
 
 
 def select_primary_rows(rows, policy="latest_before_kickoff"):
@@ -118,7 +130,16 @@ def select_primary_rows(rows, policy="latest_before_kickoff"):
                 continue
             chosen = max(exact, key=lambda r: str(r.get("created_at") or ""))
         elif policy == "latest_before_kickoff":
-            chosen = max(candidates, key=lambda r: (_selection_time(r),
+            eligible = []
+            for candidate in candidates:
+                selection_time = _selection_time(candidate)
+                kickoff = _parse_auditable_time(candidate.get("kickoff"))
+                if kickoff is not None and selection_time > kickoff:
+                    continue
+                eligible.append(candidate)
+            if not eligible:
+                continue
+            chosen = max(eligible, key=lambda r: (_selection_time(r),
                                                      _snapshot_rank(r.get("snapshot_type")),
                                                      str(r.get("created_at") or "")))
         else:
@@ -520,11 +541,14 @@ def score_record(rec, root):
         bt_view = {"yes": float(bt["yes_pct"]) / 100.0, "actual": 1 if h > 0 and a > 0 else 0}
     _m = rec.get("model")
     _version = _m.get("version") if isinstance(_m, dict) else str(_m or "")
+    observed_at = (((rec.get("input") or {}).get("field_meta") or {})
+                   .get("odds") or {}).get("observed_at")
     return {
         "prediction_id": rec.get("prediction_id"),
         "match_id": mid,
         "created_at": rec.get("created_at") or "",
         "prediction_as_of": rec.get("prediction_as_of") or "",
+        "observed_at": observed_at or "",
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
         "model": _m if isinstance(_m, dict) else {},
@@ -542,6 +566,8 @@ def score_record(rec, root):
         "clv_pp": None,
         "snapshot_odds": (rec.get("input") or {}).get("odds"),
         "kickoff": ((rec.get("match") or {}).get("kickoff")),
+        "evidence_gap": bool((((rec.get("output") or {}).get("evidence_audit") or {}).get("evidence_gap"))),
+        "evidence_age_hours": (((rec.get("output") or {}).get("evidence_audit") or {}).get("evidence_freshness_hours")),
     }, None
 
 
@@ -571,6 +597,20 @@ def attach_clv(rows):
             except Exception:
                 pass
     return rows
+
+
+def evidence_stratification(rows):
+    """按证据缺口与新鲜度分层，避免整体指标掩盖失败样本。"""
+    groups = {}
+    for row in rows:
+        gap = bool(row.get("evidence_gap"))
+        age = row.get("evidence_age_hours")
+        age_bucket = "unknown"
+        if isinstance(age, (int, float)):
+            age_bucket = "0-6h" if age <= 6 else ("6-24h" if age <= 24 else ">24h")
+        groups.setdefault(("evidence_gap", "gap" if gap else "no_gap"), []).append(row)
+        groups.setdefault(("evidence_age", age_bucket), []).append(row)
+    return {f"{key}:{value}": summarize(rows) for (key, value), rows in sorted(groups.items())}
 
 
 def main():
@@ -612,6 +652,8 @@ def main():
                 "top_scores": None, "ou25": None, "btts": None, "clv_pp": None,
                 "snapshot_odds": None, "created_at": it.get("created_at") or "",
                 "kickoff": it.get("kickoff") or "",
+                "evidence_gap": bool(it.get("evidence_gap", False)),
+                "evidence_age_hours": it.get("evidence_age_hours"),
             })
         snapshot_rows, dropped = dedupe_snapshot_rows(raw_rows)
     else:
@@ -680,6 +722,7 @@ def main():
         },
         "paired_market": paired_market_comparison(
             rows, iterations=a.bootstrap_iterations, seed=20260808),
+        "evidence_stratification": evidence_stratification(rows),
         "walk_forward": walk_forward_report(
             rows, folds=a.walk_forward_folds, bootstrap_iterations=a.bootstrap_iterations),
         "current_identity": current_identity,

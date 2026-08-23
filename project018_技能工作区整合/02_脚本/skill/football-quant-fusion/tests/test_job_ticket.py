@@ -6,6 +6,38 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import job_ticket as jt
 
 
+def test_quant_summary_keeps_four_market_model_outputs_with_dependency_label():
+    """Catches job compression dropping score/TTG/HAFU model distributions."""
+    out = {
+        "mode": "market_only",
+        "market_dependency_pct": 100,
+        "forecast": {
+            "final_1x2_pct": [20.0, 30.0, 50.0],
+            "top_scores": [{"score": "0-1", "prob_pct": 12.0}],
+            "ou_2_5": {"over_pct": 45.0, "under_pct": 55.0},
+        },
+        "core_output": {
+            "ttg_score_consistency": {
+                "model_prob_pct": [8.0, 20.0, 26.0, 22.0, 13.0, 6.0, 3.0, 2.0]
+            },
+            "hafu_model": {
+                "prob_pct": [10.0, 5.0, 2.0, 8.0, 15.0, 19.0, 1.0, 5.0, 35.0],
+                "calibration_status": "UNFITTED",
+            },
+            "derived_market_status": {"top_scores": "FITTED"},
+        },
+    }
+
+    summary = jt.quant_from_fusion_output(out)
+
+    assert summary["market_forecasts"]["CRS"]["top_scores"][0]["score"] == "0-1"
+    assert summary["market_forecasts"]["TTG"]["model_prob_pct"][2] == 26.0
+    assert summary["market_forecasts"]["HAFU"]["model_prob_pct"][8] == 35.0
+    assert summary["market_forecasts"]["HAFU"]["calibration_status"] == "UNFITTED"
+    assert summary["market_forecasts"]["TTG"]["probability_source"] == "market_conditioned_model"
+    assert summary["market_forecasts"]["TTG"]["independent_from_same_pool"] is False
+
+
 def test_normalize_match_id_accepts_int_str_and_prefixed():
     assert jt.normalize_match_id(2040898) == "sporttery-2040898"
     assert jt.normalize_match_id("2040898") == "sporttery-2040898"

@@ -42,6 +42,11 @@ def _market_freshness(output):
     return output.get('market_freshness') or output.get('core_output', {}).get('market_freshness') or {}
 
 
+def _evidence_audit(output):
+    return (output.get('evidence_audit') or
+            output.get('core_output', {}).get('evidence_audit') or {})
+
+
 # [中文功能] 读取已批准的主概率校准值（未批准返回None）
 def _calibrated_primary(output, policy):
     status = str(policy.get('calibration_status') or 'UNFITTED').upper()
@@ -87,6 +92,9 @@ def evaluate(output, market_freshness=None):
     dependency = float(decision.get('market_dependency_pct') or core.get('market_dependency_pct') or 0)
     significant = decision.get('edge_significant_vs_sensitivity') is True
     cal_prob, cal_status = _calibrated_primary(output, policy)
+    evidence = _evidence_audit(output)
+    evidence_gap = bool(evidence.get('evidence_gap'))
+    evidence_gap_reasons = list(evidence.get('evidence_gap_reasons') or [])
 
     hhad = core.get('sporttery_hhad_3way') or {}
     hhad_probs = hhad.get('model_prob_pct') or []
@@ -116,6 +124,7 @@ def evaluate(output, market_freshness=None):
         and significant
         and dependency < max_dependency
         and not stale_pools
+        and not evidence_gap
         and cal_prob is not None
         and cal_prob >= prob_threshold
     )
@@ -139,6 +148,9 @@ def evaluate(output, market_freshness=None):
         reasons.append(f'CALIBRATED_PROB_BELOW_THRESHOLD:{round(cal_prob * 100, 1)}%')
     if stale_pools:
         reasons.append('STALE_MARKET:' + ','.join(sorted(stale_pools)))
+    if evidence_gap:
+        reasons.append('EVIDENCE_GAP')
+        reasons.extend('EVIDENCE_GAP_REASON:' + str(reason) for reason in evidence_gap_reasons)
     if one_goal_risk is not None and one_goal_risk >= float(policy.get('one_goal_draw_risk_pct', 18.0)):
         reasons.append('ONE_GOAL_OR_PUSH_RISK')
 
@@ -157,6 +169,8 @@ def evaluate(output, market_freshness=None):
         hhad_reasons.append(f'STATUS_NOT_REVIEWABLE:{status or "MISSING"}')
     if stale_pools:
         hhad_reasons.append('STALE_MARKET:' + ','.join(sorted(stale_pools)))
+    if evidence_gap:
+        hhad_reasons.append('EVIDENCE_GAP')
     risk_threshold = float(policy.get('one_goal_draw_risk_pct', 18.0))
     if (hhad_primary == 2 and one_goal_risk is not None
             and one_goal_risk >= risk_threshold):
@@ -168,6 +182,7 @@ def evaluate(output, market_freshness=None):
         and hhad_cal_status in ('VALID', 'APPROVED')
         and hhad_max_prob >= prob_threshold
         and not stale_pools
+        and not evidence_gap
         and 'ONE_GOAL_RISK_BLOCK' not in hhad_reasons
     )
     hhad_recommendation = {
@@ -201,6 +216,10 @@ def evaluate(output, market_freshness=None):
         'hhad_recommendation': hhad_recommendation,
         'one_goal_risk_pct': one_goal_risk,
         'stale_pools': sorted(stale_pools),
+        'evidence_gap': evidence_gap,
+        'evidence_gap_reasons': evidence_gap_reasons,
+        'evidence_status': evidence.get('evidence_status'),
+        'evidence_freshness_hours': evidence.get('evidence_freshness_hours'),
         'reasons': reasons,
         'thresholds': {
             'one_goal_draw_risk_pct': float(policy.get('one_goal_draw_risk_pct', 18.0)),

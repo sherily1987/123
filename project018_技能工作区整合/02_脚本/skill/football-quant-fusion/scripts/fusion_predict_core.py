@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import importlib.util
 import json
@@ -42,6 +43,133 @@ SEVERE_PREFIXES = ("DOUBLE_HOME_ADV", "EXTREME_LAMBDA_ASYMMETRY", "EXTREME_CLEAN
 DERIVATIVE_PREFIXES = ("TTG_SCORE_CONFLICT", "HHAD_CONFLICT")
 # 字节码缺陷修复：market_freshness 分支曾引用未赋值的模块级变量
 market_freshness_meta = {}
+
+EVIDENCE_FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
+_EVIDENCE_VALID = {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG"}
+_EVIDENCE_BAD = {"MISSING", "UNAVAILABLE", "UNVERIFIED", "OUTDATED", "ASSUMED", "POST_KICKOFF"}
+
+
+def _parse_evidence_time(value):
+    if not value:
+        return None
+    try:
+        text = str(value).strip().replace("Z", "+00:00")
+        parsed = datetime.fromisoformat(text)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def _evidence_candidate(data, name, api_features, api):
+    direct = data.get(name)
+    evidence = data.get("evidence_chain") or data.get("evidence") or {}
+    meta = data.get("field_meta") or {}
+    candidate = direct if direct not in (None, "", [], {}) else evidence.get(name)
+    if candidate in (None, "", [], {}):
+        candidate = meta.get(name)
+    if candidate in (None, "", [], {}):
+        mapped = {
+            "team_stats": ("team_strength", "rolling_statistics", "standings"),
+            "recent_form": ("rolling_statistics",),
+            "injury": (),
+            "suspensions": (),
+            "starting_xi": ("lineups",),
+        }
+        for key in mapped.get(name, ()):
+            candidate = api_features.get(key)
+            if candidate not in (None, "", [], {}):
+                break
+    if candidate in (None, "", [], {}):
+        if name in ("starting_xi", "suspensions"):
+            candidate = (api.get("lineups") if isinstance(api, dict) else None)
+        elif name == "injury":
+            candidate = meta.get("injury_home") or meta.get("injury_away")
+    return candidate
+
+
+def _evidence_entry(data, name, api_features, api, kickoff):
+    candidate = _evidence_candidate(data, name, api_features, api)
+    meta = (data.get("field_meta") or {}).get(name) or {}
+    if not isinstance(meta, dict):
+        meta = {}
+    if isinstance(candidate, dict):
+        status = str(candidate.get("status") or candidate.get("state") or meta.get("status") or "").upper()
+        refreshed = (candidate.get("refreshed_at") or candidate.get("updated_at") or
+                     candidate.get("observed_at") or candidate.get("collected_at") or
+                     candidate.get("as_of"))
+        source_id = candidate.get("source_id") or candidate.get("source") or candidate.get("provider")
+        source_url = candidate.get("source_url") or candidate.get("url")
+    else:
+        status = str(meta.get("status") or "").upper()
+        refreshed = meta.get("refreshed_at") or meta.get("updated_at") or meta.get("observed_at") or meta.get("collected_at")
+        source_id = meta.get("source_id") or meta.get("source") or meta.get("provider")
+        source_url = meta.get("source_url") or meta.get("url")
+    if isinstance(refreshed, dict):
+        refreshed = refreshed.get("collected_at") or refreshed.get("observed_at") or refreshed.get("as_of")
+    present = candidate not in (None, "", [], {})
+    reasons = []
+    if not status and present:
+        status = "VALID"
+    if not status:
+        status = "MISSING"
+    refreshed_dt = _parse_evidence_time(refreshed)
+    age_hours = None
+    kickoff_dt = _parse_evidence_time(kickoff)
+    if refreshed_dt:
+        reference = kickoff_dt or datetime.now(timezone.utc)
+        age_hours = round(max(0.0, (reference - refreshed_dt).total_seconds() / 3600.0), 2)
+        if kickoff_dt and refreshed_dt > kickoff_dt:
+            status = "POST_KICKOFF"
+            reasons.append("POST_KICKOFF")
+    elif present:
+        status = "UNVERIFIED"
+        reasons.append("REFRESHED_AT_MISSING")
+    if status in _EVIDENCE_BAD or status not in _EVIDENCE_VALID:
+        if status not in reasons:
+            reasons.append(status)
+    return {
+        "status": status,
+        "source_id": source_id or "unknown",
+        "source_url": source_url,
+        "refreshed_at": refreshed,
+        "age_hours": age_hours,
+        "missing_reason": ";".join(reasons) if reasons else None,
+    }
+
+
+def build_evidence_audit(data):
+    """统一赛前证据审计；缺关键字段时明确 evidence_gap，不作常识回填。"""
+    api_features = data.get("api_features") or {}
+    api = data.get("api_football") or {}
+    match_meta = data.get("match") if isinstance(data.get("match"), dict) else {}
+    kickoff = data.get("kickoff") or data.get("kickoff_at") or match_meta.get("kickoff")
+    entries = {name: _evidence_entry(data, name, api_features, api, kickoff) for name in EVIDENCE_FIELDS}
+    missing = [name for name, entry in entries.items() if entry["status"] not in _EVIDENCE_VALID]
+    reasons = []
+    for name in missing:
+        reason = entries[name].get("missing_reason") or entries[name].get("status") or "MISSING"
+        reasons.append(f"{name.upper()}_{reason}")
+    ages = [v["age_hours"] for v in entries.values() if v.get("age_hours") is not None]
+    return {
+        "schema_version": "evidence-audit-1.0",
+        "critical_fields": list(EVIDENCE_FIELDS),
+        "entries": entries,
+        "missing_fields": missing,
+        "evidence_gap": bool(missing),
+        "evidence_gap_reasons": reasons,
+        "evidence_status": "GAP" if missing else "OK",
+        "evidence_freshness_hours": max(ages) if ages else None,
+        "kickoff": kickoff,
+        "market_source_policy": {
+            "HAD": "Sporttery official odds",
+            "TTG": "Sporttery official odds",
+            "HAFU": "Sporttery official odds",
+            "CRS": "Sporttery official odds",
+            "international_odds": "research_only",
+        },
+    }
 
 
 def _hash_files(paths):
@@ -467,6 +595,7 @@ def predict_one(core, version, data):
     """单场融合预测入口：市场权重注入 → 核心预测 → 审计 → 门控。"""
     build = build_identity()
     data, weights_loaded = ensure_market_weights(dict(data))
+    evidence_audit = build_evidence_audit(data)
     try:
         out = core.predict(data)
     except Exception as exc:
@@ -494,6 +623,7 @@ def predict_one(core, version, data):
             "fusion_status": "blocked",
             "core_engine_version": version,
             "build_identity": build,
+            "evidence_audit": evidence_audit,
             "core_output": core_output,
         }, data)
     if out.get("status") == "ok":
@@ -525,6 +655,7 @@ def predict_one(core, version, data):
             "fusion_status": "blocked",
             "core_engine_version": version,
             "build_identity": build,
+            "evidence_audit": evidence_audit,
             "core_output": out,
         }, data)
     ledger = ledger_audit(data)
@@ -633,6 +764,7 @@ def predict_one(core, version, data):
                                  or (data.get("lambda_prior") or {}).get("source")),
         "note": "只有显式注入lambda_prior且通过当前引擎校验时，球队动态强度才影响模型；原始统计/阵容/积分榜仅作分层审计。",
     }
+    evidence_audit = build_evidence_audit(data)
 
     policy_path = HERE.parent / "config" / "recommendation_policy.json"
     policy_mod = HERE / "recommendation_policy.py"
@@ -646,6 +778,7 @@ def predict_one(core, version, data):
             "fusion_decision": decision(out, ledger, data),
             "reliability_flags": out.get("reliability_flags"),
             "market_freshness": (out.get("multi_market_fit") or {}).get("freshness"),
+            "evidence_audit": evidence_audit,
         })
     except Exception as exc:
         recommendation_gate = {
@@ -687,6 +820,7 @@ def predict_one(core, version, data):
         "api_features": api_features or None,
         "market_freshness": (out.get("multi_market_fit") or {}).get("freshness") or market_freshness_meta,
         "data_usage_audit": data_usage_audit,
+        "evidence_audit": evidence_audit,
         "recommendation_gate": recommendation_gate,
         "injury": build_injury_view(data),
         "market_weights": data.get("market_weights"),

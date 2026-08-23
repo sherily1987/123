@@ -162,6 +162,8 @@ def validate_job(job: dict) -> list[str]:
                 errors.append("quant.final_1x2_pct must be [H,D,A]")
             if item.get("strength") is not None:
                 errors.append("quant must not carry LLM strength")
+            if item.get("evidence_gap") is True and item.get("action") == "bet":
+                errors.append("quant evidence_gap=true cannot be action=bet")
         if track == "llm":
             strength = item.get("strength")
             if strength is not None:
@@ -269,6 +271,7 @@ def load_job(root: Path, match_id, sales_day: str | None = None) -> dict | None:
 
 def quant_from_fusion_output(out: dict, *, prediction_id: str | None = None) -> dict:
     forecast = out.get("forecast") or {}
+    core = out.get("core_output") or out
     decision = out.get("fusion_decision") or {}
     gate = out.get("recommendation_gate") or {}
     pct = forecast.get("final_1x2_pct") or out.get("final_1x2_pct")
@@ -276,6 +279,38 @@ def quant_from_fusion_output(out: dict, *, prediction_id: str | None = None) -> 
     action = decision.get("action")
     if action is None:
         action = "skip" if banker is False else None
+    ttg = core.get("ttg_score_consistency") or {}
+    hafu = core.get("hafu_model") or {}
+    derived_status = core.get("derived_market_status") or {}
+    market_dependency = (
+        out.get("market_dependency_pct")
+        if out.get("market_dependency_pct") is not None
+        else gate.get("market_dependency_pct")
+    )
+    conditioned_meta = {
+        "probability_source": "market_conditioned_model",
+        "independent_from_same_pool": False,
+        "market_dependency_pct": market_dependency,
+    }
+    market_forecasts = {
+        "CRS": {
+            "top_scores": forecast.get("top_scores") or core.get("top_scores") or [],
+            "calibration_status": derived_status.get("top_scores"),
+            **conditioned_meta,
+        },
+        "TTG": {
+            "model_prob_pct": ttg.get("model_prob_pct"),
+            "market_prob_pct": ttg.get("market_prob_pct"),
+            "calibration_status": derived_status.get("ttg") or derived_status.get("ou_2_5"),
+            **conditioned_meta,
+        },
+        "HAFU": {
+            "model_prob_pct": hafu.get("prob_pct"),
+            "calibration_status": hafu.get("calibration_status") or derived_status.get("hafu_half_time"),
+            **conditioned_meta,
+        },
+    }
+    evidence_audit = out.get("evidence_audit") or core.get("evidence_audit") or {}
     return {
         "track": "quant",
         "prediction_id": prediction_id or out.get("prediction_id"),
@@ -284,8 +319,19 @@ def quant_from_fusion_output(out: dict, *, prediction_id: str | None = None) -> 
         "primary_outcome": decision.get("primary_outcome"),
         "status": decision.get("status") or out.get("fusion_status"),
         "action": action,
-        "market_dependency_pct": out.get("market_dependency_pct") if out.get("market_dependency_pct") is not None else gate.get("market_dependency_pct"),
+        "market_dependency_pct": market_dependency,
         "mode": out.get("mode"),
+        "market_forecasts": market_forecasts,
+        "evidence_audit": evidence_audit,
+        "evidence_gap": bool(evidence_audit.get("evidence_gap", False)),
+        "evidence_gap_reasons": list(evidence_audit.get("evidence_gap_reasons") or []),
+        "market_source_policy": {
+            "HAD": "Sporttery official odds",
+            "TTG": "Sporttery official odds",
+            "HAFU": "Sporttery official odds",
+            "CRS": "Sporttery official odds",
+            "international_odds": "research_only",
+        },
     }
 
 

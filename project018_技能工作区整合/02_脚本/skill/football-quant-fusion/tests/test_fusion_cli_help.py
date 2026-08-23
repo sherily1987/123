@@ -17,3 +17,5 @@ def test_top_level_help_lists_supported_commands():
     assert "odds-intl-capture" in completed.stdout
     assert "draw-watch-evaluate" in completed.stdout
     assert "draw-ttg-shadow-research" in completed.stdout
+    assert "strategy-plan" in completed.stdout
+    assert "independent-market-shadow" in completed.stdout

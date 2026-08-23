@@ -1,7 +1,7 @@
 {
  "calibration_status": "LEGACY_RESEARCH_ONLY",
  "production_recommendations_enabled": false,
- "production_recommendations_disabled_reason": "m2同版本赛前样本与独立推荐校准尚未达到正式评审条件",
+ "production_recommendations_disabled_reason": "当前版本及各独立市场尚未分别满足样本量、样本外校准、收益稳定性与发布门禁",
  "max_market_dependency_pct": 80.0,
  "hhad_calibration_status": "UNFITTED",
  "min_samples_for_recalibration": 100,
@@ -80,7 +80,7 @@
   }
  },
  "review": {
-  "next_review": "prematch 已结算样本达到 200 后复审（当前 prematch 9 场，预计 2026-27 新赛季中期）",
+  "next_review": "当前概率版本已结算赛前样本达到100场时启动重校准审查，达到200场时复审推荐阈值；HAD、TTG、CRS、HAFU必须按各自赔率池与独立概率分别评审，不得共用分母",
   "rollback": "restore config/recommendation_policy.json.bak_2026-08-06_P0"
  },
  "banker_prob_threshold": 0.5,

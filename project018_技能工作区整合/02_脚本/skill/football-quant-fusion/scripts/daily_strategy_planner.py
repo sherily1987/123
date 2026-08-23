@@ -11,6 +11,7 @@ import argparse
 import itertools
 import json
 import math
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -120,6 +121,14 @@ def _model_views(job: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return views
 
 
+def _job_evidence_audit(job: dict[str, Any]) -> dict[str, Any]:
+    quant = next((row for row in (job.get("outputs") or []) if row.get("track") == "quant"), {})
+    audit = quant.get("evidence_audit") or job.get("evidence_audit") or {}
+    if not audit:
+        return {"evidence_gap": True, "evidence_status": "MISSING", "evidence_gap_reasons": ["EVIDENCE_AUDIT_MISSING"]}
+    return audit
+
+
 def _market_rows(
     job: dict[str, Any],
     policy: dict[str, Any],
@@ -143,12 +152,18 @@ def _market_rows(
         "CRS": _pool_from_mapping(inputs.get("crs")),
     }
     model_views = _model_views(job)
+    evidence = _job_evidence_audit(job)
+    evidence_gap = bool(evidence.get("evidence_gap"))
+    evidence_reasons = list(evidence.get("evidence_gap_reasons") or [])
     rows = []
     for market, pool in pools.items():
         baseline = _market_baseline(pool)
         model_view = model_views.get(market) or {}
         independent = independent_index.get((str(match_id), market)) or {}
         reasons = ["MARKET_DERIVED_ONLY", "INDEPENDENT_MODEL_PROBABILITY_UNAVAILABLE"]
+        if evidence_gap:
+            reasons.append("EVIDENCE_GAP")
+            reasons.extend(f"EVIDENCE_GAP_REASON:{reason}" for reason in evidence_reasons)
         if model_view.get("source") == "market_conditioned_model":
             reasons.append("MARKET_CONDITIONED_MODEL")
         if not baseline["official_pool_used"]:
@@ -169,6 +184,7 @@ def _market_rows(
             baseline["official_pool_used"]
             and policy.get("production_recommendations_enabled") is True
             and independent_approved
+            and not evidence_gap
         )
         if strategy_eligible:
             reasons = []
@@ -176,6 +192,8 @@ def _market_rows(
             **common,
             "candidate_id": f"{match_id}:{market}" if match_id else None,
             "market": market,
+            "official_odds_source": "Sporttery official odds",
+            "international_odds_policy": "research_only",
             **baseline,
             "model_top_selection": model_view.get("selection"),
             "model_top_probability_pct": model_view.get("probability_pct"),
@@ -189,6 +207,10 @@ def _market_rows(
             "independent_calibration_status": independent.get("calibration_status"),
             "strategy_eligible": strategy_eligible,
             "block_reasons": reasons,
+            "evidence_gap": evidence_gap,
+            "evidence_status": evidence.get("evidence_status"),
+            "evidence_gap_reasons": evidence_reasons,
+            "risk_tags": ["EVIDENCE_GAP"] if evidence_gap else [],
             "note": "对应市场官方赔率仅作为市场基线；没有获批的独立校准概率时不得转成购买建议。",
         })
     return rows
@@ -236,6 +258,8 @@ def _recreational_candidates(
         limits = RECREATIONAL_LIMITS.get(market)
         kickoff = _aware_time(row.get("kickoff"))
         if limits is None or kickoff is None or kickoff <= as_of:
+            continue
+        if row.get("evidence_gap") is True:
             continue
         probability = row.get("market_top_probability_pct")
         odds = row.get("market_top_odds")
@@ -382,6 +406,39 @@ def build_daily_strategy(
         for row in _market_rows(job, policy, independent_index)
     ]
     eligible = [row for row in market_audit if row.get("strategy_eligible") is True]
+    gap_rows = [row for row in market_audit if row.get("evidence_gap") is True]
+    reason_counts = Counter(
+        reason
+        for row in gap_rows
+        for reason in (row.get("evidence_gap_reasons") or ["EVIDENCE_GAP"])
+    )
+    edge_values = [
+        float(row["independent_raw_ev_pct"])
+        for row in market_audit
+        if isinstance(row.get("independent_raw_ev_pct"), (int, float))
+        and row.get("independent_calibration_status") in {"VALID", "APPROVED"}
+    ]
+    evidence_gap_summary = {
+        "total_market_rows": len(market_audit),
+        "evidence_gap_market_rows": len(gap_rows),
+        "evidence_gap_matches": len({str(row.get("match_id")) for row in gap_rows}),
+        "reason_counts": dict(reason_counts),
+        "status_counts": dict(Counter(str(row.get("evidence_status") or "UNKNOWN") for row in market_audit)),
+    }
+    edge_distribution = {
+        "count": len(edge_values),
+        "min_pct": min(edge_values) if edge_values else None,
+        "max_pct": max(edge_values) if edge_values else None,
+        "median_pct": sorted(edge_values)[len(edge_values) // 2] if edge_values else None,
+        "research_only": True,
+    }
+    risk_tags = []
+    if gap_rows:
+        risk_tags.append("EVIDENCE_GAP")
+    if market_audit and not edge_values:
+        risk_tags.append("NO_INDEPENDENT_CALIBRATED_EDGE")
+    if any(row.get("model_probability_source") == "market_conditioned_model" for row in market_audit):
+        risk_tags.append("MARKET_DERIVED_ONLY")
     combos = build_combinations(eligible)
     if execution_mode == "budgeted_action":
         action = build_budgeted_action_plan(
@@ -411,6 +468,10 @@ def build_daily_strategy(
                 "currency": "CNY",
             },
             "market_audit": market_audit,
+            "evidence_gap_summary": evidence_gap_summary,
+            "edge_distribution": edge_distribution,
+            "risk_tags": risk_tags,
+            "market_source_policy": {"HAD": "Sporttery official odds", "TTG": "Sporttery official odds", "HAFU": "Sporttery official odds", "CRS": "Sporttery official odds", "international_odds": "research_only"},
             "recreational_candidates": action["candidates"],
             "eligible_directional_candidates": eligible,
             "eligible_combo_structures": combos,
@@ -454,6 +515,10 @@ def build_daily_strategy(
             "currency": "CNY",
         },
         "market_audit": market_audit,
+        "evidence_gap_summary": evidence_gap_summary,
+        "edge_distribution": edge_distribution,
+        "risk_tags": risk_tags,
+        "market_source_policy": {"HAD": "Sporttery official odds", "TTG": "Sporttery official odds", "HAFU": "Sporttery official odds", "CRS": "Sporttery official odds", "international_odds": "research_only"},
         "eligible_directional_candidates": eligible,
         "eligible_combo_structures": combos,
         "single_purchase_recommendations": single_recommendations,

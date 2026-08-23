@@ -38,9 +38,10 @@ Supported commands:
   odds-add | odds-drift | odds-intl | odds-intl-capture | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
   version-progress | derivative-diagnostics | half-time-enrichment | score-shadow-compare
+  league-capability-matrix
   draw-watch-evaluate | draw-ttg-shadow-research
   half-time-collect | four-market-admission
-  job
+  job | strategy-plan | independent-market-shadow
   hybrid-shadow | hybrid-evaluate | hybrid-admission
   late-info
 """
@@ -257,6 +258,14 @@ def main():
     if cmd == "job":
         run_script("job_ticket.py", rest)
         return
+    if cmd == "strategy-plan":
+        # 四市场逐池审计 + 2/3 串结构 + 每日预算总账；所有生产与资金门禁失败关闭。
+        run_script("daily_strategy_planner.py", rest)
+        return
+    if cmd == "independent-market-shadow":
+        # 不读取本场赔率生成概率；赔率只用于逐池市场基线和纸面EV比较。
+        run_script("independent_lambda_market_shadow.py", rest)
+        return
     if cmd == "hybrid-shadow":
         # 影子 hybrid：不登记、不开 m4。用法：
         #   fusion_cli.py hybrid-shadow --input raw.json --sales-day YYYY-MM-DD
@@ -281,6 +290,10 @@ def main():
         # 发布窗口期盯样本累积：当前 model_version 已结算/在途场次与门槛距离。
         # 用法：fusion_cli.py version-progress [--store DIR] [--json] [--output FILE]
         run_script("version_progress.py", rest)
+        return
+    if cmd == "league-capability-matrix":
+        # 联赛能力矩阵只做样本/证据/赛果门禁，不改变概率或版本。
+        run_script("league_capability_matrix.py", rest)
         return
     if cmd == "half-time-enrichment":
         # 离线核验半场比分，只写 research evidence，绝不反写 90 分钟正式赛果。

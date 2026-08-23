@@ -42,6 +42,7 @@ def _job(match_id="sporttery-1"):
         },
         "outputs": [{
             "track": "quant",
+            "evidence_audit": {"evidence_gap": False, "evidence_status": "OK", "evidence_gap_reasons": []},
             "final_1x2_pct": [17.3, 24.3, 58.4],
             "status": "MARKET_BASELINE",
             "market_dependency_pct": 100,

@@ -65,5 +65,9 @@ def daily_strategy(
             "edge_label": "未验证正EV",
             "decision_time": current.astimezone(CST).isoformat(),
             "warning": "这是用户授权的每日固定预算清单，不是已通过样本外验证的生产胆项或凯利仓位。",
+            "evidence_warning": (
+                f"{plan.get('evidence_gap_summary', {}).get('evidence_gap_market_rows', 0)} 个市场行存在证据缺口；"
+                "缺口场次不会进入购买候选。"
+            ),
         },
     }
