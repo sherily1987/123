@@ -260,6 +260,11 @@ def build_evidence_catalog(evidence_text):
         explicit_status = status_match.group(1).upper() if status_match else ""
         if any(marker in lowered for marker in ("来源冲突", "source_conflict", "说法冲突")) or explicit_status == "SOURCE_CONFLICT":
             status = "SOURCE_CONFLICT"
+        elif explicit_status == "PARTIAL" and "facts_available=true" in lowered:
+            # Facts exist but a quality/scope gate remains open.  Let the
+            # auditor cite the facts while the separate evidence_gap flag
+            # still forces a cautious downstream decision.
+            status = "SINGLE_SOURCE"
         elif explicit_status and explicit_status not in (
             "VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING",
             "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG",

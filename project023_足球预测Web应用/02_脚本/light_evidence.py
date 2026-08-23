@@ -55,10 +55,11 @@ def render_fusion_evidence(m: dict) -> str:
         refreshed = item.get("refreshed_at") or item.get("collected_at") or "unknown"
         reason = item.get("missing_reason")
         suffix = f"；reason={reason}" if reason else ""
+        value = item.get("value")
+        facts_flag = "；facts_available=true" if value not in (None, "", [], {}) else ""
         provenance = f" | source({source_url})" if source_url else ""
         collected = f" | collected_at({refreshed})" if refreshed != "unknown" else ""
-        lines.append(f"> - {name}: status={status}；source={source}；refreshed_at={refreshed}{suffix}{provenance}{collected}")
-        value = item.get("value")
+        lines.append(f"> - {name}: status={status}；source={source}；refreshed_at={refreshed}{suffix}{facts_flag}{provenance}{collected}")
         if value not in (None, "", [], {}):
             blob = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
             lines.append(f">   facts={blob[:2400]}")

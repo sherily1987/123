@@ -258,13 +258,14 @@ def test_prompt_assigns_evidence_ids_without_claiming_cross_verification():
 
 
 def test_catalog_accepts_structured_snapshot_blockquotes_and_honors_status():
-    text = """> - starting_xi: status=PREDICTED；source=api-sports.io | source(https://v3.football.api-sports.io/fixtures/lineups?fixture=1) | collected_at(2026-08-23T12:00:00+08:00)
+    text = """> - recent_form: status=PARTIAL；source=sporttery.preview；facts_available=true | source(https://m.sporttery.cn/zqlszl/bssj/?mid=1) | collected_at(2026-08-23T12:00:00+08:00)
+> - starting_xi: status=PREDICTED；source=api-sports.io | source(https://v3.football.api-sports.io/fixtures/lineups?fixture=1) | collected_at(2026-08-23T12:00:00+08:00)
 >   facts={"home":["A"]}
 > - suspensions: status=EMPTY_UNCONFIRMED；source=sporttery.late_info | source(https://m.sporttery.cn/zqlszl/bssj/?mid=1) | collected_at(2026-08-23T12:00:00+08:00)
 """
     catalog = predict.build_evidence_catalog(text)
-    assert [item["status"] for item in catalog] == ["SINGLE_SOURCE", "UNAVAILABLE"]
-    assert catalog[0]["source"].endswith("fixture=1")
+    assert [item["status"] for item in catalog] == ["SINGLE_SOURCE", "SINGLE_SOURCE", "UNAVAILABLE"]
+    assert catalog[1]["source"].endswith("fixture=1")
 
 
 def test_empty_unconfirmed_status_is_a_gap_not_a_clear_injury_claim():
