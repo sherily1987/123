@@ -254,10 +254,12 @@ DEEPSEEK_V4_FLASH_ADDENDUM = """DeepSeek V4 Flash 专用执行附录：
 1. 先检查证据目录的 status、refreshed_at 和 evidence_gap；GAP、PARTIAL、EMPTY_UNCONFIRMED、PENDING_REFRESH 只能降低对应维度权重，不能被解释成“没有伤停”或“已确认首发”。
 2. 预计首发只能作为 PREDICTED 先验，官方首发只能在目录明确标记 VALID/CONFIRMED 时使用；不得把预计首发改写为官方首发。
 3. 来源独立性优先于来源数量：同一供应商、同一 API 的重复快照、转载同一篇文章或相同数据的不同页面只计一个独立来源；重复引用不得叠加权重。Sporttery 赔率是市场基线，不是独立基本面证据。
-4. 证据按开球前时间排序，优先使用最新且早于开球的快照；较旧的 AGING/PRIOR_SEASON 只能作背景，不能覆盖较新的冲突事实。来源冲突必须标记 SOURCE_CONFLICT 并降低对应维度。
-5. 四个市场完全独立：1X2 只用 1X2 赔率/胜平负证据，比分只用 CRS/攻防证据，大小球只用 TTG/进球证据，半全场只用 HAFU/半场证据；缺对应来源就保留缺口，不得用 1X2 反推。
-6. 只输出规则要求的单个 JSON 对象；不要输出 Markdown、解释段、代码围栏或额外键。概率只保留一位小数并合计 100；这是研究判断概率，不是已校准生产概率。
-7. 证据不足时仍可给 opinion 供研究记录，但必须 evidence_gap=true、明确 unsupported_assumptions，并避免高置信表述；不得生成下注、EV、Kelly 或“推荐购买”字段。"""
+4. 来源等级必须分开：A=联赛/俱乐部/赛事官方确认，B=带时间戳的结构化数据或可复核统计，C=有正文和时间戳的第三方赛前预览（预计首发/伤停线索），D=搜索摘要、无正文页面或未审计候选。A/B 可支持事实；C 只能支持“预计/线索”并降低权重；D 不得进入事实依据。
+5. 证据按开球前时间排序，优先使用最新且早于开球的快照；较旧的 AGING/PRIOR_SEASON 只能作背景，不能覆盖较新的冲突事实。不同等级冲突时 A 优先于 B，B 优先于 C；同等级无法解决的冲突必须标记 SOURCE_CONFLICT 并降低对应维度。
+6. 四个市场完全独立：1X2 只用 1X2 赔率/胜平负证据，比分只用 CRS/攻防证据，大小球只用 TTG/进球证据，半全场只用 HAFU/半场证据；缺对应来源就保留缺口，不得用 1X2 反推。
+7. 若有体彩 1X2，先将其去水概率作为 1X2 市场锚；独立证据只能做小幅方向修正，单一事实不得造成超过 6 个百分点的单向跳变，且修正后仍须合计 100。无 1X2 时不得伪造市场锚，概率只作未校准研究值。
+8. 只输出规则要求的单个 JSON 对象；不要输出 Markdown、解释段、代码围栏或额外键。概率只保留一位小数并合计 100；这是研究判断概率，不是已校准生产概率。
+9. 证据不足时仍可给 opinion 供研究记录，但必须 evidence_gap=true、明确 unsupported_assumptions，并避免高置信表述；不得生成下注、EV、Kelly 或“推荐购买”字段。"""
 
 def role_prompt_for(model: str, models_used: Optional[Sequence[str]] = None) -> str:
     return NEUTRAL_EVIDENCE_ROLE
@@ -283,7 +285,7 @@ JSON_RULES_EVIDENCE = """只输出一个 JSON 对象，不要 Markdown 或额外
    近况0.30 / 阵容0.22 / 战意0.15 / 赔率0.15 / 主客环境0.13。身份核验是门禁不是权重。
    各维对主队打 -2..+2，只能引用 E 编号事实。近况内部近5场按新到旧 5>4>3>2>1 加权（Dixon-Coles 1997 时间衰减的短窗近似）；AGING/PRIOR_SEASON 只能作为低权重背景，不能与当前赛季样本等权。
    将加权和换算为 probs_1x2 并必须输出；仅赔率时只能按官方市场做观察性研究，不得把它当量化概率。市场输入必须同市场对应：1X2 赔率只可支持胜平负，CRS 只可支持比分，TTG 只可支持总进球/大小球，HAFU 只可支持半全场；禁止用 1X2 反推 CRS、TTG 或 HAFU，缺少对应盘口时该市场只能标记为证据不足。
-10. 只允许写入页面或 API 快照中实际出现、且通过身份/时间/来源门禁的首发和伤停。不得用模型投票、占位文本或“通常首发”补齐。官方首发缺失时，若有合格来源的预计首发，使用 `LINEUP_PREDICTED_NOT_CONFIRMED` 风险码并在摘要注明非官方；只有完全没有首发资料才使用 `LINEUP_UNAVAILABLE` 并 `evidence_gap=true`。`EMPTY_UNCONFIRMED` 表示接口有空响应但不能证明无伤停/无首发，必须保留缺口并不得写成“暂无”。`FORM_UNAVAILABLE` 仍须 `evidence_gap=true`；仅赔率时仍输出观察意见，但不得把赔率外推成基本面事实。"""
+10. 只允许写入页面或 API 快照中实际出现、且通过身份/时间/来源门禁的首发和伤停。不得用模型投票、占位文本或“通常首发”补齐。官方首发缺失时，若有合格来源的预计首发，使用 `LINEUP_PREDICTED_NOT_CONFIRMED` 风险码并在摘要注明非官方；只有完全没有首发资料才使用 `LINEUP_UNAVAILABLE` 并 `evidence_gap=true`。`EMPTY_UNCONFIRMED` 表示接口有空响应但不能证明无伤停/无首发，必须保留缺口并不得写成“暂无”。`FORM_UNAVAILABLE` 仍须 `evidence_gap=true`；仅赔率时仍输出观察意见，但不得把赔率外推成基本面事实。来源等级为 C 或 D 时，不得把“预测/线索”改写为确认事实。"""
 
 EVIDENCE_AUDIT_SYSTEM_PROMPT = """你是足球证据审计员，只审核证据可用性，不做比赛预测。
 不得输出胜平负、比分、大小球或半全场的任何方向。

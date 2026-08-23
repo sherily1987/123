@@ -88,6 +88,9 @@ def test_deepseek_v4_flash_prompt_addendum_is_model_scoped():
     assert "不得把预计首发改写为官方首发" in deepseek
     assert "四个市场完全独立" in deepseek
     assert "来源独立性优先于来源数量" in deepseek
+    assert "来源等级必须分开" in deepseek
+    assert "单一事实不得造成超过 6 个百分点" in deepseek
+    assert "C 或 D" in deepseek
     assert "Sporttery 赔率是市场基线" in deepseek
     assert "DeepSeek V4 Flash 专用执行附录" not in other
 
