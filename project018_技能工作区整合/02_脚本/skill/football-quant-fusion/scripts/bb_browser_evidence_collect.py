@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Collect optional third-party pre-match evidence through BB-browser.
 
-BB-browser reuses the user's real browser session.  This adapter deliberately
-requires a per-match FotMob URL/ID mapping; it never guesses a fixture from a
-search snippet.  The result is research evidence only and cannot replace the
-official Sporttery market or an official starting-XI confirmation. A non-empty
-predicted lineup is retained as explicit ``PREDICTED`` evidence; it is usable
-for pre-match research but is never labelled as confirmed.
+BB-browser reuses the user's real browser session. This adapter deliberately
+requires a per-match source mapping; it never guesses a fixture from a search
+snippet. FotMob uses its structured endpoint when available, while a mapped
+``scrapling_url`` can use the generic dynamic parser for other league sources.
+The result is research evidence only and cannot replace the official Sporttery
+market or an official starting-XI confirmation. A non-empty predicted lineup
+is retained as explicit ``PREDICTED`` evidence; it is usable for pre-match
+research but is never labelled as confirmed.
 """
 from __future__ import annotations
 
@@ -226,6 +228,48 @@ def _scrapling_fotmob_snapshot(match: dict[str, Any], mapping: dict[str, Any],
         output_path.unlink(missing_ok=True)
 
 
+def _scrapling_generic_snapshot(match: dict[str, Any], mapping: dict[str, Any],
+                                collected_at: str) -> dict[str, Any]:
+    """Fetch a mapped non-FotMob page without changing its provenance."""
+    script = Path(__file__).with_name("scrapling_generic_fallback.py")
+    spec = importlib.util.spec_from_file_location("scrapling_generic_fallback", script)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("SCRAPLING_GENERIC_MODULE_MISSING")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    url = str(mapping.get("scrapling_url") or "")
+    if not url:
+        raise ValueError("SCRAPLING_URL_REQUIRED")
+    fd, name = tempfile.mkstemp(prefix="scrapling_generic_", suffix=".md")
+    os.close(fd)
+    output_path = Path(name)
+    try:
+        proc = subprocess.run(
+            ["scrapling", "extract", "fetch", url, str(output_path),
+             "--ai-targeted", "--network-idle", "--wait", "2000",
+             "--timeout", "60000"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=180,
+        )
+        if proc.returncode != 0:
+            raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_FETCH_FAILED")[-300:])
+        source_id = str(mapping.get("source_id") or urllib.parse.urlparse(url).netloc or "scrapling.generic")
+        provider = str(mapping.get("provider") or source_id)
+        text = output_path.read_text(encoding="utf-8", errors="replace")
+        return module.parse_markdown(text, match, url, collected_at,
+                                     source_id=source_id, provider=provider)
+    finally:
+        output_path.unlink(missing_ok=True)
+
+
+def _scrapling_snapshot(match: dict[str, Any], mapping: dict[str, Any],
+                        collected_at: str) -> dict[str, Any]:
+    """Dispatch to the source-specific or source-agnostic Scrapling parser."""
+    if mapping.get("scrapling_url"):
+        return _scrapling_generic_snapshot(match, mapping, collected_at)
+    return _scrapling_fotmob_snapshot(match, mapping, collected_at)
+
+
 def _merge_scrapling_snapshot(primary: dict[str, Any], fallback: dict[str, Any]) -> bool:
     """Fill only API-missing fields; never downgrade a valid API field."""
     primary_audit = primary.get("evidence_audit") or {}
@@ -416,9 +460,26 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
                                  "query": f"{match.get('home')} vs {match.get('away')} {match.get('kickoff')}"}}
     url = mapping.get("url")
     fotmob_id = mapping.get("fotmob_match_id")
-    if not url or not fotmob_id:
+    generic_url = mapping.get("scrapling_url")
+    if not url and not generic_url:
         return {"status": "pending_browser_task", "match_id": match.get("match_id"),
                 "browser_task": {"reason": "FOTMOB_URL_AND_MATCH_ID_REQUIRED"}}
+    if not fotmob_id and not generic_url:
+        return {"status": "pending_browser_task", "match_id": match.get("match_id"),
+                "browser_task": {"reason": "SCRAPLING_URL_REQUIRED_FOR_GENERIC_SOURCE"}}
+    if not fotmob_id:
+        collected_at = datetime.now(UTC).isoformat(timespec="seconds")
+        try:
+            snapshot = _scrapling_snapshot(match, mapping, collected_at)
+            row = {"status": "ok", **snapshot}
+            official_url = mapping.get("official_url")
+            if official_url:
+                row["official_page_probe"] = _probe_official_page(match, str(official_url))
+            return row
+        except Exception as exc:
+            return {"status": "source_fetch_error", "match_id": match.get("match_id"),
+                    "reason": str(exc)[:300], "evidence_gap": True,
+                    "scrapling_fallback_used": False}
     tab = None
     collected_at = datetime.now(UTC).isoformat(timespec="seconds")
     try:
@@ -445,7 +506,7 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         )}
         if mapping.get("scrapling_fallback") and (row.get("evidence_audit") or {}).get("missing_fields"):
             try:
-                _merge_scrapling_snapshot(row, _scrapling_fotmob_snapshot(match, mapping, collected_at))
+                _merge_scrapling_snapshot(row, _scrapling_snapshot(match, mapping, collected_at))
             except Exception as exc:
                 row["scrapling_fallback_used"] = False
                 row["scrapling_fallback_error"] = str(exc)[:300]
@@ -458,7 +519,7 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         # API blocks/rate limits.  If it is unavailable, retain the older
         # explicit predicted-XI fallback below.
         try:
-            dynamic = _scrapling_fotmob_snapshot(match, mapping, collected_at)
+            dynamic = _scrapling_snapshot(match, mapping, collected_at)
             return {"status": "ok", **dynamic}
         except Exception:
             pass
@@ -541,7 +602,8 @@ def main() -> int:
     ap.add_argument("--input", type=Path, required=True)
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--url-map", type=Path,
-                    help="可选：JSON keyed by match_id: {url, fotmob_match_id}")
+                    help=("可选：JSON keyed by match_id；FotMob 使用 {url, fotmob_match_id}，"
+                          "其他来源使用 {scrapling_url, source_id, provider}"))
     ap.add_argument("--discover", action="store_true",
                     help="无映射时按比赛身份用BB-browser发现官方/补充来源候选")
     args = ap.parse_args()

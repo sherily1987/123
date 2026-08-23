@@ -138,6 +138,27 @@ def test_collect_one_uses_scrapling_for_missing_api_fields_and_merges_valid_entr
     assert row["scrapling_fallback_used"] is True
 
 
+def test_collect_one_supports_generic_scrapling_source_without_fotmob_id(monkeypatch):
+    called = []
+
+    def fake_generic(match, mapping, collected_at):
+        called.append(mapping["scrapling_url"])
+        return {"provider": "league_preview", "research_only": True,
+                "evidence_audit": {"missing_fields": ["team_stats"], "evidence_gap": True}}
+
+    monkeypatch.setattr(bec, "_scrapling_generic_snapshot", fake_generic)
+    row = bec.collect_one(
+        {"match_id": "sporttery-generic", "home": "A", "away": "B",
+         "kickoff": "2026-08-26T03:00:00+00:00"},
+        {"scrapling_url": "https://league.example/match/1", "source_id": "league.example.preview",
+         "provider": "league_preview", "scrapling_fallback": True},
+        now=bec._parse("2026-08-23T17:45:00+00:00"),
+    )
+    assert row["status"] == "ok"
+    assert row["provider"] == "league_preview"
+    assert called == ["https://league.example/match/1"]
+
+
 def test_mapping_predicted_xi_overlay_keeps_media_provenance(monkeypatch):
     def fake_run(args):
         if args[0] == "open":
