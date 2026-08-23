@@ -303,6 +303,22 @@ def _scrapling_mappings(mapping: dict[str, Any]) -> list[dict[str, Any]]:
         # listed explicitly; preserving mapping order makes retries stable.
         if not any(c.get("scrapling_url") == primary.get("scrapling_url") for c in candidates):
             candidates.insert(0, primary)
+    # A browser mapping may carry the page used to obtain an explicit
+    # predicted XI even when no Scrapling URL was declared.  Include that page
+    # after explicit candidates so API gaps do not skip its provenance source.
+    for key, source_id, provider in (
+        ("predicted_xi_source_url", "predicted_xi.source", "scrapling_predicted_xi_source"),
+        ("official_url", "official.page", "scrapling_official_probe"),
+    ):
+        url = str(mapping.get(key) or "").strip()
+        if not url or any(c.get("scrapling_url") == url for c in candidates):
+            continue
+        candidates.append({
+            "scrapling_url": url,
+            "source_id": str(mapping.get(f"{key}_source_id") or source_id),
+            "provider": str(mapping.get(f"{key}_provider") or provider),
+            "source_tier": str(mapping.get("source_tier") or "C").upper(),
+        })
     # A FotMob mapping has no ``scrapling_url``: its page ``url`` and match id
     # identify the Scrapling-specific parser used after the API fails.
     if not candidates and mapping.get("url") and mapping.get("fotmob_match_id"):

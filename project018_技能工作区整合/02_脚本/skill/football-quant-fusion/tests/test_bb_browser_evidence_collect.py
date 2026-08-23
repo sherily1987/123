@@ -138,6 +138,19 @@ def test_collect_one_uses_scrapling_for_missing_api_fields_and_merges_valid_entr
     assert row["scrapling_fallback_used"] is True
 
 
+def test_predicted_xi_source_page_enters_scrapling_fallback_order():
+    candidates = bec._scrapling_mappings({
+        "predicted_xi_source_url": "https://preview.example/match/1",
+        "source_tier": "C",
+    })
+    assert candidates == [{
+        "scrapling_url": "https://preview.example/match/1",
+        "source_id": "predicted_xi.source",
+        "provider": "scrapling_predicted_xi_source",
+        "source_tier": "C",
+    }]
+
+
 def test_collect_one_supports_generic_scrapling_source_without_fotmob_id(monkeypatch):
     called = []
 
