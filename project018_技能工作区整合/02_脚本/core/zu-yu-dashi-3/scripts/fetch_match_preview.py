@@ -134,14 +134,15 @@ def collect(mid, terms=10, hist=5):
                            "type": "伤" if p.get("injuryFlag") else ("停" if p.get("suspensionFlag") else "?"),
                            "weight": round(w, 2)})
         cl = lambda x: round(min(0.5, max(0.0, x)), 4)
-        # An explicit home/away response with an empty list is a verified
-        # clear report; a missing/failed endpoint remains unavailable.
+        # An explicit home/away response with an empty list is observable but
+        # does not prove that no absences exist; some providers return empty
+        # payloads when coverage is missing. Keep it out of usable evidence.
         response_present = isinstance(inj, dict) and any(side in inj for side in ("home", "away"))
-        status = "VALID" if lst else "VALID_EMPTY" if response_present else "UNAVAILABLE"
+        status = "VALID" if lst else "EMPTY_UNCONFIRMED" if response_present else "UNAVAILABLE"
         return {"team": s.get("teamShortName"), "team_id": s.get("teamId"),
                 "count": len(lst),
                 "status": status,
-                "confirmed_no_absence": bool(response_present and not lst),
+                "confirmed_no_absence": False,
                 "attack_absence": cl(atk), "defense_absence": cl(dfs), "gk_absence": cl(gk),
                 "players": detail, "list": lst}
 

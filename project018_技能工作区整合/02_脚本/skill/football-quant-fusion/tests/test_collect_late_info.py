@@ -43,7 +43,7 @@ def test_fold_injuries_caps_and_splits_attack_defense():
     assert folded["away"]["count"] == 0
 
 
-def test_empty_successful_injury_response_is_cleared_not_unavailable(tmp_path: Path, monkeypatch):
+def test_empty_injury_response_is_traced_but_not_treated_as_clear(tmp_path: Path, monkeypatch):
     rec = {
         "sporttery_meta": {"match_id": 2041028},
         "home": "博洛尼亚", "away": "拉齐奥",
@@ -54,8 +54,8 @@ def test_empty_successful_injury_response_is_cleared_not_unavailable(tmp_path: P
     rows = mod.collect_one(rec, "initial_prematch", want_injury=True,
                            want_lineup=False, events_path=tmp_path / "events.jsonl")
 
-    assert rows[0]["status"] == "VALID_EMPTY"
-    assert rows[0]["absence"]["home"]["status"] == "VALID_EMPTY"
+    assert rows[0]["status"] == "EMPTY_UNCONFIRMED"
+    assert rows[0]["absence"]["home"]["status"] == "EMPTY_UNCONFIRMED"
 
 
 def test_t75_window_only_inside_75_minutes():

@@ -96,8 +96,8 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
         "away": [p for p in (away_inj.get("list") or []) if p.get("suspensionFlag")],
     }
     has_suspension = bool(suspension_value["home"] or suspension_value["away"])
-    injury_status = "VALID" if has_injury else "VALID_EMPTY" if injury_response_present else "UNAVAILABLE"
-    suspension_status = "VALID" if has_suspension else "VALID_EMPTY" if injury_response_present else "UNAVAILABLE"
+    injury_status = "VALID" if has_injury else "EMPTY_UNCONFIRMED" if injury_response_present else "UNAVAILABLE"
+    suspension_status = "VALID" if has_suspension else "EMPTY_UNCONFIRMED" if injury_response_present else "UNAVAILABLE"
     # Sporttery preview exposes roster/absence information, not an official
     # starting XI.  XI is therefore pending for the rolling near-kickoff pass.
     kickoff = _parse(match.get("kickoff"))
@@ -123,7 +123,7 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
                               source_url=source_url, collected_at=collected_at,
                               reason="OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"),
     }
-    missing = [name for name, item in entries.items() if item["status"] not in {"VALID", "VALID_EMPTY", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
+    missing = [name for name, item in entries.items() if item["status"] not in {"VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
     return {"schema_version": "evidence-audit-1.1", "critical_fields": list(REQUIRED),
             "entries": entries, "missing_fields": missing, "evidence_gap": bool(missing),
             "evidence_status": "GAP" if missing else "OK",
