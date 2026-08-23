@@ -31,6 +31,8 @@ def test_quant_summary_keeps_four_market_model_outputs_with_dependency_label():
     summary = jt.quant_from_fusion_output(out)
 
     assert summary["market_forecasts"]["CRS"]["top_scores"][0]["score"] == "0-1"
+    assert summary["market_forecasts"]["HAD"]["model_prob_pct"] == [20.0, 30.0, 50.0]
+    assert summary["market_forecasts"]["HAD"]["calibration_status"] == "UNFITTED"
     assert summary["market_forecasts"]["TTG"]["model_prob_pct"][2] == 26.0
     assert summary["market_forecasts"]["HAFU"]["model_prob_pct"][8] == 35.0
     assert summary["market_forecasts"]["HAFU"]["calibration_status"] == "UNFITTED"

@@ -298,7 +298,20 @@ def quant_from_fusion_output(out: dict, *, prediction_id: str | None = None) -> 
                 return str(value).upper()
         return "UNFITTED"
 
+    primary_calibration_status = calibration_status(
+        decision.get("calibration_status"),
+        gate.get("calibration_status"),
+        out.get("calibration_status"),
+        (out.get("calibration") or {}).get("status") if isinstance(out.get("calibration"), dict) else None,
+    )
+
     market_forecasts = {
+        "HAD": {
+            "model_prob_pct": pct,
+            "market_prob_pct": forecast.get("market_prob_pct") or core.get("market_prob_pct") or [],
+            "calibration_status": primary_calibration_status,
+            **conditioned_meta,
+        },
         "CRS": {
             "top_scores": forecast.get("top_scores") or core.get("top_scores") or [],
             "calibration_status": calibration_status(derived_status.get("top_scores")),
