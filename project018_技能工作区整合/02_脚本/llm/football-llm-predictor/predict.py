@@ -248,7 +248,7 @@ def build_evidence_catalog(evidence_text):
     """将已通过时间和来源门禁的 Markdown 事实转为紧凑证据目录。"""
     catalog = []
     for line in (evidence_text or "").splitlines():
-        stripped = line.strip()
+        stripped = re.sub(r"^\s*>\s?", "", line).strip()
         if not stripped.startswith(("-", "*")):
             continue
         fact = stripped[1:].strip().split("| source(", 1)[0].strip()
@@ -256,8 +256,15 @@ def build_evidence_catalog(evidence_text):
         if not fact or not source_match:
             continue
         lowered = fact.lower()
-        if any(marker in lowered for marker in ("来源冲突", "source_conflict", "说法冲突")):
+        status_match = re.search(r"(?:status|状态)\s*[=:]\s*([A-Z_]+)", fact, re.I)
+        explicit_status = status_match.group(1).upper() if status_match else ""
+        if any(marker in lowered for marker in ("来源冲突", "source_conflict", "说法冲突")) or explicit_status == "SOURCE_CONFLICT":
             status = "SOURCE_CONFLICT"
+        elif explicit_status and explicit_status not in (
+            "VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING",
+            "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG",
+        ):
+            status = "UNAVAILABLE"
         elif any(marker in lowered for marker in (
             "无记录", "0条", "未获得", "未检索到", "未拿到", "证据缺口",
             "封锁源占槽", "不采正文", "待采", "无本场逐人", "未取到本场", "按缺口记录",

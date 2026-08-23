@@ -257,6 +257,16 @@ def test_prompt_assigns_evidence_ids_without_claiming_cross_verification():
     assert "来源已交叉验证" not in prompt
 
 
+def test_catalog_accepts_structured_snapshot_blockquotes_and_honors_status():
+    text = """> - starting_xi: status=PREDICTED；source=api-sports.io | source(https://v3.football.api-sports.io/fixtures/lineups?fixture=1) | collected_at(2026-08-23T12:00:00+08:00)
+>   facts={"home":["A"]}
+> - suspensions: status=EMPTY_UNCONFIRMED；source=sporttery.late_info | source(https://m.sporttery.cn/zqlszl/bssj/?mid=1) | collected_at(2026-08-23T12:00:00+08:00)
+"""
+    catalog = predict.build_evidence_catalog(text)
+    assert [item["status"] for item in catalog] == ["SINGLE_SOURCE", "UNAVAILABLE"]
+    assert catalog[0]["source"].endswith("fixture=1")
+
+
 def test_empty_unconfirmed_status_is_a_gap_not_a_clear_injury_claim():
     text = """## 1. 伤停/阵容
 - 伤停状态 | EMPTY_UNCONFIRMED | source(https://example.test/injuries) | collected_at(2026-08-15T10:00:00+08:00)

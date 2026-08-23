@@ -77,11 +77,18 @@ def merge_late_info_events(chain: dict[str, Any] | None, events: list[dict[str, 
             continue
         status = str(event.get("status") or "UNAVAILABLE").upper()
         value = event.get("absence") if kind == "injury" else event.get("lineup")
+        fixture_id = event.get("api_sports_fixture_id")
+        if kind == "injury":
+            source_url = f"https://m.sporttery.cn/zqlszl/bssj/?mid={event.get('match_id')}"
+        elif fixture_id:
+            source_url = f"https://v3.football.api-sports.io/fixtures/lineups?fixture={fixture_id}"
+        else:
+            source_url = None
         entry = {
             "status": status,
             "value": value,
             "source_id": "sporttery.late_info" if kind == "injury" else "api-sports.io",
-            "source_url": None,
+            "source_url": source_url,
             "refreshed_at": event.get("collected_at"),
             "event_snapshot": event.get("snapshot"),
         }
