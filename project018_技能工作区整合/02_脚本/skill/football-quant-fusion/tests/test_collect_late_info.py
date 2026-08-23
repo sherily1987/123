@@ -193,6 +193,8 @@ def test_due_manifest_carries_api_sports_fixture_identity(tmp_path: Path):
 
     assert due[0]["api_sports_fixture_id"] == 1550089
     assert due[0]["lineup_provider"] == "api-sports.io"
+    assert due[0]["refresh_policy"] == "scheduled_repoll_until_kickoff"
+    assert len(due[0]["refresh_schedule"]) == 7
 
 
 def test_main_resolves_api_sports_identity_before_writing_due(tmp_path: Path, monkeypatch):

@@ -33,6 +33,7 @@ INITIAL_REFRESH_MINUTES = 24 * 60
 # Production collection never uses this value as a gate.
 T75_MINUTES = 75
 API_SPORTS_BASE = "https://v3.football.api-sports.io"
+REFRESH_SCHEDULE_MINUTES = (24 * 60, 6 * 60, 2 * 60, 90, 60, 30, 15)
 ALIAS_CONFIG = Path(__file__).resolve().parents[1] / "config" / "intl_odds_sources.json"
 try:
     TEAM_ALIASES = json.loads(ALIAS_CONFIG.read_text(encoding="utf-8")).get("team_aliases") or {}
@@ -462,12 +463,18 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
         kickoff = kickoff_of(rec)
         if kickoff is None:
             continue
+        refresh_schedule = [
+            (kickoff - timedelta(minutes=minutes)).isoformat()
+            for minutes in REFRESH_SCHEDULE_MINUTES
+        ]
         due.append({
             "match_id": match_id_of(rec),
             "home": rec.get("home"),
             "away": rec.get("away"),
             "kickoff": kickoff.isoformat(),
             "initial_refresh_at_or_after": (kickoff - timedelta(minutes=INITIAL_REFRESH_MINUTES)).isoformat(),
+            "refresh_schedule": refresh_schedule,
+            "refresh_policy": "scheduled_repoll_until_kickoff",
             "odds_at": odds_at_of(rec).isoformat() if odds_at_of(rec) else None,
             "apifootball_match_id": api_match_id_of(rec),
             "api_sports_fixture_id": api_sports_fixture_id_of(rec),
@@ -481,6 +488,7 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
         "research_only": True,
         "refresh_policy": "initial_plus_poll_until_kickoff",
         "initial_refresh_minutes": INITIAL_REFRESH_MINUTES,
+        "refresh_schedule_minutes": list(REFRESH_SCHEDULE_MINUTES),
         "matches": due,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return due
