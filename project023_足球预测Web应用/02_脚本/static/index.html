@@ -94,6 +94,12 @@ tr.clickable { cursor: pointer; }
 .strategy-combo ul { padding: 6px 0 3px 17px; line-height: 1.55; font-size: 12px; }
 .strategy-combo p { color: var(--muted); font-size: 11px; }
 .strategy-warning { margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--line); color: #fcd34d; font-size: 12px; line-height: 1.5; }
+.strategy-backtest { margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(15,23,42,.45); display: grid; gap: 7px; font-size: 12px; }
+.strategy-backtest > div { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.strategy-backtest-metrics { color: var(--muted); }
+.strategy-backtest-details { display: grid; gap: 3px; max-height: 190px; overflow: auto; }
+.strategy-backtest-row { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 8px; color: var(--muted); }
+.strategy-backtest b.profit { color: #86efac; }.strategy-backtest b.loss { color: #fca5a5; }.strategy-backtest b.flat { color: #cbd5e1; }
 @media (max-width: 900px) {
   main { padding: 12px; }
   .strategy-head { flex-direction: column; }
@@ -367,9 +373,11 @@ async function loadBoard(force) {
   }
   try {
     const selectedDay = document.getElementById("kickoffDate").value || todayStr();
-    const [d, strategy] = await Promise.all([
+    const [d, strategy, strategyBacktest] = await Promise.all([
       api("/api/board"),
       api("/api/daily-strategy?day=" + encodeURIComponent(selectedDay))
+        .catch(error => ({ load_error: error.message })),
+      api("/api/daily-strategy/backtest")
         .catch(error => ({ load_error: error.message })),
     ]);
     lastBoard = d;
@@ -382,6 +390,7 @@ async function loadBoard(force) {
       <div class="stat"><b>${s.no_odds}</b><span>开售无 HAD</span></div>
       <div class="stat"><b>${s.llm_collected || 0}</b><span>LLM 证据已采集</span></div>
       <div class="stat"><b>${s.llm_predicted || 0}</b><span>LLM 已出方向</span></div>`;
+    strategy.backtest = strategyBacktest;
     document.getElementById("dailyStrategy").innerHTML = strategy.load_error
       ? `<div class="banner err">每日策略加载失败：${strategy.load_error}</div>`
       : DailyStrategyView.formatDailyStrategyHtml(strategy);

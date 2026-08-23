@@ -11,6 +11,8 @@ from pydantic import BaseModel
 HERE = Path(__file__).resolve().parent
 import db
 import daily_strategy_view as dsv
+import importlib.util
+import inspect
 import runner
 import store_view as sv
 
@@ -75,11 +77,29 @@ def late_info():
 @app.get("/api/daily-strategy")
 def daily_strategy_api(day: str | None = None):
     try:
-        return dsv.daily_strategy(day)
+        kwargs = {"persist": True} if "persist" in inspect.signature(dsv.daily_strategy).parameters else {}
+        return dsv.daily_strategy(day, **kwargs)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     except Exception as exc:
         raise HTTPException(500, f"每日策略生成失败: {exc}") from exc
+
+
+@app.get("/api/daily-strategy/backtest")
+def daily_strategy_backtest_api(from_day: str | None = None, to_day: str | None = None):
+    try:
+        script = sv.FUSION_SCRIPTS / "daily_strategy_backtest.py"
+        spec = importlib.util.spec_from_file_location("daily_strategy_backtest", script)
+        if not spec or not spec.loader:
+            raise RuntimeError("daily strategy backtest module unavailable")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        plans = module.load_plans(sv.store_root() / "daily_strategy_plans", from_day, to_day)
+        return module.build_report(plans, sv.store_root() / "backtest" / "results")
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(500, f"策略回测失败: {exc}") from exc
 
 
 @app.get("/api/history")
