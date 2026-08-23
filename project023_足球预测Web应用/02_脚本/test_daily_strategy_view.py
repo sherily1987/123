@@ -207,6 +207,10 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
             {"market": "HAD", "independent_calibration_status": "VALID"},
         ],
         "evidence_gap_summary": {"evidence_gap_market_rows": 2, "stale_market_rows": 1, "aging_market_rows": 1},
+        "source_health": {
+            "api_sports": {"ok": 1, "NOT_REQUESTED": 2, "UNAVAILABLE": 1},
+            "scrapling": {"attempted": 2, "ok": 1, "UNAVAILABLE": 1},
+        },
             "llm_calibration": {
                 "model": "deepseek/deepseek-v4-flash",
                 "llm_rows": 12,
@@ -240,6 +244,7 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
     assert "进球数" in run.stdout
     assert "市场校准状态" in run.stdout and "UNFITTED" in run.stdout and "VALID" in run.stdout
     assert "新鲜度：过期 1 行 / 老化 1 行" in run.stdout
+    assert "API-Sports 成功 1" in run.stdout and "Scrapling 尝试 2" in run.stdout
     assert "DeepSeek V4 Flash 校准" in run.stdout and "已登记 12 场" in run.stdout and "已结算 9/100" in run.stdout
     assert "周日003" in run.stdout and "2球" in run.stdout and "10元" in run.stdout
     assert "2串1" in run.stdout and "16元" in run.stdout
