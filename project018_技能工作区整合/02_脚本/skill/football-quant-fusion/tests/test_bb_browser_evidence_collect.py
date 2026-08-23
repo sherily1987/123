@@ -267,6 +267,22 @@ def test_discover_sources_uses_match_identity_not_fixed_league_url(monkeypatch):
     assert any(args[0] == "close" for args in calls)
 
 
+def test_discover_sources_classifies_serie_a_official_domain(monkeypatch):
+    def fake_run(args):
+        if args[0] == "open":
+            return "tab: seriea\n"
+        if args[0] == "eval":
+            return json.dumps(["https://www.legaseriea.it/en/match/serie-a/test"])
+        return "closed\n"
+
+    monkeypatch.setattr(bec, "_run_browser", fake_run)
+    row = bec.discover_sources({
+        "match_id": "sporttery-4", "competition": "意甲", "home": "A", "away": "B",
+        "kickoff": "2026-08-26T03:00:00+00:00",
+    })
+    assert row["official_candidates"] == ["https://www.legaseriea.it/en/match/serie-a/test"]
+
+
 def test_snapshot_extracts_team_stats_and_suspensions_without_inventing_clear_status():
     payload = _payload()
     payload["content"]["stats"] = {

@@ -34,7 +34,7 @@ UTC = timezone.utc
 # this list.
 DEFAULT_OFFICIAL_DOMAINS = (
     "uefa.com/", "premierleague.com/", "laliga.com/", "bundesliga.com/",
-    "ligue1.com/", "seriea.com/", "eredivisie.eu/", "ligaportugal.pt/",
+    "ligue1.com/", "seriea.com/", "legaseriea.it/", "eredivisie.eu/", "ligaportugal.pt/",
     "jleague.jp/", "mlssoccer.com/", "fifa.com/",
 )
 
