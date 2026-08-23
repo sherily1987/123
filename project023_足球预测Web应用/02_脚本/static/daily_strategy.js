@@ -75,6 +75,10 @@
     const calibrationBlock = calibrationRows
       ? `<div class="strategy-evidence"><strong>市场校准状态：</strong>${calibrationRows}</div>`
       : "";
+    const llm = plan.llm_calibration || {};
+    const llmBlock = `<div class="strategy-evidence"><strong>DeepSeek V4 Flash 校准：</strong>` +
+      `${esc(llm.eligible_settled_rows || 0)}/${esc(llm.minimum_review_rows || 100)} 场` +
+      ` · ${llm.ready_for_review ? "达到复核门槛" : "未达到复核门槛"} · 仅研究观察</div>`;
     const empty = !singles.length && !combos.length;
     const body = empty
       ? `<div class="banner warn">当天没有足够的未开赛候选，保留 ${amount(budget.preserved_amount)} 元，不用已开赛或缺失数据强行凑单。</div>`
@@ -104,6 +108,7 @@
       </div>
       ${evidenceBlock}
       ${calibrationBlock}
+      ${llmBlock}
       ${body}
       ${backtestBlock(plan.backtest)}
       <p class="strategy-evidence-warning">${esc(display.evidence_warning || "")}</p>

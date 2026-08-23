@@ -105,6 +105,27 @@ def _attach_evidence_sidecars(jobs: list[dict], store: Path, day: str) -> list[d
     return enriched
 
 
+def _load_deepseek_calibration(store: Path, day: str) -> dict:
+    """Read the model-isolated DeepSeek audit for transparent workbench display."""
+    path = store / "forward" / day / "deepseek_calibration_audit.json"
+    if not path.is_file():
+        return {"status": "missing", "model": "deepseek/deepseek-v4-flash",
+                "eligible_settled_rows": 0, "minimum_review_rows": 100}
+    try:
+        report = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return {"status": "invalid", "model": "deepseek/deepseek-v4-flash",
+                "eligible_settled_rows": 0, "minimum_review_rows": 100}
+    report = dict(report)
+    report.setdefault("status", "ok")
+    report.setdefault("minimum_review_rows", 100)
+    report.setdefault("model", "deepseek/deepseek-v4-flash")
+    report.setdefault("eligible_settled_rows", 0)
+    report["ready_for_review"] = report.get("eligible_settled_rows", 0) >= report["minimum_review_rows"]
+    report["production_change_allowed"] = False
+    return report
+
+
 def daily_strategy(
     day: str | None = None,
     *,
@@ -128,6 +149,7 @@ def daily_strategy(
         **plan,
         "selected_day": selected_day,
         "source_job_count": len(jobs),
+        "llm_calibration": _load_deepseek_calibration(store, selected_day),
         "display": {
             "strategy_type": "固定娱乐预算（放宽门禁）",
             "edge_label": "未验证正EV",
@@ -136,6 +158,9 @@ def daily_strategy(
             "evidence_warning": (
                 f"{plan.get('evidence_gap_summary', {}).get('evidence_gap_market_rows', 0)} 个市场行存在证据缺口；"
                 "仅允许低风险市场在规定证据状态下放宽，HAFU/CRS等衍生市场仍会因缺口排除。"
+            ),
+            "llm_calibration_warning": (
+                "DeepSeek V4 Flash 独立校准样本未达到 100 场；LLM 仅作研究观察，不能触发生产投注。"
             ),
         },
     }

@@ -72,6 +72,25 @@ def test_daily_strategy_view_builds_user_authorized_100_yuan_plan(tmp_path: Path
     assert got["display"]["edge_label"] == "未验证正EV"
 
 
+def test_daily_strategy_view_exposes_model_isolated_deepseek_calibration(tmp_path: Path):
+    import daily_strategy_view as view
+
+    _write_jobs(tmp_path, "2026-08-23", count=1)
+    audit_dir = tmp_path / "forward" / "2026-08-23"
+    audit_dir.mkdir(parents=True)
+    (audit_dir / "deepseek_calibration_audit.json").write_text(json.dumps({
+        "model": "deepseek/deepseek-v4-flash", "eligible_settled_rows": 9,
+        "metrics": {"brier": None},
+    }), encoding="utf-8")
+    got = view.daily_strategy("2026-08-23", root=tmp_path,
+                              now=datetime(2026, 8, 23, 8, 0, tzinfo=CST))
+    assert got["llm_calibration"]["model"] == "deepseek/deepseek-v4-flash"
+    assert got["llm_calibration"]["eligible_settled_rows"] == 9
+    assert got["llm_calibration"]["ready_for_review"] is False
+    assert got["llm_calibration"]["production_change_allowed"] is False
+    assert "独立校准样本" in got["display"]["llm_calibration_warning"]
+
+
 def test_daily_strategy_view_missing_jobs_preserves_budget(tmp_path: Path):
     """Catches a no-data day being turned into made-up recommendations."""
     import daily_strategy_view as view
@@ -186,6 +205,12 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
             {"market": "TTG", "model_calibration_status": "UNFITTED"},
             {"market": "HAD", "independent_calibration_status": "VALID"},
         ],
+        "llm_calibration": {
+            "model": "deepseek/deepseek-v4-flash",
+            "eligible_settled_rows": 9,
+            "minimum_review_rows": 100,
+            "ready_for_review": False,
+        },
         "single_purchase_recommendations": [{
             "market": "TTG", "match_num": "周日003", "home": "甲", "away": "乙",
             "selection": "2球", "odds": 3.2, "stake_amount": 10,
@@ -211,6 +236,7 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
     assert "未验证正EV" in run.stdout
     assert "进球数" in run.stdout
     assert "市场校准状态" in run.stdout and "UNFITTED" in run.stdout and "VALID" in run.stdout
+    assert "DeepSeek V4 Flash 校准" in run.stdout and "9/100" in run.stdout
     assert "周日003" in run.stdout and "2球" in run.stdout and "10元" in run.stdout
     assert "2串1" in run.stdout and "16元" in run.stdout
     assert "不是生产胆项" in run.stdout
