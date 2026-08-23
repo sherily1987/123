@@ -61,3 +61,27 @@ def test_combo_loses_when_one_leg_loses(tmp_path):
     combo = next(row for row in report["daily"][0]["records"] if row["market"] == "COMBO")
     assert combo["status"] == "lost"
     assert combo["profit"] == -10
+
+
+def test_zero_recommendation_report_exposes_gate_reasons(tmp_path):
+    results = tmp_path / "results"
+    results.mkdir()
+    plan = {
+        "snapshot_id": "blocked",
+        "selected_day": "2026-08-23",
+        "market_audit": [
+            {
+                "market": "HAD",
+                "strategy_eligible": False,
+                "evidence_gap": True,
+                "block_reasons": ["EVIDENCE_GAP", "PRODUCTION_RECOMMENDATIONS_DISABLED"],
+            }
+        ],
+        "single_purchase_recommendations": [],
+        "combo_purchase_recommendations": [],
+    }
+    report = dbt.build_report([plan], results)
+    assert report["summary"]["recommendation_count"] == 0
+    assert report["summary"]["gate_diagnostics"]["evidence_gap_rows"] == 1
+    assert report["summary"]["gate_diagnostics"]["block_reason_counts"]["EVIDENCE_GAP"] == 1
+    assert report["daily"][0]["gate_diagnostics"]["strategy_eligible_rows"] == 0

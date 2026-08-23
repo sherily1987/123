@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -126,6 +127,29 @@ def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "hit_rate_pct": round(sum(r["status"] == "won" for r in settled) / len(settled) * 100, 2) if settled else None}
 
 
+def _gate_diagnostics(plan: dict[str, Any]) -> dict[str, Any]:
+    """Explain why a persisted plan did or did not contain recommendations.
+
+    A zero-row strategy backtest is otherwise ambiguous: it can mean that no
+    plan was generated, or that every market was deliberately blocked.  Keep
+    this diagnostic separate from settlement performance so it cannot be
+    mistaken for a bet or a return.
+    """
+    audit = [row for row in plan.get("market_audit") or [] if isinstance(row, dict)]
+    reasons = Counter(
+        str(reason)
+        for row in audit
+        for reason in (row.get("block_reasons") or [])
+        if reason
+    )
+    return {
+        "market_audit_rows": len(audit),
+        "strategy_eligible_rows": sum(row.get("strategy_eligible") is True for row in audit),
+        "evidence_gap_rows": sum(row.get("evidence_gap") is True for row in audit),
+        "block_reason_counts": dict(sorted(reasons.items())),
+    }
+
+
 def score_plan(plan: dict[str, Any], results: dict[str, dict[str, Any]]) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     for row in plan.get("single_purchase_recommendations") or []:
@@ -151,7 +175,7 @@ def score_plan(plan: dict[str, Any], results: dict[str, dict[str, Any]]) -> dict
                      "profit": round(stake * (odds - 1), 2) if status == "won" else (-round(stake, 2) if status == "lost" else 0.0)})
     return {"snapshot_id": plan.get("snapshot_id"), "selected_day": plan.get("selected_day"),
             "plan_generated_at": plan.get("generated_at") or (plan.get("display") or {}).get("decision_time"),
-            "summary": _summary(rows), "records": rows,
+            "summary": _summary(rows), "gate_diagnostics": _gate_diagnostics(plan), "records": rows,
             "settlement_basis": "Sporttery official result, 90-minute score; HAFU requires verified half-time score"}
 
 
@@ -161,6 +185,16 @@ def build_report(plans: list[dict[str, Any]], results_root: Path) -> dict[str, A
     daily.sort(key=lambda x: str(x.get("selected_day") or ""))
     records = [row for day in daily for row in day["records"]]
     total = _summary(records)
+    gate_rows = [day.get("gate_diagnostics") or {} for day in daily]
+    total_gate_reasons = Counter()
+    for row in gate_rows:
+        total_gate_reasons.update(row.get("block_reason_counts") or {})
+    total["gate_diagnostics"] = {
+        "market_audit_rows": sum(int(row.get("market_audit_rows") or 0) for row in gate_rows),
+        "strategy_eligible_rows": sum(int(row.get("strategy_eligible_rows") or 0) for row in gate_rows),
+        "evidence_gap_rows": sum(int(row.get("evidence_gap_rows") or 0) for row in gate_rows),
+        "block_reason_counts": dict(sorted(total_gate_reasons.items())),
+    }
     return {"schema_version": "1.0", "generated_at": datetime.now().astimezone().isoformat(),
             "snapshot_count": len(daily), "daily": daily, "summary": total,
             "note": "历史策略回测仅覆盖已持久化的每日推荐快照，不代表未来收益。"}

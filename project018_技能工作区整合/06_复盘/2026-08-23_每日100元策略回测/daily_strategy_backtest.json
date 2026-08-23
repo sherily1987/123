@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-23T20:35:24.558376+08:00",
+  "snapshot_count": 1,
+  "daily": [
+    {
+      "snapshot_id": "5d7e864dba4a6b31",
+      "selected_day": "2026-08-23",
+      "plan_generated_at": "2026-08-23T06:02:27.758509+00:00",
+      "summary": {
+        "recommendation_count": 0,
+        "settled_count": 0,
+        "pending_count": 0,
+        "won_count": 0,
+        "lost_count": 0,
+        "committed_stake": 0,
+        "settled_stake": 0,
+        "pending_stake": 0,
+        "return_amount": 0,
+        "profit": 0,
+        "roi_pct": null,
+        "hit_rate_pct": null
+      },
+      "gate_diagnostics": {
+        "market_audit_rows": 148,
+        "strategy_eligible_rows": 0,
+        "evidence_gap_rows": 148,
+        "block_reason_counts": {
+          "EVIDENCE_GAP": 148,
+          "EVIDENCE_GAP_REASON:EVIDENCE_AUDIT_MISSING": 148,
+          "INDEPENDENT_MODEL_PROBABILITY_UNAVAILABLE": 148,
+          "MARKET_CONDITIONED_MODEL": 27,
+          "MARKET_DERIVED_ONLY": 148,
+          "PRODUCTION_RECOMMENDATIONS_DISABLED": 148
+        }
+      },
+      "records": [],
+      "settlement_basis": "Sporttery official result, 90-minute score; HAFU requires verified half-time score"
+    }
+  ],
+  "summary": {
+    "recommendation_count": 0,
+    "settled_count": 0,
+    "pending_count": 0,
+    "won_count": 0,
+    "lost_count": 0,
+    "committed_stake": 0,
+    "settled_stake": 0,
+    "pending_stake": 0,
+    "return_amount": 0,
+    "profit": 0,
+    "roi_pct": null,
+    "hit_rate_pct": null,
+    "gate_diagnostics": {
+      "market_audit_rows": 148,
+      "strategy_eligible_rows": 0,
+      "evidence_gap_rows": 148,
+      "block_reason_counts": {
+        "EVIDENCE_GAP": 148,
+        "EVIDENCE_GAP_REASON:EVIDENCE_AUDIT_MISSING": 148,
+        "INDEPENDENT_MODEL_PROBABILITY_UNAVAILABLE": 148,
+        "MARKET_CONDITIONED_MODEL": 27,
+        "MARKET_DERIVED_ONLY": 148,
+        "PRODUCTION_RECOMMENDATIONS_DISABLED": 148
+      }
+    }
+  },
+  "note": "历史策略回测仅覆盖已持久化的每日推荐快照，不代表未来收益。"
+}
