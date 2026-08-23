@@ -29,7 +29,9 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.parse
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -49,8 +51,19 @@ def get(path, params):
     if params:
         url += "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={**HEAD, "x-apisports-key": api_key()})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.load(resp)
+    last_error = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.load(resp)
+        except (urllib.error.URLError, TimeoutError) as exc:
+            last_error = exc
+            if isinstance(exc, urllib.error.HTTPError) and exc.code not in {408, 429, 500, 502, 503, 504}:
+                raise
+            if attempt == 2:
+                raise
+            time.sleep(0.5 * (2 ** attempt))
+    raise last_error  # pragma: no cover
 
 
 def fetch(path, params):
