@@ -170,3 +170,16 @@ def test_discover_sources_accepts_match_specific_official_domains(monkeypatch):
         "official_domains": ["example-league.org"],
     })
     assert row["official_candidates"] == ["https://www.example-league.org/matches/a-vs-b"]
+
+
+def test_snapshot_preserves_explicit_source_identity_for_other_leagues():
+    row = bec._snapshot(
+        {"match_id": "sporttery-6", "home": "A", "away": "B"},
+        _payload(),
+        "https://www.example-league.org/matches/a-vs-b",
+        "2026-08-23T17:45:00+00:00",
+        source_id="example_league.official_browser",
+        provider="example_league_via_bb_browser",
+    )
+    assert row["provider"] == "example_league_via_bb_browser"
+    assert row["evidence_audit"]["entries"]["recent_form"]["source_id"] == "example_league.official_browser"

@@ -199,14 +199,15 @@ def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
 
 
 def _entry(status: str, value: Any, *, source_url: str, collected_at: str,
-           reason: str | None = None) -> dict[str, Any]:
-    return {"status": status, "value": value, "source_id": "fotmob.bb_browser",
+           reason: str | None = None, source_id: str = "fotmob.bb_browser") -> dict[str, Any]:
+    return {"status": status, "value": value, "source_id": source_id,
             "source_url": source_url, "refreshed_at": collected_at,
             "missing_reason": reason}
 
 
 def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
-              collected_at: str) -> dict[str, Any]:
+              collected_at: str, *, source_id: str = "fotmob.bb_browser",
+              provider: str = "fotmob_via_bb_browser") -> dict[str, Any]:
     general = payload.get("general") or {}
     facts = ((payload.get("content") or {}).get("matchFacts") or {})
     lineup = ((payload.get("content") or {}).get("lineup") or {})
@@ -229,34 +230,34 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
     xi_reason = None if official_xi else "PREDICTED_XI_NOT_CONFIRMED" if has_predicted_xi else "LAST_STARTING_LINEUPS_NOT_OFFICIAL_XI"
     entries = {
         "team_stats": _entry("VALID" if xg else "UNAVAILABLE", {"xg": xg} if xg else None,
-                              source_url=source_url, collected_at=collected_at,
+                              source_url=source_url, collected_at=collected_at, source_id=source_id,
                               reason=None if xg else "FOTMOB_MATCH_DETAIL_HAS_NO_TEAM_XG_STATS"),
         "recent_form": _entry("VALID" if len(home_form) >= 5 and len(away_form) >= 5 else "PARTIAL",
                               {"home": home_form, "away": away_form}, source_url=source_url,
-                              collected_at=collected_at,
+                              collected_at=collected_at, source_id=source_id,
                               reason=None if len(home_form) >= 5 and len(away_form) >= 5 else "FORM_LT_5"),
         "injury": _entry("VALID" if absence_rows_present else "EMPTY_UNCONFIRMED" if absence_field_present else "UNAVAILABLE",
                           {"home": home_absences, "away": away_absences}, source_url=source_url,
-                          collected_at=collected_at,
+                          collected_at=collected_at, source_id=source_id,
                           reason=None if absence_rows_present else "EMPTY_ABSENCE_FIELD_NOT_PROOF_OF_CLEAR" if absence_field_present else "LINEUP_ABSENCE_FIELD_MISSING"),
         "suspensions": _entry("VALID" if suspension_rows_present else
                                "EMPTY_UNCONFIRMED" if absence_field_present else "UNAVAILABLE",
                                {"home": home_suspensions, "away": away_suspensions},
-                               source_url=source_url, collected_at=collected_at,
+                               source_url=source_url, collected_at=collected_at, source_id=source_id,
                                reason=None if suspension_rows_present else
                                "EMPTY_SUSPENSION_FIELD_NOT_PROOF_OF_CLEAR" if absence_field_present
                                else "LINEUP_ABSENCE_FIELD_MISSING"),
         "starting_xi": _entry(xi_status,
                               {"source": lineup_source, "home": home_team.get("starters") or [],
                                "away": away_team.get("starters") or []}, source_url=source_url,
-                              collected_at=collected_at,
+                              collected_at=collected_at, source_id=source_id,
                               reason=xi_reason),
     }
     missing = [name for name, item in entries.items() if item["status"] not in
                {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}]
     return {
         "schema_version": "bb-browser-evidence-snapshot-1.0",
-        "provider": "fotmob_via_bb_browser",
+        "provider": provider,
         "research_only": True,
         "match_id": match.get("match_id"),
         "identity": {"home": match.get("home") or (general.get("homeTeam") or {}).get("name"),
@@ -310,7 +311,11 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         if general.get("started") or general.get("finished"):
             return {"status": "post_kickoff", "match_id": match.get("match_id"),
                     "reason": "BROWSER_SOURCE_SAYS_MATCH_STARTED"}
-        return {"status": "ok", **_snapshot(match, payload, str(url), collected_at)}
+        return {"status": "ok", **_snapshot(
+            match, payload, str(url), collected_at,
+            source_id=str(mapping.get("source_id") or "fotmob.bb_browser"),
+            provider=str(mapping.get("provider") or "fotmob_via_bb_browser"),
+        )}
     finally:
         if tab:
             try:
