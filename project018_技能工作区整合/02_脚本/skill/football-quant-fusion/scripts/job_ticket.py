@@ -292,21 +292,27 @@ def quant_from_fusion_output(out: dict, *, prediction_id: str | None = None) -> 
         "independent_from_same_pool": False,
         "market_dependency_pct": market_dependency,
     }
+    def calibration_status(*values):
+        for value in values:
+            if value not in (None, ""):
+                return str(value).upper()
+        return "UNFITTED"
+
     market_forecasts = {
         "CRS": {
             "top_scores": forecast.get("top_scores") or core.get("top_scores") or [],
-            "calibration_status": derived_status.get("top_scores"),
+            "calibration_status": calibration_status(derived_status.get("top_scores")),
             **conditioned_meta,
         },
         "TTG": {
             "model_prob_pct": ttg.get("model_prob_pct"),
             "market_prob_pct": ttg.get("market_prob_pct"),
-            "calibration_status": derived_status.get("ttg") or derived_status.get("ou_2_5"),
+            "calibration_status": calibration_status(derived_status.get("ttg"), derived_status.get("ou_2_5")),
             **conditioned_meta,
         },
         "HAFU": {
             "model_prob_pct": hafu.get("prob_pct"),
-            "calibration_status": hafu.get("calibration_status") or derived_status.get("hafu_half_time"),
+            "calibration_status": calibration_status(hafu.get("calibration_status"), derived_status.get("hafu_half_time")),
             **conditioned_meta,
         },
     }

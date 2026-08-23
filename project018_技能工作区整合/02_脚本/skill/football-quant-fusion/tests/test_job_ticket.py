@@ -38,6 +38,14 @@ def test_quant_summary_keeps_four_market_model_outputs_with_dependency_label():
     assert summary["market_forecasts"]["TTG"]["independent_from_same_pool"] is False
 
 
+def test_quant_summary_marks_missing_derivative_calibration_explicitly_unfitted():
+    summary = jt.quant_from_fusion_output({"forecast": {}, "core_output": {}})
+    assert {name: summary["market_forecasts"][name]["calibration_status"]
+            for name in ("CRS", "TTG", "HAFU")} == {
+                "CRS": "UNFITTED", "TTG": "UNFITTED", "HAFU": "UNFITTED",
+            }
+
+
 def test_normalize_match_id_accepts_int_str_and_prefixed():
     assert jt.normalize_match_id(2040898) == "sporttery-2040898"
     assert jt.normalize_match_id("2040898") == "sporttery-2040898"
