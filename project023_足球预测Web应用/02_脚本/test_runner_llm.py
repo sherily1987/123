@@ -16,6 +16,28 @@ def test_start_backtest_is_not_aliased_to_settle():
     assert callable(runner.task_backtest)
 
 
+def test_task_settle_refreshes_deepseek_audit_after_success(monkeypatch, tmp_path):
+    calls = {}
+
+    class FakeResult:
+        returncode = 0
+        stdout = "settled 3"
+        stderr = ""
+
+    monkeypatch.setattr(runner, "_cli", lambda *args, **kwargs: FakeResult())
+    monkeypatch.setattr(runner.db, "run_update", lambda *args, **kwargs: calls.setdefault("updates", []).append((args, kwargs)))
+    monkeypatch.setattr(runner, "forward_work_dir", lambda: tmp_path)
+    def fake_audit(path):
+        calls["audit"] = str(path)
+        return {"status": "ok", "eligible_settled_rows": 3}
+    monkeypatch.setattr(runner, "build_deepseek_calibration_audit", fake_audit)
+
+    runner.task_settle(7, "2026-08-24")
+
+    assert calls["audit"].endswith("2026-08-24\\deepseek_calibration_audit.json")
+    assert "3 个可结算样本" in calls["updates"][-1][1]["message"]
+
+
 def test_fusion_to_llm_match_maps_sporttery_meta():
     got = runner.fusion_to_llm_match({
         "home": "赫根",

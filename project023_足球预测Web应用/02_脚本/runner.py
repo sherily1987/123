@@ -178,7 +178,16 @@ def task_settle(run_id: int, date: str | None = None):
         if r.returncode != 0:
             db.run_update(run_id, status="error", message=tail or "settle 失败")
             return
-        db.run_update(run_id, status="done", message="结算完成，看板将读 results/")
+        # Settlement can make previously pending DeepSeek rows eligible.  Refresh
+        # the model-isolated audit immediately so the workbench never relies on
+        # the pre-settlement snapshot.  This is research metadata only; it does
+        # not alter probabilities, production routing, or betting gates.
+        audit_day = date or datetime.now(CST).date().isoformat()
+        audit_path = forward_work_dir() / audit_day / "deepseek_calibration_audit.json"
+        audit = build_deepseek_calibration_audit(audit_path)
+        settled = audit.get("eligible_settled_rows", 0) if audit.get("status") == "ok" else "未刷新"
+        db.run_update(run_id, status="done",
+                      message=f"结算完成，DeepSeek 校准审计已刷新：{settled} 个可结算样本")
     except Exception as e:
         db.run_update(run_id, status="error", message=f"结算失败: {e}")
 
