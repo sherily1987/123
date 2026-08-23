@@ -28,6 +28,11 @@ import store_view as sv
 PY = resolve_python()
 CLI = FUSION_SCRIPTS / "fusion_cli.py"
 CST = timezone(timedelta(hours=8))
+EVIDENCE_FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
+EVIDENCE_VALID_STATUSES = {
+    "VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING",
+    "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG",
+}
 
 
 def _no_proxy_env():
@@ -45,6 +50,33 @@ def _cli(args: list, timeout: int = 3600) -> subprocess.CompletedProcess:
         env=_no_proxy_env(), cwd=str(FUSION_SCRIPTS),
         encoding="utf-8", errors="replace",
     )
+
+
+def _refresh_evidence_audit(match: dict, chain: dict) -> None:
+    """Recompute LLM-facing gap flags after browser/late-info merges.
+
+    The source snapshot audit is immutable, but the Markdown projection must
+    describe the merged chain. Otherwise a newly arrived predicted XI or
+    injury event is visible in ``evidence_chain`` while ``missing_fields``
+    still reports the stale pre-refresh gap.
+    """
+    audit = match.get("evidence_audit")
+    if not isinstance(audit, dict):
+        return
+    missing = []
+    reasons = []
+    for name in EVIDENCE_FIELDS:
+        item = chain.get(name) if isinstance(chain, dict) else None
+        status = str((item or {}).get("status") or "MISSING").upper()
+        if status not in EVIDENCE_VALID_STATUSES:
+            missing.append(name)
+            reason = (item or {}).get("missing_reason") or status
+            reasons.append(f"{name.upper()}_{reason}")
+    audit["missing_fields"] = missing
+    audit["evidence_gap"] = bool(missing)
+    audit["evidence_gap_reasons"] = reasons
+    audit["evidence_status"] = "GAP" if missing else "OK"
+    audit["merged_chain_fields"] = [name for name in EVIDENCE_FIELDS if isinstance(chain.get(name), dict)]
 
 
 def task_collect(kickoff_date: str, run_id: int):
@@ -328,6 +360,7 @@ def attach_collected_evidence(
                 late_merged += 1
         if chain:
             match["evidence_chain"] = chain
+            _refresh_evidence_audit(match, chain)
     return {
         "snapshot_dir": str(snapshot_dir),
         "snapshots_available": len(snapshots),

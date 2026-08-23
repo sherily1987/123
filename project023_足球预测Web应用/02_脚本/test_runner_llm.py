@@ -88,6 +88,12 @@ def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Pat
     assert got["late_info_matches_merged"] == 1
     assert matches[0]["evidence_chain"]["recent_form"]["status"] == "VALID"
     assert matches[0]["evidence_chain"]["starting_xi"]["status"] == "PREDICTED"
+    assert "starting_xi" not in matches[0]["evidence_audit"]["missing_fields"]
+    assert matches[0]["evidence_audit"]["evidence_status"] == "GAP"
+    import light_evidence
+    rendered = light_evidence.render_fusion_evidence(matches[0])
+    assert "missing_fields=injury,suspensions" in rendered
+    assert "starting_xi: status=PREDICTED" in rendered
     assert matches[0]["evidence_snapshot_ref"].endswith("sporttery-2041021.json")
 
 
