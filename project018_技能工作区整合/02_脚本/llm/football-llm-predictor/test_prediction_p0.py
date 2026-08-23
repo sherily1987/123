@@ -327,6 +327,29 @@ def test_empty_unconfirmed_status_is_a_gap_not_a_clear_injury_claim():
     assert "injuries" in status["gap_sections"]
 
 
+def test_manifest_prefers_structured_recent_form_chain_over_markdown_placeholder():
+    match = {
+        "match_id": "sporttery-1", "crs": [], "ttg": [], "hafu": [],
+        "evidence_chain": {
+            "recent_form": {"status": "VALID", "value": {
+                "home": [{"score_90": "1-0"}] * 5,
+                "away": [{"score_90": "0-1"}] * 5,
+            }},
+            "injury": {"status": "VALID", "value": {}},
+            "suspensions": {"status": "EMPTY_UNCONFIRMED", "value": {}},
+            "starting_xi": {"status": "PREDICTED", "value": {}},
+        },
+    }
+    text = "- 量化模型覆盖标注；近5场候选来源待抓取 | source(https://example.test)"
+    manifest = predict._build_llm_evidence_manifest(
+        match, {"evidence_collected_at_max": "2026-08-24T00:00:00+00:00"}, text
+    )
+    assert manifest["sections"]["recent_form"]["status"] == "AVAILABLE"
+    assert manifest["sections"]["injuries"]["status"] == "AVAILABLE"
+    assert manifest["sections"]["lineups"]["status"] == "PREDICTED"
+    assert "recent_form" not in manifest["gap_sections"]
+
+
 def test_catalog_marks_vote_slot_placeholders_unavailable():
     text = """## 1. 伤停/阵容
 - 源17 besoccer.com：封锁源占槽、不采正文 | source(https://www.besoccer.com/x) | collected_at(t)

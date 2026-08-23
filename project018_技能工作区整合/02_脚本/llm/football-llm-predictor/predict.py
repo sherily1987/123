@@ -1126,6 +1126,33 @@ def _build_llm_evidence_manifest(match, evidence_status, evidence_text):
         ),
         "collected_at": evidence_status.get("evidence_collected_at_max"),
     }
+    # Prefer the structured, identity- and time-gated chain attached by the
+    # collector over Markdown keyword heuristics.  The latter can say
+    # FORM_UNAVAILABLE even when the snapshot contains two complete recent
+    # five-match lists (the labels may be English or rendered as JSON).
+    chain = match.get("evidence_chain") or {}
+    recent = chain.get("recent_form") if isinstance(chain, dict) else None
+    if isinstance(recent, dict):
+        status = str(recent.get("status") or "").upper()
+        value = recent.get("value") or {}
+        home = value.get("home") if isinstance(value, dict) else None
+        away = value.get("away") if isinstance(value, dict) else None
+        if status in {"VALID", "OK", "AVAILABLE", "FRESH", "AGING"}:
+            evidence["recent_form"] = {
+                "home": list(home or [])[:5], "away": list(away or [])[:5]
+            }
+    for field, key in (("injury", "injuries_status"), ("suspensions", "suspensions_status"),
+                       ("starting_xi", "lineups_status")):
+        entry = chain.get(field) if isinstance(chain, dict) else None
+        if not isinstance(entry, dict):
+            continue
+        state = str(entry.get("status") or "").upper()
+        if field == "starting_xi":
+            evidence[key] = state if state in {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING"} else "UNAVAILABLE"
+        elif field == "injury":
+            evidence[key] = "AVAILABLE" if state in {"VALID", "OK", "AVAILABLE", "FRESH", "AGING"} else state or "UNAVAILABLE"
+        else:
+            evidence[key] = state or "UNAVAILABLE"
     manifest = ltc.build_evidence_manifest(match, evidence)
     if evidence_status.get("collection_status") == "ONLY_ODDS":
         manifest["collection_status"] = "ONLY_ODDS"
