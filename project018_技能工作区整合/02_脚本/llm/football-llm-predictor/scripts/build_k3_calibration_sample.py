@@ -79,6 +79,10 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
         if output is None:
             continue
         llm_count += 1
+        recorded_model = output.get("model_id") or MODEL_ID
+        if recorded_model != MODEL_ID:
+            reasons["non_k3_model"] += 1
+            continue
         identity = job.get("identity") or {}
         match_id = _mid(identity.get("match_id") or path.stem.removesuffix(".json"))
         kickoff = _time(identity.get("kickoff"))

@@ -417,6 +417,7 @@ def llm_from_parsed(row: dict) -> dict:
     scores = row.get("score_picks") or []
     return {
         "track": "llm",
+        "model_id": row.get("model_id") or row.get("model"),
         "direction": direction,
         "alt_direction": alt,
         "strength": packed,

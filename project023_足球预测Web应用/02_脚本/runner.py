@@ -28,6 +28,7 @@ import store_view as sv
 PY = resolve_python()
 CLI = FUSION_SCRIPTS / "fusion_cli.py"
 CST = timezone(timedelta(hours=8))
+K3_MODEL_ID = "moonshot/kimi-k3"
 EVIDENCE_FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
 EVIDENCE_VALID_STATUSES = {
     "VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING",
@@ -510,6 +511,7 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
         strength = (row.get("strength") or 0) / 100.0
         upsert_job(root, ident, llm={
             "track": "llm",
+            "model_id": K3_MODEL_ID,
             "direction": row.get("dir"),
             "alt_direction": row.get("alt"),
             "strength": {"type": "vote_share", "value": round(strength, 4)},

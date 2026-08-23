@@ -48,6 +48,16 @@ def test_quant_summary_marks_missing_derivative_calibration_explicitly_unfitted(
             }
 
 
+def test_llm_parsed_preserves_model_id_for_calibration_provenance():
+    row = jt.llm_from_parsed({
+        "model_id": "moonshot/kimi-k3",
+        "dir": "主胜",
+        "strength": 0.8,
+        "action": "skip",
+    })
+    assert row["model_id"] == "moonshot/kimi-k3"
+
+
 def test_normalize_match_id_accepts_int_str_and_prefixed():
     assert jt.normalize_match_id(2040898) == "sporttery-2040898"
     assert jt.normalize_match_id("2040898") == "sporttery-2040898"
