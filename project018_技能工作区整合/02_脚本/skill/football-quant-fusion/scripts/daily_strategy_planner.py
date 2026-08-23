@@ -488,6 +488,10 @@ def build_daily_strategy(
         "evidence_gap_matches": len({str(row.get("match_id")) for row in gap_rows}),
         "reason_counts": dict(reason_counts),
         "status_counts": dict(Counter(str(row.get("evidence_status") or "UNKNOWN") for row in market_audit)),
+        "age_status_counts": dict(Counter(str(row.get("evidence_age_status") or "UNKNOWN")
+                                           for row in market_audit)),
+        "stale_market_rows": sum(row.get("evidence_age_status") == "STALE" for row in market_audit),
+        "aging_market_rows": sum(row.get("evidence_age_status") == "AGING" for row in market_audit),
     }
     edge_distribution = {
         "count": len(edge_values),

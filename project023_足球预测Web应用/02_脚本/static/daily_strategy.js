@@ -71,7 +71,8 @@
     }).join("、");
     const evidenceBlock = `<div class="strategy-evidence"><strong>证据链状态：</strong>${esc(evidence.evidence_gap_market_rows || 0)} 个市场行存在证据缺口` +
       (reasonText ? `（${reasonText}）` : "") +
-      (tags ? ` · 风险标签：${tags}` : "") + `</div>`;
+      (tags ? ` · 风险标签：${tags}` : "") +
+      ` · 新鲜度：过期 ${esc(evidence.stale_market_rows || 0)} 行 / 老化 ${esc(evidence.aging_market_rows || 0)} 行</div>`;
     const calibrationBlock = calibrationRows
       ? `<div class="strategy-evidence"><strong>市场校准状态：</strong>${calibrationRows}</div>`
       : "";
