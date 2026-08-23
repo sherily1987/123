@@ -51,6 +51,27 @@
       ],
       "evidence": "25/25 场重放主概率与已记录衍生市场概率/比分矩阵完全一致；当前代码仅新增证据审计字段，未改变概率输出。报告：project018_技能工作区整合/06_复盘/2026-08-23_M4重放/m4_probability_replay.json",
       "note": "别名只在 (model_version, probability_signature) 精确成对匹配时生效；等价结论仅覆盖上述 market_only 路由和字段，不外推到 hybrid 或未重放市场。"
+    },
+    {
+      "model_version": "m4",
+      "probability_signature": "f80d948d50b673e05599f0f3a819bc8272709f10818b170c9a3b8eda9d715825",
+      "equivalent_to_model_version": "m4",
+      "verified_at": "2026-08-24",
+      "verified_by": "scripts/probability_replay_check.py --model-version m4",
+      "verified_scope": [
+        "market_only",
+        "final_1x2_pct",
+        "model_1x2_pct",
+        "ou_2_5",
+        "ou_3_5",
+        "btts",
+        "hafu_model",
+        "ttg_score_consistency",
+        "top_scores",
+        "score_matrix"
+      ],
+      "evidence": "59/59 场重放主概率与已记录衍生市场概率/比分矩阵完全一致；报告：project018_技能工作区整合/06_复盘/2026-08-24_M4重放/m4_replay_current.json",
+      "note": "本别名仅覆盖已重放的 market_only 路由与字段，不外推到 hybrid 或未重放市场。"
     }
   ],
   "probability_files": [
