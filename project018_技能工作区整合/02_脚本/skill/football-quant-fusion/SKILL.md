@@ -98,6 +98,11 @@ python $cli llm-evidence --input match.json --out-dir evidence
 
 证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发；官方首发未发布时可采集预计首发并标记 `starting_xi.status=PREDICTED`，不得改写为官方确认。
 本地 HTTP/Playwright 优先；失败项写入 `browser_tasks.json`，由当前 Codex 浏览器回补并落成可审计快照。
+BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射至少包含该场 URL 和
+来源所需的比赛 ID；可选 `official_domains`（比赛级官方域名提示）、`source_id`、`provider`
+用于跨联赛来源发现和 provenance。自定义来源复用统一 `evidence_audit` 契约时，必须保留
+真实来源身份，不能把其他联赛页面标成 `fotmob.bb_browser`。来源候选只是待审计入口，未取得
+带时间戳的字段事实前不得提升为 `VALID`，也不得进入生产概率。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
 仅剩体彩赔率时 K3 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
 禁止 EV/Kelly/下注推荐。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。
