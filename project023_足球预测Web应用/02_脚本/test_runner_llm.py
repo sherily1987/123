@@ -273,6 +273,46 @@ def test_parse_llm_log_keeps_deepseek_single_model_json_without_legacy_banner():
     assert row["evidence_gap"] is True
 
 
+def test_write_llm_jobs_persists_evidence_age_and_missing_fields(tmp_path, monkeypatch):
+    import job_ticket
+
+    captured = {}
+    monkeypatch.setattr(job_ticket, "jobs_root", lambda: tmp_path)
+
+    def fake_upsert(root, identity, **kwargs):
+        captured["identity"] = identity
+        captured["llm"] = kwargs["llm"]
+        return tmp_path / "job.json"
+
+    monkeypatch.setattr(job_ticket, "upsert_job", fake_upsert)
+    n = runner.write_llm_jobs(
+        "2026-08-24",
+        [{
+            "match_num": "周一001", "home": "主队", "away": "客队",
+            "competition": "测试联赛", "kickoff": "2026-08-25T00:30:00+08:00",
+            "sporttery_meta": {"match_id": 2041028, "match_num": "周一001"},
+            "evidence_audit": {
+                "evidence_status": "GAP", "missing_fields": ["starting_xi"],
+                "collected_at": "2026-08-24T00:00:00+00:00",
+            },
+            "evidence_snapshot_ref": "F:/evidence/sporttery-2041028.json",
+            "evidence_chain": {"recent_form": {"status": "VALID"}},
+        }],
+        [{
+            "num": "周一001", "model_id": "deepseek/deepseek-v4-flash",
+            "prediction_as_of": "2026-08-24T01:00:00+00:00", "dir": "主胜",
+            "strength": None, "evidence_gap": True, "top_scores": ["1-0"],
+        }],
+    )
+    assert n == 1
+    assert captured["llm"]["evidence_status"] == "GAP"
+    assert captured["llm"]["evidence_missing_fields"] == ["starting_xi"]
+    assert captured["llm"]["evidence_collected_at"] == "2026-08-24T00:00:00+00:00"
+    assert captured["llm"]["evidence_age_minutes"] == 60.0
+    assert captured["llm"]["evidence_chain_fields"] == ["recent_form"]
+    assert captured["llm"]["evidence_refs"]["evidence_snapshot_ref"].endswith("2041028.json")
+
+
 def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeypatch):
     src = tmp_path / "src"
     src.mkdir()

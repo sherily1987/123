@@ -595,6 +595,27 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
         if not ident.get("match_id"):
             continue
         strength = (row.get("strength") or 0) / 100.0
+        evidence_audit = src.get("evidence_audit") or {}
+        evidence_chain = src.get("evidence_chain") or {}
+        evidence_collected_at = (
+            evidence_audit.get("collected_at")
+            or src.get("collected_at")
+            or src.get("evidence_collected_at")
+        )
+        prediction_at = row.get("prediction_as_of")
+        evidence_age_minutes = None
+        collected_dt = sv.parse_dt(evidence_collected_at)
+        prediction_dt = sv.parse_dt(prediction_at)
+        if collected_dt is not None and prediction_dt is not None:
+            evidence_age_minutes = round(
+                max(0.0, (prediction_dt - collected_dt).total_seconds() / 60.0), 2
+            )
+        evidence_status = evidence_audit.get("evidence_status")
+        evidence_missing_fields = list(evidence_audit.get("missing_fields") or [])
+        evidence_refs = {
+            key: src.get(key) for key in ("evidence_snapshot_ref", "browser_evidence_ref")
+            if src.get(key)
+        }
         upsert_job(root, ident, llm={
             "track": "llm",
             "model_id": row.get("model_id") or DEFAULT_LLM_MODEL_ID,
@@ -604,6 +625,16 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
             "strength": {"type": "vote_share", "value": round(strength, 4)},
             "action": "skip",
             "evidence_gap": bool(row.get("evidence_gap")),
+            # Persist the evidence state alongside the prediction so later
+            # calibration can separate model error from stale/missing inputs.
+            "evidence_status": evidence_status,
+            "evidence_missing_fields": evidence_missing_fields,
+            "evidence_collected_at": evidence_collected_at,
+            "evidence_age_minutes": evidence_age_minutes,
+            "evidence_refs": evidence_refs,
+            "evidence_chain_fields": sorted(
+                key for key, value in evidence_chain.items() if isinstance(value, dict)
+            ),
             "score": row.get("score"),
             "top_scores": row.get("top_scores") or ([row.get("score")] if row.get("score") else []),
             # Keep both production and research-only probability fields so a
