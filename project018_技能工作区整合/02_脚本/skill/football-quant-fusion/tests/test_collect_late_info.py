@@ -58,6 +58,22 @@ def test_empty_injury_response_is_traced_but_not_treated_as_clear(tmp_path: Path
     assert rows[0]["absence"]["home"]["status"] == "EMPTY_UNCONFIRMED"
 
 
+def test_post_kickoff_injury_is_not_fetched_or_admitted(tmp_path: Path, monkeypatch):
+    rec = {
+        "sporttery_meta": {"match_id": 2041028},
+        "home": "博洛尼亚", "away": "拉齐奥",
+        "kickoff": "2026-08-25T00:30:00+08:00",
+    }
+    monkeypatch.setattr(mod, "now_utc", lambda: datetime(2026, 8, 25, 1, 0, tzinfo=mod.CST))
+    monkeypatch.setattr(mod, "fetch_injury", lambda _: (_ for _ in ()).throw(AssertionError("post-match fetch")))
+
+    rows = mod.collect_one(rec, "prematch_poll", want_injury=True,
+                           want_lineup=False, events_path=tmp_path / "events.jsonl")
+
+    assert rows[0]["kind"] == "injury"
+    assert rows[0]["status"] == "POST_KICKOFF"
+
+
 def test_t75_window_only_inside_75_minutes():
     kick = datetime(2026, 8, 17, 10, 0, tzinfo=UTC)
     assert mod.in_t75_window(kick, kick - timedelta(minutes=30))

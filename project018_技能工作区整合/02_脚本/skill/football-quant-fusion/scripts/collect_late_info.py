@@ -362,14 +362,19 @@ def collect_one(rec, snapshot, want_injury, want_lineup, events_path):
     mid = match_id_of(rec)
     out = []
     if want_injury and mid:
-        raw = fetch_injury(mid)
         row = base_row(rec, "injury", snapshot, collected_at, odds_at, kickoff)
-        if raw is None:
-            row["status"] = "UNAVAILABLE"
+        # Injury endpoints often return the post-match squad report as well;
+        # never allow that response to enter a pre-match evidence sidecar.
+        if kickoff and collected_at >= kickoff:
+            row["status"] = "POST_KICKOFF"
         else:
-            folded = fold_injuries(raw)
-            row["status"] = "VALID" if (folded["home"]["count"] or folded["away"]["count"]) else "EMPTY_UNCONFIRMED"
-            row["absence"] = folded
+            raw = fetch_injury(mid)
+            if raw is None:
+                row["status"] = "UNAVAILABLE"
+            else:
+                folded = fold_injuries(raw)
+                row["status"] = "VALID" if (folded["home"]["count"] or folded["away"]["count"]) else "EMPTY_UNCONFIRMED"
+                row["absence"] = folded
         append_jsonl(events_path, row)
         out.append(row)
     if want_lineup:
