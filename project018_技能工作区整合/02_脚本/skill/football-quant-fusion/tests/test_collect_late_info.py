@@ -155,6 +155,31 @@ def test_api_sports_fixture_resolver_covers_20260823_sporttery_alias_gaps():
     }
 
 
+def test_api_sports_fixture_resolver_falls_back_to_adjacent_calendar_date():
+    """Provider calendar dates can differ from the UTC date derived from kickoff."""
+    matches = [{
+        "sporttery_meta": {"match_id": 2041101}, "competition": "意甲",
+        "home": "博洛尼亚", "away": "拉齐奥",
+        "kickoff": "2026-08-24T00:30:00+08:00",
+    }]
+    queried = []
+    fixture = [{
+        "fixture": {"id": 1550101, "date": "2026-08-24T00:30:00+08:00"},
+        "league": {"name": "Serie A"},
+        "teams": {"home": {"name": "Bologna"}, "away": {"name": "Lazio"}},
+    }]
+
+    def fetch(day):
+        queried.append(day)
+        return fixture if str(day) == "2026-08-24" else []
+
+    resolved = mod.resolve_api_sports_fixture_ids(matches, fetch_by_utc_date=fetch)
+
+    assert resolved == {2041101: {"status": "resolved", "fixture_id": 1550101}}
+    assert matches[0]["api_sports_fixture_id"] == 1550101
+    assert "2026-08-24" in queried
+
+
 def test_due_manifest_carries_api_sports_fixture_identity(tmp_path: Path):
     matches = [{
         "sporttery_meta": {"match_id": 2041028},

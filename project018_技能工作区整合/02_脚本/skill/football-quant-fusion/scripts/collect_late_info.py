@@ -247,29 +247,50 @@ def resolve_api_sports_fixture_ids(matches: list[dict], fetch_by_utc_date) -> di
         home = {normalized_name(v) for v in team_candidates(rec.get("home")) if normalized_name(v)}
         away = {normalized_name(v) for v in team_candidates(rec.get("away")) if normalized_name(v)}
         candidates = []
-        for row in rows_by_date[day]:
-            fixture = row.get("fixture") or {}
-            teams = row.get("teams") or {}
-            try:
-                provider_kickoff = parse_dt(fixture.get("date"))
-            except (TypeError, ValueError):
-                provider_kickoff = None
-            provider_home_raw = (teams.get("home") or {}).get("name")
-            provider_away_raw = (teams.get("away") or {}).get("name")
-            provider_home = normalized_name(provider_home_raw)
-            provider_away = normalized_name(provider_away_raw)
-            fixture_id = fixture.get("id")
-            if provider_kickoff is None or fixture_id is None or provider_home not in home or provider_away not in away:
-                continue
-            delta = abs((provider_kickoff - kickoff).total_seconds())
-            same_time = delta <= 5400
-            shifted_day = abs(delta - 86400) <= 5400
-            provider_league = ((row.get("league") or {}).get("name"))
-            league_ok = normalized_name(provider_league) in {
-                normalized_name(value) for value in competition_candidates(rec.get("competition"))
-            }
-            if same_time or (shifted_day and league_ok):
-                candidates.append((fixture_id, "exact_team_time" if same_time else "exact_team_league_date_shift"))
+
+        def inspect_rows(rows: list[dict]) -> None:
+            for row in rows:
+                fixture = row.get("fixture") or {}
+                teams = row.get("teams") or {}
+                try:
+                    provider_kickoff = parse_dt(fixture.get("date"))
+                except (TypeError, ValueError):
+                    provider_kickoff = None
+                provider_home_raw = (teams.get("home") or {}).get("name")
+                provider_away_raw = (teams.get("away") or {}).get("name")
+                provider_home = normalized_name(provider_home_raw)
+                provider_away = normalized_name(provider_away_raw)
+                fixture_id = fixture.get("id")
+                if provider_kickoff is None or fixture_id is None or provider_home not in home or provider_away not in away:
+                    continue
+                delta = abs((provider_kickoff - kickoff).total_seconds())
+                same_time = delta <= 5400
+                shifted_day = abs(delta - 86400) <= 5400
+                provider_league = ((row.get("league") or {}).get("name"))
+                league_ok = normalized_name(provider_league) in {
+                    normalized_name(value) for value in competition_candidates(rec.get("competition"))
+                }
+                if same_time or (shifted_day and league_ok):
+                    candidate = (fixture_id, "exact_team_time" if same_time else "exact_team_league_date_shift")
+                    if candidate not in candidates:
+                        candidates.append(candidate)
+
+        inspect_rows(rows_by_date[day])
+        # The API's `date` filter can be interpreted in its provider timezone,
+        # while the returned timestamp is rendered in another timezone.  If
+        # the first calendar day yields no identity candidate, inspect the two
+        # adjacent days; team, league and time gates still decide acceptance.
+        if not candidates:
+            requested = datetime.fromisoformat(day).date()
+            for adjacent in (requested - timedelta(days=1), requested + timedelta(days=1)):
+                adjacent_day = adjacent.isoformat()
+                if adjacent_day not in rows_by_date:
+                    try:
+                        payload = fetch_by_utc_date(adjacent_day)
+                        rows_by_date[adjacent_day] = payload if isinstance(payload, list) else []
+                    except Exception:
+                        rows_by_date[adjacent_day] = []
+                inspect_rows(rows_by_date[adjacent_day])
         if len(candidates) == 1:
             fixture_id, method = candidates[0]
             rec["api_sports_fixture_id"] = fixture_id
