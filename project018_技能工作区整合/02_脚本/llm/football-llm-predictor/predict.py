@@ -535,7 +535,26 @@ def parse_evidence_prediction(content, evidence_catalog=None):
     if decision == "opinion" and (not probs or not top_scores or not ou25 or not hafu):
         return {"error": "missing_required_markets"}
     rq = lpr.reasoning_quality(reasoning)
-    reasoning_ok = bool(reasoning) if is_new_contract else bool(rq.get("ok"))
+    # The evidence contract carries auditable E-IDs.  A non-empty summary is
+    # not evidence by itself: require the summary to cite at least one of the
+    # IDs that the model returned.  This closes the gap where a model could
+    # emit a plausible paragraph plus valid-looking markets without tying its
+    # explanation to the supplied facts.
+    # ``\b`` treats adjacent Chinese characters as word characters on
+    # Python's Unicode regex engine, so it misses strings such as ``E1记录``.
+    cited_ids = {str(value) for value in re.findall(
+        r"(?<![A-Za-z0-9_])E\d+(?![A-Za-z0-9_])", reasoning
+    )}
+    declared_ids = set(evidence_ids)
+    missing_evidence_reference = bool(is_new_contract and (
+        not declared_ids or not (cited_ids & declared_ids)
+    ))
+    if is_new_contract:
+        reasoning_ok = bool(reasoning) and not missing_evidence_reference
+    else:
+        reasoning_ok = bool(rq.get("ok"))
+    rq = {**rq, "cited_evidence_ids": sorted(cited_ids),
+          "missing_evidence_reference": missing_evidence_reference}
     if not reasoning_ok:
         egap = True
     # 动态坍缩标记：模型输出"低比分默认模板"(LOW_SCORE_SET)且 reasoning 差 = 坍缩。

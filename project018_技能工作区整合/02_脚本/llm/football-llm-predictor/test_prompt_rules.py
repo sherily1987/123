@@ -204,6 +204,26 @@ def test_predict_parse():
     assert p["direction"] == "客胜" and p["ou25"] == "小2.5" and p["reasoning_ok"]
 
 
+def test_new_evidence_contract_requires_summary_to_cite_declared_evidence_id():
+    catalog = pr.build_evidence_catalog(SIX_SECTIONS)
+    payload = {
+        "decision": "opinion", "direction": "主胜", "alt_direction": "平局",
+        "probs_1x2": [48, 28, 24], "top_scores": ["1-0", "2-0", "1-1"],
+        "ou25": "小", "hafu": "平胜", "evidence_gap": False,
+        "evidence_ids": ["E1"], "unsupported_assumptions": [],
+        "summary": "主队整体更稳，预计取得优势。",
+    }
+    parsed = pr.parse_evidence_prediction(json.dumps(payload, ensure_ascii=False), catalog)
+    assert parsed["reasoning_ok"] is False
+    assert parsed["evidence_gap"] is True
+    assert parsed["reasoning_flags"]["missing_evidence_reference"] is True
+
+    payload["summary"] = "E1记录主力后卫停赛，阵容风险使主胜置信度下调。"
+    parsed = pr.parse_evidence_prediction(json.dumps(payload, ensure_ascii=False), catalog)
+    assert parsed["reasoning_ok"] is True
+    assert parsed["reasoning_flags"]["missing_evidence_reference"] is False
+
+
 def test_prompt_uses_evidence_collection_timestamp_not_hardcoded_date():
     prompt = pr.build_evidence_prompt({"home": "A", "away": "B"}, SIX_SECTIONS, 1)
     assert "采集时间 2026-08-10T09:00:00+08:00" in prompt
