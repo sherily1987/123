@@ -74,6 +74,27 @@ def test_api_sports_client_collects_recent_and_marks_empty_availability():
     assert result["lineups_status"] == "UNAVAILABLE"
 
 
+def test_api_sports_client_marks_one_sided_lineup_as_partial():
+    def transport(path, params):
+        if path == "/fixtures" and "date" in params:
+            return {"response": [{
+                "fixture": {"id": 9, "date": "2026-08-16T14:00:00+00:00"},
+                "teams": {"home": {"id": 1, "name": "Home"},
+                          "away": {"id": 2, "name": "Away"}},
+            }]}
+        if path == "/fixtures" and "last" in params:
+            return {"response": []}
+        if path == "/injuries":
+            return {"response": []}
+        if path == "/fixtures/lineups":
+            return {"response": [{"team": {"id": 1}, "startXI": [{"player": {"name": "A"}}]}]}
+        raise AssertionError((path, params))
+
+    result = lee.ApiSportsClient(transport=transport).collect_match(
+        "Home", "Away", "2026-08-16T14:00:00+00:00")
+    assert result["lineups_status"] == "PARTIAL"
+
+
 def test_api_sports_fixture_query_uses_utc_date_for_offset_kickoff():
     seen = []
     def transport(path, params):

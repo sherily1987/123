@@ -239,6 +239,19 @@ class ApiSportsClient:
             lineups = self._request("/fixtures/lineups", {"fixture": fixture_id}).get("response", [])
         except Exception:
             lineups = []
+        # API-Sports can return one team only (or a team row with an empty
+        # startXI) while the fixture is still being populated.  Treat that as
+        # partial evidence rather than upgrading it to a complete lineup.
+        lineup_sides_with_xi = sum(
+            1 for row in lineups
+            if isinstance(row, dict) and len(row.get("startXI") or []) > 0
+        )
+        if not lineups:
+            lineups_status = "UNAVAILABLE"
+        elif lineup_sides_with_xi < 2:
+            lineups_status = "PARTIAL"
+        else:
+            lineups_status = "ok"
         return {
             "status": "ok", "fixture_id": fixture_id,
             "team_ids": {"home": home_id, "away": away_id},
@@ -247,7 +260,7 @@ class ApiSportsClient:
             "injuries": injuries,
             "injuries_status": "ok" if injuries else "UNAVAILABLE",
             "lineups": lineups,
-            "lineups_status": "ok" if lineups else "UNAVAILABLE",
+            "lineups_status": lineups_status,
         }
 
 
