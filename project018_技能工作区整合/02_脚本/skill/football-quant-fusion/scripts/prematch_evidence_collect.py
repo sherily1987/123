@@ -67,8 +67,11 @@ def _api_sports_payload(match: dict[str, Any]) -> dict[str, Any] | None:
         kwargs = {"aliases": _load_team_aliases()}
         # A provider fixture ID is more reliable than date + multilingual
         # team-name matching, especially for future fixtures and cup ties.
-        if match.get("api_sports_fixture_id") is not None:
-            kwargs["fixture_id"] = match.get("api_sports_fixture_id")
+        fixture_id = match.get("api_sports_fixture_id")
+        if fixture_id is None and isinstance(match.get("evidence_sources"), dict):
+            fixture_id = match["evidence_sources"].get("api_sports_fixture_id")
+        if fixture_id is not None:
+            kwargs["fixture_id"] = fixture_id
         return client.collect_match(match.get("home"), match.get("away"), kickoff, **kwargs)
     except Exception as exc:
         return {"status": "UNAVAILABLE", "reason": f"collector:{type(exc).__name__}"}

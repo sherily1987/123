@@ -115,6 +115,26 @@ def test_api_sports_enrichment_fills_form_injury_and_confirmed_lineups(monkeypat
     assert row["evidence_audit"]["api_sports_attempt"]["status"] == "ok"
 
 
+def test_api_fixture_id_can_be_supplied_inside_evidence_sources(monkeypatch):
+    monkeypatch.setenv("ENABLE_API_SPORTS_EVIDENCE", "1")
+    monkeypatch.setenv("API_FOOTBALL_KEY", "test-key")
+    monkeypatch.setattr(pec.preview, "collect", lambda mid, terms, hist: {
+        "feature": {}, "strength": None, "recent_home": [], "recent_away": [],
+        "injuries": {}, "tables": [],
+    })
+    seen = []
+    class FakeClient:
+        def __init__(self, **kwargs): pass
+        def collect_match(self, home, away, kickoff, *, aliases=None, fixture_id=None):
+            seen.append(fixture_id)
+            return {"status": "UNAVAILABLE", "reason": "fixture_not_ready"}
+    monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
+    pec.collect_one({"match_id": "sporttery-7", "home": "A", "away": "B",
+                     "kickoff": "2026-08-25T20:00:00+08:00",
+                     "evidence_sources": {"api_sports_fixture_id": 7788}})
+    assert seen == [7788]
+
+
 def test_audit_does_not_upgrade_one_sided_api_lineup_to_valid(monkeypatch):
     monkeypatch.setenv("ENABLE_API_SPORTS_EVIDENCE", "1")
     monkeypatch.setenv("API_FOOTBALL_KEY", "test-key")
