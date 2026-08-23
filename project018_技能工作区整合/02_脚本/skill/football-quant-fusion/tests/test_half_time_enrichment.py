@@ -88,3 +88,14 @@ def test_load_alias_files_merges_provider_inventories_without_duplicates(tmp_pat
     assert enrichment.load_alias_files([first, second]) == {
         "斯达": ["Start", "IK Start"], "维京": ["Viking"]
     }
+
+
+def test_alias_candidates_are_review_only_and_require_unique_time_score():
+    fixture = enrichment.normalize_fixture(api_sports_fixture())
+    candidates = enrichment.build_alias_candidates(
+        [({"match_id": "sporttery-1", "match": {"home": "斯达", "away": "维京",
+          "kickoff": "2026-08-02T00:00:00+08:00"}}, result())], [fixture]
+    )
+
+    assert candidates[0]["provider_home"] == "Start"
+    assert candidates[0]["review_status"] == "PENDING_MANUAL_ALIAS_REVIEW"

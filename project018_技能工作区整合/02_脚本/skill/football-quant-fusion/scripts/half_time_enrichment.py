@@ -164,6 +164,47 @@ def build_half_time_evidence(records: list[tuple[dict[str, Any], dict[str, Any]]
     return {"schema": "half-time-evidence-1.0", "research_only": True, "rows": rows}
 
 
+def build_alias_candidates(records: list[tuple[dict[str, Any], dict[str, Any]]],
+                           fixtures: list[dict[str, Any]],
+                           tolerance_minutes: int = 30) -> list[dict[str, Any]]:
+    """Suggest, but never apply, unique time+score identity candidates.
+
+    This is a review aid for expanding explicit aliases.  A coincidental
+    kickoff and score is not sufficient evidence for production matching, so
+    callers must review and add accepted pairs to an audited alias file.
+    """
+    suggestions = []
+    for record, result in records:
+        match = record.get("match") or {}
+        kickoff = _parse_time(match.get("kickoff"))
+        score = result.get("score_90")
+        if kickoff is None or not isinstance(score, dict):
+            continue
+        candidates = []
+        for fixture in fixtures:
+            provider_kickoff = _parse_time(fixture.get("kickoff"))
+            if (provider_kickoff is None or fixture.get("score_90") != score
+                    or abs((provider_kickoff - kickoff).total_seconds()) > tolerance_minutes * 60):
+                continue
+            candidates.append(fixture)
+        if len(candidates) != 1:
+            continue
+        fixture = candidates[0]
+        if _norm(match.get("home")) == _norm(fixture.get("home")) and _norm(match.get("away")) == _norm(fixture.get("away")):
+            continue
+        suggestions.append({
+            "match_id": str(record.get("match_id") or ""),
+            "kickoff": match.get("kickoff"),
+            "sporttery_home": match.get("home"), "sporttery_away": match.get("away"),
+            "provider": fixture.get("provider"),
+            "provider_home": fixture.get("home"), "provider_away": fixture.get("away"),
+            "provider_fixture_id": fixture.get("provider_fixture_id"),
+            "score_90": score, "score_ht": fixture.get("score_ht"),
+            "review_status": "PENDING_MANUAL_ALIAS_REVIEW",
+        })
+    return suggestions
+
+
 def load_settled_records(store: Path) -> list[tuple[dict[str, Any], dict[str, Any]]]:
     """Read registered predictions with finished 90-minute scores; do not mutate them."""
     registry = store / "registry.jsonl"
@@ -201,12 +242,23 @@ def main() -> None:
     parser.add_argument("--aliases", type=Path, nargs="+",
                         help="可选队名映射 JSON（可传多个，按顺序合并），格式 {aliases:{体彩名:供应商名}}")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--candidate-report", type=Path,
+                        help="可选：写出唯一时间+比分队名映射候选；不会自动用于正式匹配")
     args = parser.parse_args()
     payload = json.loads(args.fixtures.read_text(encoding="utf-8"))
     aliases: dict[str, Any] = load_alias_files(args.aliases or [])
     report = build_half_time_evidence(load_settled_records(args.store), load_fixture_payload(payload), aliases)
     report["fixture_input"] = str(args.fixtures)
     report["settled_record_count"] = len(load_settled_records(args.store))
+    if args.candidate_report:
+        report["alias_candidates"] = build_alias_candidates(
+            load_settled_records(args.store), load_fixture_payload(payload)
+        )
+        args.candidate_report.parent.mkdir(parents=True, exist_ok=True)
+        args.candidate_report.write_text(json.dumps({
+            "schema": "half-time-alias-candidates-1.0", "research_only": True,
+            "review_required": True, "rows": report["alias_candidates"]
+        }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": "ok", "output": str(args.output), "rows": len(report["rows"]),
