@@ -159,6 +159,34 @@ def test_collect_one_supports_generic_scrapling_source_without_fotmob_id(monkeyp
     assert called == ["https://league.example/match/1"]
 
 
+def test_collect_one_tries_ordered_scrapling_sources_and_records_failure(monkeypatch):
+    called = []
+
+    def fake_generic(match, mapping, collected_at):
+        url = mapping["scrapling_url"]
+        called.append(url)
+        if url.endswith("blocked"):
+            raise RuntimeError("turnstile")
+        return {"provider": mapping["provider"], "research_only": True,
+                "evidence_audit": {"missing_fields": ["team_stats"], "evidence_gap": True}}
+
+    monkeypatch.setattr(bec, "_scrapling_generic_snapshot", fake_generic)
+    row = bec.collect_one(
+        {"match_id": "sporttery-chain", "home": "A", "away": "B",
+         "kickoff": "2026-08-26T03:00:00+00:00"},
+        {"scrapling_sources": [
+            {"scrapling_url": "https://league.example/blocked", "provider": "blocked"},
+            {"scrapling_url": "https://league.example/preview", "provider": "preview"},
+        ]},
+        now=bec._parse("2026-08-23T17:45:00+00:00"),
+    )
+    assert row["status"] == "ok"
+    assert row["provider"] == "preview"
+    assert called == ["https://league.example/blocked", "https://league.example/preview"]
+    assert row["scrapling_attempts"][0]["status"] == "error"
+    assert row["scrapling_attempts"][1]["status"] == "ok"
+
+
 def test_mapping_predicted_xi_overlay_keeps_media_provenance(monkeypatch):
     def fake_run(args):
         if args[0] == "open":

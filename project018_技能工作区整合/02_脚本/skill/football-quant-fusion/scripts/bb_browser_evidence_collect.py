@@ -270,6 +270,54 @@ def _scrapling_snapshot(match: dict[str, Any], mapping: dict[str, Any],
     return _scrapling_fotmob_snapshot(match, mapping, collected_at)
 
 
+def _scrapling_mappings(mapping: dict[str, Any]) -> list[dict[str, Any]]:
+    """Expand one mapping into ordered, auditable Scrapling source candidates.
+
+    ``scrapling_sources`` is deliberately opt-in: each item may be a URL or a
+    mapping with its own source metadata.  Inherited metadata keeps concise
+    URL-only entries useful while allowing league-specific provenance.
+    """
+    candidates: list[dict[str, Any]] = []
+    raw = mapping.get("scrapling_sources")
+    if isinstance(raw, list):
+        for item in raw:
+            if isinstance(item, str) and item.strip():
+                item = {"scrapling_url": item.strip()}
+            if not isinstance(item, dict) or not item.get("scrapling_url"):
+                continue
+            candidate = dict(mapping)
+            candidate.pop("scrapling_sources", None)
+            candidate.update(item)
+            candidates.append(candidate)
+    if mapping.get("scrapling_url"):
+        primary = dict(mapping)
+        primary.pop("scrapling_sources", None)
+        # A legacy singular URL is the first candidate unless it was already
+        # listed explicitly; preserving mapping order makes retries stable.
+        if not any(c.get("scrapling_url") == primary.get("scrapling_url") for c in candidates):
+            candidates.insert(0, primary)
+    # A FotMob mapping has no ``scrapling_url``: its page ``url`` and match id
+    # identify the Scrapling-specific parser used after the API fails.
+    if not candidates and mapping.get("url") and mapping.get("fotmob_match_id"):
+        candidates.append(dict(mapping))
+    return candidates
+
+
+def _scrapling_attempts(match: dict[str, Any], mapping: dict[str, Any],
+                        collected_at: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Try Scrapling candidates in order and retain failures for audit."""
+    attempts: list[dict[str, Any]] = []
+    for candidate in _scrapling_mappings(mapping):
+        url = str(candidate.get("scrapling_url") or candidate.get("url") or "")
+        try:
+            snapshot = _scrapling_snapshot(match, candidate, collected_at)
+            attempts.append({"source_url": url, "status": "ok"})
+            return snapshot, attempts
+        except Exception as exc:
+            attempts.append({"source_url": url, "status": "error", "reason": str(exc)[:300]})
+    return None, attempts
+
+
 def _merge_scrapling_snapshot(primary: dict[str, Any], fallback: dict[str, Any]) -> bool:
     """Fill only API-missing fields; never downgrade a valid API field."""
     primary_audit = primary.get("evidence_audit") or {}
@@ -460,7 +508,11 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
                                  "query": f"{match.get('home')} vs {match.get('away')} {match.get('kickoff')}"}}
     url = mapping.get("url")
     fotmob_id = mapping.get("fotmob_match_id")
-    generic_url = mapping.get("scrapling_url")
+    generic_url = mapping.get("scrapling_url") or next(
+        (item.get("scrapling_url") if isinstance(item, dict) else item
+         for item in (mapping.get("scrapling_sources") or [])
+         if (isinstance(item, str) and item.strip()) or
+            (isinstance(item, dict) and item.get("scrapling_url"))), None)
     if not url and not generic_url:
         return {"status": "pending_browser_task", "match_id": match.get("match_id"),
                 "browser_task": {"reason": "FOTMOB_URL_AND_MATCH_ID_REQUIRED"}}
@@ -469,17 +521,17 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
                 "browser_task": {"reason": "SCRAPLING_URL_REQUIRED_FOR_GENERIC_SOURCE"}}
     if not fotmob_id:
         collected_at = datetime.now(UTC).isoformat(timespec="seconds")
-        try:
-            snapshot = _scrapling_snapshot(match, mapping, collected_at)
+        snapshot, attempts = _scrapling_attempts(match, mapping, collected_at)
+        if snapshot is not None:
             row = {"status": "ok", **snapshot}
+            row["scrapling_attempts"] = attempts
             official_url = mapping.get("official_url")
             if official_url:
                 row["official_page_probe"] = _probe_official_page(match, str(official_url))
             return row
-        except Exception as exc:
-            return {"status": "source_fetch_error", "match_id": match.get("match_id"),
-                    "reason": str(exc)[:300], "evidence_gap": True,
-                    "scrapling_fallback_used": False}
+        return {"status": "source_fetch_error", "match_id": match.get("match_id"),
+                "reason": "ALL_SCRAPLING_SOURCES_FAILED", "evidence_gap": True,
+                "scrapling_attempts": attempts, "scrapling_fallback_used": False}
     tab = None
     collected_at = datetime.now(UTC).isoformat(timespec="seconds")
     try:
@@ -505,11 +557,12 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
             predicted_xi_source_url=mapping.get("predicted_xi_source_url"),
         )}
         if mapping.get("scrapling_fallback") and (row.get("evidence_audit") or {}).get("missing_fields"):
-            try:
-                _merge_scrapling_snapshot(row, _scrapling_snapshot(match, mapping, collected_at))
-            except Exception as exc:
+            fallback, attempts = _scrapling_attempts(match, mapping, collected_at)
+            row["scrapling_attempts"] = attempts
+            if fallback is not None:
+                row["scrapling_fallback_used"] = _merge_scrapling_snapshot(row, fallback)
+            else:
                 row["scrapling_fallback_used"] = False
-                row["scrapling_fallback_error"] = str(exc)[:300]
         official_url = mapping.get("official_url")
         if official_url:
             row["official_page_probe"] = _probe_official_page(match, str(official_url))
@@ -518,11 +571,10 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         # The dynamic Scrapling path is a bounded research-only fallback for
         # API blocks/rate limits.  If it is unavailable, retain the older
         # explicit predicted-XI fallback below.
-        try:
-            dynamic = _scrapling_snapshot(match, mapping, collected_at)
+        dynamic, attempts = _scrapling_attempts(match, mapping, collected_at)
+        if dynamic is not None:
+            dynamic["scrapling_attempts"] = attempts
             return {"status": "ok", **dynamic}
-        except Exception:
-            pass
         # A source page can be reachable while its structured FotMob endpoint
         # is blocked/rate-limited.  If a browser review already captured an
         # explicit predicted XI in the mapping, retain that auditable fact
