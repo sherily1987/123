@@ -107,6 +107,9 @@ API/结构化端点失败或关键字段缺失后，采集器按映射顺序调�
 映射既可由 `--url-map` 提供，也可随单场输入放在 `evidence_sources` 中。回退结果始终
 带 `research_only=true`、`scrapling_attempts` 和字段级来源，不会覆盖已有有效 API 字段；
 未提供经过审计的页面映射时只生成待处理任务，不会把搜索候选直接当作事实来源。
+启用 `daily-pipeline --bb-browser-discover` 时，发现到的官方候选优先、已知第三方候选其次，
+会自动进入 Scrapling 有序尝试；只有页面解析出带时间戳的字段事实才写入快照，失败仍保留
+`browser_tasks.json` 待人工复核。这样 API 不可用时会实际执行回退，而不是只记录搜索链接。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。
 仅剩体彩赔率时 DeepSeek V4 Flash 仍可输出研究意见，但强制 `evidence_gap=true`、`confidence=null`、`action=observe`，
 禁止 EV/Kelly/下注推荐。若外部脚本不存在，明确失败；不得静默改用仓库内旧副本。

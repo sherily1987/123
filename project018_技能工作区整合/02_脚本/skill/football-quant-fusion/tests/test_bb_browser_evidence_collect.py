@@ -263,6 +263,32 @@ def test_collect_file_discovery_keeps_nested_identity(monkeypatch, tmp_path):
     assert report["rows"][0]["browser_task"]["match"]["match_id"] == "sporttery-2050001"
 
 
+def test_collect_file_scrapes_discovered_allowlisted_candidates(monkeypatch, tmp_path):
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps({"matches": [{
+        "home": "A", "away": "B", "competition": "测试联赛",
+        "kickoff": "2026-08-26T03:00:00+08:00",
+        "sporttery_meta": {"match_id": 2050002},
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(bec, "discover_sources", lambda match: {
+        "status": "source_candidates_found",
+        "official_candidates": ["https://league.example/match/2050002"],
+        "third_party_candidates": [],
+    })
+    monkeypatch.setattr(bec, "_scrapling_generic_snapshot",
+                        lambda match, mapping, collected_at: {
+                            "provider": "discovered_official", "research_only": True,
+                            "match_id": match["match_id"],
+                            "evidence_audit": {"entries": {}, "missing_fields": [],
+                                                "evidence_gap": False},
+                        })
+    report = bec.collect_file(source, tmp_path / "out", None, discover=True,
+                              scrape_discovered=True)
+    assert report["ok"] == 1
+    saved = json.loads((tmp_path / "out" / "sporttery-2050002.json").read_text(encoding="utf-8"))
+    assert saved["source_discovery"]["official_candidates"]
+
+
 def test_collect_one_without_mapping_emits_browser_task():
     row = bec.collect_one(
         {"match_id": "sporttery-2", "home": "A", "away": "B",

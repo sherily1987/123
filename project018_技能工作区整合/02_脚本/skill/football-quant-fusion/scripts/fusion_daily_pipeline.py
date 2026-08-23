@@ -192,7 +192,7 @@ def main():
     ap.add_argument('--bb-browser-url-map', type=Path,
                     help='可选：BB-browser/FotMob URL映射JSON；仅追加research-only证据')
     ap.add_argument('--bb-browser-discover', action='store_true',
-                    help='可选：按比赛身份发现官方/补充来源候选，写browser_tasks.json')
+                    help='可选：按比赛身份发现来源，并按官方→第三方顺序尝试Scrapling；失败写browser_tasks.json')
     ap.add_argument('--apifootball-fallback', action='store_true',
                     help='体彩官方赛果缺失时显式启用 APIFootball 欧冠补全')
     a = ap.parse_args()
@@ -312,7 +312,7 @@ def main():
         if a.bb_browser_url_map:
             browser_args += ['--url-map', a.bb_browser_url_map]
         if a.bb_browser_discover:
-            browser_args += ['--discover']
+            browser_args += ['--discover', '--scrape-discovered']
         br = run(browser_args)
         try:
             report['bb_browser_evidence'] = json.loads(br.stdout.strip().splitlines()[-1])

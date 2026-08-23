@@ -604,7 +604,7 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
 
 
 def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
-                 *, discover: bool = False) -> dict[str, Any]:
+                 *, discover: bool = False, scrape_discovered: bool = False) -> dict[str, Any]:
     payload = json.loads(input_path.read_text(encoding="utf-8-sig"))
     matches = payload.get("matches", []) if isinstance(payload, dict) else payload
     mappings = json.loads(url_map_path.read_text(encoding="utf-8-sig")) if url_map_path else {}
@@ -640,9 +640,39 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
             mapping.setdefault("scrapling_fallback", True)
         if not mapping and discover:
             discovered = discover_sources(match)
+            # Discovery is deliberately limited to links classified as
+            # official or known football-data providers.  When enabled, feed
+            # those candidates into the same ordered Scrapling fallback used
+            # by API failures; arbitrary search results remain review-only.
+            if scrape_discovered and discovered.get("status") == "source_candidates_found":
+                candidates = []
+                for url in (discovered.get("official_candidates") or []):
+                    candidates.append({"scrapling_url": url,
+                                       "source_id": "discovered.official",
+                                       "provider": "discovered_official"})
+                for url in (discovered.get("third_party_candidates") or []):
+                    candidates.append({"scrapling_url": url,
+                                       "source_id": "discovered.third_party",
+                                       "provider": "discovered_third_party"})
+                if candidates:
+                    mapping = {"scrapling_sources": candidates,
+                               "source_discovery": discovered,
+                               "scrapling_fallback": True}
+                    row = collect_one(match, mapping)
+                    if row.get("status") == "ok":
+                        row["source_discovery"] = discovered
+                        path = output_dir / f"{mid}.json"
+                        path.write_text(json.dumps(row, ensure_ascii=False, indent=2) + "\n",
+                                        encoding="utf-8")
+                        row["path"] = str(path)
+                        rows.append({k: row.get(k) for k in
+                                     ("match_id", "status", "reason", "path", "browser_task")
+                                     if k in row})
+                        continue
             row = {"status": "pending_browser_task", "match_id": mid,
                    "browser_task": {"reason": "SOURCE_REVIEW_REQUIRED",
-                                    "match": match, "discovery": discovered}}
+                                    "match": match, "discovery": discovered,
+                                    "scrapling_attempted": bool(scrape_discovered)}}
             rows.append({k: row.get(k) for k in ("match_id", "status", "reason", "path", "browser_task") if k in row})
             continue
         try:
@@ -671,9 +701,12 @@ def main() -> int:
                           "其他来源使用 {scrapling_url, source_id, provider}"))
     ap.add_argument("--discover", action="store_true",
                     help="无映射时按比赛身份用BB-browser发现官方/补充来源候选")
+    ap.add_argument("--scrape-discovered", action="store_true",
+                    help="发现候选后按官方→第三方顺序自动用Scrapling抓取；失败仍生成待复核任务")
     args = ap.parse_args()
     print(json.dumps(collect_file(args.input, args.output_dir, args.url_map,
-                                  discover=args.discover), ensure_ascii=False))
+                                  discover=args.discover,
+                                  scrape_discovered=args.scrape_discovered), ensure_ascii=False))
     return 0
 
 
