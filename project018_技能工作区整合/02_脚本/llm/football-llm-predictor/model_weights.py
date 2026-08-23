@@ -28,7 +28,8 @@ MODEL_PRIOR_WEIGHTS: Dict[str, float] = {
     "qwen/qwen-flash": 0.8,         # 市场派，中等
     "qwen/qwen3.8-max": 0.9,        # 千问 Max 更强
     "deepseek/deepseek-chat": 1.2,  # 推理质量最好
-    "moonshot/kimi-k3": 1.0,        # K3 新生产投票模型，基准权重
+    "moonshot/kimi-k3": 1.0,        # 历史 K3 研究模型，基准权重
+    "deepseek/deepseek-v4-flash": 1.0,  # 当前默认 DeepSeek V4 Flash
     "groq/llama-3.3-70b-versatile": 0.8,  # 冷门猎手，有差异化
     "ark/doubao-seed-evolving": 0.9,       # 逆向思维
     "gemini/gemini-3-flash-preview": 0.7,  # 战术流，中等
@@ -38,7 +39,7 @@ MODEL_PRIOR_WEIGHTS: Dict[str, float] = {
 # 问题：所有模型看同一份证据，本质不是独立投票
 INDEPENDENCE_GROUPS = {
     "market_follower": {"qwen/qwen-flash", "qwen/qwen3.8-max"},  # 市场派组
-    "domestic_reasoning": {"deepseek/deepseek-chat", "moonshot/kimi-k3"},  # 国内推理组
+    "domestic_reasoning": {"deepseek/deepseek-chat", "deepseek/deepseek-v4-flash", "moonshot/kimi-k3"},  # 国内推理组
     "overseas": {"groq/llama-3.3-70b-versatile", "gemini/gemini-3-flash-preview"},  # 海外组
     "noise": {"zhipu/glm-4-flash"},  # 噪音组
     "contrarian": {"ark/doubao-seed-evolving"},  # 逆向组

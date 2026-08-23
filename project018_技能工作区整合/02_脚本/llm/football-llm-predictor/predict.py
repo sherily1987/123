@@ -95,7 +95,7 @@ AGGREGATION_RULE_SPEC = {
     "weak_strength_threshold": 0.6,
 }
 MIN_VALID_EVIDENCE_MODELS = 2
-EVIDENCE_AUDITOR_MODEL = "moonshot/kimi-k3"
+EVIDENCE_AUDITOR_MODEL = "deepseek/deepseek-v4-flash"
 # 主胜比例熔断：批内主胜方向占比过高 = 赛季初/主队系统性高估（08-05 回测 4/5 主胜全错，
 # 08-13 官方赔率方向仅 30% 命中）。触发后把"强度最低"的主胜场次改判为次高方向。
 HOME_BIAS_THRESHOLD = 0.65   # 主胜方向占比 >= 65% 触发熔断
@@ -549,7 +549,18 @@ EVIDENCE_SYSTEM_PROMPT = lpr.EVIDENCE_SYSTEM_PROMPT
 
 def output_token_budget(model):
     """Reserve enough room for reasoning models to emit their final JSON."""
-    return 4096 if fp.strip_provider(model) == "kimi-k3" else 1024
+    # DeepSeek V4 Flash exposes a reasoning channel; with a 1024-token cap it
+    # can spend the whole completion on reasoning and return no final JSON.
+    return 4096 if fp.strip_provider(model) in {"kimi-k3", "deepseek-v4-flash"} else 1024
+
+
+def model_request_options(model):
+    """Return provider-specific options without leaking them into model contracts."""
+    if fp.strip_provider(model) == "deepseek-v4-flash":
+        # V4 Flash otherwise spends the whole completion in reasoning_content;
+        # the LLM track needs a bounded final JSON decision instead.
+        return {"extra_body": {"thinking": {"type": "disabled"}}}
+    return {}
 
 
 def _empty_response_diagnostic(response):
@@ -576,6 +587,7 @@ def call_evidence_model(client, model, prompt, models_used=None, evidence_catalo
             if model.startswith("zhipu/"):
                 prompt = sanitize_for_zhipu(prompt)
             sys_prompt = lpr.system_prompt_evidence(model, models_used)
+            request_options = model_request_options(model)
             resp = client.chat.completions.create(
                 model=real_model,
                 messages=[
@@ -584,6 +596,7 @@ def call_evidence_model(client, model, prompt, models_used=None, evidence_catalo
                 ],
                 temperature=temperature,
                 max_tokens=output_token_budget(model),
+                **request_options,
             )
             content = resp.choices[0].message.content
             if content is None or not str(content).strip():
@@ -606,16 +619,18 @@ def call_evidence_auditor(client, prompt, evidence_catalog):
             prompt = sanitize_for_zhipu(prompt)
         auditor_model = fp.strip_provider(EVIDENCE_AUDITOR_MODEL)
         temperature = fp.MODEL_TEMPERATURE_OVERRIDES.get(auditor_model, 0.0)
-        audit_max_tokens = output_token_budget(EVIDENCE_AUDITOR_MODEL) if auditor_model == "kimi-k3" else 768
+        audit_max_tokens = output_token_budget(EVIDENCE_AUDITOR_MODEL)
         messages = [
             {"role": "system", "content": lpr.system_prompt_evidence_audit()},
             {"role": "user", "content": prompt},
         ]
+        request_options = model_request_options(EVIDENCE_AUDITOR_MODEL)
         response = client.chat.completions.create(
             model=auditor_model,
             messages=messages,
             temperature=temperature,
             max_tokens=audit_max_tokens,
+            **request_options,
         )
         raw = response.choices[0].message.content
         parsed = parse_evidence_audit(raw, evidence_catalog)
@@ -641,6 +656,7 @@ def call_evidence_auditor(client, prompt, evidence_catalog):
             messages=messages,
             temperature=temperature,
             max_tokens=audit_max_tokens,
+            **request_options,
         )
         return parse_evidence_audit(response.choices[0].message.content, evidence_catalog)
     except Exception as exc:
@@ -1280,7 +1296,7 @@ def main():
 
         if agg.get("single_model"):
             agg = eo.apply_collection_degradation(agg, evidence_status.get("collection_status", "PARTIAL"))
-            print(f"\n  🔎 K3 单模型研究意见: {agg['direction']}（非共识，不显示强度/概率）")
+            print(f"\n  🔎 DeepSeek V4 Flash 单模型研究意见: {agg['direction']}（非共识，不显示强度/概率）")
             print(f"  🚫 下注建议: 跳过（{agg['reason']}）")
             top3 = agg.get("top_scores") or ([agg["top_score_pref"]] if agg.get("top_score_pref") else [])
             print(f"  🎯 比分研究偏好: {', '.join(top3) if top3 else '分散'}")

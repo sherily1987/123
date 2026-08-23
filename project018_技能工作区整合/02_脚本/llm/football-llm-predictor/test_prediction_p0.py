@@ -103,7 +103,7 @@ def test_skip_audit_record_keeps_match_identity():
     assert record["action"] == "skip"
 
 
-def test_k3_evidence_auditor_uses_model_temperature_override():
+def test_deepseek_v4_flash_evidence_auditor_uses_default_temperature_budget():
     requests = []
 
     class Completions:
@@ -116,8 +116,9 @@ def test_k3_evidence_auditor_uses_model_temperature_override():
     predict.call_evidence_auditor(client, "证据审计", [])
 
     assert requests
-    assert all(request["temperature"] == 1.0 for request in requests)
+    assert all(request["temperature"] == 0.0 for request in requests)
     assert all(request["max_tokens"] == 4096 for request in requests)
+    assert all(request["extra_body"] == {"thinking": {"type": "disabled"}} for request in requests)
 
 
 def test_evidence_auditor_retries_once_after_unknown_evidence_id():
@@ -456,9 +457,9 @@ def test_voter_prompt_contains_neutral_audit_not_direction():
     assert '"direction"' not in prompt
 
 
-def test_kimi_k3_is_the_only_default_auditor_and_voter():
-    assert predict.EVIDENCE_AUDITOR_MODEL == "moonshot/kimi-k3"
-    assert fp.DEFAULT_MODELS == ["moonshot/kimi-k3"]
+def test_deepseek_v4_flash_is_the_only_default_auditor_and_voter():
+    assert predict.EVIDENCE_AUDITOR_MODEL == "deepseek/deepseek-v4-flash"
+    assert fp.DEFAULT_MODELS == ["deepseek/deepseek-v4-flash"]
 
 
 def test_two_voter_consensus_requires_two_matching_opinions():

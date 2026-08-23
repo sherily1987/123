@@ -35,8 +35,8 @@ def test_normalize():
     assert lpr.normalize_score_pref("6-0") == "胜其他"
 
 
-def test_production_default_models_are_kimi_k3_only():
-    assert fp.DEFAULT_MODELS == ["moonshot/kimi-k3"]
+def test_production_default_models_are_deepseek_v4_flash_only():
+    assert fp.DEFAULT_MODELS == ["deepseek/deepseek-v4-flash"]
     assert "moonshot/kimi-k2.6" not in fp.DEFAULT_MODELS
     assert fp.MODEL_TEMPERATURE_OVERRIDES["kimi-k3"] == 1.0
 

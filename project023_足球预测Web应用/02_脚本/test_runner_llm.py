@@ -253,7 +253,7 @@ def test_parse_llm_log_preserves_model_timestamp_for_calibration():
 {"direction":"主胜","prediction_as_of":"2026-08-18T00:11:12+00:00","probs_1x2":[55,25,20],"top_scores":["1-0","2-0","1-1"]}
 '''
     row = runner.parse_llm_log(text)["rows"][0]
-    assert row["model_id"] == "moonshot/kimi-k3"
+    assert row["model_id"] == "deepseek/deepseek-v4-flash"
     assert row["prediction_as_of"] == "2026-08-18T00:11:12+00:00"
     assert row["probs_1x2"] == [55, 25, 20]
     assert row["top_scores"] == ["1-0", "2-0", "1-1"]

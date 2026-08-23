@@ -67,11 +67,11 @@ python football_predictor.py "曼城" "利物浦" --dry-run
 
 ## 工作原理
 1. 每个模型独立收到相同的比赛信息，各自预测比分 + 置信度 + 理由
-2. 默认调用 Kimi K3；其他模型只能通过 `--models` 做隔离实验，单模型结果始终是研究意见
+2. 默认调用 DeepSeek V4 Flash（`deepseek/deepseek-v4-flash`）；其他模型只能通过 `--models` 做隔离实验，单模型结果始终是研究意见
 3. 聚合：比分众数投票 → 综合预测；赛果众数 → 综合赛果
 4. 输出平均置信度 + 分歧度（分歧大 = 谨慎参考）
 
-## 完整流水线：体彩采集 → K3 研究预测
+## 完整流水线：体彩采集 → DeepSeek V4 Flash 研究预测
 配合足彩移动采集器（中国体彩官方移动端链路，零依赖零Key）使用：
 
 ```bash
@@ -184,7 +184,7 @@ python simulate_from_odds.py --input data/raw_2026-08-05.json --sim 10000
 
 ## 模型配置
 
-默认只调用 `moonshot/kimi-k3`，包括证据审计与研究意见。单模型输出标记为 `single_model_research` / `action=observe`：它不是投票共识，不显示投票强度或 LLM 概率，也不会计算 EV、生成单选或下注建议。只有显式传入两个独立投票模型时，才可能形成 `consensus`；即使如此，LLM 轨仍只作研究，不能替代量化轨校准概率。
+默认只调用 `deepseek/deepseek-v4-flash`，包括证据审计与研究意见。单模型输出标记为 `single_model_research` / `action=observe`：它不是投票共识，不显示投票强度或 LLM 概率，也不会计算 EV、生成单选或下注建议。只有显式传入两个独立投票模型时，才可能形成 `consensus`；即使如此，LLM 轨仍只作研究，不能替代量化轨校准概率。
 
 需要做隔离实验时，可运行时用 `--models` 指定模型列表；不要修改默认池或把实验输出混入生产登记/回测。
 
@@ -198,7 +198,7 @@ python simulate_from_odds.py --input data/raw_2026-08-05.json --sim 10000
 - `zhipu/glm-4-flash` → 智谱（完全免费无限量，国内直连，key 已持久化 `ZHIPU_API_KEY`）
 - `qwen/qwen-flash` → 千问/阿里云百炼（完全免费无限量，国内直连，key 用 `DASHSCOPE_API_KEY`，需在 https://bailian.console.aliyun.com 创建）
 - `groq/llama-3.3-70b-versatile` → Groq（需代理 `127.0.0.1:10809`，key 已持久化 `GROQ_API_KEY`）
-- `moonshot/kimi-k3` → Kimi K3（推理模型，国内直连，key 已持久化 `MOONSHOT_API_KEY`）
+- `deepseek/deepseek-v4-flash` → DeepSeek V4 Flash（官方 API 模型 ID，key 使用 `DEEPSEEK_API_KEY`）
 - `deepseek/deepseek-chat` → DeepSeek V3（国内直连，强推理，极低价，key 用 `DEEPSEEK_API_KEY`，需在 https://platform.deepseek.com 注册）
 - `gemini/gemini-3-flash-preview` → Google Gemini 3（需代理，key 已持久化 `GOOGLE_API_KEY`；注意 2.5 系列已对新用户关闭，用 3 系列）
 - `ark/doubao-seed-evolving` → 豆包/火山方舟（key 已持久化 `ARK_API_KEY`；需控制台开通模型，当前账户已开通 doubao-seed-evolving）

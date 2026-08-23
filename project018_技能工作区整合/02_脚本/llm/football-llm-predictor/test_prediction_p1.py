@@ -155,7 +155,7 @@ def test_k3_only_main_skips_ev_and_single_pick(tmp_path, monkeypatch, capsys):
                                        "--models", "moonshot/kimi-k3"])
     predict.main()
     output = capsys.readouterr().out
-    assert "K3 单模型研究意见" in output
+    assert "DeepSeek V4 Flash 单模型研究意见" in output
     assert "single_model_no_consensus" in output
     assert "💰 下注推荐" not in output
     assert '"action": "observe"' in output
@@ -196,7 +196,7 @@ def test_k3_only_main_uses_valid_mcp_as_primary_when_web_evidence_is_absent(tmp_
 
     output = capsys.readouterr().out
     assert "证据: evidence_001_target_mcp.md (MCP 主证据)" in output
-    assert "K3 单模型研究意见" in output
+    assert "DeepSeek V4 Flash 单模型研究意见" in output
     assert "💰 下注推荐" not in output
     assert '"evidence_source": "mcp_primary"' in output
 

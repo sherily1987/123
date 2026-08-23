@@ -28,7 +28,7 @@ import store_view as sv
 PY = resolve_python()
 CLI = FUSION_SCRIPTS / "fusion_cli.py"
 CST = timezone(timedelta(hours=8))
-K3_MODEL_ID = "moonshot/kimi-k3"
+DEFAULT_LLM_MODEL_ID = "deepseek/deepseek-v4-flash"
 EVIDENCE_FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
 EVIDENCE_VALID_STATUSES = {
     "VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING",
@@ -481,6 +481,11 @@ def parse_llm_log(text: str) -> dict:
                 audit = candidate
                 break
         individual = (audit or {}).get("individual") if isinstance(audit, dict) else None
+        models_used = (audit or {}).get("models_used") if isinstance(audit, dict) else None
+        logged_model_id = (
+            models_used[0] if isinstance(models_used, list) and len(models_used) == 1
+            else None
+        )
         raw_audit = {}
         if isinstance(individual, dict):
             for item in individual.values():
@@ -506,7 +511,9 @@ def parse_llm_log(text: str) -> dict:
             "top_scores": scores[:3],
             "alt": am.group(2) if am else None,
             "evidence_gap": ("证据存在缺口" in blk) or ("证据缺口" in blk),
-            "model_id": K3_MODEL_ID,
+            # Preserve historical single-model logs; only new/unlabelled logs
+            # use the current DeepSeek V4 Flash default.
+            "model_id": logged_model_id or DEFAULT_LLM_MODEL_ID,
             "prediction_as_of": (audit or {}).get("prediction_as_of"),
             "probs_1x2": (audit or {}).get("probs_1x2"),
             "raw_llm_probs_1x2": (audit or {}).get("raw_llm_probs_1x2") or raw_audit.get("raw_llm_probs_1x2"),
@@ -541,7 +548,7 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
         strength = (row.get("strength") or 0) / 100.0
         upsert_job(root, ident, llm={
             "track": "llm",
-            "model_id": K3_MODEL_ID,
+            "model_id": DEFAULT_LLM_MODEL_ID,
             "llm_prediction_as_of": row.get("prediction_as_of"),
             "direction": row.get("dir"),
             "alt_direction": row.get("alt"),
