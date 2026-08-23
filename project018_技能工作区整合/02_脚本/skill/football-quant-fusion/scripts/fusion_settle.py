@@ -53,6 +53,32 @@ def combine_reports(
     }
 
 
+def parse_command_output(stdout: str, returncode: int = 0) -> dict[str, Any]:
+    """Parse a JSON payload even when the child emits human logs first."""
+    raw = stdout or ""
+    decoder = json.JSONDecoder()
+    candidates: list[tuple[int, dict[str, Any]]] = []
+    for index, char in enumerate(raw):
+        if char != "{":
+            continue
+        try:
+            value, end = decoder.raw_decode(raw[index:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            candidates.append((index + end, value))
+    if candidates:
+        # Nested report entries also decode successfully; the outer payload
+        # consumes the longest suffix and is the actual command result.
+        return max(candidates, key=lambda item: item[0])[1]
+    return {
+        "status": "failed",
+        "settled": 0,
+        "returncode": returncode,
+        "error": raw[-1000:],
+    }
+
+
 def run_command(command: list[str]) -> dict[str, Any]:
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             text=True, encoding="utf-8", errors="replace")
@@ -63,15 +89,7 @@ def run_command(command: list[str]) -> dict[str, Any]:
         sys.stdout.flush()
     proc.wait()
     stdout = "".join(chunks)
-    try:
-        payload = json.loads(stdout)
-    except json.JSONDecodeError:
-        payload = {
-            "status": "failed",
-            "settled": 0,
-            "returncode": proc.returncode,
-            "error": stdout[-1000:],
-        }
+    payload = parse_command_output(stdout, proc.returncode)
     if proc.returncode != 0:
         payload.setdefault("status", "failed")
         payload.setdefault("settled", 0)
