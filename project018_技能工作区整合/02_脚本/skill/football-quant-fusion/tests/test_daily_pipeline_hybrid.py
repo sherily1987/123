@@ -114,6 +114,35 @@ def test_draw_watch_research_runs_after_settlement_without_affecting_prediction_
     assert retries == 0
 
 
+def test_llm_calibration_research_is_a_sidecar_and_uses_shared_roots(monkeypatch, tmp_path):
+    output = tmp_path / "shared" / "research" / "llm-calibration" / "deepseek_latest.json"
+    seen = []
+
+    monkeypatch.setattr(pipeline, "LLM_ROOT", tmp_path / "llm")
+    script = tmp_path / "llm" / "scripts" / "build_deepseek_calibration_sample.py"
+    script.parent.mkdir(parents=True)
+    script.write_text("# test stub", encoding="utf-8")
+
+    def fake_run(command, retries=0):
+        seen.append(command)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps({
+            "model": "deepseek/deepseek-v4-flash", "eligible_settled_rows": 0,
+            "metrics": {"direction_n": 0}, "excluded_by_reason": {},
+        }), encoding="utf-8")
+        return type("Result", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    monkeypatch.setattr(pipeline, "run", fake_run)
+    store = tmp_path / "shared" / "backtest"
+    report = pipeline.run_llm_calibration_research(store)
+    command = seen[0]
+    assert command[0] == script
+    assert command[command.index("--jobs-root") + 1] == tmp_path / "shared" / "jobs"
+    assert command[command.index("--results-root") + 1] == store / "results"
+    assert report["status"] == "ok"
+    assert report["eligible_settled_rows"] == 0
+
+
 def test_daily_pipeline_default_snapshot_is_truthful_generic_prematch(monkeypatch, tmp_path):
     """A default run may not claim an arbitrary T-minus hour it did not measure."""
     seen = []
@@ -171,6 +200,7 @@ def test_daily_pipeline_refreshes_derivatives_after_a_new_settlement(monkeypatch
     monkeypatch.setattr(pipeline, "run_half_time_research", lambda store: calls.append(("half", store)) or {"status": "ok"})
     monkeypatch.setattr(pipeline, "run_derivative_research", lambda store: calls.append(("derivative", store)) or {"status": "ok"})
     monkeypatch.setattr(pipeline, "run_draw_watch_research", lambda store: calls.append(("draw", store)) or {"status": "ok"})
+    monkeypatch.setattr(pipeline, "run_llm_calibration_research", lambda store: calls.append(("llm", store)) or {"status": "ok"})
     monkeypatch.setattr(pipeline.sys, "argv", [
         "fusion_daily_pipeline.py", "--kickoff-date", "2026-08-25",
         "--store", str(tmp_path / "backtest"), "--odds-store", str(tmp_path / "odds.jsonl"),
@@ -179,10 +209,11 @@ def test_daily_pipeline_refreshes_derivatives_after_a_new_settlement(monkeypatch
 
     pipeline.main()
 
-    assert [name for name, _ in calls] == ["half", "derivative", "draw"]
+    assert [name for name, _ in calls] == ["half", "derivative", "draw", "llm"]
     report = json.loads(capsys.readouterr().out)
     assert report["derivative_research"] == {"status": "ok"}
     assert report["draw_watch_research"] == {"status": "ok"}
+    assert report["llm_calibration"] == {"status": "ok"}
 
 
 def test_daily_pipeline_skips_market_sidecars_when_collector_has_no_formal_inputs(monkeypatch, tmp_path):

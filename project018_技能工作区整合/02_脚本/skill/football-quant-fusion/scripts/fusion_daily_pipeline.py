@@ -53,6 +53,10 @@ STORE = backtest_store()
 ODDS_STORE = odds_store()
 WORK = forward_work_dir()
 CST = timezone(timedelta(hours=8))
+LLM_ROOT = Path(os.environ.get(
+    "FOOTBALL_LLM_ROOT",
+    str(HERE.parents[2] / "llm" / "football-llm-predictor"),
+))
 
 
 # [中文功能] 带重试地执行子进程命令（实时转发输出，同时保留 stdout 供调用方解析）
@@ -175,6 +179,39 @@ def run_draw_watch_research(store: Path) -> dict:
             "shadow_probability_paired": payload.get("shadow_probability_paired")}
 
 
+def run_llm_calibration_research(store: Path) -> dict:
+    """Refresh the DeepSeek research sample after official settlements.
+
+    This is deliberately a sidecar: it never writes the quant registry,
+    changes model probabilities, or opens a recommendation gate.
+    """
+    script = LLM_ROOT / "scripts" / "build_deepseek_calibration_sample.py"
+    if not script.is_file():
+        return {"status": "skipped", "reason": "LLM_CALIBRATION_SCRIPT_MISSING"}
+    # ``store`` is the shared-data/football-quant-fusion/backtest directory;
+    # jobs and research sit beside ``backtest`` under the same project root.
+    shared_root = store.parent
+    jobs_root = shared_root / "jobs"
+    results_root = store / "results"
+    output = shared_root / "research" / "llm-calibration" / "deepseek_latest.json"
+    result = run([
+        script, "--jobs-root", jobs_root, "--results-root", results_root,
+        "--output", output,
+    ])
+    try:
+        payload = json.loads(output.read_text(encoding="utf-8")) if output.is_file() else {}
+    except (OSError, ValueError):
+        payload = {}
+    if result.returncode != 0 or not payload:
+        return {"status": "error", "output": str(output),
+                "error": (result.stderr or result.stdout)[-300:]}
+    return {"status": "ok", "output": str(output),
+            "model": payload.get("model"),
+            "eligible_settled_rows": payload.get("eligible_settled_rows"),
+            "metrics": payload.get("metrics"),
+            "excluded_by_reason": payload.get("excluded_by_reason")}
+
+
 # [中文功能] 每日流水线：结算→采集→登记→赔率移动
 def main():
     ap = argparse.ArgumentParser()
@@ -208,7 +245,8 @@ def main():
     report = {'ran_at': datetime.now(CST).isoformat(), 'sales_day': sales_day,
               'settle': None, 'collect': None, 'record': [], 'movement': None,
               'intl_odds': None, 'hybrid_shadow': None, 'half_time_research': None,
-              'derivative_research': None, 'draw_watch_research': None}
+              'derivative_research': None, 'draw_watch_research': None,
+              'llm_calibration': None}
 
     # 1) Settle already-finished matches first (official matchId preferred).
     r = run([HERE / 'fusion_settle.py', '--store', a.store]
@@ -236,8 +274,10 @@ def main():
         report['half_time_research'] = run_half_time_research(a.store)
         report['derivative_research'] = run_derivative_research(a.store)
         report['draw_watch_research'] = run_draw_watch_research(a.store)
+        report['llm_calibration'] = run_llm_calibration_research(a.store)
     else:
         report['half_time_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
+        report['llm_calibration'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
         report['derivative_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
         report['draw_watch_research'] = {'status': 'skipped', 'reason': 'no_new_settlement_or_dry_run'}
 
