@@ -93,7 +93,7 @@ def parse_markdown(text: str, match: dict[str, Any], source_url: str,
     entries = {
         "team_stats": _entry("UNAVAILABLE", None, url=source_url, collected_at=collected_at,
                               reason="SCRAPLING_FOTMOB_PAGE_HAS_NO_STRUCTURED_XG"),
-        "recent_form": _entry("PARTIAL" if form_rows else "UNAVAILABLE",
+        "recent_form": _entry("VALID" if len(form_rows) >= 5 else "PARTIAL" if form_rows else "UNAVAILABLE",
                               {"raw_rows": form_rows}, url=source_url, collected_at=collected_at,
                               reason=None if form_rows else "TEAM_FORM_SECTION_MISSING"),
         "injury": _entry("VALID" if injuries else "EMPTY_UNCONFIRMED",
