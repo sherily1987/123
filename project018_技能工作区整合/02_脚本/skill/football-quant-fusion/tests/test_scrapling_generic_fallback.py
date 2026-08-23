@@ -80,3 +80,40 @@ def test_parse_markdown_supports_chinese_sections_and_explicit_strength():
     assert entries["injury"]["status"] == "VALID"
     assert entries["suspensions"]["status"] == "VALID"
     assert "xG" in entries["team_stats"]["value"]["raw_rows"][0]
+
+
+def test_parse_markdown_supports_setext_headings_and_bold_predicted_lineups():
+    text = """Bologna pre-season form:
+
+* L
+* D
+* W
+* W
+* L
+* L
+
+Team News
+---------
+
+While Nicolo Casale is the hosts' sole fitness doubt, Lazio could be missing Isaksen.
+Mario Gila has left for Milan.
+
+**Bologna possible starting lineup:**
+
+Skorupski; Zortea, Vitik, Heggem, Miranda
+
+**Lazio possible starting lineup:**
+
+Mandas; Marusic, Doekhi, Pedraza
+"""
+    row = sg.parse_markdown(
+        text, {"match_id": "sporttery-it-1", "home": "Bologna", "away": "Lazio"},
+        "https://www.sportsmole.co.uk/football/bologna/preview/example.html",
+        "2026-08-24T03:28:41Z", source_id="sportsmole.preview", provider="scrapling_generic",
+    )
+    entries = row["evidence_audit"]["entries"]
+    assert entries["recent_form"]["status"] == "VALID"
+    assert entries["starting_xi"]["status"] == "PREDICTED"
+    assert entries["injury"]["status"] == "VALID"
+    # No explicit suspension section: do not infer that nobody is suspended.
+    assert entries["suspensions"]["status"] == "UNAVAILABLE"
