@@ -73,6 +73,12 @@
       (reasonText ? `（${reasonText}）` : "") +
       (tags ? ` · 风险标签：${tags}` : "") +
       ` · 新鲜度：过期 ${esc(evidence.stale_market_rows || 0)} 行 / 老化 ${esc(evidence.aging_market_rows || 0)} 行</div>`;
+    const health = plan.source_health || {};
+    const apiHealth = health.api_sports || {};
+    const scrapeHealth = health.scrapling || {};
+    const sourceHealthBlock = `<div class="strategy-evidence"><strong>采集器：</strong>` +
+      `API-Sports 成功 ${esc(apiHealth.ok || 0)} / 未请求 ${esc(apiHealth.NOT_REQUESTED || 0)} / 失败 ${esc(apiHealth.UNAVAILABLE || 0)}` +
+      ` · Scrapling 尝试 ${esc(scrapeHealth.attempted || 0)}，成功 ${esc(scrapeHealth.ok || 0)}，失败 ${esc(scrapeHealth.UNAVAILABLE || 0)}</div>`;
     const calibrationBlock = calibrationRows
       ? `<div class="strategy-evidence"><strong>市场校准状态：</strong>${calibrationRows}</div>`
       : "";
@@ -108,6 +114,7 @@
         <div><b>${amount((plan.risk_disclosure || {}).maximum_loss_amount)}元</b><span>最大损失</span></div>
       </div>
       ${evidenceBlock}
+      ${sourceHealthBlock}
       ${calibrationBlock}
       ${llmBlock}
       ${body}

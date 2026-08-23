@@ -146,6 +146,21 @@ def daily_strategy(
         execution_mode="budgeted_action",
         as_of=current,
     )
+    source_health = {
+        "matches": len(jobs),
+        "api_sports": {"NOT_REQUESTED": 0, "ok": 0, "UNAVAILABLE": 0, "SOURCE_CONFLICT": 0},
+        "scrapling": {"attempted": 0, "ok": 0, "UNAVAILABLE": 0},
+    }
+    for job in jobs:
+        audit = job.get("evidence_audit") or {}
+        api = audit.get("api_sports_attempt") or {}
+        status = str(api.get("status") or "NOT_REQUESTED")
+        source_health["api_sports"][status] = source_health["api_sports"].get(status, 0) + 1
+        scrapling = (job.get("facts") or {}).get("scrapling")
+        if isinstance(scrapling, dict):
+            source_health["scrapling"]["attempted"] += 1
+            key = "UNAVAILABLE" if scrapling.get("status") == "UNAVAILABLE" else "ok"
+            source_health["scrapling"][key] += 1
     output = {
         **plan,
         # Backward-compatible alias for older workbench clients.  The
@@ -154,6 +169,7 @@ def daily_strategy(
         "day": selected_day,
         "selected_day": selected_day,
         "source_job_count": len(jobs),
+        "source_health": source_health,
         "llm_calibration": _load_deepseek_calibration(store, selected_day),
         "display": {
             "strategy_type": "固定娱乐预算（放宽门禁）",
