@@ -130,11 +130,15 @@ def test_fusion_evidence_markdown_exposes_audit_summary():
 
 def test_fusion_evidence_blockquotes_do_not_break_llm_source_gate():
     import light_evidence
+    import importlib.util
     llm = runner.llm_repo()
     import sys
     if str(llm) not in sys.path:
         sys.path.insert(0, str(llm))
-    import predict
+    spec = importlib.util.spec_from_file_location("llm_predict_source_gate", llm / "predict.py")
+    predict = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(predict)
     match = {
         "match_num": "周一001", "home": "甲", "away": "乙", "league": "测试联赛",
         "kickoff_iso": "2026-08-25T03:00:00+08:00", "match_id": 1,
