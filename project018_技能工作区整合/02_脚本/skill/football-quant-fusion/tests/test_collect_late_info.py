@@ -45,7 +45,7 @@ def test_fold_injuries_caps_and_splits_attack_defense():
 
 def test_empty_injury_response_is_traced_but_not_treated_as_clear(tmp_path: Path, monkeypatch):
     rec = {
-        "sporttery_meta": {"match_id": 2041028},
+        "sporttery_meta": {"match_id": 2041028}, "competition": "意甲",
         "home": "博洛尼亚", "away": "拉齐奥",
         "kickoff": "2026-08-25T00:30:00+08:00",
     }
@@ -90,7 +90,7 @@ def test_api_sports_fixture_resolver_matches_chinese_alias_and_kickoff():
         "kickoff": "2026-08-25T00:30:00+08:00",
     }]
     fixtures = [{
-        "fixture": {"id": 1550089, "date": "2026-08-24T16:30:00+00:00"},
+        "fixture": {"id": 1550089, "date": "2026-08-24T16:30:00+00:00"}, "league": {"name": "Serie A"},
         "teams": {"home": {"name": "Bologna"}, "away": {"name": "Lazio"}},
     }]
 
@@ -102,19 +102,19 @@ def test_api_sports_fixture_resolver_matches_chinese_alias_and_kickoff():
 
 def test_api_sports_fixture_resolver_covers_provider_team_name_variants():
     matches = [
-        {"sporttery_meta": {"match_id": 2041033}, "home": "罗马", "away": "佛罗伦萨",
+        {"sporttery_meta": {"match_id": 2041033}, "competition": "意甲", "home": "罗马", "away": "佛罗伦萨",
          "kickoff": "2026-08-25T02:45:00+08:00"},
-        {"sporttery_meta": {"match_id": 2041037}, "home": "马拉加", "away": "拉科",
+        {"sporttery_meta": {"match_id": 2041037}, "competition": "西甲", "home": "马拉加", "away": "拉科",
          "kickoff": "2026-08-25T03:30:00+08:00"},
-        {"sporttery_meta": {"match_id": 2041038}, "home": "博塔弗戈", "away": "巴竞技",
+        {"sporttery_meta": {"match_id": 2041038}, "competition": "巴甲", "home": "博塔弗戈", "away": "巴竞技",
          "kickoff": "2026-08-25T07:00:00+08:00"},
     ]
     fixtures = [
-        {"fixture": {"id": 1550087, "date": "2026-08-24T18:45:00+00:00"},
+        {"fixture": {"id": 1550087, "date": "2026-08-24T18:45:00+00:00"}, "league": {"name": "Serie A"},
          "teams": {"home": {"name": "AS Roma"}, "away": {"name": "Fiorentina"}}},
-        {"fixture": {"id": 1570349, "date": "2026-08-24T19:30:00+00:00"},
+        {"fixture": {"id": 1570349, "date": "2026-08-24T19:30:00+00:00"}, "league": {"name": "La Liga"},
          "teams": {"home": {"name": "Malaga"}, "away": {"name": "Deportivo La Coruna"}}},
-        {"fixture": {"id": 1492340, "date": "2026-08-24T23:00:00+00:00"},
+        {"fixture": {"id": 1492340, "date": "2026-08-24T23:00:00+00:00"}, "league": {"name": "Serie A"},
          "teams": {"home": {"name": "Botafogo"}, "away": {"name": "Atletico Paranaense"}}},
     ]
 
@@ -128,23 +128,23 @@ def test_api_sports_fixture_resolver_covers_provider_team_name_variants():
 def test_api_sports_fixture_resolver_covers_20260823_sporttery_alias_gaps():
     """Known Sporttery labels must resolve to provider fixtures used by the late-info chain."""
     matches = [
-        {"sporttery_meta": {"match_id": 2041018}, "home": "弗洛西诺", "away": "尤文图斯",
+        {"sporttery_meta": {"match_id": 2041018}, "competition": "意甲", "home": "弗洛西诺", "away": "尤文图斯",
          "kickoff": "2026-08-24T00:30:00+08:00"},
-        {"sporttery_meta": {"match_id": 2041019}, "home": "威尼斯", "away": "莱切",
+        {"sporttery_meta": {"match_id": 2041019}, "competition": "意甲", "home": "威尼斯", "away": "莱切",
          "kickoff": "2026-08-24T00:30:00+08:00"},
-        {"sporttery_meta": {"match_id": 2041021}, "home": "赫塔费", "away": "桑坦德",
+        {"sporttery_meta": {"match_id": 2041021}, "competition": "西甲", "home": "赫塔费", "away": "桑坦德",
          "kickoff": "2026-08-24T01:30:00+08:00"},
-        {"sporttery_meta": {"match_id": 2041026}, "home": "新英格兰", "away": "纽约城",
+        {"sporttery_meta": {"match_id": 2041026}, "competition": "美职", "home": "新英格兰", "away": "纽约城",
          "kickoff": "2026-08-24T04:30:00+08:00"},
     ]
     fixtures = [
-        {"fixture": {"id": 1550090, "date": "2026-08-23T16:30:00+00:00"},
+        {"fixture": {"id": 1550090, "date": "2026-08-23T16:30:00+00:00"}, "league": {"name": "Serie A"},
          "teams": {"home": {"name": "Frosinone"}, "away": {"name": "Juventus"}}},
-        {"fixture": {"id": 1550096, "date": "2026-08-23T16:30:00+00:00"},
+        {"fixture": {"id": 1550096, "date": "2026-08-23T16:30:00+00:00"}, "league": {"name": "Serie A"},
          "teams": {"home": {"name": "Venezia"}, "away": {"name": "Lecce"}}},
-        {"fixture": {"id": 1570348, "date": "2026-08-23T17:30:00+00:00"},
+        {"fixture": {"id": 1570348, "date": "2026-08-23T17:30:00+00:00"}, "league": {"name": "La Liga"},
          "teams": {"home": {"name": "Getafe"}, "away": {"name": "Racing Santander"}}},
-        {"fixture": {"id": 1490419, "date": "2026-08-23T20:30:00+00:00"},
+        {"fixture": {"id": 1490419, "date": "2026-08-23T20:30:00+00:00"}, "league": {"name": "Major League Soccer"},
          "teams": {"home": {"name": "New England Revolution"}, "away": {"name": "New York City FC"}}},
     ]
 

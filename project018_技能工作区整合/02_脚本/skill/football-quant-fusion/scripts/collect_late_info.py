@@ -45,6 +45,17 @@ CAP = {
     "Goalkeeper": (0.00, 0.00),
 }
 
+# API-Sports occasionally publishes the same synthetic/future fixture one
+# local calendar day earlier than Sporttery.  Date-shift matching is therefore
+# permitted only with an explicit league and two-sided team alias match.
+COMPETITION_ALIASES = {
+    "意甲": {"Serie A"}, "英超": {"Premier League"}, "英冠": {"Championship"},
+    "西甲": {"La Liga"}, "法甲": {"Ligue 1"}, "法乙": {"Ligue 2"},
+    "葡超": {"Primeira Liga"}, "荷甲": {"Eredivisie"}, "德甲": {"Bundesliga"},
+    "瑞超": {"Allsvenskan"}, "挪超": {"Eliteserien"}, "巴甲": {"Serie A"},
+    "美职": {"Major League Soccer"}, "日职": {"J1 League"}, "韩职": {"K League 1"},
+}
+
 
 def now_utc():
     return datetime.now(timezone.utc)
@@ -205,6 +216,10 @@ def team_candidates(name) -> list[str]:
     return [key, *TEAM_ALIASES.get(key, []), *SPORTTERY_TO_TRAINED.get(key, [])]
 
 
+def competition_candidates(name) -> set[str]:
+    return {str(name or ""), *COMPETITION_ALIASES.get(str(name or ""), set())}
+
+
 def resolve_api_sports_fixture_ids(matches: list[dict], fetch_by_utc_date) -> dict[int, dict]:
     """Attach a unique API-Sports fixture ID without altering formal market data.
 
@@ -239,16 +254,30 @@ def resolve_api_sports_fixture_ids(matches: list[dict], fetch_by_utc_date) -> di
                 provider_kickoff = parse_dt(fixture.get("date"))
             except (TypeError, ValueError):
                 provider_kickoff = None
-            provider_home = normalized_name((teams.get("home") or {}).get("name"))
-            provider_away = normalized_name((teams.get("away") or {}).get("name"))
+            provider_home_raw = (teams.get("home") or {}).get("name")
+            provider_away_raw = (teams.get("away") or {}).get("name")
+            provider_home = normalized_name(provider_home_raw)
+            provider_away = normalized_name(provider_away_raw)
             fixture_id = fixture.get("id")
-            if (provider_kickoff is not None and fixture_id is not None
-                    and abs((provider_kickoff - kickoff).total_seconds()) <= 5400
-                    and provider_home in home and provider_away in away):
-                candidates.append(fixture_id)
+            if provider_kickoff is None or fixture_id is None or provider_home not in home or provider_away not in away:
+                continue
+            delta = abs((provider_kickoff - kickoff).total_seconds())
+            same_time = delta <= 5400
+            shifted_day = abs(delta - 86400) <= 5400
+            provider_league = ((row.get("league") or {}).get("name"))
+            league_ok = normalized_name(provider_league) in {
+                normalized_name(value) for value in competition_candidates(rec.get("competition"))
+            }
+            if same_time or (shifted_day and league_ok):
+                candidates.append((fixture_id, "exact_team_time" if same_time else "exact_team_league_date_shift"))
         if len(candidates) == 1:
-            rec["api_sports_fixture_id"] = candidates[0]
-            resolved[mid] = {"status": "resolved", "fixture_id": candidates[0]}
+            fixture_id, method = candidates[0]
+            rec["api_sports_fixture_id"] = fixture_id
+            if method != "exact_team_time":
+                rec["api_sports_fixture_match_method"] = method
+                resolved[mid] = {"status": "resolved", "fixture_id": fixture_id, "method": method}
+            else:
+                resolved[mid] = {"status": "resolved", "fixture_id": fixture_id}
         else:
             resolved[mid] = {
                 "status": "SOURCE_CONFLICT" if len(candidates) > 1 else "UNAVAILABLE",
