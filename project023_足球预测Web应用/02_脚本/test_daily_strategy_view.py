@@ -115,6 +115,35 @@ def test_daily_strategy_view_attaches_forward_pipeline_sidecar(tmp_path: Path):
     assert jobs[0]["evidence_snapshot_ref"].endswith("sporttery-1.json")
 
 
+def test_daily_strategy_view_merges_pre_kickoff_late_info(tmp_path: Path):
+    import daily_strategy_view as view
+
+    _write_jobs(tmp_path, "2026-08-23", count=1)
+    sidecar_dir = tmp_path / "forward" / "2026-08-23" / "evidence_snapshots"
+    sidecar_dir.mkdir(parents=True)
+    (sidecar_dir / "sporttery-1.json").write_text(json.dumps({
+        "match_id": "sporttery-1",
+        "evidence_audit": {"evidence_gap": True, "evidence_status": "GAP",
+                            "missing_fields": ["injury"],
+                            "entries": {"injury": {"status": "UNAVAILABLE"}}},
+    }), encoding="utf-8")
+    late = tmp_path / "late_info"
+    late.mkdir()
+    (late / "events.jsonl").write_text(json.dumps({
+        "match_id": 1, "kind": "injury", "status": "VALID",
+        "kickoff": "2026-08-23T18:00:00+08:00",
+        "collected_at": "2026-08-23T10:00:00+08:00",
+        "absence": {"home": {"count": 1}},
+        "gate": {"minutes_to_kickoff": 480},
+    }) + "\n", encoding="utf-8")
+
+    jobs = view._attach_evidence_sidecars(
+        view._load_jobs(tmp_path / "jobs" / "2026-08-23"), tmp_path, "2026-08-23"
+    )
+    assert jobs[0]["evidence_audit"]["entries"]["injury"]["status"] == "VALID"
+    assert jobs[0]["evidence_audit"]["late_info_merge_audit"]["fields_merged"] == ["injury"]
+
+
 def test_daily_strategy_view_rejects_non_date_path(tmp_path: Path):
     """Catches path traversal through the day query parameter."""
     import daily_strategy_view as view

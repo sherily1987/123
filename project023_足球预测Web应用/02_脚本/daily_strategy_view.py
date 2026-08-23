@@ -17,6 +17,7 @@ if str(sv.FUSION_SCRIPTS) not in sys.path:
 
 from daily_strategy_planner import build_daily_strategy  # noqa: E402
 from recommendation_policy import load_policy  # noqa: E402
+from evidence_merge import merge_late_info_events  # noqa: E402
 
 
 def _validated_day(day: str | None, now: datetime) -> str:
@@ -48,6 +49,19 @@ def _attach_evidence_sidecars(jobs: list[dict], store: Path, day: str) -> list[d
     evidence_root = store / "research" / "evidence" / day
     roots = [evidence_root, store / "forward" / day]
     sidecars: dict[str, tuple[float, Path, dict]] = {}
+    late_events: dict[str, list[dict]] = {}
+    late_path = store / "late_info" / "events.jsonl"
+    if late_path.is_file():
+        for line in late_path.read_text(encoding="utf-8-sig").splitlines():
+            try:
+                event = json.loads(line)
+            except (json.JSONDecodeError, TypeError):
+                continue
+            event_mid = str(event.get("match_id") or "")
+            if event_mid and not event_mid.startswith("sporttery-"):
+                event_mid = f"sporttery-{event_mid}"
+            if event_mid and str(event.get("kickoff") or "").startswith(day):
+                late_events.setdefault(event_mid, []).append(event)
     paths = []
     for root in roots:
         if not root.is_dir():
@@ -73,6 +87,17 @@ def _attach_evidence_sidecars(jobs: list[dict], store: Path, day: str) -> list[d
             continue
         _, sidecar_path, blob = found
         audit = blob.get("evidence_audit") or {}
+        mid_key = mid if mid.startswith("sporttery-") else f"sporttery-{mid}"
+        if late_events.get(mid_key):
+            chain, merge_audit = merge_late_info_events(audit.get("entries") or {}, late_events[mid_key])
+            valid_statuses = {"VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}
+            audit = dict(audit)
+            audit["entries"] = chain
+            audit["missing_fields"] = [name for name, entry in chain.items()
+                                        if str((entry or {}).get("status") or "").upper() not in valid_statuses]
+            audit["evidence_gap"] = bool(audit["missing_fields"])
+            audit["evidence_status"] = "GAP" if audit["evidence_gap"] else "OK"
+            audit["late_info_merge_audit"] = merge_audit
         item = dict(job)
         item["evidence_audit"] = audit
         item["evidence_snapshot_ref"] = str(sidecar_path)

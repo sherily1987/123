@@ -7,6 +7,7 @@ from typing import Any
 
 VALID = {"VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"}
 FIELDS = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
+VALID_EVENT_STATUSES = {"VALID", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING"}
 
 
 def _same(left: dict[str, Any], right: dict[str, Any]) -> bool:
@@ -45,4 +46,53 @@ def merge_browser_audit(chain: dict[str, Any] | None, browser_audit: dict[str, A
         if not _same(current, browser):
             merged[name].setdefault("alternatives", []).append(deepcopy(browser))
             audit["conflicts"].append(name)
+    return merged, audit
+
+
+def merge_late_info_events(chain: dict[str, Any] | None, events: list[dict[str, Any]] | None):
+    """Merge pre-kickoff late-info events into an evidence chain.
+
+    Late-info is research-only and may arrive from a different provider than
+    the initial preview.  A valid event replaces only a missing/unusable field;
+    disagreements are retained as alternatives.  Events observed at or after
+    kickoff are ignored to prevent post-match leakage.
+    """
+    merged = deepcopy(chain or {})
+    audit = {"events_seen": 0, "fields_merged": [], "conflicts": [], "ignored_post_kickoff": 0}
+    for event in events or []:
+        if not isinstance(event, dict):
+            continue
+        audit["events_seen"] += 1
+        gate = event.get("gate") or {}
+        minutes = gate.get("minutes_to_kickoff")
+        try:
+            if minutes is not None and float(minutes) <= 0:
+                audit["ignored_post_kickoff"] += 1
+                continue
+        except (TypeError, ValueError):
+            pass
+        kind = str(event.get("kind") or "").lower()
+        field = {"injury": "injury", "lineup": "starting_xi"}.get(kind)
+        if not field:
+            continue
+        status = str(event.get("status") or "UNAVAILABLE").upper()
+        value = event.get("absence") if kind == "injury" else event.get("lineup")
+        entry = {
+            "status": status,
+            "value": value,
+            "source_id": "sporttery.late_info" if kind == "injury" else "api-sports.io",
+            "source_url": None,
+            "refreshed_at": event.get("collected_at"),
+            "event_snapshot": event.get("snapshot"),
+        }
+        current = merged.get(field)
+        current_status = str((current or {}).get("status") or "").upper() if isinstance(current, dict) else ""
+        if not isinstance(current, dict) or (current_status not in VALID_EVENT_STATUSES and status in VALID_EVENT_STATUSES):
+            if isinstance(current, dict):
+                entry["alternatives"] = [deepcopy(current)]
+            merged[field] = entry
+            audit["fields_merged"].append(field)
+        elif not _same(current, entry):
+            merged[field].setdefault("alternatives", []).append(deepcopy(entry))
+            audit["conflicts"].append(field)
     return merged, audit

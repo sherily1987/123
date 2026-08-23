@@ -32,3 +32,35 @@ def test_conflict_preserves_both_sources_without_silent_overwrite():
     assert merged["injury"]["source_id"] == "sporttery.preview"
     assert len(merged["injury"]["alternatives"]) == 1
     assert audit["conflicts"] == ["injury"]
+
+
+def test_late_info_fills_unusable_injury_and_preserves_post_kickoff_event():
+    chain = {
+        "injury": {"status": "UNAVAILABLE", "source_id": "sporttery.preview"},
+        "starting_xi": {"status": "PENDING_REFRESH", "source_id": "sporttery.preview"},
+    }
+    merged, audit = em.merge_late_info_events(chain, [
+        {
+            "kind": "injury", "status": "VALID", "collected_at": "2026-08-23T20:00:00+00:00",
+            "absence": {"home": {"count": 1}}, "gate": {"minutes_to_kickoff": 120},
+        },
+        {
+            "kind": "lineup", "status": "VALID", "collected_at": "2026-08-24T01:00:00+00:00",
+            "lineup": {"home": {"starting_count": 11}}, "gate": {"minutes_to_kickoff": -1},
+        },
+    ])
+    assert merged["injury"]["status"] == "VALID"
+    assert merged["starting_xi"]["status"] == "PENDING_REFRESH"
+    assert audit["fields_merged"] == ["injury"]
+    assert audit["ignored_post_kickoff"] == 1
+
+
+def test_late_info_conflict_keeps_initial_confirmed_source():
+    chain = {"injury": {"status": "VALID", "source_id": "official", "value": {"home": []}}}
+    merged, audit = em.merge_late_info_events(chain, [{
+        "kind": "injury", "status": "VALID", "collected_at": "2026-08-23T20:00:00+00:00",
+        "absence": {"home": {"count": 2}}, "gate": {"minutes_to_kickoff": 60},
+    }])
+    assert merged["injury"]["source_id"] == "official"
+    assert len(merged["injury"]["alternatives"]) == 1
+    assert audit["conflicts"] == ["injury"]
