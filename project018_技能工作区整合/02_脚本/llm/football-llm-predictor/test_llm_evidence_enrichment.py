@@ -6,6 +6,13 @@ import llm_evidence_enrichment as lee
 COLLECTED = "2026-08-15T13:22:20+00:00"
 
 
+def test_api_sports_injury_dedup_uses_team_player_and_reason_key():
+    row = {"team": {"id": 1}, "player": {"id": 7, "type": "Missing Fixture", "reason": "Knee"}}
+    got = lee.ApiSportsClient._dedupe_injuries([row, dict(row),
+        {"team": {"id": 1}, "player": {"id": 7, "type": "Questionable", "reason": "Knee"}}])
+    assert len(got) == 2
+
+
 def test_render_sporttery_markets_keeps_crs_ttg_and_hafu():
     raw = {
         "fixed_bonus_url": "https://webapi.sporttery.cn/match/2040898",

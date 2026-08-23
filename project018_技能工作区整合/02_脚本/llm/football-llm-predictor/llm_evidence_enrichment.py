@@ -167,6 +167,20 @@ class ApiSportsClient:
         with urllib.request.urlopen(req, timeout=self.timeout) as response:
             return json.load(response)
 
+    @staticmethod
+    def _dedupe_injuries(rows):
+        unique, seen = [], set()
+        for row in rows or []:
+            player = row.get("player") or {}
+            team = row.get("team") or {}
+            key = (team.get("id"), player.get("id") or player.get("name"),
+                   player.get("type"), player.get("reason"))
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(row)
+        return unique
+
     def collect_match(self, home, away, kickoff, *, aliases=None):
         kick = _dt(kickoff)
         aliases = aliases or {}
@@ -220,6 +234,7 @@ class ApiSportsClient:
             injuries = self._request("/injuries", {"fixture": fixture_id}).get("response", [])
         except Exception:
             injuries = []
+        injuries = self._dedupe_injuries(injuries)
         try:
             lineups = self._request("/fixtures/lineups", {"fixture": fixture_id}).get("response", [])
         except Exception:
