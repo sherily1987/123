@@ -655,7 +655,11 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         assert proc.stdout is not None
         for line in proc.stdout:
             chunks.append(line)
-            if "综合方向:" in line or '"status": "evidence_' in line:
+            # DeepSeek V4 Flash's single-model research output does not print
+            # the legacy "综合方向" banner; its one-line JSON is the durable
+            # completion marker. Keep the legacy markers for older logs.
+            if ("综合方向:" in line or '"status": "evidence_' in line
+                    or ('"llm_track_contract"' in line and '"match_id"' in line)):
                 done += 1
                 db.run_update(run_id, done=done, message=f"LLM {done}/{len(matches)}")
         rc = proc.wait(timeout=7200)
