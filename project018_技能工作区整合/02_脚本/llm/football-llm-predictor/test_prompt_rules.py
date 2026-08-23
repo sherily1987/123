@@ -265,6 +265,18 @@ def test_audit_record_keeps_failed_model_without_casting_a_reverse_vote():
     json.dumps(record, ensure_ascii=False)
 
 
+def test_aging_prior_season_form_is_not_treated_as_current_form():
+    prompt = lpr.system_prompt_evidence("K3")
+    assert "AGING/PRIOR_SEASON" in prompt
+    assert "上一赛季样本" in prompt
+    assert "降低近况维度权重" in prompt
+
+
+def test_evidence_audit_marks_aging_form_as_low_freshness_context():
+    prompt = lpr.system_prompt_evidence_audit()
+    assert "赛季切换风险" in prompt
+
+
 if __name__ == "__main__":
     test_reasoning_quality()
     test_normalize()
