@@ -62,6 +62,7 @@ def test_daily_strategy_view_builds_user_authorized_100_yuan_plan(tmp_path: Path
     )
 
     assert got["selected_day"] == "2026-08-23"
+    assert got["day"] == "2026-08-23"
     assert got["source_job_count"] == 8
     assert got["execution_mode"] == "budgeted_action"
     assert got["budget"]["allocated_amount"] == 100.0

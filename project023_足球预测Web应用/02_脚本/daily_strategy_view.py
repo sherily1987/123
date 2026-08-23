@@ -148,6 +148,10 @@ def daily_strategy(
     )
     output = {
         **plan,
+        # Backward-compatible alias for older workbench clients.  The
+        # canonical field remains selected_day; both are derived from the
+        # validated path segment and never accept arbitrary user input.
+        "day": selected_day,
         "selected_day": selected_day,
         "source_job_count": len(jobs),
         "llm_calibration": _load_deepseek_calibration(store, selected_day),
