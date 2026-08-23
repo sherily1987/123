@@ -253,9 +253,11 @@ ROLE_PROMPTS: Dict[str, str] = {}
 DEEPSEEK_V4_FLASH_ADDENDUM = """DeepSeek V4 Flash 专用执行附录：
 1. 先检查证据目录的 status、refreshed_at 和 evidence_gap；GAP、PARTIAL、EMPTY_UNCONFIRMED、PENDING_REFRESH 只能降低对应维度权重，不能被解释成“没有伤停”或“已确认首发”。
 2. 预计首发只能作为 PREDICTED 先验，官方首发只能在目录明确标记 VALID/CONFIRMED 时使用；不得把预计首发改写为官方首发。
-3. 四个市场完全独立：1X2 只用 1X2 赔率/胜平负证据，比分只用 CRS/攻防证据，大小球只用 TTG/进球证据，半全场只用 HAFU/半场证据；缺对应来源就保留缺口，不得用 1X2 反推。
-4. 只输出规则要求的单个 JSON 对象；不要输出 Markdown、解释段、代码围栏或额外键。概率只保留一位小数并合计 100；这是研究判断概率，不是已校准生产概率。
-5. 证据不足时仍可给 opinion 供研究记录，但必须 evidence_gap=true、明确 unsupported_assumptions，并避免高置信表述；不得生成下注、EV、Kelly 或“推荐购买”字段。"""
+3. 来源独立性优先于来源数量：同一供应商、同一 API 的重复快照、转载同一篇文章或相同数据的不同页面只计一个独立来源；重复引用不得叠加权重。Sporttery 赔率是市场基线，不是独立基本面证据。
+4. 证据按开球前时间排序，优先使用最新且早于开球的快照；较旧的 AGING/PRIOR_SEASON 只能作背景，不能覆盖较新的冲突事实。来源冲突必须标记 SOURCE_CONFLICT 并降低对应维度。
+5. 四个市场完全独立：1X2 只用 1X2 赔率/胜平负证据，比分只用 CRS/攻防证据，大小球只用 TTG/进球证据，半全场只用 HAFU/半场证据；缺对应来源就保留缺口，不得用 1X2 反推。
+6. 只输出规则要求的单个 JSON 对象；不要输出 Markdown、解释段、代码围栏或额外键。概率只保留一位小数并合计 100；这是研究判断概率，不是已校准生产概率。
+7. 证据不足时仍可给 opinion 供研究记录，但必须 evidence_gap=true、明确 unsupported_assumptions，并避免高置信表述；不得生成下注、EV、Kelly 或“推荐购买”字段。"""
 
 def role_prompt_for(model: str, models_used: Optional[Sequence[str]] = None) -> str:
     return NEUTRAL_EVIDENCE_ROLE
@@ -319,7 +321,9 @@ JSON_RULES_FOUR_MARKET = """你是专业足球分析师。只输出一个 JSON �
 13. 不得因常见比分统计而选 2-1。
 14. 证据中有双方近5场正式赛果时，reasoning 必须写【近况:主队…；客队…】并用近况推本场方向与进球倾向；若为AGING/PRIOR_SEASON，必须注明上一赛季样本并降低置信度。热身赛不算正式近5场。缺近5场不得编造，evidence_gap=true。
 15. 择向按近况0.30/阵容0.22/战意0.15/赔率0.15/主客0.13 加权；缺维删权再标定。近5场新到旧 5>4>3>2>1。加权和换算为 probs_1x2 必须输出。
-16. 各市场独立判断：不得把胜平负概率、比分概率或模型投票复制到另一个市场；若对应市场赔率或独立进球/半场证据缺失，降低该市场 readiness 并在 unsupported_assumptions 中写明缺口。"""
+16. 各市场独立判断：不得把胜平负概率、比分概率或模型投票复制到另一个市场；若对应市场赔率或独立进球/半场证据缺失，降低该市场 readiness 并在 unsupported_assumptions 中写明缺口。
+17. 来源独立性：同一供应商、同一 API、转载文章或同一事实的多个页面只计一次；不能用“有多个链接”制造虚假共识。Sporttery 赔率只能作为对应市场的市场基线，不能充当伤停、近况或攻防强度证据。
+18. 时间与冲突：优先使用最新的开球前快照；AGING/PRIOR_SEASON 只作背景。若两条可用来源冲突，必须写 SOURCE_CONFLICT、降低该维度置信度，并在 unsupported_assumptions 中说明，不得自行挑选支持方向的一条。"""
 
 
 EVIDENCE_SYSTEM_PROMPT = (

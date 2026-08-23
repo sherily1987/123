@@ -87,7 +87,15 @@ def test_deepseek_v4_flash_prompt_addendum_is_model_scoped():
     assert "DeepSeek V4 Flash 专用执行附录" in deepseek
     assert "不得把预计首发改写为官方首发" in deepseek
     assert "四个市场完全独立" in deepseek
+    assert "来源独立性优先于来源数量" in deepseek
+    assert "Sporttery 赔率是市场基线" in deepseek
     assert "DeepSeek V4 Flash 专用执行附录" not in other
+
+
+def test_four_market_prompt_rejects_duplicate_sources_as_fake_consensus():
+    prompt = lpr.system_prompt_four_market("deepseek/deepseek-v4-flash")
+    assert "同一供应商、同一 API" in prompt
+    assert "SOURCE_CONFLICT" in prompt
 
 
 def test_deepseek_audit_prompt_has_no_result_direction_fields():
