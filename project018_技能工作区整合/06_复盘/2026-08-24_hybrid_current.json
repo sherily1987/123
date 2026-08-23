@@ -1,0 +1,267 @@
+{
+  "schema_version": "hybrid-oos-evaluation-1.0",
+  "research_only": true,
+  "bootstrap": {
+    "samples": 500,
+    "seed": 20260821
+  },
+  "n": 12,
+  "excluded": {
+    "missing_router_audit": 54,
+    "not_independent_hybrid": 65,
+    "research_run_not_prematch": 3,
+    "missing_verified_score_90": 19
+  },
+  "rows": [
+    {
+      "match_id": "sporttery-2040991",
+      "brier_hybrid": 0.9504179999999999,
+      "brier_market": 0.944034,
+      "logloss_hybrid": 1.448169764837978,
+      "logloss_market": 1.4146938356415886,
+      "brier_delta_hybrid_minus_market": 0.006383999999999834,
+      "logloss_delta_hybrid_minus_market": 0.03347592919638953
+    },
+    {
+      "match_id": "sporttery-2040993",
+      "brier_hybrid": 0.7849340000000001,
+      "brier_market": 0.745346,
+      "logloss_hybrid": 1.2837377727947987,
+      "logloss_market": 1.2173958246580765,
+      "brier_delta_hybrid_minus_market": 0.03958800000000018,
+      "logloss_delta_hybrid_minus_market": 0.06634194813672223
+    },
+    {
+      "match_id": "sporttery-2040995",
+      "brier_hybrid": 0.383082,
+      "brier_market": 0.3797811825839854,
+      "logloss_hybrid": 0.7031975164134467,
+      "logloss_market": 0.6961547016239006,
+      "brier_delta_hybrid_minus_market": 0.0033008174160145676,
+      "logloss_delta_hybrid_minus_market": 0.007042814789546159
+    },
+    {
+      "match_id": "sporttery-2040996",
+      "brier_hybrid": 0.7065859999999999,
+      "brier_market": 0.758888,
+      "logloss_hybrid": 1.152013065395225,
+      "logloss_market": 1.2378743560016174,
+      "brier_delta_hybrid_minus_market": -0.05230200000000007,
+      "logloss_delta_hybrid_minus_market": -0.08586129060639247
+    },
+    {
+      "match_id": "sporttery-2040997",
+      "brier_hybrid": 0.8617616150083683,
+      "brier_market": 0.83426569712856,
+      "logloss_hybrid": 1.387293861452974,
+      "logloss_market": 1.3308056755022373,
+      "brier_delta_hybrid_minus_market": 0.027495917879808318,
+      "logloss_delta_hybrid_minus_market": 0.05648818595073668
+    },
+    {
+      "match_id": "sporttery-2040998",
+      "brier_hybrid": 0.687128,
+      "brier_market": 0.6868980000000001,
+      "logloss_hybrid": 1.1086626245216111,
+      "logloss_market": 1.1147416705979933,
+      "brier_delta_hybrid_minus_market": 0.00022999999999984144,
+      "logloss_delta_hybrid_minus_market": -0.006079046076382211
+    },
+    {
+      "match_id": "sporttery-2040999",
+      "brier_hybrid": 0.12313800000000003,
+      "brier_market": 0.11328800000000001,
+      "logloss_hybrid": 0.33547273628812946,
+      "logloss_market": 0.3174542307854511,
+      "brier_delta_hybrid_minus_market": 0.009850000000000012,
+      "logloss_delta_hybrid_minus_market": 0.01801850550267836
+    },
+    {
+      "match_id": "sporttery-2041000",
+      "brier_hybrid": 0.192686,
+      "brier_market": 0.15265399999999996,
+      "logloss_hybrid": 0.44161055474451766,
+      "logloss_market": 0.38272562113867487,
+      "brier_delta_hybrid_minus_market": 0.04003200000000004,
+      "logloss_delta_hybrid_minus_market": 0.05888493360584279
+    },
+    {
+      "match_id": "sporttery-2041004",
+      "brier_hybrid": 0.7442687182946923,
+      "brier_market": 0.778322,
+      "logloss_hybrid": 1.21839532499116,
+      "logloss_market": 1.2729656758128873,
+      "brier_delta_hybrid_minus_market": -0.034053281705307636,
+      "logloss_delta_hybrid_minus_market": -0.05457035082172723
+    },
+    {
+      "match_id": "sporttery-2041006",
+      "brier_hybrid": 0.839328,
+      "brier_market": 0.8261839999999999,
+      "logloss_hybrid": 1.3783261914707137,
+      "logloss_market": 1.3547956940605197,
+      "brier_delta_hybrid_minus_market": 0.013144000000000045,
+      "logloss_delta_hybrid_minus_market": 0.023530497410193973
+    },
+    {
+      "match_id": "sporttery-2041007",
+      "brier_hybrid": 1.159602,
+      "brier_market": 1.223106,
+      "logloss_hybrid": 1.8018098050815563,
+      "logloss_market": 1.9379419794061363,
+      "brier_delta_hybrid_minus_market": -0.063504,
+      "logloss_delta_hybrid_minus_market": -0.13613217432458002
+    },
+    {
+      "match_id": "sporttery-2041008",
+      "brier_hybrid": 0.10813400000000001,
+      "brier_market": 0.07749090431773115,
+      "logloss_hybrid": 0.3106095770954856,
+      "logloss_market": 0.25647573006113156,
+      "brier_delta_hybrid_minus_market": 0.03064309568226886,
+      "logloss_delta_hybrid_minus_market": 0.05413384703435403
+    }
+  ],
+  "metrics": {
+    "brier": {
+      "hybrid": 0.628422,
+      "market": 0.626688,
+      "delta_hybrid_minus_market": 0.001734,
+      "paired_bootstrap_95_ci": [
+        -0.020095,
+        0.01901
+      ]
+    },
+    "logloss": {
+      "hybrid": 1.047442,
+      "market": 1.044502,
+      "delta_hybrid_minus_market": 0.002939,
+      "paired_bootstrap_95_ci": [
+        -0.037003,
+        0.033617
+      ]
+    }
+  },
+  "weight_sweep": {
+    "research_only": true,
+    "n": 60,
+    "by_market_weight": {
+      "0.4": {
+        "n": 12,
+        "metrics": {
+          "brier": {
+            "candidate": 0.629703,
+            "market": 0.626688,
+            "delta_candidate_minus_market": 0.003015,
+            "paired_bootstrap_95_ci": [
+              -0.021133,
+              0.021436
+            ]
+          },
+          "logloss": {
+            "candidate": 1.049969,
+            "market": 1.044502,
+            "delta_candidate_minus_market": 0.005466,
+            "paired_bootstrap_95_ci": [
+              -0.038635,
+              0.039371
+            ]
+          }
+        }
+      },
+      "0.5": {
+        "n": 12,
+        "metrics": {
+          "brier": {
+            "candidate": 0.628422,
+            "market": 0.626688,
+            "delta_candidate_minus_market": 0.001734,
+            "paired_bootstrap_95_ci": [
+              -0.020095,
+              0.01901
+            ]
+          },
+          "logloss": {
+            "candidate": 1.047442,
+            "market": 1.044502,
+            "delta_candidate_minus_market": 0.002939,
+            "paired_bootstrap_95_ci": [
+              -0.037003,
+              0.033617
+            ]
+          }
+        }
+      },
+      "0.6": {
+        "n": 12,
+        "metrics": {
+          "brier": {
+            "candidate": 0.626843,
+            "market": 0.626688,
+            "delta_candidate_minus_market": 0.000155,
+            "paired_bootstrap_95_ci": [
+              -0.018798,
+              0.015881
+            ]
+          },
+          "logloss": {
+            "candidate": 1.044472,
+            "market": 1.044502,
+            "delta_candidate_minus_market": -3e-05,
+            "paired_bootstrap_95_ci": [
+              -0.035098,
+              0.027271
+            ]
+          }
+        }
+      },
+      "0.7": {
+        "n": 12,
+        "metrics": {
+          "brier": {
+            "candidate": 0.625791,
+            "market": 0.626688,
+            "delta_candidate_minus_market": -0.000898,
+            "paired_bootstrap_95_ci": [
+              -0.017607,
+              0.013131
+            ]
+          },
+          "logloss": {
+            "candidate": 1.042416,
+            "market": 1.044502,
+            "delta_candidate_minus_market": -0.002086,
+            "paired_bootstrap_95_ci": [
+              -0.03187,
+              0.022541
+            ]
+          }
+        }
+      },
+      "0.8": {
+        "n": 12,
+        "metrics": {
+          "brier": {
+            "candidate": 0.62448,
+            "market": 0.626688,
+            "delta_candidate_minus_market": -0.002208,
+            "paired_bootstrap_95_ci": [
+              -0.01621,
+              0.010481
+            ]
+          },
+          "logloss": {
+            "candidate": 1.039868,
+            "market": 1.044502,
+            "delta_candidate_minus_market": -0.004634,
+            "paired_bootstrap_95_ci": [
+              -0.030667,
+              0.016771
+            ]
+          }
+        }
+      }
+    },
+    "note": "每个权重仅与同一场、同一盘口快照配对；不改变生产market_only输出。"
+  }
+}
