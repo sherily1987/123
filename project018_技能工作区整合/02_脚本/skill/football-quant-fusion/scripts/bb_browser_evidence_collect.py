@@ -11,6 +11,7 @@ for pre-match research but is never labelled as confirmed.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -172,7 +173,9 @@ def _probe_official_page(match: dict[str, Any], url: str) -> dict[str, Any]:
     if not script.is_file():
         return {"status": "source_fetch_error", "source_url": url,
                 "reason": "OFFICIAL_PROBE_SCRIPT_MISSING"}
-    output_path = Path(tempfile.mkstemp(prefix="official_probe_", suffix=".json")[1])
+    fd, name = tempfile.mkstemp(prefix="official_probe_", suffix=".json")
+    os.close(fd)
+    output_path = Path(name)
     try:
         proc = subprocess.run(
             [sys.executable, str(script), "--url", str(url),
@@ -192,6 +195,65 @@ def _probe_official_page(match: dict[str, Any], url: str) -> dict[str, Any]:
                 "reason": str(exc)[:300]}
     finally:
         output_path.unlink(missing_ok=True)
+
+
+def _scrapling_fotmob_snapshot(match: dict[str, Any], mapping: dict[str, Any],
+                               collected_at: str) -> dict[str, Any]:
+    """Build a research snapshot when FotMob's structured endpoint is blocked."""
+    script = Path(__file__).with_name("scrapling_fotmob_fallback.py")
+    spec = importlib.util.spec_from_file_location("scrapling_fotmob_fallback", script)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("SCRAPLING_FALLBACK_MODULE_MISSING")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    fd, name = tempfile.mkstemp(prefix="scrapling_fotmob_", suffix=".md")
+    os.close(fd)
+    output_path = Path(name)
+    try:
+        url = str(mapping.get("url") or "")
+        proc = subprocess.run(
+            ["scrapling", "extract", "fetch", url, str(output_path),
+             "--ai-targeted", "--network-idle", "--wait", "2000",
+             "--timeout", "60000"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=180,
+        )
+        if proc.returncode != 0:
+            raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_FETCH_FAILED")[-300:])
+        text = output_path.read_text(encoding="utf-8", errors="replace")
+        return module.parse_markdown(text, match, url, collected_at)
+    finally:
+        output_path.unlink(missing_ok=True)
+
+
+def _merge_scrapling_snapshot(primary: dict[str, Any], fallback: dict[str, Any]) -> bool:
+    """Fill only API-missing fields; never downgrade a valid API field."""
+    primary_audit = primary.get("evidence_audit") or {}
+    fallback_entries = (fallback.get("evidence_audit") or {}).get("entries") or {}
+    entries = primary_audit.get("entries") or {}
+    usable = {"VALID", "OK", "FRESH", "AGING", "EXPLICIT_XG", "PROXY_XG", "PREDICTED", "PARTIAL"}
+    changed = False
+    for name, item in fallback_entries.items():
+        if not isinstance(item, dict):
+            continue
+        if str((entries.get(name) or {}).get("status") or "UNAVAILABLE") not in usable and str(item.get("status")) in usable:
+            entries[name] = item
+            changed = True
+    if not changed:
+        return False
+    missing = [name for name, item in entries.items() if str((item or {}).get("status")) not in usable]
+    primary_audit["entries"] = entries
+    primary_audit["missing_fields"] = missing
+    primary_audit["evidence_gap"] = bool(missing)
+    primary_audit["evidence_status"] = "GAP" if missing else "OK"
+    primary_audit["evidence_gap_reasons"] = [
+        f"{name.upper()}_{entries[name].get('missing_reason') or entries[name].get('status')}"
+        for name in missing
+    ]
+    primary["evidence_audit"] = primary_audit
+    primary["provider"] = "fotmob_api+scrapling_dynamic"
+    primary["scrapling_fallback_used"] = True
+    return True
 
 
 def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
@@ -381,11 +443,25 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
             predicted_xi=mapping.get("predicted_xi"),
             predicted_xi_source_url=mapping.get("predicted_xi_source_url"),
         )}
+        if mapping.get("scrapling_fallback") and (row.get("evidence_audit") or {}).get("missing_fields"):
+            try:
+                _merge_scrapling_snapshot(row, _scrapling_fotmob_snapshot(match, mapping, collected_at))
+            except Exception as exc:
+                row["scrapling_fallback_used"] = False
+                row["scrapling_fallback_error"] = str(exc)[:300]
         official_url = mapping.get("official_url")
         if official_url:
             row["official_page_probe"] = _probe_official_page(match, str(official_url))
         return row
     except Exception:
+        # The dynamic Scrapling path is a bounded research-only fallback for
+        # API blocks/rate limits.  If it is unavailable, retain the older
+        # explicit predicted-XI fallback below.
+        try:
+            dynamic = _scrapling_fotmob_snapshot(match, mapping, collected_at)
+            return {"status": "ok", **dynamic}
+        except Exception:
+            pass
         # A source page can be reachable while its structured FotMob endpoint
         # is blocked/rate-limited.  If a browser review already captured an
         # explicit predicted XI in the mapping, retain that auditable fact
@@ -433,6 +509,9 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
         match = dict(match)
         match["match_id"] = mid
         mapping = mappings.get(mid) or mappings.get(mid.removeprefix("sporttery-"))
+        if isinstance(mapping, dict):
+            mapping = dict(mapping)
+            mapping.setdefault("scrapling_fallback", True)
         if not mapping and discover:
             discovered = discover_sources(match)
             row = {"status": "pending_browser_task", "match_id": mid,

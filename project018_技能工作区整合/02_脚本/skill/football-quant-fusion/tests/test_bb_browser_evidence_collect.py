@@ -88,6 +88,56 @@ def test_collect_one_attaches_official_page_probe_without_changing_lineup_status
     assert row["evidence_audit"]["entries"]["starting_xi"]["status"] == "PREDICTED"
 
 
+def test_collect_one_uses_scrapling_when_fotmob_api_is_unavailable(monkeypatch):
+    monkeypatch.setattr(bec, "_run_browser", lambda args: (_ for _ in ()).throw(RuntimeError("api blocked")))
+    monkeypatch.setattr(bec, "_scrapling_fotmob_snapshot", lambda match, mapping, collected_at: {
+        "schema_version": "scrapling-fotmob-evidence-1.0",
+        "provider": "fotmob_via_scrapling_dynamic", "research_only": True,
+        "match_id": match["match_id"], "evidence_audit": {
+            "entries": {"starting_xi": {"status": "PREDICTED"}},
+            "missing_fields": ["team_stats"], "evidence_gap": True,
+        },
+    })
+
+    row = bec.collect_one(
+        {"match_id": "sporttery-1", "home": "Bodø/Glimt", "away": "NEC Nijmegen",
+         "kickoff": "2026-08-26T03:00:00+00:00"},
+        {"url": "https://www.fotmob.com/matches/a/x", "fotmob_match_id": "5987811",
+         "scrapling_fallback": True},
+        now=bec._parse("2026-08-23T17:45:00+00:00"),
+    )
+    assert row["status"] == "ok"
+    assert row["provider"] == "fotmob_via_scrapling_dynamic"
+    assert row["research_only"] is True
+
+
+def test_collect_one_uses_scrapling_for_missing_api_fields_and_merges_valid_entries(monkeypatch):
+    def fake_run(args):
+        if args[0] == "open":
+            return "tab: partial-api\n"
+        if args[0] == "eval":
+            return json.dumps(_payload(), ensure_ascii=False)
+        return "closed\n"
+
+    monkeypatch.setattr(bec, "_run_browser", fake_run)
+    monkeypatch.setattr(bec, "_scrapling_fotmob_snapshot", lambda match, mapping, collected_at: {
+        "provider": "fotmob_via_scrapling_dynamic", "research_only": True,
+        "evidence_audit": {"entries": {
+            "team_stats": {"status": "EXPLICIT_XG", "value": {"xg": {"home": 1.1, "away": 0.8}},
+                            "source_id": "fotmob.scrapling.dynamic"},
+        }}
+    })
+    row = bec.collect_one(
+        {"match_id": "sporttery-1", "home": "Bodø/Glimt", "away": "NEC Nijmegen",
+         "kickoff": "2026-08-26T03:00:00+00:00"},
+        {"url": "https://www.fotmob.com/matches/a/x", "fotmob_match_id": "5987811",
+         "scrapling_fallback": True},
+        now=bec._parse("2026-08-23T17:45:00+00:00"),
+    )
+    assert row["evidence_audit"]["entries"]["team_stats"]["status"] == "EXPLICIT_XG"
+    assert row["scrapling_fallback_used"] is True
+
+
 def test_mapping_predicted_xi_overlay_keeps_media_provenance(monkeypatch):
     def fake_run(args):
         if args[0] == "open":
