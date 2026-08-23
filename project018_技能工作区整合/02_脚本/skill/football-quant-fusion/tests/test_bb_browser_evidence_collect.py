@@ -64,6 +64,34 @@ def test_collect_one_accepts_predicted_xi_as_explicit_nonofficial_evidence(monke
     assert any(args[0] == "close" for args in calls)
 
 
+def test_collect_file_normalizes_nested_sporttery_identity_for_pending_tasks(tmp_path):
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps({"matches": [{
+        "home": "A", "away": "B", "competition": "测试联赛",
+        "kickoff": "2026-08-26T03:00:00+08:00",
+        "sporttery_meta": {"match_id": 2040999},
+    }]}), encoding="utf-8")
+    output = tmp_path / "out"
+    report = bec.collect_file(source, output, None, discover=False)
+    assert report["rows"][0]["match_id"] == "sporttery-2040999"
+    assert report["rows"][0]["status"] == "pending_browser_task"
+    task = json.loads((output / "browser_tasks.json").read_text(encoding="utf-8"))[0]
+    assert task["match_id"] == "sporttery-2040999"
+
+
+def test_collect_file_discovery_keeps_nested_identity(monkeypatch, tmp_path):
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps({"matches": [{
+        "home": "A", "away": "B", "competition": "测试联赛",
+        "kickoff": "2026-08-26T03:00:00+08:00",
+        "sporttery_meta": {"match_id": 2050001},
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(bec, "discover_sources", lambda match: {"status": "source_candidates_found"})
+    report = bec.collect_file(source, tmp_path / "out", None, discover=True)
+    assert report["rows"][0]["match_id"] == "sporttery-2050001"
+    assert report["rows"][0]["browser_task"]["match"]["match_id"] == "sporttery-2050001"
+
+
 def test_collect_one_without_mapping_emits_browser_task():
     row = bec.collect_one(
         {"match_id": "sporttery-2", "home": "A", "away": "B",

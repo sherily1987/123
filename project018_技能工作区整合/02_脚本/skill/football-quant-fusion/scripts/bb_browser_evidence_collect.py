@@ -332,7 +332,16 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
     output_dir.mkdir(parents=True, exist_ok=True)
     rows = []
     for match in matches if isinstance(matches, list) else []:
-        mid = str(match.get("match_id") or "")
+        # sales_day_collect emits the stable Sporttery id inside
+        # ``sporttery_meta``.  Normalize it here so BB-browser discovery and
+        # sidecars remain joinable with jobs/registry instead of producing
+        # rows with an empty match_id.
+        raw_mid = match.get("match_id") or (match.get("sporttery_meta") or {}).get("match_id")
+        mid = str(raw_mid or "")
+        if mid and not mid.startswith("sporttery-"):
+            mid = f"sporttery-{mid}"
+        match = dict(match)
+        match["match_id"] = mid
         mapping = mappings.get(mid) or mappings.get(mid.removeprefix("sporttery-"))
         if not mapping and discover:
             discovered = discover_sources(match)
