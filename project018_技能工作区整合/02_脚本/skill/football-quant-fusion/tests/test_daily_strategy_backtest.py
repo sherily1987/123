@@ -13,6 +13,8 @@ spec.loader.exec_module(dbt)
 def _plan():
     return {
         "snapshot_id": "snap-1", "selected_day": "2026-08-23",
+        "execution_mode": "budgeted_action", "production_authorized": False,
+        "decision": {"action": "purchase_recreational_budget"},
         "single_purchase_recommendations": [
             {"match_id": "sporttery-1", "market": "HAD", "selection": "胜", "odds": 2.0, "stake_amount": 10},
             {"match_id": "sporttery-2", "market": "TTG", "selection": "2球", "odds": 3.0, "stake_amount": 10},
@@ -41,6 +43,9 @@ def test_scores_markets_and_excludes_pending_hafu_from_roi(tmp_path):
     for match_id, payload in payloads.items():
         (results / f"{match_id}.json").write_text(json.dumps(payload), encoding="utf-8")
     report = dbt.build_report([_plan()], results)
+    assert report["daily"][0]["execution_mode"] == "budgeted_action"
+    assert report["daily"][0]["production_authorized"] is False
+    assert report["daily"][0]["decision_action"] == "purchase_recreational_budget"
     summary = report["summary"]
     assert summary["recommendation_count"] == 5
     assert summary["won_count"] == 4

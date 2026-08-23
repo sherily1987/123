@@ -173,8 +173,14 @@ def score_plan(plan: dict[str, Any], results: dict[str, dict[str, Any]]) -> dict
                      "legs": legs, "stake_amount": stake, "odds": odds, "status": status, "reason": reason,
                      "return_amount": round(stake * odds, 2) if status == "won" else 0.0,
                      "profit": round(stake * (odds - 1), 2) if status == "won" else (-round(stake, 2) if status == "lost" else 0.0)})
+    decision = plan.get("decision") or {}
     return {"snapshot_id": plan.get("snapshot_id"), "selected_day": plan.get("selected_day"),
             "plan_generated_at": plan.get("generated_at") or (plan.get("display") or {}).get("decision_time"),
+            # Keep recreational budget actions visibly separate from
+            # production recommendations in every settlement report.
+            "execution_mode": plan.get("execution_mode") or "unknown",
+            "production_authorized": plan.get("production_authorized") is True,
+            "decision_action": decision.get("action"),
             "summary": _summary(rows), "gate_diagnostics": _gate_diagnostics(plan), "records": rows,
             "settlement_basis": "Sporttery official result, 90-minute score; HAFU requires verified half-time score"}
 
