@@ -134,7 +134,9 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
         identity = job.get("identity") or {}
         match_id = _mid(identity.get("match_id") or path.stem.removesuffix(".json"))
         kickoff = _time(identity.get("kickoff"))
-        as_of = _time((job.get("input") or {}).get("prediction_as_of"))
+        as_of = _time(output.get("llm_prediction_as_of")) or _time(
+            (job.get("input") or {}).get("prediction_as_of")
+        )
         if not kickoff or not as_of:
             reasons["missing_prediction_or_kickoff_time"] += 1
             continue

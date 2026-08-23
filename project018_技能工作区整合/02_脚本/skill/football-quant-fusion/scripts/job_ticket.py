@@ -429,6 +429,7 @@ def llm_from_parsed(row: dict) -> dict:
     return {
         "track": "llm",
         "model_id": row.get("model_id") or row.get("model"),
+        "llm_prediction_as_of": row.get("prediction_as_of"),
         # Explicit llm_ prefix prevents this self-reported vector from being
         # mistaken for the calibrated quant track probability.
         "llm_probs_1x2": llm_probs,

@@ -246,6 +246,19 @@ def test_parse_llm_log_reads_top3_scores():
     assert row["alt"] == "平局"
 
 
+def test_parse_llm_log_preserves_model_timestamp_for_calibration():
+    text = '''
+⚽ 第1/1场 [周一004] 拉科 VS 埃尔切 | 西甲 | 2026-08-18 03:00
+  📊 综合方向: 主胜  (1.0/1.0票, 强度100%)
+{"direction":"主胜","prediction_as_of":"2026-08-18T00:11:12+00:00","probs_1x2":[55,25,20],"top_scores":["1-0","2-0","1-1"]}
+'''
+    row = runner.parse_llm_log(text)["rows"][0]
+    assert row["model_id"] == "moonshot/kimi-k3"
+    assert row["prediction_as_of"] == "2026-08-18T00:11:12+00:00"
+    assert row["probs_1x2"] == [55, 25, 20]
+    assert row["top_scores"] == ["1-0", "2-0", "1-1"]
+
+
 def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeypatch):
     src = tmp_path / "src"
     src.mkdir()

@@ -469,6 +469,17 @@ def parse_llm_log(text: str) -> dict:
         hm = _LLM_HEAD.search(blk)
         sm = _LLM_SCORE.search(blk)
         am = _LLM_ALT.search(blk)
+        audit = None
+        for line in blk.splitlines():
+            try:
+                candidate = json.loads(line.strip())
+            except (TypeError, ValueError):
+                continue
+            if isinstance(candidate, dict) and (
+                "prediction_as_of" in candidate or "direction" in candidate
+            ):
+                audit = candidate
+                break
         scores = []
         if sm:
             for part in re.split(r"[,，/]", sm.group(1)):
@@ -488,6 +499,14 @@ def parse_llm_log(text: str) -> dict:
             "top_scores": scores[:3],
             "alt": am.group(2) if am else None,
             "evidence_gap": ("证据存在缺口" in blk) or ("证据缺口" in blk),
+            "model_id": K3_MODEL_ID,
+            "prediction_as_of": (audit or {}).get("prediction_as_of"),
+            "probs_1x2": (audit or {}).get("probs_1x2"),
+            "confidence": (audit or {}).get("confidence"),
+            "decision": (audit or {}).get("decision"),
+            "top_scores": (audit or {}).get("top_scores") or scores[:3],
+            "ou25": (audit or {}).get("top_ou25") or (audit or {}).get("ou25"),
+            "hafu": (audit or {}).get("top_hafu") or (audit or {}).get("hafu"),
         })
     skipped = len(re.findall(
         r'"status":\s*"(evidence_insufficient|evidence_audit_failed)"', text or ""
@@ -512,6 +531,7 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
         upsert_job(root, ident, llm={
             "track": "llm",
             "model_id": K3_MODEL_ID,
+            "llm_prediction_as_of": row.get("prediction_as_of"),
             "direction": row.get("dir"),
             "alt_direction": row.get("alt"),
             "strength": {"type": "vote_share", "value": round(strength, 4)},
