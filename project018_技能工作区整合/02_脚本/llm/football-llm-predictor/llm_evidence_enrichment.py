@@ -200,7 +200,7 @@ class ApiSportsClient:
             unique.append(row)
         return unique
 
-    def collect_match(self, home, away, kickoff, *, aliases=None):
+    def collect_match(self, home, away, kickoff, *, aliases=None, fixture_id=None):
         kick = _dt(kickoff)
         aliases = aliases or {}
         home_values = list(home) if isinstance(home, (list, tuple, set)) else [home]
@@ -209,22 +209,22 @@ class ApiSportsClient:
         away_values += [alias for value in away_values for alias in (aliases.get(str(value)) or [])]
         home_names, away_names = _normal_names(home_values), _normal_names(away_values)
         try:
-            fixtures = self._request("/fixtures", {
-                "date": kick.astimezone(timezone.utc).date().isoformat(), "timezone": "UTC",
-            }).get("response", [])
+            query = ({"id": fixture_id, "timezone": "UTC"} if fixture_id else
+                     {"date": kick.astimezone(timezone.utc).date().isoformat(), "timezone": "UTC"})
+            fixtures = self._request("/fixtures", query).get("response", [])
         except Exception as exc:
             return {"status": "UNAVAILABLE", "reason": f"fixture_fetch:{type(exc).__name__}"}
         matches = []
         for row in fixtures:
             teams = row.get("teams") or {}
-            if (_normal((teams.get("home") or {}).get("name")) not in home_names
+            if not fixture_id and (_normal((teams.get("home") or {}).get("name")) not in home_names
                     or _normal((teams.get("away") or {}).get("name")) not in away_names):
                 continue
             try:
                 event_time = _dt((row.get("fixture") or {}).get("date"))
             except (TypeError, ValueError):
                 continue
-            if abs((event_time.astimezone(timezone.utc) - kick.astimezone(timezone.utc)).total_seconds()) <= 5400:
+            if fixture_id or abs((event_time.astimezone(timezone.utc) - kick.astimezone(timezone.utc)).total_seconds()) <= 5400:
                 matches.append(row)
         if len(matches) != 1:
             return {"status": "SOURCE_CONFLICT" if len(matches) > 1 else "UNAVAILABLE",

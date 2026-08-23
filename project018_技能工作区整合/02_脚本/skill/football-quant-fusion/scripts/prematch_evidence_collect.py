@@ -64,10 +64,12 @@ def _api_sports_payload(match: dict[str, Any]) -> dict[str, Any] | None:
         # Sporttery's kickoff field is local China time without an offset.
         if kickoff and not re.search(r"(?:Z|[+-]\d{2}:?\d{2})$", kickoff):
             kickoff = kickoff + "+08:00"
-        return client.collect_match(
-            match.get("home"), match.get("away"), kickoff,
-            aliases=_load_team_aliases(),
-        )
+        kwargs = {"aliases": _load_team_aliases()}
+        # A provider fixture ID is more reliable than date + multilingual
+        # team-name matching, especially for future fixtures and cup ties.
+        if match.get("api_sports_fixture_id") is not None:
+            kwargs["fixture_id"] = match.get("api_sports_fixture_id")
+        return client.collect_match(match.get("home"), match.get("away"), kickoff, **kwargs)
     except Exception as exc:
         return {"status": "UNAVAILABLE", "reason": f"collector:{type(exc).__name__}"}
 

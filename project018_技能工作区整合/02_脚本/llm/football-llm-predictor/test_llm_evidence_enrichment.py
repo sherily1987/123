@@ -74,6 +74,25 @@ def test_api_sports_client_collects_recent_and_marks_empty_availability():
     assert result["lineups_status"] == "UNAVAILABLE"
 
 
+def test_api_sports_fixture_id_bypasses_date_and_team_name_matching():
+    calls = []
+    def transport(path, params):
+        calls.append((path, dict(params)))
+        if path == "/fixtures" and params.get("id") == 1582365:
+            return {"response": [{"fixture": {"id": 1582365, "date": "2030-01-01T14:00:00+00:00"},
+                                   "teams": {"home": {"id": 42, "name": "Bologna"},
+                                             "away": {"id": 50, "name": "Lazio"}}}]}
+        if path == "/fixtures" and "last" in params:
+            return {"response": []}
+        if path in ("/injuries", "/fixtures/lineups"):
+            return {"response": []}
+        raise AssertionError((path, params))
+    result = lee.ApiSportsClient(transport=transport).collect_match(
+        "博洛尼亚", "拉齐奥", "2026-08-30T20:00:00+08:00", fixture_id=1582365)
+    assert result["status"] == "ok" and result["fixture_id"] == 1582365
+    assert calls[0][1] == {"id": 1582365, "timezone": "UTC"}
+
+
 def test_api_sports_client_marks_one_sided_lineup_as_partial():
     def transport(path, params):
         if path == "/fixtures" and "date" in params:
