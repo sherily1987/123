@@ -22,6 +22,34 @@ from typing import Any
 
 
 MODEL_ID = "moonshot/kimi-k3"
+MIN_SAMPLES_FOR_RECALIBRATION = 100
+TARGET_SAMPLES_FOR_THRESHOLD_REVIEW = 200
+
+
+def _calibration_gate(eligible_rows: int) -> dict[str, object]:
+    """Return an explicit, fail-closed status for downstream consumers.
+
+    The thresholds are review triggers, not evidence that a model is good.
+    Even after the target is reached, an out-of-sample comparison and a
+    release review are still required before any production change.
+    """
+    if eligible_rows < MIN_SAMPLES_FOR_RECALIBRATION:
+        status = "INSUFFICIENT_SAMPLE"
+        reason = "fewer than the minimum settled rows for recalibration"
+    elif eligible_rows < TARGET_SAMPLES_FOR_THRESHOLD_REVIEW:
+        status = "RESEARCH_REVIEW_PENDING"
+        reason = "minimum sample reached; threshold review target not reached"
+    else:
+        status = "RESEARCH_ONLY_OOS_REQUIRED"
+        reason = "review target reached; independent out-of-sample validation is still required"
+    return {
+        "status": status,
+        "reason": reason,
+        "minimum_samples_for_recalibration": MIN_SAMPLES_FOR_RECALIBRATION,
+        "target_samples_for_threshold_review": TARGET_SAMPLES_FOR_THRESHOLD_REVIEW,
+        "eligible_settled_rows": eligible_rows,
+        "production_change_allowed": False,
+    }
 RESULT_LABELS = {0: "H", 1: "D", 2: "A"}
 
 
@@ -209,6 +237,7 @@ def build_sample(
             "total_goals": home + away,
             "settlement_source": (result.get("source") or {}).get("name") or result.get("settlement_evidence"),
         })
+    gate = _calibration_gate(len(rows))
     return {
         "schema": "llm-calibration-sample-1.0",
         "model": model_id,
@@ -217,6 +246,7 @@ def build_sample(
         "jobs_scanned": sum(1 for _ in jobs_root.glob("**/sporttery-*.json")) if jobs_root.is_dir() else 0,
         "llm_rows": llm_count,
         "eligible_settled_rows": len(rows),
+        "calibration_gate": gate,
         "excluded_by_reason": dict(sorted(reasons.items())),
         "metrics": _metrics(rows),
         "rows": rows,

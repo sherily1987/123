@@ -47,6 +47,8 @@ def test_build_sample_requires_pre_kickoff_and_official_result(tmp_path: Path):
 
     assert report["model"] == "moonshot/kimi-k3"
     assert report["eligible_settled_rows"] == 1
+    assert report["calibration_gate"]["status"] == "INSUFFICIENT_SAMPLE"
+    assert report["calibration_gate"]["production_change_allowed"] is False
     assert report["rows"][0]["direction_correct"] is True
     assert report["rows"][0]["score_exact"] is False
     assert report["excluded_by_reason"] == {"pending_or_missing_official_result": 1}
