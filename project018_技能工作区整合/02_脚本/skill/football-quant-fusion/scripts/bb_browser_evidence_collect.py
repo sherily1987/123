@@ -422,7 +422,13 @@ def render_llm_markdown(row: dict[str, Any], match: dict[str, Any]) -> str:
     for title, fields in sections.items():
         lines.append(f"## {title}")
         if not fields:
-            lines.append("- 本补充源未提供该类事实，不能按无影响处理。")
+            source_url = row.get("source_url") or ""
+            source_id = row.get("source_id") or row.get("provider") or "scrapling"
+            lines.append(
+                f"- 本补充源未提供该类事实: status=UNAVAILABLE; facts_available=false "
+                f"| source({source_url}) | collected_at({collected_at}) "
+                f"| source_id({source_id}) | source_tier({row_source_tier})"
+            )
             continue
         for field in fields:
             entry = entries.get(field) or {}
@@ -712,7 +718,14 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
 def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
                  *, discover: bool = False, scrape_discovered: bool = False) -> dict[str, Any]:
     payload = json.loads(input_path.read_text(encoding="utf-8-sig"))
-    matches = payload.get("matches", []) if isinstance(payload, dict) else payload
+    if isinstance(payload, dict) and isinstance(payload.get("matches"), list):
+        matches = payload["matches"]
+    elif isinstance(payload, dict):
+        # The single-match CLI is a supported production path as well as the
+        # batch path.  Do not silently turn a valid object into count=0.
+        matches = [payload]
+    else:
+        matches = payload
     mappings = json.loads(url_map_path.read_text(encoding="utf-8-sig")) if url_map_path else {}
     output_dir.mkdir(parents=True, exist_ok=True)
     rows = []

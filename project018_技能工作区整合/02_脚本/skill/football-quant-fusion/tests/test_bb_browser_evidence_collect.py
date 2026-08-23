@@ -253,6 +253,34 @@ def test_collect_file_uses_match_embedded_scrapling_source_without_url_map(monke
     assert "## 3. 近况与状态" in markdown
 
 
+def test_collect_file_accepts_single_match_object(monkeypatch, tmp_path):
+    monkeypatch.setattr(bec, "_scrapling_generic_snapshot", lambda match, mapping, collected_at: {
+        "provider": "single.preview", "research_only": True,
+        "match_id": match["match_id"],
+        "evidence_audit": {"entries": {}, "missing_fields": [], "evidence_gap": False},
+    })
+    source = tmp_path / "single.json"
+    source.write_text(json.dumps({
+        "match_id": "sporttery-2041002", "match_num": "周一001",
+        "home": "A", "away": "B", "kickoff": "2026-08-26T03:00:00+00:00",
+        "evidence_sources": {"scrapling_url": "https://league.example/single"},
+    }), encoding="utf-8")
+    report = bec.collect_file(source, tmp_path / "out", None)
+    assert report["count"] == 1
+    assert report["ok"] == 1
+    assert (tmp_path / "out" / "evidence_001_A_B_browser.md").is_file()
+
+
+def test_render_llm_markdown_marks_unavailable_sections_with_provenance():
+    text = bec.render_llm_markdown({
+        "provider": "discovered_official", "source_url": "https://official.example/match",
+        "collected_at": "2026-08-24T00:00:00+00:00", "evidence_audit": {"entries": {}},
+    }, {"match_id": "sporttery-1", "home": "A", "away": "B"})
+    assert "status=UNAVAILABLE" in text
+    assert "source(https://official.example/match)" in text
+    assert "collected_at(2026-08-24T00:00:00+00:00)" in text
+
+
 def test_collect_file_discovery_keeps_nested_identity(monkeypatch, tmp_path):
     source = tmp_path / "input.json"
     source.write_text(json.dumps({"matches": [{
