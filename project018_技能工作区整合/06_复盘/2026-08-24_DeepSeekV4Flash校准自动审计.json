@@ -1,0 +1,29 @@
+{
+  "schema": "llm-calibration-sample-1.0",
+  "model": "deepseek/deepseek-v4-flash",
+  "research_only": true,
+  "production_change_allowed": false,
+  "jobs_scanned": 153,
+  "llm_rows": 10,
+  "eligible_settled_rows": 0,
+  "excluded_by_reason": {
+    "non_target_model": 1,
+    "pending_or_missing_official_result": 9
+  },
+  "metrics": {
+    "direction_n": 0,
+    "direction_accuracy_pct": null,
+    "probability_n": 0,
+    "probability_source_counts": {
+      "production_llm_probs": 0,
+      "research_raw_llm_probs": 0
+    },
+    "brier": null,
+    "log_loss": null,
+    "score_n": 0,
+    "score_exact_accuracy_pct": null,
+    "ou25_n": 0,
+    "ou25_accuracy_pct": null
+  },
+  "rows": []
+}

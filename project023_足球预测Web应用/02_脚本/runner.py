@@ -458,6 +458,7 @@ def auto_collect_late_info(input_path: Path, day: str, matches: list[dict], *, n
 
 def build_deepseek_calibration_audit(output_path: Path) -> dict:
     """Refresh the model-specific calibration audit without changing production."""
+    output_path = Path(output_path).resolve()
     script = (llm_repo() / "scripts" / "build_deepseek_calibration_sample.py").resolve()
     jobs_root = (backtest_store() / ".." / "jobs").resolve()
     results_root = (backtest_store() / "results").resolve()
