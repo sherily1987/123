@@ -107,6 +107,23 @@ def in_collection_window(kickoff, at=None, window=INITIAL_REFRESH_MINUTES) -> bo
     return mins is not None and 0 < mins <= window
 
 
+def refresh_schedule(kickoff) -> list[datetime]:
+    """Return the fixed pre-match refresh instants in chronological order."""
+    parsed = kickoff if isinstance(kickoff, datetime) else parse_dt(kickoff)
+    if parsed is None:
+        return []
+    return sorted(parsed - timedelta(minutes=minutes) for minutes in REFRESH_SCHEDULE_MINUTES)
+
+
+def next_refresh_at(kickoff, at=None) -> str | None:
+    """Return the next scheduled refresh after ``at``, or ``None``."""
+    now = at or now_utc()
+    for point in refresh_schedule(kickoff):
+        if point > now:
+            return point.isoformat()
+    return None
+
+
 def fold_side(block: dict) -> dict:
     lst = (block or {}).get("injuriesAndSuspensionsList") or []
     atk = dfs = gk = 0.0
@@ -463,17 +480,15 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
         kickoff = kickoff_of(rec)
         if kickoff is None:
             continue
-        refresh_schedule = [
-            (kickoff - timedelta(minutes=minutes)).isoformat()
-            for minutes in REFRESH_SCHEDULE_MINUTES
-        ]
+        refresh_points = refresh_schedule(kickoff)
         due.append({
             "match_id": match_id_of(rec),
             "home": rec.get("home"),
             "away": rec.get("away"),
             "kickoff": kickoff.isoformat(),
             "initial_refresh_at_or_after": (kickoff - timedelta(minutes=INITIAL_REFRESH_MINUTES)).isoformat(),
-            "refresh_schedule": refresh_schedule,
+            "refresh_schedule": [point.isoformat() for point in refresh_points],
+            "next_refresh_at": next_refresh_at(kickoff),
             "refresh_policy": "scheduled_repoll_until_kickoff",
             "odds_at": odds_at_of(rec).isoformat() if odds_at_of(rec) else None,
             "apifootball_match_id": api_match_id_of(rec),
