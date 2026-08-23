@@ -571,6 +571,18 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
             "evidence_gap": bool(row.get("evidence_gap")),
             "score": row.get("score"),
             "top_scores": row.get("top_scores") or ([row.get("score")] if row.get("score") else []),
+            # Keep both production and research-only probability fields so a
+            # settled DeepSeek cohort can be calibrated without promoting raw
+            # self-reported probabilities into production.
+            "llm_probs_1x2": row.get("probs_1x2"),
+            "llm_raw_probs_1x2": row.get("raw_llm_probs_1x2"),
+            "llm_confidence": row.get("confidence"),
+            "llm_decision": row.get("decision"),
+            "llm_ou25": row.get("ou25"),
+            "llm_hafu": row.get("hafu"),
+            "llm_raw_top_scores": row.get("raw_llm_top_scores") or [],
+            "llm_raw_ou25": row.get("raw_llm_ou25"),
+            "llm_raw_hafu": row.get("raw_llm_hafu"),
         })
         n += 1
     return n

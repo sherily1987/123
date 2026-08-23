@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build an auditable K3-only calibration sample from job tickets.
+"""Build an auditable single-model calibration sample from job tickets.
 
 The builder deliberately does not infer results from external aggregates.  A
 row is scored only when its job has a pre-kickoff timestamp and a verified
@@ -126,7 +126,11 @@ def _metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
+def build_sample(
+    jobs_root: Path,
+    results_root: Path,
+    model_id: str = MODEL_ID,
+) -> dict[str, Any]:
     results = _load_results(results_root)
     rows: list[dict[str, Any]] = []
     reasons = Counter()
@@ -142,8 +146,8 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
             continue
         llm_count += 1
         recorded_model = output.get("model_id") or MODEL_ID
-        if recorded_model != MODEL_ID:
-            reasons["non_k3_model"] += 1
+        if recorded_model != model_id:
+            reasons["non_target_model"] += 1
             continue
         identity = job.get("identity") or {}
         match_id = _mid(identity.get("match_id") or path.stem.removesuffix(".json"))
@@ -170,7 +174,7 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
         direction = str(output.get("direction") or "")
         direction_code = direction if direction in {"H", "D", "A"} else {"主胜": "H", "平局": "D", "客胜": "A"}.get(direction)
         rows.append({
-            "model": MODEL_ID,
+            "model": model_id,
             "match_id": match_id,
             "prediction_as_of": as_of.isoformat(),
             "kickoff": kickoff.isoformat(),
@@ -203,8 +207,8 @@ def build_sample(jobs_root: Path, results_root: Path) -> dict[str, Any]:
             "settlement_source": (result.get("source") or {}).get("name") or result.get("settlement_evidence"),
         })
     return {
-        "schema": "k3-calibration-sample-1.0",
-        "model": MODEL_ID,
+        "schema": "llm-calibration-sample-1.0",
+        "model": model_id,
         "research_only": True,
         "production_change_allowed": False,
         "jobs_scanned": sum(1 for _ in jobs_root.glob("**/sporttery-*.json")) if jobs_root.is_dir() else 0,
@@ -221,8 +225,10 @@ def main() -> None:
     parser.add_argument("--jobs-root", type=Path, required=True)
     parser.add_argument("--results-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--model-id", default=MODEL_ID,
+                        help="只纳入该模型；默认保留历史 K3 校准口径")
     args = parser.parse_args()
-    report = build_sample(args.jobs_root, args.results_root)
+    report = build_sample(args.jobs_root, args.results_root, args.model_id)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({key: value for key, value in report.items() if key != "rows"}, ensure_ascii=False, indent=2))

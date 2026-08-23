@@ -112,3 +112,21 @@ def test_build_sample_scores_raw_markets_without_promoting_them(tmp_path: Path):
     assert report["rows"][0]["llm_probs_1x2"] is None
     assert report["rows"][0]["llm_raw_probs_1x2"] == [60, 25, 15]
     assert report["metrics"]["probability_source_counts"]["research_raw_llm_probs"] == 1
+
+
+def test_build_sample_can_target_deepseek_v4_flash_without_changing_default_k3(tmp_path: Path):
+    jobs = tmp_path / "jobs"
+    results = tmp_path / "results"
+    jobs.mkdir()
+    results.mkdir()
+    job = _job(6)
+    job["outputs"][0]["model_id"] = "deepseek/deepseek-v4-flash"
+    (jobs / "sporttery-6.json").write_text(json.dumps(job), encoding="utf-8")
+    (results / "6.json").write_text(json.dumps({
+        "match_id": "6", "status": "finished", "score_90": {"home": 2, "away": 0}
+    }), encoding="utf-8")
+
+    report = build_sample(jobs, results, "deepseek/deepseek-v4-flash")
+
+    assert report["model"] == "deepseek/deepseek-v4-flash"
+    assert report["eligible_settled_rows"] == 1
