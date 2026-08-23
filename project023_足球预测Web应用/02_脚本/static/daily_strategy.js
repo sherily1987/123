@@ -77,7 +77,7 @@
       : "";
     const llm = plan.llm_calibration || {};
     const llmBlock = `<div class="strategy-evidence"><strong>DeepSeek V4 Flash 校准：</strong>` +
-      `${esc(llm.eligible_settled_rows || 0)}/${esc(llm.minimum_review_rows || 100)} 场` +
+      `已登记 ${esc(llm.llm_rows || 0)} 场，已结算 ${esc(llm.eligible_settled_rows || 0)}/${esc(llm.minimum_review_rows || 100)} 场` +
       ` · ${llm.ready_for_review ? "达到复核门槛" : "未达到复核门槛"} · 仅研究观察</div>`;
     const empty = !singles.length && !combos.length;
     const body = empty

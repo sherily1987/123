@@ -79,7 +79,7 @@ def test_daily_strategy_view_exposes_model_isolated_deepseek_calibration(tmp_pat
     audit_dir = tmp_path / "forward" / "2026-08-23"
     audit_dir.mkdir(parents=True)
     (audit_dir / "deepseek_calibration_audit.json").write_text(json.dumps({
-        "model": "deepseek/deepseek-v4-flash", "eligible_settled_rows": 9,
+        "model": "deepseek/deepseek-v4-flash", "llm_rows": 12, "eligible_settled_rows": 9,
         "metrics": {"brier": None},
     }), encoding="utf-8")
     got = view.daily_strategy("2026-08-23", root=tmp_path,
@@ -205,9 +205,10 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
             {"market": "TTG", "model_calibration_status": "UNFITTED"},
             {"market": "HAD", "independent_calibration_status": "VALID"},
         ],
-        "llm_calibration": {
-            "model": "deepseek/deepseek-v4-flash",
-            "eligible_settled_rows": 9,
+            "llm_calibration": {
+                "model": "deepseek/deepseek-v4-flash",
+                "llm_rows": 12,
+                "eligible_settled_rows": 9,
             "minimum_review_rows": 100,
             "ready_for_review": False,
         },
@@ -236,7 +237,7 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
     assert "未验证正EV" in run.stdout
     assert "进球数" in run.stdout
     assert "市场校准状态" in run.stdout and "UNFITTED" in run.stdout and "VALID" in run.stdout
-    assert "DeepSeek V4 Flash 校准" in run.stdout and "9/100" in run.stdout
+    assert "DeepSeek V4 Flash 校准" in run.stdout and "已登记 12 场" in run.stdout and "已结算 9/100" in run.stdout
     assert "周日003" in run.stdout and "2球" in run.stdout and "10元" in run.stdout
     assert "2串1" in run.stdout and "16元" in run.stdout
     assert "不是生产胆项" in run.stdout

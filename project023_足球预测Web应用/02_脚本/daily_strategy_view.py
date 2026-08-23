@@ -110,16 +110,17 @@ def _load_deepseek_calibration(store: Path, day: str) -> dict:
     path = store / "forward" / day / "deepseek_calibration_audit.json"
     if not path.is_file():
         return {"status": "missing", "model": "deepseek/deepseek-v4-flash",
-                "eligible_settled_rows": 0, "minimum_review_rows": 100}
+                "llm_rows": 0, "eligible_settled_rows": 0, "minimum_review_rows": 100}
     try:
         report = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError):
         return {"status": "invalid", "model": "deepseek/deepseek-v4-flash",
-                "eligible_settled_rows": 0, "minimum_review_rows": 100}
+                "llm_rows": 0, "eligible_settled_rows": 0, "minimum_review_rows": 100}
     report = dict(report)
     report.setdefault("status", "ok")
     report.setdefault("minimum_review_rows", 100)
     report.setdefault("model", "deepseek/deepseek-v4-flash")
+    report.setdefault("llm_rows", 0)
     report.setdefault("eligible_settled_rows", 0)
     report["ready_for_review"] = report.get("eligible_settled_rows", 0) >= report["minimum_review_rows"]
     report["production_change_allowed"] = False
