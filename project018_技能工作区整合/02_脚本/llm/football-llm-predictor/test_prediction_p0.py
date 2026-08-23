@@ -495,7 +495,8 @@ def test_kimi_reasoning_model_gets_larger_output_budget():
 
 def test_skip_audit_record_preserves_gate_and_evidence_audit():
     record = predict.build_skip_audit_record(
-        {"moonshot/kimi-k3": {"decision": "abstain", "direction": None}},
+        {"moonshot/kimi-k3": {"decision": "abstain", "direction": None,
+                               "raw_llm_probs_1x2": [20, 25, 55]}},
         ["moonshot/kimi-k3"], "PROMPT",
         {"evidence_file_sha256": "abc", "evidence_collected_at_min": "t1",
          "evidence_collected_at_max": "t2"},
@@ -506,3 +507,4 @@ def test_skip_audit_record_preserves_gate_and_evidence_audit():
     assert record["status"] == "skip"
     assert record["reason"] == "voter_abstained_or_failed"
     assert record["evidence_audit"]["summary"] == "audit"
+    assert record["individual"]["moonshot/kimi-k3"]["raw_llm_probs_1x2"] == [20, 25, 55]
