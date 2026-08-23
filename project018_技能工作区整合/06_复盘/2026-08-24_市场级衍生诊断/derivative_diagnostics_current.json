@@ -1,0 +1,43 @@
+{
+  "schema": "derivative-diagnostics-1.0",
+  "research_only": true,
+  "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+  "snapshot_policy": "prematch",
+  "record_sample_size": 128,
+  "metrics": {
+    "ou_2_5": {
+      "n": 128,
+      "brier": 0.243901,
+      "accuracy_pct": 56.25
+    },
+    "ou_3_5": {
+      "n": 128,
+      "brier": 0.173019,
+      "accuracy_pct": 76.56
+    },
+    "ou_calibration_comparison": {
+      "ou_2_5": {
+        "n": 128,
+        "calibrated_brier": 0.243901,
+        "raw_brier": 0.247187,
+        "delta_calibrated_minus_raw": -0.003286
+      },
+      "ou_3_5": {
+        "n": 128,
+        "calibrated_brier": 0.173019,
+        "raw_brier": 0.177574,
+        "delta_calibrated_minus_raw": -0.004554
+      }
+    },
+    "hafu": {
+      "n": 0,
+      "accuracy_pct": null,
+      "brier": null,
+      "log_loss": null,
+      "excluded_unverified_evidence": 0,
+      "excluded_unfitted_prediction": 127
+    }
+  },
+  "half_time_evidence_input": null,
+  "note": "半全场只在status=verified的独立半场证据上评分；UNFITTED输出不进入分母。"
+}
