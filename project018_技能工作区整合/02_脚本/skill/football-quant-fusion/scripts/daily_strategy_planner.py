@@ -93,16 +93,18 @@ def _model_views(job: dict[str, Any]) -> dict[str, dict[str, Any]]:
         {},
     )
     forecasts = quant.get("market_forecasts") or {}
-    had_selection, had_probability = _top_from_probabilities(
-        HAD_LABELS, quant.get("final_1x2_pct")
-    )
+    had_data = forecasts.get("HAD") or {}
+    had_probs = had_data.get("model_prob_pct") or quant.get("final_1x2_pct")
+    had_selection, had_probability = _top_from_probabilities(HAD_LABELS, had_probs)
     views = {
         "HAD": {
             "selection": had_selection,
             "probability_pct": had_probability,
-            "source": "market_conditioned_model" if quant.get("mode") == "market_only" else "hybrid_model",
+            "source": had_data.get("probability_source") or (
+                "market_conditioned_model" if quant.get("mode") == "market_only" else "hybrid_model"
+            ),
             "independent": False,
-            "calibration_status": quant.get("calibration_status") or (quant.get("calibration") or {}).get("status"),
+            "calibration_status": had_data.get("calibration_status") or quant.get("calibration_status") or (quant.get("calibration") or {}).get("status"),
         }
     }
     for market, labels in (("TTG", TTG_LABELS), ("HAFU", HAFU_LABELS)):

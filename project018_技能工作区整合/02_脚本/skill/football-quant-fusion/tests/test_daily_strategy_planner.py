@@ -132,6 +132,28 @@ def test_market_conditioned_model_directions_are_visible_but_not_independent():
     assert "MARKET_CONDITIONED_MODEL" in by_market["TTG"]["block_reasons"]
 
 
+def test_had_model_view_prefers_market_level_forecast_contract():
+    job = {
+        "outputs": [{
+            "track": "quant",
+            "mode": "market_only",
+            "final_1x2_pct": [20.0, 30.0, 50.0],
+            "calibration_status": "LEGACY",
+            "market_forecasts": {
+                "HAD": {
+                    "model_prob_pct": [41.0, 29.0, 30.0],
+                    "probability_source": "market_conditioned_model",
+                    "calibration_status": "UNFITTED",
+                }
+            },
+        }]
+    }
+    view = dsp._model_views(job)["HAD"]
+    assert view["selection"] == "胜"
+    assert view["probability_pct"] == 41.0
+    assert view["calibration_status"] == "UNFITTED"
+
+
 def test_market_implied_probability_never_becomes_a_purchase_candidate():
     """Catches same-book implied probability being mislabeled as independent edge."""
     plan = dsp.build_daily_strategy([_job()], _disabled_policy(), bankroll=100)
