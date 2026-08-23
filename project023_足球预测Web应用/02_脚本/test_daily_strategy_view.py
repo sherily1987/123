@@ -182,6 +182,10 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
             "decision_time": "2026-08-23T10:00:00+08:00",
         },
         "budget": {"daily_budget_amount": 100, "allocated_amount": 100, "preserved_amount": 0},
+        "market_audit": [
+            {"market": "TTG", "model_calibration_status": "UNFITTED"},
+            {"market": "HAD", "independent_calibration_status": "VALID"},
+        ],
         "single_purchase_recommendations": [{
             "market": "TTG", "match_num": "周日003", "home": "甲", "away": "乙",
             "selection": "2球", "odds": 3.2, "stake_amount": 10,
@@ -206,6 +210,7 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
     assert "固定娱乐预算" in run.stdout
     assert "未验证正EV" in run.stdout
     assert "进球数" in run.stdout
+    assert "市场校准状态" in run.stdout and "UNFITTED" in run.stdout and "VALID" in run.stdout
     assert "周日003" in run.stdout and "2球" in run.stdout and "10元" in run.stdout
     assert "2串1" in run.stdout and "16元" in run.stdout
     assert "不是生产胆项" in run.stdout

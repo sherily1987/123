@@ -102,6 +102,7 @@ def _model_views(job: dict[str, Any]) -> dict[str, dict[str, Any]]:
             "probability_pct": had_probability,
             "source": "market_conditioned_model" if quant.get("mode") == "market_only" else "hybrid_model",
             "independent": False,
+            "calibration_status": quant.get("calibration_status") or (quant.get("calibration") or {}).get("status"),
         }
     }
     for market, labels in (("TTG", TTG_LABELS), ("HAFU", HAFU_LABELS)):
@@ -112,6 +113,7 @@ def _model_views(job: dict[str, Any]) -> dict[str, dict[str, Any]]:
             "probability_pct": probability,
             "source": data.get("probability_source"),
             "independent": data.get("independent_from_same_pool") is True,
+            "calibration_status": data.get("calibration_status"),
         }
     score = forecasts.get("CRS") or {}
     top_scores = score.get("top_scores") or []
@@ -121,6 +123,7 @@ def _model_views(job: dict[str, Any]) -> dict[str, dict[str, Any]]:
         "probability_pct": first.get("prob_pct", first.get("probability_pct")),
         "source": score.get("probability_source"),
         "independent": score.get("independent_from_same_pool") is True,
+        "calibration_status": score.get("calibration_status"),
     }
     return views
 
@@ -202,6 +205,7 @@ def _market_rows(
             "model_top_selection": model_view.get("selection"),
             "model_top_probability_pct": model_view.get("probability_pct"),
             "model_probability_source": model_view.get("source"),
+            "model_calibration_status": model_view.get("calibration_status"),
             "independent_selection": independent.get("selection"),
             "independent_model_probability_pct": round(float(independent_probability) * 100.0, 2)
             if independent_probability is not None else None,

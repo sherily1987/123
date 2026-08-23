@@ -65,9 +65,16 @@
     const reasonText = Object.entries(evidence.reason_counts || {})
       .slice(0, 3).map(([key, value]) => `${esc(key)} ${esc(value)}`).join("、");
     const tags = (plan.risk_tags || []).map(tag => esc(tag)).join("、");
+    const calibrationRows = (plan.market_audit || []).map(row => {
+      const status = row.independent_calibration_status || row.model_calibration_status || "UNFITTED";
+      return `${esc(MARKET_NAMES[row.market] || row.market)}：${esc(status)}`;
+    }).join("、");
     const evidenceBlock = `<div class="strategy-evidence"><strong>证据链状态：</strong>${esc(evidence.evidence_gap_market_rows || 0)} 个市场行存在证据缺口` +
       (reasonText ? `（${reasonText}）` : "") +
       (tags ? ` · 风险标签：${tags}` : "") + `</div>`;
+    const calibrationBlock = calibrationRows
+      ? `<div class="strategy-evidence"><strong>市场校准状态：</strong>${calibrationRows}</div>`
+      : "";
     const empty = !singles.length && !combos.length;
     const body = empty
       ? `<div class="banner warn">当天没有足够的未开赛候选，保留 ${amount(budget.preserved_amount)} 元，不用已开赛或缺失数据强行凑单。</div>`
@@ -96,6 +103,7 @@
         <div><b>${amount((plan.risk_disclosure || {}).maximum_loss_amount)}元</b><span>最大损失</span></div>
       </div>
       ${evidenceBlock}
+      ${calibrationBlock}
       ${body}
       ${backtestBlock(plan.backtest)}
       <p class="strategy-evidence-warning">${esc(display.evidence_warning || "")}</p>

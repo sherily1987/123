@@ -126,6 +126,8 @@ def test_market_conditioned_model_directions_are_visible_but_not_independent():
     assert by_market["HAFU"]["model_top_selection"] == "负负"
     assert by_market["CRS"]["model_top_selection"] == "0-1"
     assert by_market["TTG"]["model_probability_source"] == "market_conditioned_model"
+    assert "model_calibration_status" in by_market["TTG"]
+    assert by_market["TTG"]["model_calibration_status"] is None
     assert by_market["TTG"]["independent_model_probability_pct"] is None
     assert "MARKET_CONDITIONED_MODEL" in by_market["TTG"]["block_reasons"]
 
