@@ -363,7 +363,10 @@ def attach_collected_evidence(
             else:
                 chain, browser_audit = merge_browser_audit(chain, blob.get("evidence_audit"))
                 match["evidence_snapshot_ref"] = str(path)
-                match["browser_evidence_ref"] = str(path)
+                match["browser_evidence_ref"] = (
+                    (blob.get("evidence_audit") or {}).get("browser_evidence_ref")
+                    or str(path)
+                )
                 match["evidence_snapshot_audit"] = browser_audit
                 match["evidence_audit"] = blob.get("evidence_audit") or {}
                 attached += 1

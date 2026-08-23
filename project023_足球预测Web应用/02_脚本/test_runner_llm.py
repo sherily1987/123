@@ -64,6 +64,7 @@ def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Pat
     (snap_dir / "sporttery-2041021.json").write_text(json.dumps({
         "match_id": "sporttery-2041021",
         "evidence_audit": {
+            "browser_evidence_ref": "F:/forward/2026-08-24/evidence_snapshots/bb-browser/sporttery-2041021.json",
             "entries": {
                 "recent_form": {"status": "VALID", "source_id": "sporttery.preview",
                                  "refreshed_at": "2026-08-23T12:00:00+00:00",
@@ -96,6 +97,7 @@ def test_attach_collected_evidence_projects_snapshot_and_late_info(tmp_path: Pat
     assert "missing_fields=injury,suspensions" in rendered
     assert "starting_xi: status=PREDICTED" in rendered
     assert matches[0]["evidence_snapshot_ref"].endswith("sporttery-2041021.json")
+    assert matches[0]["browser_evidence_ref"].endswith("bb-browser/sporttery-2041021.json")
 
 
 def test_attach_reports_missing_snapshot_ids(tmp_path: Path):
