@@ -42,7 +42,7 @@ STATUS_ZH = {
     "UNAVAILABLE": "暂无数据",
     "VALID": "有效",
     "NO_API_ID": "无供应商场次号",
-    "TOO_EARLY": "未到T-75",
+    "TOO_EARLY": "未进入动态采集窗口",
     "POST_KICKOFF": "已开球",
     "MISSING": "缺失",
     "MARKET_BASELINE": "市场基线",

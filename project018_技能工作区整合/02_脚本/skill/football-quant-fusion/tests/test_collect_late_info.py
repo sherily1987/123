@@ -262,7 +262,7 @@ def test_lineup_collection_uses_dynamic_prematch_window_not_t75(tmp_path: Path, 
                            want_lineup=True, events_path=tmp_path / "events.jsonl")
 
     # 8 hours before kickoff is collected even though it is outside the old
-    # T-75 gate; a missing provider response remains UNAVAILABLE and is retryable.
+    # The dynamic window is active; a missing provider response remains UNAVAILABLE and is retryable.
     assert rows[0]["status"] == "UNAVAILABLE"
     assert mod.in_collection_window(rec["kickoff"], now)
 
