@@ -38,6 +38,8 @@ def test_collect_file_writes_sidecar_without_mutating_input(tmp_path, monkeypatc
     assert out["count"] == 1
     assert (tmp_path / "out" / "sporttery-1.json").exists()
     assert "evidence_audit" not in source.read_text(encoding="utf-8")
+    assert out["source_health"]["api_sports"]["NOT_REQUESTED"] == 1
+    assert out["source_health"]["evidence_gap"] == 1
 
 
 def test_audit_exposes_mobile_feature_analysis_without_guessing_labels(monkeypatch):

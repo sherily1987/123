@@ -344,6 +344,11 @@ def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | No
     else:
         matches = payload
     rows, statuses = [], []
+    source_health = {
+        "api_sports": {"NOT_REQUESTED": 0, "ok": 0, "UNAVAILABLE": 0, "SOURCE_CONFLICT": 0},
+        "scrapling": {"attempted": 0, "ok": 0, "UNAVAILABLE": 0},
+        "evidence_gap": 0,
+    }
     source_map: dict[str, Any] = {}
     if scrapling_url_map:
         try:
@@ -371,12 +376,25 @@ def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | No
             row = collect_one(match, terms=terms, hist=hist)
             path = output_dir / f"{key}.json"
             path.write_text(json.dumps(row, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            audit = row.get("evidence_audit") or {}
+            api_status = str((audit.get("api_sports_attempt") or {}).get("status") or "NOT_REQUESTED")
+            source_health["api_sports"][api_status] = source_health["api_sports"].get(api_status, 0) + 1
+            scrapling = (row.get("facts") or {}).get("scrapling")
+            if isinstance(scrapling, dict):
+                source_health["scrapling"]["attempted"] += 1
+                if scrapling.get("status") == "UNAVAILABLE":
+                    source_health["scrapling"]["UNAVAILABLE"] += 1
+                else:
+                    source_health["scrapling"]["ok"] += 1
+            if audit.get("evidence_gap"):
+                source_health["evidence_gap"] += 1
             rows.append({"match_id": key, "status": "ok", "evidence_gap": row["evidence_audit"]["evidence_gap"], "path": str(path)})
         except Exception as exc:
             rows.append({"match_id": key, "status": "error", "reason": str(exc)[:200]})
         statuses.append(rows[-1])
     return {"schema_version": "prematch-evidence-run-1.0", "input": str(input_path),
-            "output_dir": str(output_dir), "count": len(statuses), "rows": rows}
+            "output_dir": str(output_dir), "count": len(statuses), "rows": rows,
+            "source_health": source_health}
 
 
 def main() -> int:
