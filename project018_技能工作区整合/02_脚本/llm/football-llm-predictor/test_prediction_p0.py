@@ -313,6 +313,21 @@ def test_catalog_accepts_structured_snapshot_blockquotes_and_honors_status():
     assert catalog[1]["source"].endswith("fixture=1")
 
 
+def test_catalog_marks_same_provider_pages_as_non_independent():
+    text = (
+        "- 近期状态 | source(https://www.example.test/form) | collected_at(2026-08-23T12:00:00+08:00)\n"
+        "- 伤停状态 | source(https://www.example.test/injuries) | collected_at(2026-08-23T12:00:00+08:00)\n"
+        "- 首发状态 | source(https://other.example.test/lineup) | collected_at(2026-08-23T12:00:00+08:00)\n"
+    )
+    catalog = predict.build_evidence_catalog(text)
+    assert catalog[0]["source_group"] == "example.test"
+    assert catalog[0]["independence"] == "PRIMARY_SOURCE_GROUP"
+    assert catalog[1]["independence"] == "DUPLICATE_SOURCE_GROUP"
+    assert "source_group" not in catalog[2]
+    prompt = predict.build_evidence_prompt({"home": "A", "away": "B"}, text, 1)
+    assert "DUPLICATE_SOURCE_GROUP" in prompt
+
+
 def test_prompt_explicitly_downweights_predicted_xi():
     text = (
         "> - starting_xi: status=PREDICTED；source=fotmob.bb_browser；"

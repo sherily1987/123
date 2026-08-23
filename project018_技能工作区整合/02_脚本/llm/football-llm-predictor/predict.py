@@ -20,6 +20,7 @@ import re
 import sys
 import threading
 import time
+import urllib.parse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -292,6 +293,21 @@ def build_evidence_catalog(evidence_text):
             "fact": fact,
             "source": source_match.group(1),
         })
+    # Mark repeated provider domains conservatively.  This does not delete
+    # facts—each item remains auditable—but prevents the prompt/auditor from
+    # treating several pages from one supplier as independent confirmation.
+    groups = {}
+    for item in catalog:
+        host = (urllib.parse.urlparse(item["source"]).netloc or "").lower()
+        group = host.removeprefix("www.") or item["source"]
+        groups.setdefault(group, []).append(item)
+    for group, items in groups.items():
+        if len(items) < 2:
+            continue
+        for rank, item in enumerate(items, 1):
+            item["source_group"] = group
+            item["source_group_rank"] = rank
+            item["independence"] = "PRIMARY_SOURCE_GROUP" if rank == 1 else "DUPLICATE_SOURCE_GROUP"
     return catalog
 
 
@@ -342,6 +358,11 @@ def build_evidence_prompt(match, evidence_text, match_idx):
     catalog = build_evidence_catalog(evidence_text)
     lines.append(f"\n=== 结构化证据（{evidence_collection_label(evidence_text)}） ===")
     lines.append(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
+    if any(item.get("independence") == "DUPLICATE_SOURCE_GROUP" for item in catalog):
+        lines.append(
+            "\n来源独立性提示：标记为 DUPLICATE_SOURCE_GROUP 的证据来自同一来源组，"
+            "只能作为同源补充，不能与 PRIMARY_SOURCE_GROUP 叠加成多个独立确认。"
+        )
     predicted_xi = any(item.get("status") == "SINGLE_SOURCE" and
                        ("starting_xi" in str(item.get("fact", "")).lower() or
                         "预计首发" in str(item.get("fact", "")) or
