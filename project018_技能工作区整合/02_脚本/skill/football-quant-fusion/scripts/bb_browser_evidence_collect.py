@@ -352,6 +352,29 @@ def _merge_scrapling_snapshot(primary: dict[str, Any], fallback: dict[str, Any])
     return True
 
 
+def _evidence_needs_source_discovery(row: dict[str, Any]) -> bool:
+    """Return true when a successful fetch still leaves auditable gaps."""
+    if str(row.get("status") or "") != "ok":
+        return True
+    audit = row.get("evidence_audit") or {}
+    return bool(audit.get("evidence_gap") or audit.get("missing_fields"))
+
+
+def _discovered_mapping(discovered: dict[str, Any]) -> dict[str, Any] | None:
+    """Convert classified discovery output into ordered Scrapling candidates."""
+    candidates = []
+    for url in (discovered.get("official_candidates") or []):
+        candidates.append({"scrapling_url": url, "source_id": "discovered.official",
+                           "provider": "discovered_official", "source_tier": "A"})
+    for url in (discovered.get("third_party_candidates") or []):
+        candidates.append({"scrapling_url": url, "source_id": "discovered.third_party",
+                           "provider": "discovered_third_party", "source_tier": "C"})
+    if not candidates:
+        return None
+    return {"scrapling_sources": candidates, "source_discovery": discovered,
+            "scrapling_fallback": True}
+
+
 def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
     """Discover candidate official/secondary pages from fixture identity.
 
@@ -649,21 +672,8 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
             # those candidates into the same ordered Scrapling fallback used
             # by API failures; arbitrary search results remain review-only.
             if scrape_discovered and discovered.get("status") == "source_candidates_found":
-                candidates = []
-                for url in (discovered.get("official_candidates") or []):
-                    candidates.append({"scrapling_url": url,
-                                       "source_id": "discovered.official",
-                                       "provider": "discovered_official",
-                                       "source_tier": "A"})
-                for url in (discovered.get("third_party_candidates") or []):
-                    candidates.append({"scrapling_url": url,
-                                       "source_id": "discovered.third_party",
-                                       "provider": "discovered_third_party",
-                                       "source_tier": "C"})
-                if candidates:
-                    mapping = {"scrapling_sources": candidates,
-                               "source_discovery": discovered,
-                               "scrapling_fallback": True}
+                mapping = _discovered_mapping(discovered)
+                if mapping:
                     row = collect_one(match, mapping)
                     if row.get("status") == "ok":
                         row["source_discovery"] = discovered
@@ -685,6 +695,27 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
             row = collect_one(match, mapping)
         except Exception as exc:
             row = {"status": "error", "match_id": mid, "reason": str(exc)[:300]}
+        # A mapped API/FotMob source may be reachable yet omit injuries, form,
+        # or lineups.  Treat that as a trigger for cross-source discovery too;
+        # otherwise a partial success would incorrectly terminate the fallback
+        # chain before the league's official/secondary pages are tried.
+        if (discover and scrape_discovered and mapping and
+                _evidence_needs_source_discovery(row)):
+            discovered = discover_sources(match)
+            discovered_mapping = (
+                _discovered_mapping(discovered)
+                if discovered.get("status") == "source_candidates_found" else None
+            )
+            if discovered_mapping:
+                discovered_row = collect_one(match, discovered_mapping)
+                if row.get("status") == "ok" and discovered_row.get("status") == "ok":
+                    attempts = discovered_row.get("scrapling_attempts") or []
+                    row["scrapling_attempts"] = (row.get("scrapling_attempts") or []) + attempts
+                    _merge_scrapling_snapshot(row, discovered_row)
+                    row["source_discovery"] = discovered
+                elif discovered_row.get("status") == "ok":
+                    row = discovered_row
+                    row["source_discovery"] = discovered
         if row.get("status") == "ok":
             path = output_dir / f"{mid}.json"
             path.write_text(json.dumps(row, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

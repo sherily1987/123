@@ -289,6 +289,38 @@ def test_collect_file_scrapes_discovered_allowlisted_candidates(monkeypatch, tmp
     assert saved["source_discovery"]["official_candidates"]
 
 
+def test_collect_file_discovers_additional_sources_after_partial_mapped_fetch(monkeypatch, tmp_path):
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps({"matches": [{
+        "match_id": "sporttery-2050003", "home": "A", "away": "B",
+        "competition": "测试联赛", "kickoff": "2026-08-26T03:00:00+00:00",
+        "evidence_sources": {"scrapling_url": "https://mapped.example/preview",
+                              "source_id": "mapped.preview"},
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(bec, "discover_sources", lambda match: {
+        "status": "source_candidates_found",
+        "official_candidates": ["https://official.example/match/2050003"],
+        "third_party_candidates": [],
+    })
+    calls = []
+
+    def fake_generic(match, mapping, collected_at):
+        calls.append(mapping["scrapling_url"])
+        complete = mapping["scrapling_url"].startswith("https://official")
+        return {"provider": mapping.get("provider"), "research_only": True,
+                "match_id": match["match_id"],
+                "evidence_audit": {"entries": {}, "missing_fields": [] if complete else ["injury"],
+                                    "evidence_gap": not complete}}
+
+    monkeypatch.setattr(bec, "_scrapling_generic_snapshot", fake_generic)
+    report = bec.collect_file(source, tmp_path / "out", None,
+                              discover=True, scrape_discovered=True)
+    assert report["ok"] == 1
+    assert calls == ["https://mapped.example/preview", "https://official.example/match/2050003"]
+    saved = json.loads((tmp_path / "out" / "sporttery-2050003.json").read_text(encoding="utf-8"))
+    assert saved["source_discovery"]["official_candidates"]
+
+
 def test_collect_one_without_mapping_emits_browser_task():
     row = bec.collect_one(
         {"match_id": "sporttery-2", "home": "A", "away": "B",
