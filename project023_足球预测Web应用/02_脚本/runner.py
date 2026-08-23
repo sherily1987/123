@@ -365,6 +365,51 @@ def auto_collect_prematch_evidence(input_path: Path, day: str, match_ids: list[s
     }
 
 
+def auto_collect_late_info(input_path: Path, day: str, matches: list[dict], *, now: datetime | None = None) -> dict:
+    """Run one bounded injury/lineup refresh when a fixture is within 24h.
+
+    The collector itself enforces the pre-kickoff gate and writes research-only
+    events. We do not use ``--watch`` here: the web job must finish, while a
+    later invocation can perform the next refresh window.
+    """
+    now = now or datetime.now(CST)
+    due = []
+    for match in matches:
+        kickoff = sv.parse_dt(match.get("kickoff_iso") or match.get("kickoff"))
+        if kickoff is None:
+            continue
+        minutes = (kickoff - now).total_seconds() / 60.0
+        if 0 < minutes <= 24 * 60:
+            due.append(sv.sporttery_id(match.get("match_id")))
+    due = [mid for mid in due if mid]
+    if not due:
+        return {"attempted": 0, "status": "not_needed", "reason": "no_match_within_24h"}
+    input_path = Path(input_path).resolve()
+    work_dir = (forward_work_dir() / day).resolve()
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    args = ["late-info", "--from-collect", str(input_path), "--snapshot", f"llm-{stamp}",
+            "--work-dir", str(work_dir), "--once"]
+    try:
+        result = _cli(args, timeout=1800)
+    except Exception as exc:
+        return {"attempted": len(due), "status": "error", "error": str(exc)[:240]}
+    payload = None
+    for line in reversed((result.stdout or "").splitlines()):
+        try:
+            payload = json.loads(line)
+            break
+        except ValueError:
+            continue
+    return {
+        "attempted": len(due),
+        "status": "ok" if result.returncode == 0 else "error",
+        "returncode": result.returncode,
+        "report": payload,
+        "error_tail": ((result.stderr or result.stdout or "")[-500:]
+                       if result.returncode else ""),
+    }
+
+
 _LLM_HEAD = re.compile(r"⚽ 第\d+/\d+场 \[([^\]]+)\]\s+(\S+)\s+VS\s+(\S+)")
 _LLM_DIR = re.compile(
     r"综合方向:\s+(\S+)\s+\((\d+(?:\.\d+)?)/(\d+(?:\.\d+)?)票,\s*强度(\d+)%\)"
@@ -480,12 +525,14 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         if not matches:
             db.run_update(run_id, status="done", message=f"{day} 没有未开球可跑的 LLM 场次")
             return
+        late_info_stats = auto_collect_late_info(inp, day, matches)
         raw = {
             "schema_version": "1.0",
             "source": "fusion inputs_prematch",
             "kickoff_date": day,
             "count": len(matches),
             "matches": matches,
+            "late_info_projection": late_info_stats,
         }
         evidence_stats = attach_collected_evidence(matches, day)
         auto_collect = auto_collect_prematch_evidence(
@@ -509,6 +556,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             message=(f"证据就绪 快照{evidence_stats['snapshots_attached']}/"
                      f"{len(matches)}，晚到合并{evidence_stats['late_info_matches_merged']}，"
                      f"自动补采{auto_collect.get('attempted', 0)}，"
+                     f"晚到刷新{late_info_stats.get('attempted', 0)}，"
                      f"复用{reused} 轻量{light}，开始跑 {len(matches)} 场…"),
         )
         repo = llm_repo()
@@ -548,6 +596,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             f"- 待跑 {len(matches)} 场，侧车快照接入 {evidence_stats['snapshots_attached']}，"
             f"晚到信息合并 {evidence_stats['late_info_matches_merged']}，"
             f"自动补采 {auto_collect.get('attempted', 0)}，"
+            f"晚到刷新 {late_info_stats.get('attempted', 0)}，"
             f"补采后仍缺 {len(evidence_stats.get('missing_snapshot_ids') or [])}",
             f"- 复用深度证据 {reused}，轻量证据 {light}",
             f"- 出方向 {parsed['ok']}，门禁/审计跳过 {parsed['skipped']}",

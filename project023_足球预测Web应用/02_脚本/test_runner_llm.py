@@ -122,6 +122,35 @@ def test_auto_collect_prematch_evidence_is_id_scoped(tmp_path: Path, monkeypatch
     assert seen["args"].count("--match-id") == 2
 
 
+def test_auto_collect_late_info_is_only_run_within_24h(tmp_path: Path, monkeypatch):
+    seen = {}
+
+    class Result:
+        returncode = 0
+        stdout = '{"matches": 1, "lineup_valid": 1}\n'
+        stderr = ""
+
+    def fake_cli(args, timeout=0):
+        seen["args"] = args
+        seen["timeout"] = timeout
+        return Result()
+
+    monkeypatch.setattr(runner, "_cli", fake_cli)
+    monkeypatch.setattr(runner, "forward_work_dir", lambda: tmp_path / "forward")
+    now = datetime(2026, 8, 23, 12, 0, tzinfo=CST)
+    matches = [{"match_id": 2041021, "kickoff_iso": "2026-08-24T03:30:00+08:00"}]
+    got = runner.auto_collect_late_info(tmp_path / "inputs.json", "2026-08-24", matches, now=now)
+    assert got["status"] == "ok"
+    assert got["attempted"] == 1
+    assert seen["args"][0] == "late-info"
+    assert "--watch" not in seen["args"]
+    far = runner.auto_collect_late_info(
+        tmp_path / "inputs.json", "2026-08-24",
+        [{"match_id": 2041022, "kickoff_iso": "2026-08-25T13:00:00+08:00"}], now=now
+    )
+    assert far["status"] == "not_needed"
+
+
 def test_parse_llm_log_extracts_direction_and_skips():
     text = """
 ⚽ 第1/2场 [周一002] 赫根 VS 哈尔姆斯 | 瑞超 | 2026-08-18 01:00
