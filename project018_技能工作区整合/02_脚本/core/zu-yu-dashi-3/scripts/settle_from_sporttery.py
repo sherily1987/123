@@ -75,6 +75,14 @@ def fetch_fixed_by_id(mid):
             "score_ht": s1.replace(":", "-") or None,
             "status_name": v.get("matchStatusName")}
 
+
+def filter_pending_by_date(pending, only_date):
+    """Apply the requested local kickoff-date scope before any remote lookup."""
+    if not only_date:
+        return list(pending)
+    return [row for row in pending
+            if str(row.get("kickoff") or "")[:10] == str(only_date)]
+
 # [中文功能] 按官方赛果自动回填登记库
 def main():
     ap = argparse.ArgumentParser()
@@ -105,6 +113,10 @@ def main():
             pending.append({'match_id': mid, 'home': m['home'], 'away': m['away'],
                             'kickoff': m.get('kickoff') or '', 'path': str(p),
                             'sporttery_id': meta.get('match_id')})
+
+    # Apply the date scope before both date queries and matchId direct lookup.
+    # The direct lookup is authoritative, but must not bypass --date.
+    pending = filter_pending_by_date(pending, a.date)
 
     # 按待回填场次的开球日期逐日查询，覆盖官方滚动窗口之外的历史场次
     if a.date:
