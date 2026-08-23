@@ -51,7 +51,7 @@ def test_t75_window_only_inside_75_minutes():
 
 
 def test_api_sports_fixture_resolver_matches_chinese_alias_and_kickoff():
-    """Removing alias/time matching would leave the T-75 lineup chain without an ID."""
+    """Removing alias/time matching would leave the dynamic lineup chain without an ID."""
     matches = [{
         "sporttery_meta": {"match_id": 2041028},
         "home": "博洛尼亚",
@@ -95,7 +95,7 @@ def test_api_sports_fixture_resolver_covers_provider_team_name_variants():
 
 
 def test_api_sports_fixture_resolver_covers_20260823_sporttery_alias_gaps():
-    """Known Sporttery labels must resolve to the provider fixtures used at T-75."""
+    """Known Sporttery labels must resolve to provider fixtures used by the late-info chain."""
     matches = [
         {"sporttery_meta": {"match_id": 2041018}, "home": "弗洛西诺", "away": "尤文图斯",
          "kickoff": "2026-08-24T00:30:00+08:00"},
@@ -191,6 +191,26 @@ def test_t75_lineup_uses_api_sports_fixture_identity(tmp_path: Path, monkeypatch
     assert rows[0]["lineup"]["away"]["starting"] == ["Away Starter"]
 
 
+def test_lineup_collection_uses_dynamic_prematch_window_not_t75(tmp_path: Path, monkeypatch):
+    now = datetime(2026, 8, 24, 16, 0, tzinfo=UTC)
+    rec = {
+        "sporttery_meta": {"match_id": 2041028},
+        "home": "博洛尼亚", "away": "拉齐奥",
+        "kickoff": "2026-08-25T00:30:00+08:00",
+        "api_sports_fixture_id": 1550089,
+    }
+    monkeypatch.setattr(mod, "now_utc", lambda: now)
+    monkeypatch.setattr(mod, "fetch_api_sports_lineup", lambda fixture_id: [])
+
+    rows = mod.collect_one(rec, "initial_prematch", want_injury=False,
+                           want_lineup=True, events_path=tmp_path / "events.jsonl")
+
+    # 8 hours before kickoff is collected even though it is outside the old
+    # T-75 gate; a missing provider response remains UNAVAILABLE and is retryable.
+    assert rows[0]["status"] == "UNAVAILABLE"
+    assert mod.in_collection_window(rec["kickoff"], now)
+
+
 def test_t75_watcher_retries_until_a_valid_lineup_arrives():
     unavailable = [
         {"kind": "injury", "status": "UNAVAILABLE"},
@@ -216,6 +236,8 @@ def test_due_and_jsonl_are_research_only(tmp_path: Path):
     data = json.loads(due_path.read_text(encoding="utf-8"))
     assert data["research_only"] is True
     assert due[0]["match_id"] == 2040907
+    assert "t75_at" not in due[0]
+    assert data["refresh_policy"] == "initial_plus_poll_until_kickoff"
     row = mod.base_row(
         matches[0], "injury", "T-7h",
         datetime(2026, 8, 16, 8, 0, tzinfo=UTC),

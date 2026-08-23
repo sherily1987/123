@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""伤停 + T-75 首发采集。只写研究库，不改生产 input / 不登记。
+"""伤停 + 动态赛前首发采集。只写研究库，不改生产 input / 不登记。
 
 伤停：体彩 getInjurySuspensionV1（有 sporttery match_id 即可）。
 首发：API-Sports /fixtures/lineups，要求先经队名别名和开球时间映射到
-api_sports_fixture_id；开球前 75 分钟以外不拉首发。
+api_sports_fixture_id；在固定的赛前初始窗口采集，并可持续轮询到开球，
+不依赖单一 T-75 时刻。
 """
 from __future__ import annotations
 
@@ -24,6 +25,12 @@ import fetch_match_preview as preview  # noqa: E402
 from sporttery_trained_aliases import SPORTTERY_TO_TRAINED  # noqa: E402
 
 CST = timezone(timedelta(hours=8))
+# The first refresh is deliberately a broad, fixed window.  It is not a
+# claim that lineups are published at this offset; providers may publish
+# earlier or later, so --watch can retry until kickoff.
+INITIAL_REFRESH_MINUTES = 24 * 60
+# Kept only so historical callers/tests can inspect the old diagnostic helper.
+# Production collection never uses this value as a gate.
 T75_MINUTES = 75
 API_SPORTS_BASE = "https://v3.football.api-sports.io"
 ALIAS_CONFIG = Path(__file__).resolve().parents[1] / "config" / "intl_odds_sources.json"
@@ -68,6 +75,8 @@ def parse_dt(value):
 
 
 def minutes_to_kickoff(kickoff, at=None) -> float | None:
+    if not isinstance(kickoff, datetime):
+        kickoff = parse_dt(kickoff)
     if kickoff is None:
         return None
     at = at or now_utc()
@@ -75,6 +84,13 @@ def minutes_to_kickoff(kickoff, at=None) -> float | None:
 
 
 def in_t75_window(kickoff, at=None, window=T75_MINUTES) -> bool:
+    """Backward-compatible diagnostic; never gates collection anymore."""
+    mins = minutes_to_kickoff(kickoff, at)
+    return mins is not None and 0 < mins <= window
+
+
+def in_collection_window(kickoff, at=None, window=INITIAL_REFRESH_MINUTES) -> bool:
+    """Return whether the fixed initial pre-match refresh window is active."""
     mins = minutes_to_kickoff(kickoff, at)
     return mins is not None and 0 < mins <= window
 
@@ -334,7 +350,7 @@ def base_row(rec, kind, snapshot, collected_at, odds_at, kickoff):
         "gate": {
             "late": late,
             "minutes_to_kickoff": None if kickoff is None else round(minutes_to_kickoff(kickoff, collected_at), 2),
-            "in_t75": in_t75_window(kickoff, collected_at),
+            "in_collection_window": in_collection_window(kickoff, collected_at),
         },
     }
 
@@ -360,7 +376,7 @@ def collect_one(rec, snapshot, want_injury, want_lineup, events_path):
         row = base_row(rec, "lineup", snapshot, collected_at, odds_at, kickoff)
         if kickoff and collected_at >= kickoff:
             row["status"] = "POST_KICKOFF"
-        elif not in_t75_window(kickoff, collected_at):
+        elif not in_collection_window(kickoff, collected_at):
             row["status"] = "TOO_EARLY"
         else:
             fixture_id = api_sports_fixture_id_of(rec)
@@ -396,7 +412,7 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
             "home": rec.get("home"),
             "away": rec.get("away"),
             "kickoff": kickoff.isoformat(),
-            "t75_at": (kickoff - timedelta(minutes=T75_MINUTES)).isoformat(),
+            "initial_refresh_at_or_after": (kickoff - timedelta(minutes=INITIAL_REFRESH_MINUTES)).isoformat(),
             "odds_at": odds_at_of(rec).isoformat() if odds_at_of(rec) else None,
             "apifootball_match_id": api_match_id_of(rec),
             "api_sports_fixture_id": api_sports_fixture_id_of(rec),
@@ -408,7 +424,8 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
     path.write_text(json.dumps({
         "schema": "late-info-due-1.0",
         "research_only": True,
-        "t75_minutes": T75_MINUTES,
+        "refresh_policy": "initial_plus_poll_until_kickoff",
+        "initial_refresh_minutes": INITIAL_REFRESH_MINUTES,
         "matches": due,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return due
@@ -420,7 +437,7 @@ def main() -> None:
     ap.add_argument("--snapshot", default="T-7h")
     ap.add_argument("--work-dir", type=Path)
     ap.add_argument("--events", type=Path)
-    ap.add_argument("--watch", action="store_true", help="等到 T-75 再采首发/伤停；每日流水线不要带这个")
+    ap.add_argument("--watch", action="store_true", help="在初始赛前窗口内轮询首发直到开球")
     ap.add_argument("--poll-seconds", type=int, default=60)
     ap.add_argument("--once", action="store_true")
     args = ap.parse_args()
@@ -440,7 +457,7 @@ def main() -> None:
     for rec in matches:
         collected.extend(collect_one(
             rec, args.snapshot, want_injury=True,
-            want_lineup=in_t75_window(kickoff_of(rec)),
+            want_lineup=in_collection_window(kickoff_of(rec)),
             events_path=events_path))
         time.sleep(0.4)
 
@@ -453,9 +470,9 @@ def main() -> None:
                 kickoff = kickoff_of(rec)
                 if kickoff is None or now_utc() >= kickoff:
                     continue
-                if in_t75_window(kickoff):
+                if in_collection_window(kickoff):
                     rows = collect_one(
-                        rec, "T-75", want_injury=True, want_lineup=True, events_path=events_path)
+                        rec, "prematch_poll", want_injury=True, want_lineup=True, events_path=events_path)
                     collected.extend(rows)
                     if should_retry_lineup(rows):
                         still.append(rec)

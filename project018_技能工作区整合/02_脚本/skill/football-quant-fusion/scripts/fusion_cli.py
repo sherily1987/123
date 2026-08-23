@@ -285,7 +285,7 @@ def main():
         run_script("hybrid_admission.py", rest)
         return
     if cmd == "late-info":
-        # 盘后伤停 + T-75 首发，只写研究库。
+        # 动态赛前伤停/首发，只写研究库。
         #   fusion_cli.py late-info --from-collect raw.json
         #   fusion_cli.py late-info --from-collect raw.json --watch
         run_script("collect_late_info.py", rest)

@@ -357,7 +357,7 @@ def main():
         report['intl_odds'] = {'status': 'skipped',
                                'reason': 'ODDS_API_KEY 未设置，国际盘对照默认不启用'}
 
-    # 3.6) 盘后伤停 + T-75 首发：只写研究库，不并入下面的正式登记 input。
+    # 3.6) 动态赛前伤停/首发：只写研究库，不并入下面的正式登记 input。
     if a.dry_run:
         report['late_info'] = {'status': 'skipped', 'reason': 'dry-run'}
     else:
