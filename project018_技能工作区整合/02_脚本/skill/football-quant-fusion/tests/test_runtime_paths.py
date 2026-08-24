@@ -44,3 +44,30 @@ def test_legacy_suite_write_is_blocked(monkeypatch):
         assert "legacy" in str(exc).lower()
     else:
         raise AssertionError("legacy suite path should be blocked")
+
+
+def test_validate_cli_paths_rejects_legacy_store_override():
+    paths = _load_module()
+    legacy = r"C:\Users\Administrator\.codex\skills\football-quant-fusion-suite\shared-data"
+    try:
+        paths.validate_cli_paths(["--store", legacy])
+    except ValueError as exc:
+        assert "legacy fusion suite is read-only" in str(exc)
+    else:
+        raise AssertionError("legacy CLI store override should be blocked")
+
+
+def test_core_copy_status_reports_matching_critical_files(tmp_path, monkeypatch):
+    paths = _load_module()
+    repo = tmp_path / "repo"
+    external = tmp_path / "external"
+    repo.mkdir()
+    external.mkdir()
+    for name in ("predict.py", "team_strength.py"):
+        (repo / name).write_text(name, encoding="utf-8")
+        (external / name).write_text(name, encoding="utf-8")
+    monkeypatch.setenv("FUSION_CORE_DIR", str(repo))
+    monkeypatch.setenv("FUSION_LEGACY_CORE_DIR", str(external))
+    report = paths.core_copy_status()
+    assert report["status"] == "MATCH"
+    assert report["mismatches"] == []

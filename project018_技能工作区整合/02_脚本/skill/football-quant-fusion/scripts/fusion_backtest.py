@@ -23,7 +23,7 @@ from pathlib import Path
 # 那种加载方式不会把 scripts/ 放进 sys.path，同目录模块会 ModuleNotFoundError。
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from runtime_paths import backtest_store
+from runtime_paths import assert_writable_target, backtest_store
 
 # 2026-08-16 修正：原默认值硬编码指向外部 football-quant-fusion-suite。
 # 那是一份物理拷贝、且比仓库内唯一事实源旧，忘了传 --store 就会**静默评测错的库**
@@ -555,6 +555,9 @@ def score_record(rec, root):
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
         "model": _m if isinstance(_m, dict) else {},
+        "mode": str((rec.get("input") or {}).get("mode") or
+                     ((rec.get("output") or {}).get("mode")) or
+                     (_m.get("mode") if isinstance(_m, dict) else "unknown")),
         "core_engine_version": (rec.get("output") or {}).get("core_engine_version"),
         "league": ((rec.get("match") or {}).get("competition")) or ((rec.get("match") or {}).get("stage")) or "?",
         "probs": probs,
@@ -617,6 +620,18 @@ def evidence_stratification(rows):
     return {f"{key}:{value}": summarize(rows) for (key, value), rows in sorted(groups.items())}
 
 
+def route_stratification(rows):
+    """Report market-only and independent hybrid routes separately."""
+    groups = {}
+    for row in rows:
+        model = row.get("model") or {}
+        route = str(row.get("mode") or model.get("mode") or "unknown").lower()
+        if route not in {"market_only", "hybrid"}:
+            route = "unknown"
+        groups.setdefault(route, []).append(row)
+    return {key: summarize(value) for key, value in sorted(groups.items())}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("input", nargs="?", help="可选：离线历史 JSON（含 output+actual 的融合记录）")
@@ -629,7 +644,7 @@ def main():
     ap.add_argument("--bootstrap-iterations", type=int, default=2000)
     ap.add_argument("--output")
     a = ap.parse_args()
-    root = Path(a.store)
+    root = assert_writable_target(Path(a.store))
 
     if a.input:
         raw = json.loads(Path(a.input).read_text(encoding="utf-8-sig"))
@@ -647,6 +662,7 @@ def main():
                 "snapshot_type": it.get("snapshot_type", "offline"),
                 "version": str(it.get("engine_version") or "offline"),
                 "model": it.get("model") or {},
+                "mode": str(it.get("mode") or (it.get("model") or {}).get("mode") or "unknown"),
                 "league": str(it.get("competition") or it.get("stage") or "?"),
                 "probs": [x / 100.0 for x in probs_pct],
                 "model_probs": ([x / 100.0 for x in (find(out, "model_1x2_pct") or [])]
@@ -730,6 +746,7 @@ def main():
         "paired_market": paired_market_comparison(
             rows, iterations=a.bootstrap_iterations, seed=20260808),
         "evidence_stratification": evidence_stratification(rows),
+        "route_stratification": route_stratification(rows),
         "walk_forward": walk_forward_report(
             rows, folds=a.walk_forward_folds, bootstrap_iterations=a.bootstrap_iterations),
         "current_identity": current_identity,

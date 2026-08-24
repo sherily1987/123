@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 from runtime import resolve_python
-from runtime_paths import core_scripts_dir, data_root, odds_store
+from runtime_paths import core_copy_status, core_scripts_dir, data_root, odds_store, validate_cli_paths
 from draw_watch_signal import build_draw_calibration_shadow, build_draw_research
 
 # 统一解释器：当前为 3.14 等非 3.12 时，所有子进程改用内置 Python 3.12
@@ -49,6 +49,15 @@ Supported commands:
   prematch-evidence
   bb-browser-evidence
 """
+
+
+def assert_release_lock_clean() -> None:
+    """Fail closed when probability files drift from the release lock."""
+    audit = HERE / "audit_version_consistency.py"
+    proc = subprocess.run([PY, str(audit)], text=True, capture_output=True)
+    if proc.returncode:
+        detail = (proc.stdout or proc.stderr or "版本审计失败").strip()
+        raise SystemExit(f"发布锁审计未通过，禁止生产登记：{detail}")
 
 
 # [中文功能] 从命令行参数中提取指定flag的值
@@ -237,6 +246,16 @@ def main():
         print(HELP)
         return
     cmd, rest = sys.argv[1], sys.argv[2:]
+    # All routed commands share the same write-path guard.  This prevents a
+    # caller from silently bypassing the repository fact source with an
+    # explicit legacy ``--store`` or ``--odds-store`` override.
+    validate_cli_paths(rest)
+    copy_status = core_copy_status()
+    if copy_status["status"] == "MISMATCH":
+        raise SystemExit(
+            "核心引擎仓库副本与外部物理副本不一致；请先同步并重新审计："
+            + ",".join(copy_status["mismatches"])
+        )
     if cmd == "record" and any(arg in ("-h", "--help") for arg in rest):
         print("Usage: fusion_cli.py record --input MATCH.json --output MODEL.json "
               "[--snapshot prematch] [--store DIR] [--odds-source ODDS.json]")
@@ -262,6 +281,8 @@ def main():
     if cmd == "job":
         run_script("job_ticket.py", rest)
         return
+    if cmd == "record":
+        assert_release_lock_clean()
     if cmd == "strategy-plan":
         # 四市场逐池审计 + 2/3 串结构 + 每日预算总账；所有生产与资金门禁失败关闭。
         run_script("daily_strategy_planner.py", rest)

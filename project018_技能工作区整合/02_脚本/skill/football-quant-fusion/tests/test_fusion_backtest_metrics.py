@@ -43,3 +43,18 @@ def test_summary_does_not_invent_score_logloss_from_a_topk_list():
 
     assert report["score"]["full_matrix_n"] == 0
     assert report["score"]["score_log_loss"] is None
+
+
+def test_route_stratification_keeps_market_only_and_hybrid_separate():
+    rows = [
+        {"mode": "market_only", "probs": [0.5, 0.3, 0.2], "actual_idx": 0,
+         "actual_score": "1-0", "top_scores": None, "score_matrix": None,
+         "ou25": None, "ou35": None, "btts": None, "clv_pp": None},
+        {"mode": "hybrid", "probs": [0.5, 0.3, 0.2], "actual_idx": 1,
+         "actual_score": "0-0", "top_scores": None, "score_matrix": None,
+         "ou25": None, "ou35": None, "btts": None, "clv_pp": None},
+    ]
+    report = backtest.route_stratification(rows)
+    assert set(report) == {"hybrid", "market_only"}
+    assert report["hybrid"]["n"] == 1
+    assert report["market_only"]["n"] == 1

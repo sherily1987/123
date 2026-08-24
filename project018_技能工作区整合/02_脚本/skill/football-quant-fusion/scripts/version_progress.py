@@ -26,7 +26,7 @@ from pathlib import Path
 from fusion_backtest import (load_jsonl, load_version_aliases, resolve_path,
                              select_primary_rows)
 from fusion_predict_core import build_identity
-from runtime_paths import backtest_store, data_root
+from runtime_paths import assert_writable_target, backtest_store, data_root
 
 MIN_RECALIBRATION = 100
 THRESHOLD_REVIEW = 200
@@ -215,7 +215,7 @@ def main() -> int:
     ap.add_argument("--output", help="同时写入指定文件")
     a = ap.parse_args()
 
-    report = build_report(Path(a.store), a.snapshot_policy)
+    report = build_report(assert_writable_target(Path(a.store)), a.snapshot_policy)
     text = json.dumps(report, ensure_ascii=False, indent=2) if a.json else render(report)
     print(text)
     if a.output:

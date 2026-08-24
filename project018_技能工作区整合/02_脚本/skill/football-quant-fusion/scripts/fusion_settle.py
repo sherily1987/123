@@ -14,7 +14,7 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-from runtime_paths import core_scripts_dir, data_root
+from runtime_paths import assert_writable_target, core_scripts_dir, data_root
 
 
 def build_commands(
@@ -109,6 +109,7 @@ def main() -> None:
     parser.add_argument("--include-llm-jobs", action="store_true",
                         help="为 LLM 研究工单查询官方赛果，用于独立校准")
     args = parser.parse_args()
+    args.store = assert_writable_target(Path(args.store))
     commands = build_commands(args.store, args.date, args.dry_run,
                               args.apifootball_fallback, args.include_llm_jobs)
     official = run_command(commands[0]["cmd"])

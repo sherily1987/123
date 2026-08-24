@@ -38,6 +38,16 @@ class DayReq(BaseModel):
 @app.get("/api/health")
 def health():
     root = sv.store_root()
+    copy_status = None
+    try:
+        import sys
+        scripts = HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts"
+        if str(scripts) not in sys.path:
+            sys.path.insert(0, str(scripts))
+        from runtime_paths import core_copy_status
+        copy_status = core_copy_status()
+    except Exception as exc:
+        copy_status = {"status": "UNAVAILABLE", "error": str(exc)}
     return {
         "ok": True,
         "now": datetime.now(timezone.utc).isoformat(),
@@ -47,6 +57,8 @@ def health():
         "quant_mode": "market_only",
         "llm_track": True,
         "daily_strategy": "budgeted_action",
+        "production_recommendations_enabled": False,
+        "core_copy_status": copy_status,
     }
 
 
@@ -83,6 +95,20 @@ def daily_strategy_api(day: str | None = None):
         raise HTTPException(400, str(exc)) from exc
     except Exception as exc:
         raise HTTPException(500, f"每日策略生成失败: {exc}") from exc
+
+
+@app.get("/api/version-progress")
+def version_progress():
+    """Expose version/cohort progress without silently merging stores."""
+    try:
+        import sys
+        scripts = HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts"
+        if str(scripts) not in sys.path:
+            sys.path.insert(0, str(scripts))
+        from version_progress import build_report
+        return build_report(sv.store_root() / "backtest")
+    except Exception as exc:
+        raise HTTPException(500, f"版本进度读取失败: {exc}") from exc
 
 
 @app.get("/api/daily-strategy/backtest")

@@ -1,6 +1,6 @@
 {
   "schema_version": "fusion-backtest-2.0",
-  "generated_at": "2026-08-24T12:05:29.834815+00:00",
+  "generated_at": "2026-08-24T14:26:01.839054+00:00",
   "store": "project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
   "evaluation_unit": "match",
   "snapshot_policy": "closing",
@@ -1725,6 +1725,93 @@
       "clv_n": 369
     },
     "evidence_gap:no_gap": {
+      "n": 369,
+      "accuracy_pct": 51.762,
+      "brier_mean": 0.61160791,
+      "brier_sum": 225.683318,
+      "log_loss": 1.02023376,
+      "ece": 0.032598,
+      "calibration_bins": [
+        {
+          "bin": "0.0-0.1",
+          "n": 43,
+          "avg_prob": 0.074837,
+          "actual_rate": 0.093023
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 176,
+          "avg_prob": 0.157938,
+          "actual_rate": 0.221591
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 361,
+          "avg_prob": 0.250465,
+          "actual_rate": 0.243767
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 249,
+          "avg_prob": 0.348112,
+          "actual_rate": 0.341365
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 98,
+          "avg_prob": 0.453163,
+          "actual_rate": 0.479592
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 68,
+          "avg_prob": 0.552162,
+          "actual_rate": 0.602941
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 58,
+          "avg_prob": 0.645466,
+          "actual_rate": 0.448276
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 39,
+          "avg_prob": 0.746564,
+          "actual_rate": 0.74359
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 15,
+          "avg_prob": 0.827133,
+          "actual_rate": 0.666667
+        }
+      ],
+      "score": {
+        "top1_accuracy_pct": 11.92,
+        "top3_accuracy_pct": 31.17,
+        "top5_accuracy_pct": 48.78,
+        "full_matrix_n": 369,
+        "score_log_loss": 2.93562
+      },
+      "ou_2_5_brier": 0.262032,
+      "ou_2_5": {
+        "n": 369,
+        "brier": 0.262032,
+        "accuracy_pct": 52.03
+      },
+      "ou_3_5": {
+        "n": 369,
+        "brier": 0.217172,
+        "accuracy_pct": 69.65
+      },
+      "btts_brier": 0.255285,
+      "clv_mean_pp": -0.029,
+      "clv_n": 369
+    }
+  },
+  "route_stratification": {
+    "market_only": {
       "n": 369,
       "accuracy_pct": 51.762,
       "brier_mean": 0.61160791,

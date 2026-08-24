@@ -45,6 +45,12 @@ def classify(rows, *, min_samples=300, min_recent=60, max_missing_rate=0.20, min
         if audit.get("evidence_gap") is True:
             gap_count += 1
     verified = sum(1 for row in ordered if _is_verified_result(row))
+    xg_valid_statuses = {"VALID", "AVAILABLE", "EXPLICIT_XG", "PROXY_XG", "OK"}
+    xg_count = sum(
+        1 for row in ordered
+        if str(row.get("xg_status") or row.get("xg", {}).get("status") or "").upper()
+        in xg_valid_statuses
+    )
     n = len(ordered)
     missing_rate = gap_count / n if n else 1.0
     verified_rate = verified / n if n else 0.0
@@ -75,6 +81,10 @@ def classify(rows, *, min_samples=300, min_recent=60, max_missing_rate=0.20, min
         "evidence_missing_rate": round(missing_rate, 4),
         "verified_result_count": verified,
         "verified_result_rate": round(verified_rate, 4),
+        "xg_coverage_count": xg_count,
+        "xg_coverage_rate": round(xg_count / n, 4) if n else 0.0,
+        "production_eligible": tier == "可用",
+        "research_only": tier != "可用",
         "reasons": reasons,
         "thresholds": {
             "min_samples": min_samples,
