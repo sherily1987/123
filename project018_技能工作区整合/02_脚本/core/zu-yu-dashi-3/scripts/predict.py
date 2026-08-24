@@ -368,6 +368,28 @@ def bp_matrix(lh, la, lam3, n=MAX_GOALS):
     return {k: v / tot for k, v in m.items()}
 
 
+def bp_matrix_stable(lh, la, lam3, n=MAX_GOALS, tail_buffer=6):
+    """计算带尾部缓冲的双变量泊松矩阵，再折叠到展示网格。
+
+    `bp_matrix` 为兼容历史生产概率保留原有截断行为；本函数先在更大的
+    网格上计算，再把超出展示上限的比分合并到最后一格，避免高λ场次把
+    截断误差集中到单个 (n-1,n-1) 格。它是数值稳定研究入口，不改变默认生产路由。
+    """
+    size = int(n)
+    buffer = max(int(tail_buffer), 0)
+    if size < 1:
+        raise ValueError("n must be positive")
+    if buffer == 0:
+        return bp_matrix(lh, la, lam3, n=size)
+    raw = bp_matrix(lh, la, lam3, n=size + buffer)
+    folded = {}
+    for (home, away), value in raw.items():
+        key = (min(home, size - 1), min(away, size - 1))
+        folded[key] = folded.get(key, 0.0) + value
+    total = sum(folded.values())
+    return {key: value / total for key, value in folded.items()} if total > 0 else folded
+
+
 # [中文功能] 比分矩阵温度缩放：p^(1/T) 归一化；T=1.0 时原样返回
 def temperature_scale(m, T):
     if T is None or abs(float(T) - 1.0) < 1e-9:

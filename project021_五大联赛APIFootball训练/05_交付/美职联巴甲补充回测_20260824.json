@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step_days": 30,
+    "half_life": 500.0,
+    "xg_weight": 0.4,
+    "shrinkage": "off",
+    "metric_basis": "model_on_baseline_subset"
+  },
+  "leagues": {
+    "fd_bra": {
+      "config": "滚动（无 xG 数据）hl=500",
+      "baseline": "closing_market",
+      "test_from": 738796,
+      "n_all": 1098,
+      "skip": 8,
+      "model_all": 0.612071,
+      "n_subset": 1098,
+      "model_subset": 0.612071,
+      "market": 0.596333,
+      "frequency": 0.637299,
+      "accuracy_pct": 50.09,
+      "log_loss": 1.021384,
+      "no_market": false,
+      "thin": false
+    },
+    "fd_usa": {
+      "config": "滚动（无 xG 数据）hl=500",
+      "baseline": "closing_market",
+      "test_from": 738998,
+      "n_all": 1203,
+      "skip": 4,
+      "model_all": 0.631692,
+      "n_subset": 1203,
+      "model_subset": 0.631692,
+      "market": 0.608364,
+      "frequency": 0.646239,
+      "accuracy_pct": 47.38,
+      "log_loss": 1.049865,
+      "no_market": false,
+      "thin": false
+    }
+  },
+  "summary_by_baseline": {
+    "closing_market": {
+      "leagues": [
+        "fd_bra",
+        "fd_usa"
+      ],
+      "n": 2301,
+      "model": 0.6223,
+      "market": 0.6026,
+      "frequency": 0.642,
+      "gap": 0.0197
+    }
+  }
+}

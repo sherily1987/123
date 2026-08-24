@@ -94,8 +94,14 @@ def _score_row(row: dict[str, Any], results: dict[str, dict[str, Any]], *, combo
     odds = _num(row.get("odds"))
     stake = _num(row.get("stake_amount")) or 0.0
     result = results.get(match_id)
-    base = {"match_id": match_id, "market": market, "selection": selection,
-            "stake_amount": stake, "odds": odds, "combo_id": combo_id}
+    # Keep human-readable fixture identity in the persisted strategy record;
+    # match_id remains the settlement key, but the workbench must not force
+    # users to decode IDs to understand which teams were recommended.
+    base = {"match_id": match_id, "match_num": row.get("match_num"),
+            "home": row.get("home"), "away": row.get("away"),
+            "kickoff": row.get("kickoff"), "market": market,
+            "selection": selection, "stake_amount": stake, "odds": odds,
+            "combo_id": combo_id}
     if not match_id or odds is None or odds <= 1 or stake <= 0:
         return {**base, "status": "void", "reason": "malformed_recommendation"}
     if not result:

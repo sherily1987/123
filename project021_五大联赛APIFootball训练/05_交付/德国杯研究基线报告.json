@@ -1,0 +1,16 @@
+{
+  "schema": "research-frequency-baseline-1.0",
+  "competition": "德国杯",
+  "source": "api-sports.io_event_results",
+  "train_n": 204,
+  "test_n": 69,
+  "train_class_prior": {"H": 0.26960784, "D": 0.12254902, "A": 0.60784314},
+  "frequency_baseline": {
+    "accuracy_pct": 68.1159,
+    "brier": 0.495543,
+    "log_loss": 0.859882
+  },
+  "model_status": "NOT_TRAINED",
+  "decision": "RESEARCH_ONLY",
+  "reason": "杯赛主客顺序、加时和点球会使简单胜平负频率产生结构偏差，不能据此放行生产模型"
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "browser-team-evidence-1.0",
+  "match_id": "sporttery-2041017",
+  "collected_at": "2026-08-23T18:23:00+08:00",
+  "confirmed_starting_xi": {"status": "NOT_PUBLISHED"},
+  "probable_lineups": {
+    "source_id": "fotmob.match_preview",
+    "source_url": "https://www.fotmob.com/matches/liverpool-vs-newcastle/2ygyxm",
+    "home_formation": "4-2-3-1",
+    "home": ["Hornicek", "Dedic", "Thiaw", "Botman", "Hall", "Ramsey", "Bamba", "Elanga", "Wissa", "Barnes", "Osula"],
+    "away_formation": "4-2-3-1",
+    "away": ["Alisson", "Frimpong", "Jacquet", "Van Dijk", "Kerkez", "Gravenberch", "Szoboszlai", "Ngumoha", "Wirtz", "Gakpo", "Isak"]
+  },
+  "injury_and_suspension": {
+    "source_id": "goal.preview",
+    "source_url": "https://www.goal.com/en/news/newcastle-united-liverpool-premier-league-preview/blt8a1b76d6d787990e",
+    "newcastle_injured_or_doubtful": ["Lewis Miley", "Fabian Schar", "Valentino Livramento", "Anthony Elanga", "Lewis Hall"],
+    "liverpool_injured": ["Hugo Ekitike", "Stefan Bajcetic", "Conor Bradley", "Alexis Mac Allister", "Joseph Gomez", "Giovanni Leoni", "Jeremy Jacquet", "Vitezslav Jaros", "Curtis Jones"],
+    "suspensions": "No suspensions currently recorded in the preview"
+  },
+  "recent_form": {
+    "source_id": "fotmob.match_preview",
+    "source_url": "https://www.fotmob.com/matches/liverpool-vs-newcastle/2ygyxm",
+    "newcastle_last5": ["1-1 Strasbourg", "1-2 Leverkusen", "1-3 Everton", "2-1 Valencia", "1-4 Bristol City"],
+    "liverpool_last5": ["2-0 Como", "0-0 Como", "2-3 Monaco", "2-4 Leeds", "1-0 Wrexham"],
+    "scope_note": "公开页包含季前赛；不能把这组数据当作五场英超正式比赛"
+  },
+  "production_policy": {
+    "use": "research evidence and audit only",
+    "not_used_as": ["confirmed_starting_xi", "calibrated_independent_probability", "automatic_injury_coefficient"],
+    "evidence_gap_remains": true,
+    "reason": "首发未正式发布，且来源的伤停名单存在差异，需要临场官方名单复核"
+  }
+}

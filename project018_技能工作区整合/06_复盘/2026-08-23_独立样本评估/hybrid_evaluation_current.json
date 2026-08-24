@@ -1,0 +1,240 @@
+{
+  "schema_version": "hybrid-oos-evaluation-1.0",
+  "research_only": true,
+  "bootstrap": {
+    "samples": 2000,
+    "seed": 20260821
+  },
+  "n": 9,
+  "excluded": {
+    "missing_router_audit": 54,
+    "not_independent_hybrid": 65,
+    "research_run_not_prematch": 3,
+    "missing_verified_score_90": 22
+  },
+  "rows": [
+    {
+      "match_id": "sporttery-2040991",
+      "brier_hybrid": 0.9504179999999999,
+      "brier_market": 0.944034,
+      "logloss_hybrid": 1.448169764837978,
+      "logloss_market": 1.4146938356415886,
+      "brier_delta_hybrid_minus_market": 0.006383999999999834,
+      "logloss_delta_hybrid_minus_market": 0.03347592919638953
+    },
+    {
+      "match_id": "sporttery-2040993",
+      "brier_hybrid": 0.7849340000000001,
+      "brier_market": 0.745346,
+      "logloss_hybrid": 1.2837377727947987,
+      "logloss_market": 1.2173958246580765,
+      "brier_delta_hybrid_minus_market": 0.03958800000000018,
+      "logloss_delta_hybrid_minus_market": 0.06634194813672223
+    },
+    {
+      "match_id": "sporttery-2040995",
+      "brier_hybrid": 0.383082,
+      "brier_market": 0.3797811825839854,
+      "logloss_hybrid": 0.7031975164134467,
+      "logloss_market": 0.6961547016239006,
+      "brier_delta_hybrid_minus_market": 0.0033008174160145676,
+      "logloss_delta_hybrid_minus_market": 0.007042814789546159
+    },
+    {
+      "match_id": "sporttery-2040996",
+      "brier_hybrid": 0.7065859999999999,
+      "brier_market": 0.758888,
+      "logloss_hybrid": 1.152013065395225,
+      "logloss_market": 1.2378743560016174,
+      "brier_delta_hybrid_minus_market": -0.05230200000000007,
+      "logloss_delta_hybrid_minus_market": -0.08586129060639247
+    },
+    {
+      "match_id": "sporttery-2040997",
+      "brier_hybrid": 0.8617616150083683,
+      "brier_market": 0.83426569712856,
+      "logloss_hybrid": 1.387293861452974,
+      "logloss_market": 1.3308056755022373,
+      "brier_delta_hybrid_minus_market": 0.027495917879808318,
+      "logloss_delta_hybrid_minus_market": 0.05648818595073668
+    },
+    {
+      "match_id": "sporttery-2040998",
+      "brier_hybrid": 0.687128,
+      "brier_market": 0.6868980000000001,
+      "logloss_hybrid": 1.1086626245216111,
+      "logloss_market": 1.1147416705979933,
+      "brier_delta_hybrid_minus_market": 0.00022999999999984144,
+      "logloss_delta_hybrid_minus_market": -0.006079046076382211
+    },
+    {
+      "match_id": "sporttery-2040999",
+      "brier_hybrid": 0.12313800000000003,
+      "brier_market": 0.11328800000000001,
+      "logloss_hybrid": 0.33547273628812946,
+      "logloss_market": 0.3174542307854511,
+      "brier_delta_hybrid_minus_market": 0.009850000000000012,
+      "logloss_delta_hybrid_minus_market": 0.01801850550267836
+    },
+    {
+      "match_id": "sporttery-2041000",
+      "brier_hybrid": 0.192686,
+      "brier_market": 0.15265399999999996,
+      "logloss_hybrid": 0.44161055474451766,
+      "logloss_market": 0.38272562113867487,
+      "brier_delta_hybrid_minus_market": 0.04003200000000004,
+      "logloss_delta_hybrid_minus_market": 0.05888493360584279
+    },
+    {
+      "match_id": "sporttery-2041004",
+      "brier_hybrid": 0.7442687182946923,
+      "brier_market": 0.778322,
+      "logloss_hybrid": 1.21839532499116,
+      "logloss_market": 1.2729656758128873,
+      "brier_delta_hybrid_minus_market": -0.034053281705307636,
+      "logloss_delta_hybrid_minus_market": -0.05457035082172723
+    }
+  ],
+  "metrics": {
+    "brier": {
+      "hybrid": 0.603778,
+      "market": 0.599275,
+      "delta_hybrid_minus_market": 0.004503,
+      "paired_bootstrap_95_ci": [
+        -0.014324,
+        0.022803
+      ]
+    },
+    "logloss": {
+      "hybrid": 1.008728,
+      "market": 0.998312,
+      "delta_hybrid_minus_market": 0.010416,
+      "paired_bootstrap_95_ci": [
+        -0.021409,
+        0.040743
+      ]
+    }
+  },
+  "weight_sweep": {
+    "research_only": true,
+    "n": 45,
+    "by_market_weight": {
+      "0.4": {
+        "n": 9,
+        "metrics": {
+          "brier": {
+            "candidate": 0.605297,
+            "market": 0.599275,
+            "delta_candidate_minus_market": 0.006022,
+            "paired_bootstrap_95_ci": [
+              -0.014633,
+              0.026862
+            ]
+          },
+          "logloss": {
+            "candidate": 1.011913,
+            "market": 0.998312,
+            "delta_candidate_minus_market": 0.013601,
+            "paired_bootstrap_95_ci": [
+              -0.022149,
+              0.047804
+            ]
+          }
+        }
+      },
+      "0.5": {
+        "n": 9,
+        "metrics": {
+          "brier": {
+            "candidate": 0.603778,
+            "market": 0.599275,
+            "delta_candidate_minus_market": 0.004503,
+            "paired_bootstrap_95_ci": [
+              -0.014324,
+              0.022803
+            ]
+          },
+          "logloss": {
+            "candidate": 1.008728,
+            "market": 0.998312,
+            "delta_candidate_minus_market": 0.010416,
+            "paired_bootstrap_95_ci": [
+              -0.021409,
+              0.040743
+            ]
+          }
+        }
+      },
+      "0.6": {
+        "n": 9,
+        "metrics": {
+          "brier": {
+            "candidate": 0.601764,
+            "market": 0.599275,
+            "delta_candidate_minus_market": 0.002489,
+            "paired_bootstrap_95_ci": [
+              -0.014767,
+              0.018824
+            ]
+          },
+          "logloss": {
+            "candidate": 1.004746,
+            "market": 0.998312,
+            "delta_candidate_minus_market": 0.006434,
+            "paired_bootstrap_95_ci": [
+              -0.021971,
+              0.033292
+            ]
+          }
+        }
+      },
+      "0.7": {
+        "n": 9,
+        "metrics": {
+          "brier": {
+            "candidate": 0.600265,
+            "market": 0.599275,
+            "delta_candidate_minus_market": 0.00099,
+            "paired_bootstrap_95_ci": [
+              -0.014842,
+              0.015835
+            ]
+          },
+          "logloss": {
+            "candidate": 1.001546,
+            "market": 0.998312,
+            "delta_candidate_minus_market": 0.003234,
+            "paired_bootstrap_95_ci": [
+              -0.022286,
+              0.027611
+            ]
+          }
+        }
+      },
+      "0.8": {
+        "n": 9,
+        "metrics": {
+          "brier": {
+            "candidate": 0.598591,
+            "market": 0.599275,
+            "delta_candidate_minus_market": -0.000684,
+            "paired_bootstrap_95_ci": [
+              -0.015684,
+              0.012985
+            ]
+          },
+          "logloss": {
+            "candidate": 0.998063,
+            "market": 0.998312,
+            "delta_candidate_minus_market": -0.000249,
+            "paired_bootstrap_95_ci": [
+              -0.024252,
+              0.020825
+            ]
+          }
+        }
+      }
+    },
+    "note": "每个权重仅与同一场、同一盘口快照配对；不改变生产market_only输出。"
+  }
+}

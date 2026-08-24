@@ -9,7 +9,8 @@ import os
 import sys
 
 sys.path.insert(0, r"F:\HM足球比赛预测\project018_技能工作区整合\02_脚本\skill\football-quant-fusion\scripts")
-os.environ.setdefault("API_FOOTBALL_KEY", "c6a716469c9da4b82552c4efa8043629")
+if not os.environ.get("API_FOOTBALL_KEY"):
+    raise SystemExit("请先设置 API_FOOTBALL_KEY 环境变量；密钥不写入仓库。")
 
 import apifootball_adapter as ad
 

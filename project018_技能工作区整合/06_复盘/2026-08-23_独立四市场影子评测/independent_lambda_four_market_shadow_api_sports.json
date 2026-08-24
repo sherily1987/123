@@ -1,0 +1,4823 @@
+{
+  "schema": "independent-lambda-four-market-shadow-1.0",
+  "generated_at": "2026-08-23T13:33:47.511937+00:00",
+  "research_only": true,
+  "production_change_allowed": false,
+  "probability_input_contract": {
+    "allowed": "pre-match rolling-xG lambda prior",
+    "forbidden": "same-match HAD/TTG/HAFU/CRS odds as probability input",
+    "odds_usage": "price and market baseline only"
+  },
+  "coverage": {
+    "unique_jobs_with_safe_lambda": 27,
+    "deterministic_replay_verified_jobs": 27,
+    "legacy_prematch_claim_only_jobs": 57,
+    "settled_pairs": 9,
+    "deterministic_replay_settled_pairs": 9,
+    "legacy_plus_strict_settled_pairs": 66,
+    "unsettled_or_result_unavailable": 18,
+    "verified_half_time_joined": 37
+  },
+  "evaluation": {
+    "schema": "independent-lambda-market-evaluation-1.0",
+    "research_only": true,
+    "production_change_allowed": false,
+    "markets": {
+      "HAD": {
+        "n": 9,
+        "minimum_n": 100,
+        "model_brier": 0.65227041,
+        "market_brier": 0.59914531,
+        "model_minus_market_brier": 0.0531251,
+        "model_logloss": 1.08559841,
+        "market_logloss": 0.99806234,
+        "model_minus_market_logloss": 0.08753606,
+        "model_top1_pct": 44.44,
+        "market_top1_pct": 33.33,
+        "raw_positive_ev_bets": 9,
+        "raw_positive_ev_roi_pct": -36.78,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          -0.05635783,
+          0.18382561
+        ],
+        "logloss_delta_ci95": [
+          -0.0714513,
+          0.26013999
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "TTG": {
+        "n": 9,
+        "minimum_n": 100,
+        "model_brier": 0.82418211,
+        "market_brier": 0.77835136,
+        "model_minus_market_brier": 0.04583076,
+        "model_logloss": 1.91567644,
+        "market_logloss": 1.70501844,
+        "model_minus_market_logloss": 0.210658,
+        "model_top1_pct": 55.56,
+        "market_top1_pct": 55.56,
+        "raw_positive_ev_bets": 7,
+        "raw_positive_ev_roi_pct": -100.0,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          0.0298377,
+          0.0645758
+        ],
+        "logloss_delta_ci95": [
+          0.11739357,
+          0.31177644
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "HAFU": {
+        "n": 7,
+        "minimum_n": 200,
+        "model_brier": 0.88119428,
+        "market_brier": 0.8158247,
+        "model_minus_market_brier": 0.06536958,
+        "model_logloss": 2.01817729,
+        "market_logloss": 1.82334043,
+        "model_minus_market_logloss": 0.19483686,
+        "model_top1_pct": 0.0,
+        "market_top1_pct": 14.29,
+        "raw_positive_ev_bets": 7,
+        "raw_positive_ev_roi_pct": -100.0,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          -0.01147821,
+          0.17351875
+        ],
+        "logloss_delta_ci95": [
+          0.01405028,
+          0.40046461
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "CRS": {
+        "n": 9,
+        "minimum_n": 100,
+        "model_brier": 0.91352983,
+        "market_brier": 0.89824002,
+        "model_minus_market_brier": 0.01528981,
+        "model_logloss": 2.9055887,
+        "market_logloss": 2.57887067,
+        "model_minus_market_logloss": 0.32671802,
+        "model_top1_pct": 11.11,
+        "market_top1_pct": 11.11,
+        "raw_positive_ev_bets": 9,
+        "raw_positive_ev_roi_pct": -100.0,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          0.00451551,
+          0.02583689
+        ],
+        "logloss_delta_ci95": [
+          0.0803931,
+          0.66905807
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      }
+    }
+  },
+  "market_weight_walk_forward": {
+    "schema": "independent-lambda-market-weight-scan-1.0",
+    "research_only": true,
+    "split": "chronological_70_30",
+    "markets": {
+      "HAD": {
+        "n": 9,
+        "train_n": 6,
+        "test_n": 3,
+        "selected_market_weight": 0.0,
+        "train_brier": 0.68668611,
+        "train_logloss": 1.13981579,
+        "test_brier": 0.58343901,
+        "test_logloss": 0.97716365,
+        "test_market_brier": 0.34814078,
+        "test_market_logloss": 0.65779727,
+        "test_brier_delta_vs_market": 0.23529823,
+        "test_logloss_delta_vs_market": 0.31936637,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "TTG": {
+        "n": 9,
+        "train_n": 6,
+        "test_n": 3,
+        "selected_market_weight": 1.0,
+        "train_brier": 0.78749983,
+        "train_logloss": 1.74017517,
+        "test_brier": 0.76005441,
+        "test_logloss": 1.63470496,
+        "test_market_brier": 0.76005441,
+        "test_market_logloss": 1.63470496,
+        "test_brier_delta_vs_market": 0.0,
+        "test_logloss_delta_vs_market": 0.0,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "HAFU": {
+        "n": 7,
+        "train_n": 4,
+        "test_n": 3,
+        "selected_market_weight": 1.0,
+        "train_brier": 0.88557288,
+        "train_logloss": 2.07417645,
+        "test_brier": 0.72282713,
+        "test_logloss": 1.4888924,
+        "test_market_brier": 0.72282713,
+        "test_market_logloss": 1.4888924,
+        "test_brier_delta_vs_market": 0.0,
+        "test_logloss_delta_vs_market": 0.0,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "CRS": {
+        "n": 9,
+        "train_n": 6,
+        "test_n": 3,
+        "selected_market_weight": 1.0,
+        "train_brier": 0.8977614,
+        "train_logloss": 2.44087704,
+        "test_brier": 0.89919726,
+        "test_logloss": 2.85485794,
+        "test_market_brier": 0.89919726,
+        "test_market_logloss": 2.85485794,
+        "test_brier_delta_vs_market": 0.0,
+        "test_logloss_delta_vs_market": 0.0,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      }
+    }
+  },
+  "deterministic_replay_evaluation": {
+    "schema": "independent-lambda-market-evaluation-1.0",
+    "research_only": true,
+    "production_change_allowed": false,
+    "markets": {
+      "HAD": {
+        "n": 9,
+        "minimum_n": 100,
+        "model_brier": 0.65227041,
+        "market_brier": 0.59914531,
+        "model_minus_market_brier": 0.0531251,
+        "model_logloss": 1.08559841,
+        "market_logloss": 0.99806234,
+        "model_minus_market_logloss": 0.08753606,
+        "model_top1_pct": 44.44,
+        "market_top1_pct": 33.33,
+        "raw_positive_ev_bets": 9,
+        "raw_positive_ev_roi_pct": -36.78,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          -0.05635783,
+          0.18382561
+        ],
+        "logloss_delta_ci95": [
+          -0.0714513,
+          0.26013999
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "TTG": {
+        "n": 9,
+        "minimum_n": 100,
+        "model_brier": 0.82418211,
+        "market_brier": 0.77835136,
+        "model_minus_market_brier": 0.04583076,
+        "model_logloss": 1.91567644,
+        "market_logloss": 1.70501844,
+        "model_minus_market_logloss": 0.210658,
+        "model_top1_pct": 55.56,
+        "market_top1_pct": 55.56,
+        "raw_positive_ev_bets": 7,
+        "raw_positive_ev_roi_pct": -100.0,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          0.0298377,
+          0.0645758
+        ],
+        "logloss_delta_ci95": [
+          0.11739357,
+          0.31177644
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "HAFU": {
+        "n": 7,
+        "minimum_n": 200,
+        "model_brier": 0.88119428,
+        "market_brier": 0.8158247,
+        "model_minus_market_brier": 0.06536958,
+        "model_logloss": 2.01817729,
+        "market_logloss": 1.82334043,
+        "model_minus_market_logloss": 0.19483686,
+        "model_top1_pct": 0.0,
+        "market_top1_pct": 14.29,
+        "raw_positive_ev_bets": 7,
+        "raw_positive_ev_roi_pct": -100.0,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          -0.01147821,
+          0.17351875
+        ],
+        "logloss_delta_ci95": [
+          0.01405028,
+          0.40046461
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "CRS": {
+        "n": 9,
+        "minimum_n": 100,
+        "model_brier": 0.91352983,
+        "market_brier": 0.89824002,
+        "model_minus_market_brier": 0.01528981,
+        "model_logloss": 2.9055887,
+        "market_logloss": 2.57887067,
+        "model_minus_market_logloss": 0.32671802,
+        "model_top1_pct": 11.11,
+        "market_top1_pct": 11.11,
+        "raw_positive_ev_bets": 9,
+        "raw_positive_ev_roi_pct": -100.0,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          0.00451551,
+          0.02583689
+        ],
+        "logloss_delta_ci95": [
+          0.0803931,
+          0.66905807
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      }
+    }
+  },
+  "deterministic_replay_weight_scan": {
+    "schema": "independent-lambda-market-weight-scan-1.0",
+    "research_only": true,
+    "split": "chronological_70_30",
+    "markets": {
+      "HAD": {
+        "n": 9,
+        "train_n": 6,
+        "test_n": 3,
+        "selected_market_weight": 0.0,
+        "train_brier": 0.68668611,
+        "train_logloss": 1.13981579,
+        "test_brier": 0.58343901,
+        "test_logloss": 0.97716365,
+        "test_market_brier": 0.34814078,
+        "test_market_logloss": 0.65779727,
+        "test_brier_delta_vs_market": 0.23529823,
+        "test_logloss_delta_vs_market": 0.31936637,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "TTG": {
+        "n": 9,
+        "train_n": 6,
+        "test_n": 3,
+        "selected_market_weight": 1.0,
+        "train_brier": 0.78749983,
+        "train_logloss": 1.74017517,
+        "test_brier": 0.76005441,
+        "test_logloss": 1.63470496,
+        "test_market_brier": 0.76005441,
+        "test_market_logloss": 1.63470496,
+        "test_brier_delta_vs_market": 0.0,
+        "test_logloss_delta_vs_market": 0.0,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "HAFU": {
+        "n": 7,
+        "train_n": 4,
+        "test_n": 3,
+        "selected_market_weight": 1.0,
+        "train_brier": 0.88557288,
+        "train_logloss": 2.07417645,
+        "test_brier": 0.72282713,
+        "test_logloss": 1.4888924,
+        "test_market_brier": 0.72282713,
+        "test_market_logloss": 1.4888924,
+        "test_brier_delta_vs_market": 0.0,
+        "test_logloss_delta_vs_market": 0.0,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "CRS": {
+        "n": 9,
+        "train_n": 6,
+        "test_n": 3,
+        "selected_market_weight": 1.0,
+        "train_brier": 0.8977614,
+        "train_logloss": 2.44087704,
+        "test_brier": 0.89919726,
+        "test_logloss": 2.85485794,
+        "test_market_brier": 0.89919726,
+        "test_market_logloss": 2.85485794,
+        "test_brier_delta_vs_market": 0.0,
+        "test_logloss_delta_vs_market": 0.0,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      }
+    }
+  },
+  "deterministic_replay_by_source": {
+    "apifootball_events_goals_only": {
+      "settled_pairs": 2,
+      "evaluation": {
+        "schema": "independent-lambda-market-evaluation-1.0",
+        "research_only": true,
+        "production_change_allowed": false,
+        "markets": {
+          "HAD": {
+            "n": 2,
+            "minimum_n": 100,
+            "model_brier": 0.71724614,
+            "market_brier": 0.4654388,
+            "model_minus_market_brier": 0.25180735,
+            "model_logloss": 1.15877984,
+            "market_logloss": 0.82776324,
+            "model_minus_market_logloss": 0.3310166,
+            "model_top1_pct": 0.0,
+            "market_top1_pct": 50.0,
+            "raw_positive_ev_bets": 2,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              0.04173824,
+              0.46187646
+            ],
+            "logloss_delta_ci95": [
+              0.03550997,
+              0.62652323
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          },
+          "TTG": {
+            "n": 2,
+            "minimum_n": 100,
+            "model_brier": 0.82943423,
+            "market_brier": 0.79537932,
+            "model_minus_market_brier": 0.03405492,
+            "model_logloss": 1.87979596,
+            "market_logloss": 1.74181933,
+            "model_minus_market_logloss": 0.13797663,
+            "model_top1_pct": 50.0,
+            "market_top1_pct": 50.0,
+            "raw_positive_ev_bets": 2,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              0.00833577,
+              0.05977406
+            ],
+            "logloss_delta_ci95": [
+              0.01042924,
+              0.26552402
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          },
+          "HAFU": {
+            "n": 1,
+            "minimum_n": 200,
+            "model_brier": 0.73060369,
+            "market_brier": 0.380328,
+            "model_minus_market_brier": 0.3502757,
+            "model_logloss": 1.53993536,
+            "market_logloss": 0.82930932,
+            "model_minus_market_logloss": 0.71062604,
+            "model_top1_pct": 0.0,
+            "market_top1_pct": 100.0,
+            "raw_positive_ev_bets": 1,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": null,
+            "logloss_delta_ci95": null,
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          },
+          "CRS": {
+            "n": 2,
+            "minimum_n": 100,
+            "model_brier": 0.94181799,
+            "market_brier": 0.92675422,
+            "model_minus_market_brier": 0.01506377,
+            "model_logloss": 4.0137736,
+            "market_logloss": 3.1992451,
+            "model_minus_market_logloss": 0.81452849,
+            "model_top1_pct": 0.0,
+            "market_top1_pct": 50.0,
+            "raw_positive_ev_bets": 2,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              0.00912146,
+              0.02100607
+            ],
+            "logloss_delta_ci95": [
+              0.00076753,
+              1.62828946
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          }
+        }
+      },
+      "weight_scan": {
+        "schema": "independent-lambda-market-weight-scan-1.0",
+        "research_only": true,
+        "split": "chronological_70_30",
+        "markets": {
+          "HAD": {
+            "n": 2,
+            "train_n": 0,
+            "test_n": 0,
+            "selected_market_weight": null,
+            "decision": "hold",
+            "reason": "insufficient_for_time_split"
+          },
+          "TTG": {
+            "n": 2,
+            "train_n": 0,
+            "test_n": 0,
+            "selected_market_weight": null,
+            "decision": "hold",
+            "reason": "insufficient_for_time_split"
+          },
+          "HAFU": {
+            "n": 1,
+            "train_n": 0,
+            "test_n": 0,
+            "selected_market_weight": null,
+            "decision": "hold",
+            "reason": "insufficient_for_time_split"
+          },
+          "CRS": {
+            "n": 2,
+            "train_n": 0,
+            "test_n": 0,
+            "selected_market_weight": null,
+            "decision": "hold",
+            "reason": "insufficient_for_time_split"
+          }
+        }
+      },
+      "bet_policy_scans": {
+        "HAD": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 1,
+          "test_n": 1,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        },
+        "TTG": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 1,
+          "test_n": 1,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        },
+        "HAFU": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 0,
+          "test_n": 1,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        },
+        "CRS": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 1,
+          "test_n": 1,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        }
+      }
+    },
+    "understat_rolling_xg": {
+      "settled_pairs": 7,
+      "evaluation": {
+        "schema": "independent-lambda-market-evaluation-1.0",
+        "research_only": true,
+        "production_change_allowed": false,
+        "markets": {
+          "HAD": {
+            "n": 7,
+            "minimum_n": 100,
+            "model_brier": 0.63370591,
+            "market_brier": 0.63734717,
+            "model_minus_market_brier": -0.00364125,
+            "model_logloss": 1.06468943,
+            "market_logloss": 1.04671923,
+            "model_minus_market_logloss": 0.0179702,
+            "model_top1_pct": 57.14,
+            "market_top1_pct": 28.57,
+            "raw_positive_ev_bets": 7,
+            "raw_positive_ev_roi_pct": -18.71,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              -0.10393362,
+              0.09691766
+            ],
+            "logloss_delta_ci95": [
+              -0.12632609,
+              0.15124085
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          },
+          "TTG": {
+            "n": 7,
+            "minimum_n": 100,
+            "model_brier": 0.82268151,
+            "market_brier": 0.77348623,
+            "model_minus_market_brier": 0.04919528,
+            "model_logloss": 1.925928,
+            "market_logloss": 1.69450389,
+            "model_minus_market_logloss": 0.23142411,
+            "model_top1_pct": 57.14,
+            "market_top1_pct": 57.14,
+            "raw_positive_ev_bets": 5,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              0.03182438,
+              0.06957039
+            ],
+            "logloss_delta_ci95": [
+              0.12870128,
+              0.34126389
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          },
+          "HAFU": {
+            "n": 6,
+            "minimum_n": 200,
+            "model_brier": 0.90629271,
+            "market_brier": 0.88840748,
+            "model_minus_market_brier": 0.01788522,
+            "model_logloss": 2.09788428,
+            "market_logloss": 1.98901228,
+            "model_minus_market_logloss": 0.108872,
+            "model_top1_pct": 0.0,
+            "market_top1_pct": 0.0,
+            "raw_positive_ev_bets": 6,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              -0.02271976,
+              0.06124291
+            ],
+            "logloss_delta_ci95": [
+              -0.02187238,
+              0.2257103
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          },
+          "CRS": {
+            "n": 7,
+            "minimum_n": 100,
+            "model_brier": 0.9054475,
+            "market_brier": 0.89009311,
+            "model_minus_market_brier": 0.01535439,
+            "model_logloss": 2.58896444,
+            "market_logloss": 2.40162084,
+            "model_minus_market_logloss": 0.1873436,
+            "model_top1_pct": 14.29,
+            "market_top1_pct": 0.0,
+            "raw_positive_ev_bets": 7,
+            "raw_positive_ev_roi_pct": -100.0,
+            "point_estimate_better_on_brier_and_logloss": false,
+            "brier_delta_ci95": [
+              0.00209098,
+              0.02872099
+            ],
+            "logloss_delta_ci95": [
+              0.06983735,
+              0.31745914
+            ],
+            "paired_ci_both_below_zero": false,
+            "admission": "hold",
+            "hold_reason": "sample_below_minimum"
+          }
+        }
+      },
+      "weight_scan": {
+        "schema": "independent-lambda-market-weight-scan-1.0",
+        "research_only": true,
+        "split": "chronological_70_30",
+        "markets": {
+          "HAD": {
+            "n": 7,
+            "train_n": 4,
+            "test_n": 3,
+            "selected_market_weight": 0.0,
+            "train_brier": 0.66925324,
+            "train_logloss": 1.11353795,
+            "test_brier": 0.58630947,
+            "test_logloss": 0.99955806,
+            "test_market_brier": 0.54487621,
+            "test_market_logloss": 0.92112342,
+            "test_brier_delta_vs_market": 0.04143326,
+            "test_logloss_delta_vs_market": 0.07843464,
+            "decision": "hold",
+            "reason": "minimum_sample_and_paired_ci_not_satisfied"
+          },
+          "TTG": {
+            "n": 7,
+            "train_n": 4,
+            "test_n": 3,
+            "selected_market_weight": 1.0,
+            "train_brier": 0.75383965,
+            "train_logloss": 1.6074358,
+            "test_brier": 0.79968166,
+            "test_logloss": 1.81059469,
+            "test_market_brier": 0.79968166,
+            "test_market_logloss": 1.81059469,
+            "test_brier_delta_vs_market": 0.0,
+            "test_logloss_delta_vs_market": 0.0,
+            "decision": "hold",
+            "reason": "minimum_sample_and_paired_ci_not_satisfied"
+          },
+          "HAFU": {
+            "n": 6,
+            "train_n": 4,
+            "test_n": 2,
+            "selected_market_weight": 1.0,
+            "train_brier": 0.88557288,
+            "train_logloss": 2.07417645,
+            "test_brier": 0.8940767,
+            "test_logloss": 1.81868395,
+            "test_market_brier": 0.8940767,
+            "test_market_logloss": 1.81868395,
+            "test_brier_delta_vs_market": 0.0,
+            "test_logloss_delta_vs_market": 0.0,
+            "decision": "hold",
+            "reason": "minimum_sample_and_paired_ci_not_satisfied"
+          },
+          "CRS": {
+            "n": 7,
+            "train_n": 4,
+            "test_n": 3,
+            "selected_market_weight": 1.0,
+            "train_brier": 0.87330536,
+            "train_logloss": 2.27156135,
+            "test_brier": 0.91247678,
+            "test_logloss": 2.57503349,
+            "test_market_brier": 0.91247678,
+            "test_market_logloss": 2.57503349,
+            "test_brier_delta_vs_market": 0.0,
+            "test_logloss_delta_vs_market": 0.0,
+            "decision": "hold",
+            "reason": "minimum_sample_and_paired_ci_not_satisfied"
+          }
+        }
+      },
+      "bet_policy_scans": {
+        "HAD": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 4,
+          "test_n": 3,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 2,
+                "wins": 1,
+                "hit_rate": 0.5,
+                "profit_units": 1.0,
+                "roi": 0.5,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 2,
+                "wins": 1,
+                "hit_rate": 0.5,
+                "profit_units": 1.0,
+                "roi": 0.5,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 1,
+                "hit_rate": 0.25,
+                "profit_units": -1.0,
+                "roi": -0.25,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 1,
+                "wins": 1,
+                "hit_rate": 1.0,
+                "profit_units": 2.0,
+                "roi": 2.0,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 2,
+                "wins": 1,
+                "hit_rate": 0.5,
+                "profit_units": 1.0,
+                "roi": 0.5,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 2,
+                "wins": 1,
+                "hit_rate": 0.5,
+                "profit_units": 1.0,
+                "roi": 0.5,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 2,
+                "wins": 1,
+                "hit_rate": 0.5,
+                "profit_units": 1.0,
+                "roi": 0.5,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 2,
+                "wins": 1,
+                "hit_rate": 0.5,
+                "profit_units": 1.0,
+                "roi": 0.5,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": 1.0
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        },
+        "TTG": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 3,
+          "test_n": 2,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        },
+        "HAFU": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 4,
+          "test_n": 2,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 2,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -2.0,
+                "roi": -1.0,
+                "max_drawdown_units": 2.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 1,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -1.0,
+                "roi": -1.0,
+                "max_drawdown_units": 1.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        },
+        "CRS": {
+          "schema": "walk-forward-bet-policy-scan-1.0",
+          "selected_on": "train_only",
+          "train_n": 4,
+          "test_n": 3,
+          "selected_policy": null,
+          "train": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "test": {
+            "n": 0,
+            "wins": 0,
+            "hit_rate": null,
+            "profit_units": 0.0,
+            "roi": null,
+            "max_drawdown_units": 0.0,
+            "largest_winner_profit_share": null
+          },
+          "decision": "hold",
+          "reason": "insufficient_train_bets",
+          "grid": [
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.0,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.05,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.1,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.2,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 4,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -4.0,
+                "roi": -1.0,
+                "max_drawdown_units": 4.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 3.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 5.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 10.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 20.0,
+              "train": {
+                "n": 0,
+                "wins": 0,
+                "hit_rate": null,
+                "profit_units": 0.0,
+                "roi": null,
+                "max_drawdown_units": 0.0,
+                "largest_winner_profit_share": null
+              }
+            },
+            {
+              "minimum_raw_ev": 0.3,
+              "maximum_odds": 1000.0,
+              "train": {
+                "n": 3,
+                "wins": 0,
+                "hit_rate": 0.0,
+                "profit_units": -3.0,
+                "roi": -1.0,
+                "max_drawdown_units": 3.0,
+                "largest_winner_profit_share": null
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "legacy_plus_strict_exploratory_evaluation": {
+    "schema": "independent-lambda-market-evaluation-1.0",
+    "research_only": true,
+    "production_change_allowed": false,
+    "markets": {
+      "HAD": {
+        "n": 66,
+        "minimum_n": 100,
+        "model_brier": 0.65376384,
+        "market_brier": 0.6657504,
+        "model_minus_market_brier": -0.01198656,
+        "model_logloss": 1.08192659,
+        "market_logloss": 1.09862858,
+        "model_minus_market_logloss": -0.01670199,
+        "model_top1_pct": 40.91,
+        "market_top1_pct": 45.45,
+        "raw_positive_ev_bets": 57,
+        "raw_positive_ev_roi_pct": -18.74,
+        "point_estimate_better_on_brier_and_logloss": true,
+        "brier_delta_ci95": [
+          -0.07182614,
+          0.04649835
+        ],
+        "logloss_delta_ci95": [
+          -0.09857316,
+          0.06500633
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "TTG": {
+        "n": 66,
+        "minimum_n": 100,
+        "model_brier": 0.85118813,
+        "market_brier": 0.86486902,
+        "model_minus_market_brier": -0.01368089,
+        "model_logloss": 1.98358664,
+        "market_logloss": 2.046465,
+        "model_minus_market_logloss": -0.06287836,
+        "model_top1_pct": 22.73,
+        "market_top1_pct": 18.18,
+        "raw_positive_ev_bets": 39,
+        "raw_positive_ev_roi_pct": 136.41,
+        "point_estimate_better_on_brier_and_logloss": true,
+        "brier_delta_ci95": [
+          -0.02710851,
+          -0.00106512
+        ],
+        "logloss_delta_ci95": [
+          -0.12240197,
+          -0.00332731
+        ],
+        "paired_ci_both_below_zero": true,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "HAFU": {
+        "n": 38,
+        "minimum_n": 200,
+        "model_brier": 0.85911828,
+        "market_brier": 0.85511493,
+        "model_minus_market_brier": 0.00400335,
+        "model_logloss": 2.01590635,
+        "market_logloss": 1.98859098,
+        "model_minus_market_logloss": 0.02731537,
+        "model_top1_pct": 15.79,
+        "market_top1_pct": 18.42,
+        "raw_positive_ev_bets": 35,
+        "raw_positive_ev_roi_pct": 3.57,
+        "point_estimate_better_on_brier_and_logloss": false,
+        "brier_delta_ci95": [
+          -0.04495523,
+          0.05275372
+        ],
+        "logloss_delta_ci95": [
+          -0.09944641,
+          0.13669586
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      },
+      "CRS": {
+        "n": 66,
+        "minimum_n": 100,
+        "model_brier": 0.93085709,
+        "market_brier": 0.94000575,
+        "model_minus_market_brier": -0.00914866,
+        "model_logloss": 2.91615348,
+        "market_logloss": 2.96249786,
+        "model_minus_market_logloss": -0.04634438,
+        "model_top1_pct": 10.61,
+        "market_top1_pct": 7.58,
+        "raw_positive_ev_bets": 58,
+        "raw_positive_ev_roi_pct": -70.69,
+        "point_estimate_better_on_brier_and_logloss": true,
+        "brier_delta_ci95": [
+          -0.01691342,
+          -0.00155123
+        ],
+        "logloss_delta_ci95": [
+          -0.1541299,
+          0.06498472
+        ],
+        "paired_ci_both_below_zero": false,
+        "admission": "hold",
+        "hold_reason": "sample_below_minimum"
+      }
+    }
+  },
+  "legacy_plus_strict_exploratory_weight_scan": {
+    "schema": "independent-lambda-market-weight-scan-1.0",
+    "research_only": true,
+    "split": "chronological_70_30",
+    "markets": {
+      "HAD": {
+        "n": 66,
+        "train_n": 46,
+        "test_n": 20,
+        "selected_market_weight": 0.0,
+        "train_brier": 0.668275,
+        "train_logloss": 1.10351123,
+        "test_brier": 0.62038818,
+        "test_logloss": 1.03228191,
+        "test_market_brier": 0.56564823,
+        "test_market_logloss": 0.95910062,
+        "test_brier_delta_vs_market": 0.05473996,
+        "test_logloss_delta_vs_market": 0.07318129,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "TTG": {
+        "n": 66,
+        "train_n": 46,
+        "test_n": 20,
+        "selected_market_weight": 0.0,
+        "train_brier": 0.86895112,
+        "train_logloss": 2.04924188,
+        "test_brier": 0.81033326,
+        "test_logloss": 1.83257959,
+        "test_market_brier": 0.80061501,
+        "test_market_logloss": 1.7623209,
+        "test_brier_delta_vs_market": 0.00971826,
+        "test_logloss_delta_vs_market": 0.0702587,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "HAFU": {
+        "n": 38,
+        "train_n": 26,
+        "test_n": 12,
+        "selected_market_weight": 0.5,
+        "train_brier": 0.86106978,
+        "train_logloss": 2.04357463,
+        "test_brier": 0.82973826,
+        "test_logloss": 1.85757539,
+        "test_market_brier": 0.81502463,
+        "test_market_logloss": 1.82244016,
+        "test_brier_delta_vs_market": 0.01471362,
+        "test_logloss_delta_vs_market": 0.03513523,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      },
+      "CRS": {
+        "n": 66,
+        "train_n": 46,
+        "test_n": 20,
+        "selected_market_weight": 0.0,
+        "train_brier": 0.93685593,
+        "train_logloss": 2.93566803,
+        "test_brier": 0.91705976,
+        "test_logloss": 2.87127001,
+        "test_market_brier": 0.91116133,
+        "test_market_logloss": 2.74709055,
+        "test_brier_delta_vs_market": 0.00589844,
+        "test_logloss_delta_vs_market": 0.12417945,
+        "decision": "hold",
+        "reason": "minimum_sample_and_paired_ci_not_satisfied"
+      }
+    }
+  },
+  "pending_paper_candidates": [
+    {
+      "candidate_id": "sporttery-2041025:CRS:0-3",
+      "match_id": "sporttery-2041025",
+      "match_num": "周日025",
+      "home": "波尔图",
+      "away": "阿罗卡",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "CRS",
+      "selection": "0-3",
+      "odds": 400.0,
+      "model_probability": 0.009152906213405474,
+      "decimal_ev": 2.6611624853621896,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041036:CRS:0-4",
+      "match_id": "sporttery-2041036",
+      "match_num": "周一009",
+      "home": "吉维森特",
+      "away": "卡萨皮亚",
+      "kickoff": "2026-08-25T03:15:00+08:00",
+      "market": "CRS",
+      "selection": "0-4",
+      "odds": 550.0,
+      "model_probability": 0.006502295398814648,
+      "decimal_ev": 2.5762624693480562,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041031:CRS:负其他",
+      "match_id": "sporttery-2041031",
+      "match_num": "周一004",
+      "home": "奥萨苏纳",
+      "away": "莱万特",
+      "kickoff": "2026-08-25T01:30:00+08:00",
+      "market": "CRS",
+      "selection": "负其他",
+      "odds": 250.0,
+      "model_probability": 0.013409353272984668,
+      "decimal_ev": 2.3523383182461672,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041033:CRS:0-4",
+      "match_id": "sporttery-2041033",
+      "match_num": "周一006",
+      "home": "罗马",
+      "away": "佛罗伦萨",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "CRS",
+      "selection": "0-4",
+      "odds": 350.0,
+      "model_probability": 0.007127368831491747,
+      "decimal_ev": 1.4945790910221115,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041025:HAD:负",
+      "match_id": "sporttery-2041025",
+      "match_num": "周日025",
+      "home": "波尔图",
+      "away": "阿罗卡",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 11.8,
+      "model_probability": 0.19699011003360703,
+      "decimal_ev": 1.3244832983965633,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041025:HAFU:负负",
+      "match_id": "sporttery-2041025",
+      "match_num": "周日025",
+      "home": "波尔图",
+      "away": "阿罗卡",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 21.0,
+      "model_probability": 0.10819794769577992,
+      "decimal_ev": 1.2721569016113783,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041024:CRS:4-1",
+      "match_id": "sporttery-2041024",
+      "match_num": "周日024",
+      "home": "埃尔切",
+      "away": "巴萨",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "CRS",
+      "selection": "4-1",
+      "odds": 300.0,
+      "model_probability": 0.007040883296606771,
+      "decimal_ev": 1.112264988982031,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041022:CRS:4-2",
+      "match_id": "sporttery-2041022",
+      "match_num": "周日022",
+      "home": "都灵",
+      "away": "AC米兰",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "CRS",
+      "selection": "4-2",
+      "odds": 300.0,
+      "model_probability": 0.006792351510358904,
+      "decimal_ev": 1.0377054531076713,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041036:HAFU:负负",
+      "match_id": "sporttery-2041036",
+      "match_num": "周一009",
+      "home": "吉维森特",
+      "away": "卡萨皮亚",
+      "kickoff": "2026-08-25T03:15:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 10.0,
+      "model_probability": 0.19017242391269512,
+      "decimal_ev": 0.9017242391269513,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041036:HAD:负",
+      "match_id": "sporttery-2041036",
+      "match_num": "周一009",
+      "home": "吉维森特",
+      "away": "卡萨皮亚",
+      "kickoff": "2026-08-25T03:15:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 5.5,
+      "model_probability": 0.33268116473347914,
+      "decimal_ev": 0.8297464060341353,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041031:HAFU:负负",
+      "match_id": "sporttery-2041031",
+      "match_num": "周一004",
+      "home": "奥萨苏纳",
+      "away": "莱万特",
+      "kickoff": "2026-08-25T01:30:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 8.25,
+      "model_probability": 0.22176148198923903,
+      "decimal_ev": 0.8295322264112219,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041033:HAFU:负负",
+      "match_id": "sporttery-2041033",
+      "match_num": "周一006",
+      "home": "罗马",
+      "away": "佛罗伦萨",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 9.5,
+      "model_probability": 0.18945659187142805,
+      "decimal_ev": 0.7998376227785664,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041027:CRS:0-3",
+      "match_id": "sporttery-2041027",
+      "match_num": "周日027",
+      "home": "桑托斯",
+      "away": "米拉索尔",
+      "kickoff": "2026-08-24T05:30:00+08:00",
+      "market": "CRS",
+      "selection": "0-3",
+      "odds": 60.0,
+      "model_probability": 0.02947696402598071,
+      "decimal_ev": 0.7686178415588425,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041024:HAFU:胜胜",
+      "match_id": "sporttery-2041024",
+      "match_num": "周日024",
+      "home": "埃尔切",
+      "away": "巴萨",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "HAFU",
+      "selection": "胜胜",
+      "odds": 15.0,
+      "model_probability": 0.1177827990638278,
+      "decimal_ev": 0.7667419859574169,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041023:CRS:1-4",
+      "match_id": "sporttery-2041023",
+      "match_num": "周日023",
+      "home": "亚特兰大",
+      "away": "萨索洛",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "CRS",
+      "selection": "1-4",
+      "odds": 200.0,
+      "model_probability": 0.008755112454595497,
+      "decimal_ev": 0.7510224909190995,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041031:HAD:负",
+      "match_id": "sporttery-2041031",
+      "match_num": "周一004",
+      "home": "奥萨苏纳",
+      "away": "莱万特",
+      "kickoff": "2026-08-25T01:30:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 4.66,
+      "model_probability": 0.37268855098251025,
+      "decimal_ev": 0.7367286475784978,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041024:HAD:胜",
+      "match_id": "sporttery-2041024",
+      "match_num": "周日024",
+      "home": "埃尔切",
+      "away": "巴萨",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "HAD",
+      "selection": "胜",
+      "odds": 8.25,
+      "model_probability": 0.20745486894558923,
+      "decimal_ev": 0.7115026688011112,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041033:HAD:负",
+      "match_id": "sporttery-2041033",
+      "match_num": "周一006",
+      "home": "罗马",
+      "away": "佛罗伦萨",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 5.15,
+      "model_probability": 0.3268003018148279,
+      "decimal_ev": 0.6830215543463638,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041028:CRS:1-5",
+      "match_id": "sporttery-2041028",
+      "match_num": "周一001",
+      "home": "博洛尼亚",
+      "away": "拉齐奥",
+      "kickoff": "2026-08-25T00:30:00+08:00",
+      "market": "CRS",
+      "selection": "1-5",
+      "odds": 500.0,
+      "model_probability": 0.0033351464975578723,
+      "decimal_ev": 0.6675732487789361,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041027:HAFU:负负",
+      "match_id": "sporttery-2041027",
+      "match_num": "周日027",
+      "home": "桑托斯",
+      "away": "米拉索尔",
+      "kickoff": "2026-08-24T05:30:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 7.0,
+      "model_probability": 0.22487282428010408,
+      "decimal_ev": 0.5741097699607285,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041027:HAD:负",
+      "match_id": "sporttery-2041027",
+      "match_num": "周日027",
+      "home": "桑托斯",
+      "away": "米拉索尔",
+      "kickoff": "2026-08-24T05:30:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 4.05,
+      "model_probability": 0.3848482917546847,
+      "decimal_ev": 0.558635581606473,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041023:HAFU:负负",
+      "match_id": "sporttery-2041023",
+      "match_num": "周日023",
+      "home": "亚特兰大",
+      "away": "萨索洛",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 10.0,
+      "model_probability": 0.15401326713392777,
+      "decimal_ev": 0.5401326713392778,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041023:HAD:负",
+      "match_id": "sporttery-2041023",
+      "match_num": "周日023",
+      "home": "亚特兰大",
+      "away": "萨索洛",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 5.55,
+      "model_probability": 0.26890146685851024,
+      "decimal_ev": 0.4924031410647318,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041034:CRS:0-3",
+      "match_id": "sporttery-2041034",
+      "match_num": "周一007",
+      "home": "兰斯",
+      "away": "阿纳西",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "CRS",
+      "selection": "0-3",
+      "odds": 75.0,
+      "model_probability": 0.019069527930825964,
+      "decimal_ev": 0.43021459481194735,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041022:HAFU:胜胜",
+      "match_id": "sporttery-2041022",
+      "match_num": "周日022",
+      "home": "都灵",
+      "away": "AC米兰",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "HAFU",
+      "selection": "胜胜",
+      "odds": 9.0,
+      "model_probability": 0.15798933910943183,
+      "decimal_ev": 0.42190405198488645,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041034:HAFU:负负",
+      "match_id": "sporttery-2041034",
+      "match_num": "周一007",
+      "home": "兰斯",
+      "away": "阿纳西",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 8.0,
+      "model_probability": 0.17192597365513781,
+      "decimal_ev": 0.3754077892411025,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041020:CRS:0-5",
+      "match_id": "sporttery-2041020",
+      "match_num": "周日020",
+      "home": "圣克拉拉",
+      "away": "法马利康",
+      "kickoff": "2026-08-24T01:00:00+08:00",
+      "market": "CRS",
+      "selection": "0-5",
+      "odds": 500.0,
+      "model_probability": 0.0027357227605490126,
+      "decimal_ev": 0.3678613802745063,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041035:CRS:5-1",
+      "match_id": "sporttery-2041035",
+      "match_num": "周一008",
+      "home": "富勒姆",
+      "away": "切尔西",
+      "kickoff": "2026-08-25T03:00:00+08:00",
+      "market": "CRS",
+      "selection": "5-1",
+      "odds": 350.0,
+      "model_probability": 0.003895115994156172,
+      "decimal_ev": 0.3632905979546601,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041034:HAD:负",
+      "match_id": "sporttery-2041034",
+      "match_num": "周一007",
+      "home": "兰斯",
+      "away": "阿纳西",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 4.45,
+      "model_probability": 0.3025329721056752,
+      "decimal_ev": 0.3462717258702548,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041030:CRS:0-0",
+      "match_id": "sporttery-2041030",
+      "match_num": "周一003",
+      "home": "马尔默",
+      "away": "佐加顿斯",
+      "kickoff": "2026-08-25T01:00:00+08:00",
+      "market": "CRS",
+      "selection": "0-0",
+      "odds": 22.0,
+      "model_probability": 0.060930951412423266,
+      "decimal_ev": 0.3404809310733119,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041030:TTG:0球",
+      "match_id": "sporttery-2041030",
+      "match_num": "周一003",
+      "home": "马尔默",
+      "away": "佐加顿斯",
+      "kickoff": "2026-08-25T01:00:00+08:00",
+      "market": "TTG",
+      "selection": "0球",
+      "odds": 22.0,
+      "model_probability": 0.060930951412423245,
+      "decimal_ev": 0.34048093107331145,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041031:TTG:5球",
+      "match_id": "sporttery-2041031",
+      "match_num": "周一004",
+      "home": "奥萨苏纳",
+      "away": "莱万特",
+      "kickoff": "2026-08-25T01:30:00+08:00",
+      "market": "TTG",
+      "selection": "5球",
+      "odds": 12.0,
+      "model_probability": 0.104143199633661,
+      "decimal_ev": 0.24971839560393194,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041022:HAD:胜",
+      "match_id": "sporttery-2041022",
+      "match_num": "周日022",
+      "home": "都灵",
+      "away": "AC米兰",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "HAD",
+      "selection": "胜",
+      "odds": 4.5,
+      "model_probability": 0.2769674025016474,
+      "decimal_ev": 0.24635331125741344,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041026:CRS:0-4",
+      "match_id": "sporttery-2041026",
+      "match_num": "周日026",
+      "home": "新英格兰",
+      "away": "纽约城",
+      "kickoff": "2026-08-24T04:30:00+08:00",
+      "market": "CRS",
+      "selection": "0-4",
+      "odds": 100.0,
+      "model_probability": 0.012321429786123592,
+      "decimal_ev": 0.23214297861235922,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041028:HAD:负",
+      "match_id": "sporttery-2041028",
+      "match_num": "周一001",
+      "home": "博洛尼亚",
+      "away": "拉齐奥",
+      "kickoff": "2026-08-25T00:30:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 3.2,
+      "model_probability": 0.3758595044262975,
+      "decimal_ev": 0.20275041416415207,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041035:HAFU:胜胜",
+      "match_id": "sporttery-2041035",
+      "match_num": "周一008",
+      "home": "富勒姆",
+      "away": "切尔西",
+      "kickoff": "2026-08-25T03:00:00+08:00",
+      "market": "HAFU",
+      "selection": "胜胜",
+      "odds": 6.1,
+      "model_probability": 0.1952796706373465,
+      "decimal_ev": 0.19120599088781365,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041028:HAFU:负负",
+      "match_id": "sporttery-2041028",
+      "match_num": "周一001",
+      "home": "博洛尼亚",
+      "away": "拉齐奥",
+      "kickoff": "2026-08-25T00:30:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 5.4,
+      "model_probability": 0.22030504926180963,
+      "decimal_ev": 0.18964726601377202,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041035:HAD:胜",
+      "match_id": "sporttery-2041035",
+      "match_num": "周一008",
+      "home": "富勒姆",
+      "away": "切尔西",
+      "kickoff": "2026-08-25T03:00:00+08:00",
+      "market": "HAD",
+      "selection": "胜",
+      "odds": 3.55,
+      "model_probability": 0.33195525551279326,
+      "decimal_ev": 0.17844115707041608,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041025:TTG:1球",
+      "match_id": "sporttery-2041025",
+      "match_num": "周日025",
+      "home": "波尔图",
+      "away": "阿罗卡",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "TTG",
+      "selection": "1球",
+      "odds": 6.5,
+      "model_probability": 0.1781150126940631,
+      "decimal_ev": 0.15774758251141008,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041026:HAFU:负负",
+      "match_id": "sporttery-2041026",
+      "match_num": "周日026",
+      "home": "新英格兰",
+      "away": "纽约城",
+      "kickoff": "2026-08-24T04:30:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 4.7,
+      "model_probability": 0.2449087080013591,
+      "decimal_ev": 0.15107092760638796,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041026:HAD:负",
+      "match_id": "sporttery-2041026",
+      "match_num": "周日026",
+      "home": "新英格兰",
+      "away": "纽约城",
+      "kickoff": "2026-08-24T04:30:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 2.77,
+      "model_probability": 0.40880947388799055,
+      "decimal_ev": 0.13240224266973377,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041020:HAFU:负负",
+      "match_id": "sporttery-2041020",
+      "match_num": "周日020",
+      "home": "圣克拉拉",
+      "away": "法马利康",
+      "kickoff": "2026-08-24T01:00:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 4.7,
+      "model_probability": 0.23959530592853762,
+      "decimal_ev": 0.12609793786412693,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041038:HAD:负",
+      "match_id": "sporttery-2041038",
+      "match_num": "周一011",
+      "home": "博塔弗戈",
+      "away": "巴竞技",
+      "kickoff": "2026-08-25T07:00:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 2.98,
+      "model_probability": 0.3687311804271159,
+      "decimal_ev": 0.09881891767280537,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041020:HAD:负",
+      "match_id": "sporttery-2041020",
+      "match_num": "周日020",
+      "home": "圣克拉拉",
+      "away": "法马利康",
+      "kickoff": "2026-08-24T01:00:00+08:00",
+      "market": "HAD",
+      "selection": "负",
+      "odds": 2.68,
+      "model_probability": 0.40926433871285484,
+      "decimal_ev": 0.09682842775045097,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041030:HAD:胜",
+      "match_id": "sporttery-2041030",
+      "match_num": "周一003",
+      "home": "马尔默",
+      "away": "佐加顿斯",
+      "kickoff": "2026-08-25T01:00:00+08:00",
+      "market": "HAD",
+      "selection": "胜",
+      "odds": 2.7,
+      "model_probability": 0.40618094230991947,
+      "decimal_ev": 0.09668854423678264,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041038:HAFU:负负",
+      "match_id": "sporttery-2041038",
+      "match_num": "周一011",
+      "home": "博塔弗戈",
+      "away": "巴竞技",
+      "kickoff": "2026-08-25T07:00:00+08:00",
+      "market": "HAFU",
+      "selection": "负负",
+      "odds": 5.1,
+      "model_probability": 0.2125167896388204,
+      "decimal_ev": 0.08383562715798387,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041028:TTG:5球",
+      "match_id": "sporttery-2041028",
+      "match_num": "周一001",
+      "home": "博洛尼亚",
+      "away": "拉齐奥",
+      "kickoff": "2026-08-25T00:30:00+08:00",
+      "market": "TTG",
+      "selection": "5球",
+      "odds": 14.0,
+      "model_probability": 0.07725306794885019,
+      "decimal_ev": 0.08154295128390254,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041030:HAFU:胜胜",
+      "match_id": "sporttery-2041030",
+      "match_num": "周一003",
+      "home": "马尔默",
+      "away": "佐加顿斯",
+      "kickoff": "2026-08-25T01:00:00+08:00",
+      "market": "HAFU",
+      "selection": "胜胜",
+      "odds": 4.4,
+      "model_probability": 0.2420874244558939,
+      "decimal_ev": 0.06518466760593333,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041038:CRS:0-1",
+      "match_id": "sporttery-2041038",
+      "match_num": "周一011",
+      "home": "博塔弗戈",
+      "away": "巴竞技",
+      "kickoff": "2026-08-25T07:00:00+08:00",
+      "market": "CRS",
+      "selection": "0-1",
+      "odds": 9.0,
+      "model_probability": 0.11362767437533339,
+      "decimal_ev": 0.022649069378000597,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041027:TTG:0球",
+      "match_id": "sporttery-2041027",
+      "match_num": "周日027",
+      "home": "桑托斯",
+      "away": "米拉索尔",
+      "kickoff": "2026-08-24T05:30:00+08:00",
+      "market": "TTG",
+      "selection": "0球",
+      "odds": 12.5,
+      "model_probability": 0.08060859479346709,
+      "decimal_ev": 0.007607434918338596,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041022:TTG:5球",
+      "match_id": "sporttery-2041022",
+      "match_num": "周日022",
+      "home": "都灵",
+      "away": "AC米兰",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "TTG",
+      "selection": "5球",
+      "odds": 11.0,
+      "model_probability": 0.09086689931543547,
+      "decimal_ev": -0.0004641075302098674,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041026:TTG:1球",
+      "match_id": "sporttery-2041026",
+      "match_num": "周日026",
+      "home": "新英格兰",
+      "away": "纽约城",
+      "kickoff": "2026-08-24T04:30:00+08:00",
+      "market": "TTG",
+      "selection": "1球",
+      "odds": 6.25,
+      "model_probability": 0.15939417654753263,
+      "decimal_ev": -0.003786396577921014,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041038:TTG:1球",
+      "match_id": "sporttery-2041038",
+      "match_num": "周一011",
+      "home": "博塔弗戈",
+      "away": "巴竞技",
+      "kickoff": "2026-08-25T07:00:00+08:00",
+      "market": "TTG",
+      "selection": "1球",
+      "odds": 4.3,
+      "model_probability": 0.22387683018588322,
+      "decimal_ev": -0.037329630200702124,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041020:TTG:5球",
+      "match_id": "sporttery-2041020",
+      "match_num": "周日020",
+      "home": "圣克拉拉",
+      "away": "法马利康",
+      "kickoff": "2026-08-24T01:00:00+08:00",
+      "market": "TTG",
+      "selection": "5球",
+      "odds": 16.0,
+      "model_probability": 0.059095942232135115,
+      "decimal_ev": -0.05446492428583816,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041035:TTG:5球",
+      "match_id": "sporttery-2041035",
+      "match_num": "周一008",
+      "home": "富勒姆",
+      "away": "切尔西",
+      "kickoff": "2026-08-25T03:00:00+08:00",
+      "market": "TTG",
+      "selection": "5球",
+      "odds": 8.5,
+      "model_probability": 0.10927799341686148,
+      "decimal_ev": -0.07113705595667741,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041033:TTG:5球",
+      "match_id": "sporttery-2041033",
+      "match_num": "周一006",
+      "home": "罗马",
+      "away": "佛罗伦萨",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "TTG",
+      "selection": "5球",
+      "odds": 10.5,
+      "model_probability": 0.08733443641175034,
+      "decimal_ev": -0.08298841767662135,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041034:TTG:1球",
+      "match_id": "sporttery-2041034",
+      "match_num": "周一007",
+      "home": "兰斯",
+      "away": "阿纳西",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "market": "TTG",
+      "selection": "1球",
+      "odds": 4.5,
+      "model_probability": 0.19897974229712745,
+      "decimal_ev": -0.10459115966292654,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041036:TTG:1球",
+      "match_id": "sporttery-2041036",
+      "match_num": "周一009",
+      "home": "吉维森特",
+      "away": "卡萨皮亚",
+      "kickoff": "2026-08-25T03:15:00+08:00",
+      "market": "TTG",
+      "selection": "1球",
+      "odds": 4.2,
+      "model_probability": 0.21216133665906584,
+      "decimal_ev": -0.1089223860319235,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "apifootball_events_goals_only",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041023:TTG:4球",
+      "match_id": "sporttery-2041023",
+      "match_num": "周日023",
+      "home": "亚特兰大",
+      "away": "萨索洛",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "market": "TTG",
+      "selection": "4球",
+      "odds": 5.2,
+      "model_probability": 0.1697458858790066,
+      "decimal_ev": -0.11732139342916559,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    },
+    {
+      "candidate_id": "sporttery-2041024:TTG:2球",
+      "match_id": "sporttery-2041024",
+      "match_num": "周日024",
+      "home": "埃尔切",
+      "away": "巴萨",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "market": "TTG",
+      "selection": "2球",
+      "odds": 4.7,
+      "model_probability": 0.18756360899989322,
+      "decimal_ev": -0.1184510377005018,
+      "probability_source": "independent_prematch_lambda",
+      "lambda_source": "understat_rolling_xg",
+      "research_only": true,
+      "calibration_status": "UNFITTED_SHADOW",
+      "purchase_authorized": false
+    }
+  ],
+  "admission": {
+    "decision": "hold",
+    "reason": "each market must meet its own sample, calibration, paired-CI and release gates"
+  }
+}

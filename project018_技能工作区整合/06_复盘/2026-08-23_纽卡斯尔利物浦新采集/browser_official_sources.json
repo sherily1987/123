@@ -1,0 +1,42 @@
+{
+  "schema_version": "browser-evidence-review-1.0",
+  "match_id": "sporttery-2041017",
+  "collected_at": "2026-08-23T18:18:00+08:00",
+  "method": "BB-browser dynamic discovery and page-context extraction",
+  "sources": [
+    {
+      "source_id": "newcastle.official.team_news",
+      "source_url": "https://www.newcastleunited.com/en/news/matthias-jaissles-team-news-update-livramento-and-joelinton-latest-ahead-of-reds-test",
+      "publisher": "Newcastle United official",
+      "status": "READABLE",
+      "facts": {
+        "kickoff_local": "2026-08-23 16:30 BST",
+        "livramento": "not confirmed 100% fit; manager said he will miss the opener",
+        "joelinton": "out for a couple of weeks",
+        "amar_dedic": "manager said ready to make debut"
+      },
+      "use_policy": "research evidence only; not injected into production market_only probability"
+    },
+    {
+      "source_id": "liverpool.official.fixture_search",
+      "source_url": "https://www.liverpoolfc.com/news/newcastle-v-liverpool-tv-channels-how-to-listen-live-and-more",
+      "publisher": "Liverpool FC official",
+      "status": "SEARCH_SNIPPET_ONLY",
+      "facts": {"kickoff_local": "2026-08-23 16:30 BST"},
+      "use_policy": "identity/time corroboration only; page body not used"
+    },
+    {
+      "source_id": "premierleague.official.match_page",
+      "source_url": "https://www.premierleague.com/en/match/2562129",
+      "publisher": "Premier League official",
+      "status": "BLOCKED_403",
+      "facts": {},
+      "use_policy": "not used; retained as a traceable retrieval failure"
+    }
+  ],
+  "limitations": [
+    "Official Newcastle report provides injury/team-news facts but no confirmed starting XI.",
+    "Sporttery mobile snapshot marks recent-form scope as PARTIAL, suspensions UNAVAILABLE, and starting XI PENDING_REFRESH.",
+    "The browser evidence is not silently converted into model coefficients; production remains market_only."
+  ]
+}

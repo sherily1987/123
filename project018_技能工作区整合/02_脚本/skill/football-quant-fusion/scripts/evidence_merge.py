@@ -28,6 +28,28 @@ def _newer(candidate: dict[str, Any], current: dict[str, Any]) -> bool:
     return left > right
 
 
+def _annotate_cross_validation(entry: dict[str, Any] | None) -> None:
+    """Annotate predicted media evidence without promoting it to official."""
+    if not isinstance(entry, dict) or str(entry.get("status") or "").upper() != "PREDICTED":
+        return
+    alternatives = entry.get("alternatives") or []
+    domains = set()
+    for item in [entry, *[x for x in alternatives if isinstance(x, dict)]]:
+        try:
+            from urllib.parse import urlparse
+            host = urlparse(str(item.get("source_url") or "")).netloc.lower().split(":", 1)[0]
+            if host.startswith("www."):
+                host = host[4:]
+            if host:
+                domains.add(host)
+        except Exception:
+            pass
+    entry["predicted"] = True
+    entry["cross_validated"] = len(domains) >= 2
+    entry["distinct_source_count"] = len(domains)
+    entry["cross_validation_status"] = "PASS" if entry["cross_validated"] else "SINGLE_SOURCE"
+
+
 def merge_browser_audit(chain: dict[str, Any] | None, browser_audit: dict[str, Any] | None):
     """Return ``(merged_chain, audit)`` for a browser evidence snapshot.
 
@@ -70,6 +92,9 @@ def merge_browser_audit(chain: dict[str, Any] | None, browser_audit: dict[str, A
         if not _same(current, browser):
             merged[name].setdefault("alternatives", []).append(deepcopy(browser))
             audit["conflicts"].append(name)
+        _annotate_cross_validation(merged.get(name))
+    for name in FIELDS:
+        _annotate_cross_validation(merged.get(name))
     return merged, audit
 
 
@@ -126,4 +151,7 @@ def merge_late_info_events(chain: dict[str, Any] | None, events: list[dict[str, 
         elif not _same(current, entry):
             merged[field].setdefault("alternatives", []).append(deepcopy(entry))
             audit["conflicts"].append(field)
+        _annotate_cross_validation(merged.get(field))
+    for name in FIELDS:
+        _annotate_cross_validation(merged.get(name))
     return merged, audit

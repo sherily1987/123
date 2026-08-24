@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step_days": 30,
+    "half_life": 500.0,
+    "xg_weight": 0.4,
+    "shrinkage": "off",
+    "metric_basis": "model_on_baseline_subset"
+  },
+  "leagues": {
+    "apisports_japan_j2_league": {
+      "config": "滚动（无 xG 数据）hl=500",
+      "baseline": "provider_market",
+      "test_from": 739193,
+      "n_all": 415,
+      "skip": 21,
+      "model_all": 0.654142,
+      "n_subset": 415,
+      "model_subset": 0.654142,
+      "market": null,
+      "frequency": 0.66049,
+      "accuracy_pct": 44.34,
+      "log_loss": 1.103233,
+      "no_market": true,
+      "thin": false
+    }
+  },
+  "summary_by_baseline": {
+    "no_market": {
+      "leagues": [
+        "apisports_japan_j2_league"
+      ],
+      "n": 415,
+      "model": 0.6541,
+      "market": null,
+      "frequency": 0.6605,
+      "gap_vs_frequency": -0.0063
+    }
+  }
+}

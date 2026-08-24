@@ -1,0 +1,1280 @@
+{
+  "schema_version": "prematch-evidence-snapshot-1.0",
+  "match_id": "sporttery-2041006",
+  "identity": {
+    "home": "哥德堡",
+    "away": "埃夫斯堡",
+    "competition": "瑞超",
+    "kickoff": "2026-08-23T20:00:00+08:00",
+    "match_num": null
+  },
+  "collected_at": "2026-08-23T10:14:37+00:00",
+  "facts": {
+    "match_id": 2041006,
+    "home": "哥德堡",
+    "away": "埃夫斯堡",
+    "kickoff": "2026-08-23 20:00",
+    "team_ids": {
+      "home": 0,
+      "away": 0
+    },
+    "strength": {
+      "lambda_home": 1.05,
+      "lambda_away": 1.65,
+      "sample_legs": 10,
+      "raw": {
+        "home_goal_avg": 1.1,
+        "away_goal_avg": 1.5,
+        "home_loss_avg": 1.8,
+        "away_loss_avg": 1.0
+      },
+      "status": "VALID",
+      "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+    },
+    "feature": {
+      "goalAvg": {
+        "awayGoalAvgCnt": "1.5",
+        "awayGoalAvgCntRatio": "57.7",
+        "homeGoalAvgCnt": "1.1",
+        "homeGoalAvgCntRatio": "42.3",
+        "totalLegCnt": 10
+      },
+      "lossGoalAvg": {
+        "awayLossGoalAvgCnt": "1.0",
+        "awayLossGoalAvgCntRatio": "35.7",
+        "homeLossGoalAvgCnt": "1.8",
+        "homeLossGoalAvgCntRatio": "64.3",
+        "totalLegCnt": 10
+      },
+      "last": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 1,
+        "awayScoreRatio": "83",
+        "awayWinGoalMatchCnt": 8,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 8,
+        "homeScoreRatio": "13",
+        "homeWinGoalMatchCnt": 1,
+        "totalLegCnt": 10
+      },
+      "eachHomeAway": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 3,
+        "awayScoreRatio": "50",
+        "awayWinGoalMatchCnt": 4,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "43",
+        "homeWinGoalMatchCnt": 4,
+        "totalLegCnt": 10
+      },
+      "sameHomeAway": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 2,
+        "awayScoreRatio": "60",
+        "awayWinGoalMatchCnt": 5,
+        "homeDrawMatchCnt": 3,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "30",
+        "homeWinGoalMatchCnt": 2,
+        "totalLegCnt": 10
+      },
+      "eachSameHomeAway": {
+        "awayDrawMatchCnt": 4,
+        "awayLossGoalMatchCnt": 2,
+        "awayScoreRatio": "53",
+        "awayWinGoalMatchCnt": 4,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "37",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      }
+    },
+    "h2h": [
+      {
+        "date": "2026-04-06",
+        "home": "埃夫斯堡",
+        "away": "哥德堡",
+        "score_90": "2:0",
+        "score_ht": "0:0",
+        "result": "away",
+        "league_id": 58,
+        "home_team_id": 2158,
+        "away_team_id": 2149
+      },
+      {
+        "date": "2025-07-29",
+        "home": "埃夫斯堡",
+        "away": "哥德堡",
+        "score_90": "4:3",
+        "score_ht": "1:3",
+        "result": "away",
+        "league_id": 58,
+        "home_team_id": 2158,
+        "away_team_id": 2149
+      },
+      {
+        "date": "2025-07-12",
+        "home": "哥德堡",
+        "away": "埃夫斯堡",
+        "score_90": "1:2",
+        "score_ht": "1:2",
+        "result": "away",
+        "league_id": 58,
+        "home_team_id": 2149,
+        "away_team_id": 2158
+      },
+      {
+        "date": "2024-08-25",
+        "home": "埃夫斯堡",
+        "away": "哥德堡",
+        "score_90": "3:1",
+        "score_ht": "1:0",
+        "result": "away",
+        "league_id": 0,
+        "home_team_id": 2158,
+        "away_team_id": 2149
+      },
+      {
+        "date": "2024-06-01",
+        "home": "哥德堡",
+        "away": "埃夫斯堡",
+        "score_90": "1:0",
+        "score_ht": "1:0",
+        "result": "home",
+        "league_id": 58,
+        "home_team_id": 2149,
+        "away_team_id": 2158
+      }
+    ],
+    "h2h_statistics": {
+      "drawMatchCnt": 0,
+      "drawProbability": "0%",
+      "goalCnt": 0,
+      "lossGoalCnt": 0,
+      "lossGoalMatchCnt": 4,
+      "lossProbability": "80%",
+      "netGoal": 0,
+      "sportteryTeamId": 0,
+      "teamId": 0,
+      "teamShortName": "哥德堡",
+      "totalLegCnt": 5,
+      "winGoalMatchCnt": 1,
+      "winProbability": "20%"
+    },
+    "recent_home": [
+      {
+        "date": "2026-08-16",
+        "home": "代格福什",
+        "away": "哥德堡",
+        "score_90": "3:0",
+        "score_ht": "3:0",
+        "league_id": null,
+        "home_team_id": 1110,
+        "away_team_id": 600
+      },
+      {
+        "date": "2026-08-14",
+        "home": "根特",
+        "away": "哥德堡",
+        "score_90": "1:1",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-08-09",
+        "home": "哥德堡",
+        "away": "卡尔马",
+        "score_90": "3:2",
+        "score_ht": "1:1",
+        "league_id": null,
+        "home_team_id": 600,
+        "away_team_id": 602
+      },
+      {
+        "date": "2026-08-07",
+        "home": "哥德堡",
+        "away": "根特",
+        "score_90": "0:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-08-02",
+        "home": "哥德堡",
+        "away": "代格福什",
+        "score_90": "2:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 600,
+        "away_team_id": 1110
+      },
+      {
+        "date": "2026-07-31",
+        "home": "利瓦迪亚",
+        "away": "哥德堡",
+        "score_90": "0:1",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-26",
+        "home": "天狼星",
+        "away": "哥德堡",
+        "score_90": "4:1",
+        "score_ht": "2:1",
+        "league_id": null,
+        "home_team_id": 1917,
+        "away_team_id": 600
+      },
+      {
+        "date": "2026-07-22",
+        "home": "哥德堡",
+        "away": "利瓦迪亚",
+        "score_90": "1:2",
+        "score_ht": "0:2",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-18",
+        "home": "哥德堡",
+        "away": "布鲁马波",
+        "score_90": "2:1",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 600,
+        "away_team_id": 888
+      },
+      {
+        "date": "2026-07-12",
+        "home": "马尔默",
+        "away": "哥德堡",
+        "score_90": "4:0",
+        "score_ht": "3:0",
+        "league_id": null,
+        "home_team_id": 606,
+        "away_team_id": 600
+      }
+    ],
+    "recent_away": [
+      {
+        "date": "2026-08-19",
+        "home": "Västra Frölund",
+        "away": "埃夫斯堡",
+        "score_90": "0:4",
+        "score_ht": "0:3",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 608
+      },
+      {
+        "date": "2026-08-15",
+        "home": "埃夫斯堡",
+        "away": "韦斯特罗",
+        "score_90": "3:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 608,
+        "away_team_id": 1026400
+      },
+      {
+        "date": "2026-08-08",
+        "home": "米亚尔比",
+        "away": "埃夫斯堡",
+        "score_90": "0:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 974,
+        "away_team_id": 608
+      },
+      {
+        "date": "2026-07-26",
+        "home": "马尔默",
+        "away": "埃夫斯堡",
+        "score_90": "1:2",
+        "score_ht": "1:2",
+        "league_id": null,
+        "home_team_id": 606,
+        "away_team_id": 608
+      },
+      {
+        "date": "2026-07-19",
+        "home": "埃夫斯堡",
+        "away": "天狼星",
+        "score_90": "1:3",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 608,
+        "away_team_id": 1917
+      },
+      {
+        "date": "2026-07-12",
+        "home": "盖斯",
+        "away": "埃夫斯堡",
+        "score_90": "1:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 789,
+        "away_team_id": 608
+      },
+      {
+        "date": "2026-07-05",
+        "home": "埃夫斯堡",
+        "away": "哈马比",
+        "score_90": "1:2",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 608,
+        "away_team_id": 352
+      },
+      {
+        "date": "2026-06-28",
+        "home": "腓特烈",
+        "away": "埃夫斯堡",
+        "score_90": "0:0",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 616,
+        "away_team_id": 608
+      },
+      {
+        "date": "2026-05-30",
+        "home": "厄格里特",
+        "away": "埃夫斯堡",
+        "score_90": "2:2",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 601,
+        "away_team_id": 608
+      },
+      {
+        "date": "2026-05-26",
+        "home": "埃夫斯堡",
+        "away": "赫根",
+        "score_90": "1:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 608,
+        "away_team_id": 604
+      }
+    ],
+    "injuries": {
+      "home": {
+        "team": "哥德堡",
+        "team_id": 2149,
+        "count": 1,
+        "status": "VALID",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.024,
+        "defense_absence": 0.012,
+        "gk_absence": 0.0,
+        "players": [
+          {
+            "name": "拉尔森",
+            "pos": "中场",
+            "apps": 5,
+            "starts": 3,
+            "type": "伤",
+            "weight": 0.4
+          }
+        ],
+        "list": [
+          {
+            "appearanceCnt": 5,
+            "injuryFlag": 1,
+            "personId": 138455,
+            "personName": "拉尔森",
+            "playerPositionCode": "Midfielder",
+            "playerPositionDesc": "中场",
+            "startedMatchCnt": 3,
+            "substituteMatchCnt": 2,
+            "suspensionFlag": 0,
+            "uniformNo": "8"
+          }
+        ]
+      },
+      "away": {
+        "team": "埃夫斯堡",
+        "team_id": 2158,
+        "count": 1,
+        "status": "VALID",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [
+          {
+            "name": "T. Sander",
+            "pos": "守门员",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          }
+        ],
+        "list": [
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 715724,
+            "personName": "T. Sander",
+            "playerPositionCode": "Goalkeeper",
+            "playerPositionDesc": "守门员",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "30"
+          }
+        ]
+      }
+    },
+    "tables": [
+      {
+        "drawMatchCnt": 4,
+        "groupId": 0,
+        "groupName": "",
+        "lossGoalMatchCnt": 8,
+        "phaseName": "",
+        "points": "19",
+        "ranking": "12",
+        "sportteryTeamId": 600,
+        "teamId": 0,
+        "teamShortName": "哥德堡",
+        "totalLegCnt": 17,
+        "uniformTeamId": 484,
+        "winGoalMatchCnt": 5,
+        "winProbability": "29%"
+      },
+      {
+        "drawMatchCnt": 6,
+        "groupId": 0,
+        "groupName": "",
+        "lossGoalMatchCnt": 4,
+        "phaseName": "",
+        "points": "27",
+        "ranking": "5",
+        "sportteryTeamId": 608,
+        "teamId": 0,
+        "teamShortName": "埃夫斯堡",
+        "totalLegCnt": 17,
+        "uniformTeamId": 482,
+        "winGoalMatchCnt": 7,
+        "winProbability": "41%"
+      }
+    ],
+    "players": {
+      "home": {
+        "playerList": [
+          {
+            "appearanceCnt": 16,
+            "assistAvgCnt": "0.1",
+            "assistCnt": 2,
+            "assistProbability": "13%",
+            "goalAvgCnt": "0.4",
+            "goalCnt": 6,
+            "goalProbability": "27%",
+            "injuryFlag": 0,
+            "personId": 405030,
+            "personName": "T. Heintz",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 16,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "14"
+          },
+          {
+            "appearanceCnt": 14,
+            "assistAvgCnt": "0.2",
+            "assistCnt": 3,
+            "assistProbability": "20%",
+            "goalAvgCnt": "0.2",
+            "goalCnt": 3,
+            "goalProbability": "14%",
+            "injuryFlag": 0,
+            "personId": 799045,
+            "personName": "S. Clemmensen",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 10,
+            "substituteMatchCnt": 4,
+            "suspensionFlag": 0,
+            "uniformNo": "7"
+          },
+          {
+            "appearanceCnt": 5,
+            "assistAvgCnt": "0.2",
+            "assistCnt": 1,
+            "assistProbability": "7%",
+            "goalAvgCnt": "0.6",
+            "goalCnt": 3,
+            "goalProbability": "14%",
+            "injuryFlag": 1,
+            "personId": 138455,
+            "personName": "拉尔森",
+            "playerPositionCode": "Midfielder",
+            "playerPositionDesc": "中场",
+            "startedMatchCnt": 3,
+            "substituteMatchCnt": 2,
+            "suspensionFlag": 0,
+            "uniformNo": "8"
+          }
+        ],
+        "sportteryTeamId": 600,
+        "teamId": 2149,
+        "teamShortName": "哥德堡",
+        "uniformTeamId": 484
+      },
+      "away": {
+        "playerList": [
+          {
+            "appearanceCnt": 14,
+            "assistAvgCnt": "0.1",
+            "assistCnt": 2,
+            "assistProbability": "11%",
+            "goalAvgCnt": "0.3",
+            "goalCnt": 4,
+            "goalProbability": "18%",
+            "injuryFlag": 0,
+            "personId": 228894,
+            "personName": "萨内利",
+            "playerPositionCode": "Midfielder",
+            "playerPositionDesc": "中场",
+            "startedMatchCnt": 10,
+            "substituteMatchCnt": 4,
+            "suspensionFlag": 0,
+            "uniformNo": "9"
+          },
+          {
+            "appearanceCnt": 17,
+            "assistAvgCnt": "0",
+            "assistCnt": 0,
+            "assistProbability": "0%",
+            "goalAvgCnt": "0.2",
+            "goalCnt": 4,
+            "goalProbability": "18%",
+            "injuryFlag": 0,
+            "personId": 864344,
+            "personName": "L. Östman",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 8,
+            "substituteMatchCnt": 9,
+            "suspensionFlag": 0,
+            "uniformNo": "21"
+          },
+          {
+            "appearanceCnt": 13,
+            "assistAvgCnt": "0.2",
+            "assistCnt": 3,
+            "assistProbability": "17%",
+            "goalAvgCnt": "0.2",
+            "goalCnt": 3,
+            "goalProbability": "14%",
+            "injuryFlag": 0,
+            "personId": 874973,
+            "personName": "M. Kamara",
+            "playerPositionCode": "Midfielder",
+            "playerPositionDesc": "中场",
+            "startedMatchCnt": 7,
+            "substituteMatchCnt": 6,
+            "suspensionFlag": 0,
+            "uniformNo": "29"
+          }
+        ],
+        "sportteryTeamId": 608,
+        "teamId": 2158,
+        "teamShortName": "埃夫斯堡",
+        "uniformTeamId": 482
+      }
+    },
+    "future": {
+      "home": {
+        "matchList": [
+          {
+            "awayTeamId": 2151,
+            "awayTeamShortName": "厄格里特",
+            "gameweek": "19",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2149,
+            "homeTeamShortName": "哥德堡",
+            "matchDateTime": "2026-08-30 22:30:00",
+            "matchId": 2471884,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 601,
+            "sportteryHomeTeamId": 600,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 865,
+            "uniformHomeTeamId": 484
+          },
+          {
+            "awayTeamId": 2149,
+            "awayTeamShortName": "哥德堡",
+            "gameweek": "",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 17504,
+            "homeTeamShortName": "Olympic",
+            "matchDateTime": "2026-09-03 01:00:00",
+            "matchId": 2524090,
+            "phaseId": 48499,
+            "phaseName": "2nd Round",
+            "seasonId": 14960,
+            "sportteryAwayTeamId": 600,
+            "sportteryHomeTeamId": 0,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 566,
+            "tournamentShortName": "瑞典杯",
+            "uniformAwayTeamId": 484,
+            "uniformHomeTeamId": 36315
+          },
+          {
+            "awayTeamId": 2149,
+            "awayTeamShortName": "哥德堡",
+            "gameweek": "20",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2466,
+            "homeTeamShortName": "米亚尔比",
+            "matchDateTime": "2026-09-08 01:00:00",
+            "matchId": 2471876,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 600,
+            "sportteryHomeTeamId": 974,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 484,
+            "uniformHomeTeamId": 470
+          },
+          {
+            "awayTeamId": 2145,
+            "awayTeamShortName": "哈尔姆斯",
+            "gameweek": "21",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2149,
+            "homeTeamShortName": "哥德堡",
+            "matchDateTime": "2026-09-12 23:30:00",
+            "matchId": 2471867,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 609,
+            "sportteryHomeTeamId": 600,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 1745,
+            "uniformHomeTeamId": 484
+          }
+        ],
+        "sportteryTeamId": 600,
+        "teamId": 2149,
+        "teamShortName": "哥德堡",
+        "uniformTeamId": 484
+      },
+      "away": {
+        "matchList": [
+          {
+            "awayTeamId": 2403,
+            "awayTeamShortName": "代格福什",
+            "gameweek": "19",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2158,
+            "homeTeamShortName": "埃夫斯堡",
+            "matchDateTime": "2026-08-29 21:00:00",
+            "matchId": 2471881,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 1110,
+            "sportteryHomeTeamId": 608,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 1233,
+            "uniformHomeTeamId": 482
+          },
+          {
+            "awayTeamId": 2158,
+            "awayTeamShortName": "埃夫斯堡",
+            "gameweek": "20",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2162,
+            "homeTeamShortName": "布鲁马波",
+            "matchDateTime": "2026-09-06 22:30:00",
+            "matchId": 2471874,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 608,
+            "sportteryHomeTeamId": 888,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 482,
+            "uniformHomeTeamId": 1190
+          },
+          {
+            "awayTeamId": 2148,
+            "awayTeamShortName": "卡尔马",
+            "gameweek": "21",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2158,
+            "homeTeamShortName": "埃夫斯堡",
+            "matchDateTime": "2026-09-13 20:00:00",
+            "matchId": 2471864,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 602,
+            "sportteryHomeTeamId": 608,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 435,
+            "uniformHomeTeamId": 482
+          },
+          {
+            "awayTeamId": 2158,
+            "awayTeamShortName": "埃夫斯堡",
+            "gameweek": "22",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2150,
+            "homeTeamShortName": "佐加顿斯",
+            "matchDateTime": "2026-09-20 20:00:00",
+            "matchId": 2471862,
+            "phaseId": 48269,
+            "phaseName": "Regular Season",
+            "seasonId": 14355,
+            "sportteryAwayTeamId": 608,
+            "sportteryHomeTeamId": 294,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 132,
+            "tournamentShortName": "瑞超",
+            "uniformAwayTeamId": 482,
+            "uniformHomeTeamId": 340
+          }
+        ],
+        "sportteryTeamId": 608,
+        "teamId": 2158,
+        "teamShortName": "埃夫斯堡",
+        "uniformTeamId": 482
+      }
+    },
+    "available": true,
+    "feature_analysis": {
+      "source_field_map": {
+        "goals_avg": "feature.goalAvg",
+        "conceded_avg": "feature.lossGoalAvg",
+        "h2h_last7": "feature.last",
+        "recent_home_away": "feature.eachHomeAway",
+        "same_home_away_recent": "feature.sameHomeAway",
+        "same_home_away_extended": "feature.eachSameHomeAway"
+      },
+      "goals_avg": {
+        "awayGoalAvgCnt": "1.5",
+        "awayGoalAvgCntRatio": "57.7",
+        "homeGoalAvgCnt": "1.1",
+        "homeGoalAvgCntRatio": "42.3",
+        "totalLegCnt": 10
+      },
+      "conceded_avg": {
+        "awayLossGoalAvgCnt": "1.0",
+        "awayLossGoalAvgCntRatio": "35.7",
+        "homeLossGoalAvgCnt": "1.8",
+        "homeLossGoalAvgCntRatio": "64.3",
+        "totalLegCnt": 10
+      },
+      "h2h_last7": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 1,
+        "awayScoreRatio": "83",
+        "awayWinGoalMatchCnt": 8,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 8,
+        "homeScoreRatio": "13",
+        "homeWinGoalMatchCnt": 1,
+        "totalLegCnt": 10
+      },
+      "recent_home_away": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 3,
+        "awayScoreRatio": "50",
+        "awayWinGoalMatchCnt": 4,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "43",
+        "homeWinGoalMatchCnt": 4,
+        "totalLegCnt": 10
+      },
+      "same_home_away_recent": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 2,
+        "awayScoreRatio": "60",
+        "awayWinGoalMatchCnt": 5,
+        "homeDrawMatchCnt": 3,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "30",
+        "homeWinGoalMatchCnt": 2,
+        "totalLegCnt": 10
+      },
+      "same_home_away_extended": {
+        "awayDrawMatchCnt": 4,
+        "awayLossGoalMatchCnt": 2,
+        "awayScoreRatio": "53",
+        "awayWinGoalMatchCnt": 4,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "37",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      }
+    }
+  },
+  "evidence_audit": {
+    "schema_version": "evidence-audit-1.1",
+    "critical_fields": [
+      "team_stats",
+      "recent_form",
+      "injury",
+      "suspensions",
+      "starting_xi"
+    ],
+    "entries": {
+      "team_stats": {
+        "status": "VALID",
+        "value": {
+          "strength": {
+            "lambda_home": 1.05,
+            "lambda_away": 1.65,
+            "sample_legs": 10,
+            "raw": {
+              "home_goal_avg": 1.1,
+              "away_goal_avg": 1.5,
+              "home_loss_avg": 1.8,
+              "away_loss_avg": 1.0
+            },
+            "status": "VALID",
+            "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+          },
+          "feature": {
+            "goalAvg": {
+              "awayGoalAvgCnt": "1.5",
+              "awayGoalAvgCntRatio": "57.7",
+              "homeGoalAvgCnt": "1.1",
+              "homeGoalAvgCntRatio": "42.3",
+              "totalLegCnt": 10
+            },
+            "lossGoalAvg": {
+              "awayLossGoalAvgCnt": "1.0",
+              "awayLossGoalAvgCntRatio": "35.7",
+              "homeLossGoalAvgCnt": "1.8",
+              "homeLossGoalAvgCntRatio": "64.3",
+              "totalLegCnt": 10
+            },
+            "last": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 1,
+              "awayScoreRatio": "83",
+              "awayWinGoalMatchCnt": 8,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 8,
+              "homeScoreRatio": "13",
+              "homeWinGoalMatchCnt": 1,
+              "totalLegCnt": 10
+            },
+            "eachHomeAway": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 3,
+              "awayScoreRatio": "50",
+              "awayWinGoalMatchCnt": 4,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "43",
+              "homeWinGoalMatchCnt": 4,
+              "totalLegCnt": 10
+            },
+            "sameHomeAway": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 2,
+              "awayScoreRatio": "60",
+              "awayWinGoalMatchCnt": 5,
+              "homeDrawMatchCnt": 3,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "30",
+              "homeWinGoalMatchCnt": 2,
+              "totalLegCnt": 10
+            },
+            "eachSameHomeAway": {
+              "awayDrawMatchCnt": 4,
+              "awayLossGoalMatchCnt": 2,
+              "awayScoreRatio": "53",
+              "awayWinGoalMatchCnt": 4,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "37",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            }
+          },
+          "feature_analysis": {
+            "source_field_map": {
+              "goals_avg": "feature.goalAvg",
+              "conceded_avg": "feature.lossGoalAvg",
+              "h2h_last7": "feature.last",
+              "recent_home_away": "feature.eachHomeAway",
+              "same_home_away_recent": "feature.sameHomeAway",
+              "same_home_away_extended": "feature.eachSameHomeAway"
+            },
+            "goals_avg": {
+              "awayGoalAvgCnt": "1.5",
+              "awayGoalAvgCntRatio": "57.7",
+              "homeGoalAvgCnt": "1.1",
+              "homeGoalAvgCntRatio": "42.3",
+              "totalLegCnt": 10
+            },
+            "conceded_avg": {
+              "awayLossGoalAvgCnt": "1.0",
+              "awayLossGoalAvgCntRatio": "35.7",
+              "homeLossGoalAvgCnt": "1.8",
+              "homeLossGoalAvgCntRatio": "64.3",
+              "totalLegCnt": 10
+            },
+            "h2h_last7": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 1,
+              "awayScoreRatio": "83",
+              "awayWinGoalMatchCnt": 8,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 8,
+              "homeScoreRatio": "13",
+              "homeWinGoalMatchCnt": 1,
+              "totalLegCnt": 10
+            },
+            "recent_home_away": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 3,
+              "awayScoreRatio": "50",
+              "awayWinGoalMatchCnt": 4,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "43",
+              "homeWinGoalMatchCnt": 4,
+              "totalLegCnt": 10
+            },
+            "same_home_away_recent": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 2,
+              "awayScoreRatio": "60",
+              "awayWinGoalMatchCnt": 5,
+              "homeDrawMatchCnt": 3,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "30",
+              "homeWinGoalMatchCnt": 2,
+              "totalLegCnt": 10
+            },
+            "same_home_away_extended": {
+              "awayDrawMatchCnt": 4,
+              "awayLossGoalMatchCnt": 2,
+              "awayScoreRatio": "53",
+              "awayWinGoalMatchCnt": 4,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "37",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            }
+          },
+          "home_standing": [
+            {
+              "drawMatchCnt": 4,
+              "groupId": 0,
+              "groupName": "",
+              "lossGoalMatchCnt": 8,
+              "phaseName": "",
+              "points": "19",
+              "ranking": "12",
+              "sportteryTeamId": 600,
+              "teamId": 0,
+              "teamShortName": "哥德堡",
+              "totalLegCnt": 17,
+              "uniformTeamId": 484,
+              "winGoalMatchCnt": 5,
+              "winProbability": "29%"
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041006",
+        "refreshed_at": "2026-08-23T10:14:37+00:00",
+        "missing_reason": null
+      },
+      "recent_form": {
+        "status": "PARTIAL",
+        "value": {
+          "home": [
+            {
+              "date": "2026-08-16",
+              "home": "代格福什",
+              "away": "哥德堡",
+              "score_90": "3:0",
+              "score_ht": "3:0",
+              "league_id": null,
+              "home_team_id": 1110,
+              "away_team_id": 600
+            },
+            {
+              "date": "2026-08-14",
+              "home": "根特",
+              "away": "哥德堡",
+              "score_90": "1:1",
+              "score_ht": "1:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-08-09",
+              "home": "哥德堡",
+              "away": "卡尔马",
+              "score_90": "3:2",
+              "score_ht": "1:1",
+              "league_id": null,
+              "home_team_id": 600,
+              "away_team_id": 602
+            },
+            {
+              "date": "2026-08-07",
+              "home": "哥德堡",
+              "away": "根特",
+              "score_90": "0:1",
+              "score_ht": "0:1",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-08-02",
+              "home": "哥德堡",
+              "away": "代格福什",
+              "score_90": "2:0",
+              "score_ht": "1:0",
+              "league_id": null,
+              "home_team_id": 600,
+              "away_team_id": 1110
+            }
+          ],
+          "away": [
+            {
+              "date": "2026-08-19",
+              "home": "Västra Frölund",
+              "away": "埃夫斯堡",
+              "score_90": "0:4",
+              "score_ht": "0:3",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 608
+            },
+            {
+              "date": "2026-08-15",
+              "home": "埃夫斯堡",
+              "away": "韦斯特罗",
+              "score_90": "3:0",
+              "score_ht": "1:0",
+              "league_id": null,
+              "home_team_id": 608,
+              "away_team_id": 1026400
+            },
+            {
+              "date": "2026-08-08",
+              "home": "米亚尔比",
+              "away": "埃夫斯堡",
+              "score_90": "0:1",
+              "score_ht": "0:1",
+              "league_id": null,
+              "home_team_id": 974,
+              "away_team_id": 608
+            },
+            {
+              "date": "2026-07-26",
+              "home": "马尔默",
+              "away": "埃夫斯堡",
+              "score_90": "1:2",
+              "score_ht": "1:2",
+              "league_id": null,
+              "home_team_id": 606,
+              "away_team_id": 608
+            },
+            {
+              "date": "2026-07-19",
+              "home": "埃夫斯堡",
+              "away": "天狼星",
+              "score_90": "1:3",
+              "score_ht": "0:0",
+              "league_id": null,
+              "home_team_id": 608,
+              "away_team_id": 1917
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041006",
+        "refreshed_at": "2026-08-23T10:14:37+00:00",
+        "missing_reason": "RECENT_FORM_SCOPE_UNVERIFIED"
+      },
+      "injury": {
+        "status": "VALID",
+        "value": {
+          "home": {
+            "team": "哥德堡",
+            "team_id": 2149,
+            "count": 1,
+            "status": "VALID",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.024,
+            "defense_absence": 0.012,
+            "gk_absence": 0.0,
+            "players": [
+              {
+                "name": "拉尔森",
+                "pos": "中场",
+                "apps": 5,
+                "starts": 3,
+                "type": "伤",
+                "weight": 0.4
+              }
+            ],
+            "list": [
+              {
+                "appearanceCnt": 5,
+                "injuryFlag": 1,
+                "personId": 138455,
+                "personName": "拉尔森",
+                "playerPositionCode": "Midfielder",
+                "playerPositionDesc": "中场",
+                "startedMatchCnt": 3,
+                "substituteMatchCnt": 2,
+                "suspensionFlag": 0,
+                "uniformNo": "8"
+              }
+            ]
+          },
+          "away": {
+            "team": "埃夫斯堡",
+            "team_id": 2158,
+            "count": 1,
+            "status": "VALID",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [
+              {
+                "name": "T. Sander",
+                "pos": "守门员",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              }
+            ],
+            "list": [
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 715724,
+                "personName": "T. Sander",
+                "playerPositionCode": "Goalkeeper",
+                "playerPositionDesc": "守门员",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "30"
+              }
+            ]
+          }
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041006",
+        "refreshed_at": "2026-08-23T10:14:37+00:00",
+        "missing_reason": null
+      },
+      "suspensions": {
+        "status": "UNAVAILABLE",
+        "value": {
+          "home": [],
+          "away": []
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041006",
+        "refreshed_at": "2026-08-23T10:14:37+00:00",
+        "missing_reason": "SUSPENSION_ENDPOINT_EMPTY"
+      },
+      "starting_xi": {
+        "status": "PENDING_REFRESH",
+        "value": null,
+        "source_id": "official.lineup.pending",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041006",
+        "refreshed_at": "2026-08-23T10:14:37+00:00",
+        "missing_reason": "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+      }
+    },
+    "missing_fields": [
+      "recent_form",
+      "suspensions",
+      "starting_xi"
+    ],
+    "evidence_gap": true,
+    "evidence_status": "GAP",
+    "evidence_gap_reasons": [
+      "RECENT_FORM_RECENT_FORM_SCOPE_UNVERIFIED",
+      "SUSPENSIONS_SUSPENSION_ENDPOINT_EMPTY",
+      "STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+    ],
+    "kickoff": "2026-08-23T20:00:00+08:00",
+    "collected_at": "2026-08-23T10:14:37+00:00",
+    "lineup_refresh_schedule": [
+      "2026-08-23T18:00:00+08:00",
+      "2026-08-23T18:30:00+08:00",
+      "2026-08-23T19:00:00+08:00",
+      "2026-08-23T19:15:00+08:00",
+      "2026-08-23T19:30:00+08:00",
+      "2026-08-23T19:45:00+08:00"
+    ],
+    "source_policy": {
+      "sporttery_preview": "official mobile endpoint",
+      "third_party_content_notice": "page-level notice may apply; preserve field-level provenance",
+      "international": "research_only"
+    }
+  }
+}

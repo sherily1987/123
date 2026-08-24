@@ -1,0 +1,16 @@
+{
+  "schema": "research-frequency-baseline-1.0",
+  "competition": "解放者杯",
+  "source": "api-sports.io_event_results",
+  "train_n": 548,
+  "test_n": 183,
+  "train_class_prior": {"H": 0.5, "D": 0.26459854, "A": 0.23540146},
+  "frequency_baseline": {
+    "accuracy_pct": 49.1803,
+    "brier": 0.629365,
+    "log_loss": 1.045951
+  },
+  "model_status": "NOT_TRAINED",
+  "decision": "RESEARCH_ONLY",
+  "reason": "杯赛淘汰赛与晋级结果、加时和点球需要单独建模；当前不进入国内联赛训练队列"
+}

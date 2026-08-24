@@ -1,0 +1,147 @@
+{
+  "schema_version": "market-specific-odds-evaluation-1.0",
+  "generated_at": "2026-08-23T01:15:11.621610+00:00",
+  "research_only": true,
+  "production_config_changed": false,
+  "source_policy": {
+    "odds": "official Sporttery last quote strictly before kickoff",
+    "outcome": "official pool-specific settlement",
+    "candidate": "closing HAD only -> power devig -> lambda inversion -> matching pool state space",
+    "delta_semantics": "negative direct_minus_had means the pool's own odds are better"
+  },
+  "had": {
+    "full_n": 1303,
+    "holdout": {
+      "method": "last_30pct_kickoff_date_groups",
+      "date_groups": 187,
+      "test_from": "2026-06-25",
+      "n": 326,
+      "direct_market": {
+        "n": 326,
+        "multiclass_brier": 0.59039692,
+        "log_loss": 0.98276657,
+        "top1_accuracy_pct": 52.76
+      }
+    }
+  },
+  "ttg": {
+    "full_n": 1303,
+    "average_direct_overround_pct": 24.987,
+    "holdout": {
+      "method": "last_30pct_kickoff_date_groups",
+      "date_groups": 187,
+      "test_from": "2026-06-25",
+      "n": 326,
+      "direct_market": {
+        "n": 326,
+        "multiclass_brier": 0.80657671,
+        "log_loss": 1.79382989,
+        "top1_accuracy_pct": 28.22
+      },
+      "had_derived": {
+        "n": 326,
+        "multiclass_brier": 0.82365126,
+        "log_loss": 1.84307155,
+        "top1_accuracy_pct": 23.01
+      },
+      "paired": {
+        "n": 326,
+        "draws": 2000,
+        "seed": 20260824,
+        "brier": {
+          "delta_direct_minus_had": -0.01707455,
+          "ci95_low": -0.02873998,
+          "ci95_high": -0.00532256
+        },
+        "log_loss": {
+          "delta_direct_minus_had": -0.04924166,
+          "ci95_low": -0.09649132,
+          "ci95_high": -0.00583777
+        }
+      },
+      "decision": "direct_market_better"
+    }
+  },
+  "crs": {
+    "full_n": 1303,
+    "average_direct_overround_pct": 40.31,
+    "holdout": {
+      "method": "last_30pct_kickoff_date_groups",
+      "date_groups": 187,
+      "test_from": "2026-06-25",
+      "n": 326,
+      "direct_market": {
+        "n": 326,
+        "multiclass_brier": 0.91669439,
+        "log_loss": 2.76343559,
+        "top1_accuracy_pct": 15.34
+      },
+      "had_derived": {
+        "n": 326,
+        "multiclass_brier": 0.92401184,
+        "log_loss": 2.81825481,
+        "top1_accuracy_pct": 14.72
+      },
+      "paired": {
+        "n": 326,
+        "draws": 2000,
+        "seed": 20260825,
+        "brier": {
+          "delta_direct_minus_had": -0.00731745,
+          "ci95_low": -0.01470341,
+          "ci95_high": 7.29e-06
+        },
+        "log_loss": {
+          "delta_direct_minus_had": -0.05481922,
+          "ci95_low": -0.1106866,
+          "ci95_high": -0.00434888
+        }
+      },
+      "decision": "inconclusive"
+    }
+  },
+  "hafu": {
+    "full_n": 1303,
+    "average_direct_overround_pct": 24.976,
+    "holdout": {
+      "method": "last_30pct_kickoff_date_groups",
+      "date_groups": 187,
+      "test_from": "2026-06-25",
+      "n": 326,
+      "direct_market": {
+        "n": 326,
+        "multiclass_brier": 0.79506044,
+        "log_loss": 1.8435857,
+        "top1_accuracy_pct": 31.6
+      },
+      "had_derived": {
+        "n": 326,
+        "multiclass_brier": 0.79433388,
+        "log_loss": 1.84236099,
+        "top1_accuracy_pct": 31.9
+      },
+      "paired": {
+        "n": 326,
+        "draws": 2000,
+        "seed": 20260826,
+        "brier": {
+          "delta_direct_minus_had": 0.00072656,
+          "ci95_low": -0.00278982,
+          "ci95_high": 0.00438215
+        },
+        "log_loss": {
+          "delta_direct_minus_had": 0.00122471,
+          "ci95_low": -0.01361559,
+          "ci95_high": 0.01602904
+        }
+      },
+      "decision": "inconclusive"
+    }
+  },
+  "guardrails": [
+    "This comparison tests direct pool odds against HAD-only derivation, not profitability.",
+    "TTG and HAFU already enter the production multi-market lambda fit when fresh; CRS currently remains audit-only.",
+    "A point estimate without paired dual-metric confidence intervals is not an admission decision."
+  ],
+  "input": "project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\research\\hafu-training\\sporttery_history_probe_20260203_20260821.json"
+}

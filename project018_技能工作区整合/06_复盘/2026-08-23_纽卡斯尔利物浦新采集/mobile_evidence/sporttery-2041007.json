@@ -1,0 +1,1082 @@
+{
+  "schema_version": "prematch-evidence-snapshot-1.0",
+  "match_id": "sporttery-2041007",
+  "identity": {
+    "home": "赫尔辛基",
+    "away": "赫尔火花",
+    "competition": "芬超",
+    "kickoff": "2026-08-23T20:00:00+08:00",
+    "match_num": null
+  },
+  "collected_at": "2026-08-23T10:14:45+00:00",
+  "facts": {
+    "match_id": 2041007,
+    "home": "赫尔辛基",
+    "away": "赫尔火花",
+    "kickoff": "2026-08-23 20:00",
+    "team_ids": {
+      "home": 0,
+      "away": 0
+    },
+    "strength": {
+      "lambda_home": 1.35,
+      "lambda_away": 1.25,
+      "sample_legs": 10,
+      "raw": {
+        "home_goal_avg": 1.6,
+        "away_goal_avg": 1.6,
+        "home_loss_avg": 0.9,
+        "away_loss_avg": 1.1
+      },
+      "status": "VALID",
+      "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+    },
+    "feature": {
+      "goalAvg": {
+        "awayGoalAvgCnt": "1.6",
+        "awayGoalAvgCntRatio": "50.0",
+        "homeGoalAvgCnt": "1.6",
+        "homeGoalAvgCntRatio": "50.0",
+        "totalLegCnt": 10
+      },
+      "lossGoalAvg": {
+        "awayLossGoalAvgCnt": "1.1",
+        "awayLossGoalAvgCntRatio": "55.0",
+        "homeLossGoalAvgCnt": "0.9",
+        "homeLossGoalAvgCntRatio": "45.0",
+        "totalLegCnt": 10
+      },
+      "last": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 6,
+        "awayScoreRatio": "33",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "63",
+        "homeWinGoalMatchCnt": 6,
+        "totalLegCnt": 10
+      },
+      "eachHomeAway": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 2,
+        "awayScoreRatio": "60",
+        "awayWinGoalMatchCnt": 5,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "63",
+        "homeWinGoalMatchCnt": 6,
+        "totalLegCnt": 10
+      },
+      "sameHomeAway": {
+        "awayDrawMatchCnt": 0,
+        "awayLossGoalMatchCnt": 4,
+        "awayScoreRatio": "43",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 0,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "57",
+        "homeWinGoalMatchCnt": 4,
+        "totalLegCnt": 7
+      },
+      "eachSameHomeAway": {
+        "awayDrawMatchCnt": 4,
+        "awayLossGoalMatchCnt": 3,
+        "awayScoreRatio": "43",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 1,
+        "homeScoreRatio": "77",
+        "homeWinGoalMatchCnt": 7,
+        "totalLegCnt": 10
+      }
+    },
+    "h2h": [
+      {
+        "date": "2026-04-18",
+        "home": "赫尔火花",
+        "away": "赫尔辛基",
+        "score_90": "0:3",
+        "score_ht": "0:1",
+        "result": "home",
+        "league_id": 0,
+        "home_team_id": 845,
+        "away_team_id": 820
+      },
+      {
+        "date": "2026-03-10",
+        "home": "赫尔辛基",
+        "away": "赫尔火花",
+        "score_90": "3:0",
+        "score_ht": "-:-",
+        "result": "home",
+        "league_id": 0,
+        "home_team_id": 820,
+        "away_team_id": 845
+      },
+      {
+        "date": "2026-02-07",
+        "home": "赫尔辛基",
+        "away": "赫尔火花",
+        "score_90": "3:1",
+        "score_ht": "2:0",
+        "result": "home",
+        "league_id": 0,
+        "home_team_id": 820,
+        "away_team_id": 845
+      },
+      {
+        "date": "2025-11-04",
+        "home": "赫尔火花",
+        "away": "赫尔辛基",
+        "score_90": "2:2",
+        "score_ht": "1:2",
+        "result": "draw",
+        "league_id": 2064839,
+        "home_team_id": 845,
+        "away_team_id": 820
+      },
+      {
+        "date": "2025-10-04",
+        "home": "赫尔辛基",
+        "away": "赫尔火花",
+        "score_90": "2:3",
+        "score_ht": "2:1",
+        "result": "away",
+        "league_id": 0,
+        "home_team_id": 820,
+        "away_team_id": 845
+      }
+    ],
+    "h2h_statistics": {
+      "drawMatchCnt": 1,
+      "drawProbability": "20%",
+      "goalCnt": 0,
+      "lossGoalCnt": 0,
+      "lossGoalMatchCnt": 1,
+      "lossProbability": "20%",
+      "netGoal": 0,
+      "sportteryTeamId": 0,
+      "teamId": 0,
+      "teamShortName": "赫尔辛基",
+      "totalLegCnt": 5,
+      "winGoalMatchCnt": 3,
+      "winProbability": "60%"
+    },
+    "recent_home": [
+      {
+        "date": "2026-08-16",
+        "home": "赫尔辛基",
+        "away": "雅罗",
+        "score_90": "3:0",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 297,
+        "away_team_id": 597
+      },
+      {
+        "date": "2026-08-14",
+        "home": "马瑟韦尔",
+        "away": "赫尔辛基",
+        "score_90": "2:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 297
+      },
+      {
+        "date": "2026-08-10",
+        "home": "AC奥卢",
+        "away": "赫尔辛基",
+        "score_90": "0:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 1040074,
+        "away_team_id": 297
+      },
+      {
+        "date": "2026-08-07",
+        "home": "赫尔辛基",
+        "away": "马瑟韦尔",
+        "score_90": "1:1",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 297,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-08-04",
+        "home": "塞伊奈",
+        "away": "赫尔辛基",
+        "score_90": "3:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 2348,
+        "away_team_id": 297
+      },
+      {
+        "date": "2026-07-31",
+        "home": "高利宁",
+        "away": "赫尔辛基",
+        "score_90": "0:3",
+        "score_ht": "0:2",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 297
+      },
+      {
+        "date": "2026-07-26",
+        "home": "赫尔辛基",
+        "away": "TPS图尔",
+        "score_90": "1:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 297,
+        "away_team_id": 591
+      },
+      {
+        "date": "2026-07-24",
+        "home": "赫尔辛基",
+        "away": "高利宁",
+        "score_90": "5:0",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 297,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-18",
+        "home": "赫尔辛基",
+        "away": "瓦萨",
+        "score_90": "2:1",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 297,
+        "away_team_id": 1957
+      },
+      {
+        "date": "2026-07-11",
+        "home": "拉赫蒂",
+        "away": "赫尔辛基",
+        "score_90": "2:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 592,
+        "away_team_id": 297
+      }
+    ],
+    "recent_away": [
+      {
+        "date": "2026-08-17",
+        "home": "赫尔火花",
+        "away": "坦山猫",
+        "score_90": "3:2",
+        "score_ht": "2:2",
+        "league_id": null,
+        "home_team_id": 2064951,
+        "away_team_id": 1040076
+      },
+      {
+        "date": "2026-08-08",
+        "home": "塞伊奈",
+        "away": "赫尔火花",
+        "score_90": "2:2",
+        "score_ht": "1:2",
+        "league_id": null,
+        "home_team_id": 2348,
+        "away_team_id": 2064951
+      },
+      {
+        "date": "2026-08-02",
+        "home": "赫尔火花",
+        "away": "库奥皮奥",
+        "score_90": "0:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 2064951,
+        "away_team_id": 586
+      },
+      {
+        "date": "2026-07-26",
+        "home": "国际图尔",
+        "away": "赫尔火花",
+        "score_90": "1:2",
+        "score_ht": "0:2",
+        "league_id": null,
+        "home_team_id": 588,
+        "away_team_id": 2064951
+      },
+      {
+        "date": "2026-07-18",
+        "home": "AC奥卢",
+        "away": "赫尔火花",
+        "score_90": "0:2",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 1040074,
+        "away_team_id": 2064951
+      },
+      {
+        "date": "2026-07-11",
+        "home": "赫尔火花",
+        "away": "玛丽港",
+        "score_90": "4:2",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 2064951,
+        "away_team_id": 594
+      },
+      {
+        "date": "2026-07-04",
+        "home": "拉赫蒂",
+        "away": "赫尔火花",
+        "score_90": "1:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 592,
+        "away_team_id": 2064951
+      },
+      {
+        "date": "2026-06-28",
+        "home": "赫尔火花",
+        "away": "瓦萨",
+        "score_90": "1:1",
+        "score_ht": "1:1",
+        "league_id": null,
+        "home_team_id": 2064951,
+        "away_team_id": 1957
+      },
+      {
+        "date": "2026-06-24",
+        "home": "雅罗",
+        "away": "赫尔火花",
+        "score_90": "1:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 597,
+        "away_team_id": 2064951
+      },
+      {
+        "date": "2026-06-18",
+        "home": "赫尔火花",
+        "away": "拉赫蒂",
+        "score_90": "1:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 2064951,
+        "away_team_id": 592
+      }
+    ],
+    "injuries": {
+      "home": {
+        "team": "赫尔辛基",
+        "team_id": 820,
+        "count": 0,
+        "status": "UNAVAILABLE",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [],
+        "list": []
+      },
+      "away": {
+        "team": "赫尔火花",
+        "team_id": 845,
+        "count": 0,
+        "status": "UNAVAILABLE",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [],
+        "list": []
+      }
+    },
+    "tables": [
+      {
+        "drawMatchCnt": 4,
+        "groupId": 0,
+        "groupName": "",
+        "lossGoalMatchCnt": 6,
+        "phaseName": "",
+        "points": "34",
+        "ranking": "3",
+        "sportteryTeamId": 297,
+        "teamId": 0,
+        "teamShortName": "赫尔辛基",
+        "totalLegCnt": 20,
+        "uniformTeamId": 1821,
+        "winGoalMatchCnt": 10,
+        "winProbability": "50%"
+      },
+      {
+        "drawMatchCnt": 5,
+        "groupId": 0,
+        "groupName": "",
+        "lossGoalMatchCnt": 6,
+        "phaseName": "",
+        "points": "32",
+        "ranking": "6",
+        "sportteryTeamId": 2064951,
+        "teamId": 0,
+        "teamShortName": "赫尔火花",
+        "totalLegCnt": 20,
+        "uniformTeamId": 57195,
+        "winGoalMatchCnt": 9,
+        "winProbability": "45%"
+      }
+    ],
+    "players": {
+      "home": {
+        "playerList": [
+          {
+            "appearanceCnt": 18,
+            "assistAvgCnt": "0.1",
+            "assistCnt": 2,
+            "assistProbability": "8%",
+            "goalAvgCnt": "0.4",
+            "goalCnt": 8,
+            "goalProbability": "25%",
+            "injuryFlag": 0,
+            "personId": 508936,
+            "personName": "M. Borchers",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 10,
+            "substituteMatchCnt": 8,
+            "suspensionFlag": 0,
+            "uniformNo": "9"
+          },
+          {
+            "appearanceCnt": 20,
+            "assistAvgCnt": "0.3",
+            "assistCnt": 5,
+            "assistProbability": "21%",
+            "goalAvgCnt": "0.3",
+            "goalCnt": 5,
+            "goalProbability": "16%",
+            "injuryFlag": 0,
+            "personId": 8468,
+            "personName": "普基",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 13,
+            "substituteMatchCnt": 7,
+            "suspensionFlag": 0,
+            "uniformNo": "20"
+          },
+          {
+            "appearanceCnt": 13,
+            "assistAvgCnt": "0",
+            "assistCnt": 0,
+            "assistProbability": "0%",
+            "goalAvgCnt": "0.2",
+            "goalCnt": 3,
+            "goalProbability": "9%",
+            "injuryFlag": 0,
+            "personId": 400165,
+            "personName": "L. Lappalainen",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 2,
+            "substituteMatchCnt": 11,
+            "suspensionFlag": 0,
+            "uniformNo": "26"
+          }
+        ],
+        "sportteryTeamId": 297,
+        "teamId": 820,
+        "teamShortName": "赫尔辛基",
+        "uniformTeamId": 1821
+      },
+      "away": {
+        "playerList": [
+          {
+            "appearanceCnt": 20,
+            "assistAvgCnt": "0.1",
+            "assistCnt": 1,
+            "assistProbability": "5%",
+            "goalAvgCnt": "0.6",
+            "goalCnt": 11,
+            "goalProbability": "37%",
+            "injuryFlag": 0,
+            "personId": 477118,
+            "personName": "A. Akinyemi",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 18,
+            "substituteMatchCnt": 2,
+            "suspensionFlag": 0,
+            "uniformNo": "17"
+          },
+          {
+            "appearanceCnt": 20,
+            "assistAvgCnt": "0.3",
+            "assistCnt": 5,
+            "assistProbability": "24%",
+            "goalAvgCnt": "0.3",
+            "goalCnt": 5,
+            "goalProbability": "17%",
+            "injuryFlag": 0,
+            "personId": 535122,
+            "personName": "J. Latonen",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 12,
+            "substituteMatchCnt": 8,
+            "suspensionFlag": 0,
+            "uniformNo": "10"
+          },
+          {
+            "appearanceCnt": 17,
+            "assistAvgCnt": "0.1",
+            "assistCnt": 2,
+            "assistProbability": "10%",
+            "goalAvgCnt": "0.1",
+            "goalCnt": 2,
+            "goalProbability": "7%",
+            "injuryFlag": 0,
+            "personId": 385469,
+            "personName": "S. Ylätupa",
+            "playerPositionCode": "Forward",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 15,
+            "substituteMatchCnt": 2,
+            "suspensionFlag": 0,
+            "uniformNo": "23"
+          }
+        ],
+        "sportteryTeamId": 2064951,
+        "teamId": 845,
+        "teamShortName": "赫尔火花",
+        "uniformTeamId": 57195
+      }
+    },
+    "future": {
+      "home": {
+        "matchList": [
+          {
+            "awayTeamId": 820,
+            "awayTeamShortName": "赫尔辛基",
+            "gameweek": "22",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 2385,
+            "homeTeamShortName": "坦山猫",
+            "matchDateTime": "2026-09-01 00:00:00",
+            "matchId": 2472738,
+            "phaseId": 48275,
+            "phaseName": "Regular Season",
+            "seasonId": 14374,
+            "sportteryAwayTeamId": 297,
+            "sportteryHomeTeamId": 1040076,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 130,
+            "tournamentShortName": "芬超",
+            "uniformAwayTeamId": 1821,
+            "uniformHomeTeamId": 57200
+          },
+          {
+            "awayTeamId": 820,
+            "awayTeamShortName": "赫尔辛基",
+            "gameweek": "",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 808,
+            "homeTeamShortName": "国际图尔",
+            "matchDateTime": "2026-09-05 23:00:00",
+            "matchId": 2549043,
+            "phaseId": 0,
+            "phaseName": "",
+            "seasonId": 14583,
+            "sportteryAwayTeamId": 297,
+            "sportteryHomeTeamId": 588,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 739,
+            "tournamentShortName": "芬兰杯",
+            "uniformAwayTeamId": 1821,
+            "uniformHomeTeamId": 584
+          }
+        ],
+        "sportteryTeamId": 297,
+        "teamId": 820,
+        "teamShortName": "赫尔辛基",
+        "uniformTeamId": 1821
+      },
+      "away": {
+        "matchList": [
+          {
+            "awayTeamId": 819,
+            "awayTeamShortName": "TPS图尔",
+            "gameweek": "22",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 845,
+            "homeTeamShortName": "赫尔火花",
+            "matchDateTime": "2026-09-01 00:00:00",
+            "matchId": 2472740,
+            "phaseId": 48275,
+            "phaseName": "Regular Season",
+            "seasonId": 14374,
+            "sportteryAwayTeamId": 591,
+            "sportteryHomeTeamId": 2064951,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 130,
+            "tournamentShortName": "芬超",
+            "uniformAwayTeamId": 57393,
+            "uniformHomeTeamId": 57195
+          }
+        ],
+        "sportteryTeamId": 2064951,
+        "teamId": 845,
+        "teamShortName": "赫尔火花",
+        "uniformTeamId": 57195
+      }
+    },
+    "available": true,
+    "feature_analysis": {
+      "source_field_map": {
+        "goals_avg": "feature.goalAvg",
+        "conceded_avg": "feature.lossGoalAvg",
+        "h2h_last7": "feature.last",
+        "recent_home_away": "feature.eachHomeAway",
+        "same_home_away_recent": "feature.sameHomeAway",
+        "same_home_away_extended": "feature.eachSameHomeAway"
+      },
+      "goals_avg": {
+        "awayGoalAvgCnt": "1.6",
+        "awayGoalAvgCntRatio": "50.0",
+        "homeGoalAvgCnt": "1.6",
+        "homeGoalAvgCntRatio": "50.0",
+        "totalLegCnt": 10
+      },
+      "conceded_avg": {
+        "awayLossGoalAvgCnt": "1.1",
+        "awayLossGoalAvgCntRatio": "55.0",
+        "homeLossGoalAvgCnt": "0.9",
+        "homeLossGoalAvgCntRatio": "45.0",
+        "totalLegCnt": 10
+      },
+      "h2h_last7": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 6,
+        "awayScoreRatio": "33",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "63",
+        "homeWinGoalMatchCnt": 6,
+        "totalLegCnt": 10
+      },
+      "recent_home_away": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 2,
+        "awayScoreRatio": "60",
+        "awayWinGoalMatchCnt": 5,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "63",
+        "homeWinGoalMatchCnt": 6,
+        "totalLegCnt": 10
+      },
+      "same_home_away_recent": {
+        "awayDrawMatchCnt": 0,
+        "awayLossGoalMatchCnt": 4,
+        "awayScoreRatio": "43",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 0,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "57",
+        "homeWinGoalMatchCnt": 4,
+        "totalLegCnt": 7
+      },
+      "same_home_away_extended": {
+        "awayDrawMatchCnt": 4,
+        "awayLossGoalMatchCnt": 3,
+        "awayScoreRatio": "43",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 1,
+        "homeScoreRatio": "77",
+        "homeWinGoalMatchCnt": 7,
+        "totalLegCnt": 10
+      }
+    }
+  },
+  "evidence_audit": {
+    "schema_version": "evidence-audit-1.1",
+    "critical_fields": [
+      "team_stats",
+      "recent_form",
+      "injury",
+      "suspensions",
+      "starting_xi"
+    ],
+    "entries": {
+      "team_stats": {
+        "status": "VALID",
+        "value": {
+          "strength": {
+            "lambda_home": 1.35,
+            "lambda_away": 1.25,
+            "sample_legs": 10,
+            "raw": {
+              "home_goal_avg": 1.6,
+              "away_goal_avg": 1.6,
+              "home_loss_avg": 0.9,
+              "away_loss_avg": 1.1
+            },
+            "status": "VALID",
+            "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+          },
+          "feature": {
+            "goalAvg": {
+              "awayGoalAvgCnt": "1.6",
+              "awayGoalAvgCntRatio": "50.0",
+              "homeGoalAvgCnt": "1.6",
+              "homeGoalAvgCntRatio": "50.0",
+              "totalLegCnt": 10
+            },
+            "lossGoalAvg": {
+              "awayLossGoalAvgCnt": "1.1",
+              "awayLossGoalAvgCntRatio": "55.0",
+              "homeLossGoalAvgCnt": "0.9",
+              "homeLossGoalAvgCntRatio": "45.0",
+              "totalLegCnt": 10
+            },
+            "last": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 6,
+              "awayScoreRatio": "33",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "63",
+              "homeWinGoalMatchCnt": 6,
+              "totalLegCnt": 10
+            },
+            "eachHomeAway": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 2,
+              "awayScoreRatio": "60",
+              "awayWinGoalMatchCnt": 5,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "63",
+              "homeWinGoalMatchCnt": 6,
+              "totalLegCnt": 10
+            },
+            "sameHomeAway": {
+              "awayDrawMatchCnt": 0,
+              "awayLossGoalMatchCnt": 4,
+              "awayScoreRatio": "43",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 0,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "57",
+              "homeWinGoalMatchCnt": 4,
+              "totalLegCnt": 7
+            },
+            "eachSameHomeAway": {
+              "awayDrawMatchCnt": 4,
+              "awayLossGoalMatchCnt": 3,
+              "awayScoreRatio": "43",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 1,
+              "homeScoreRatio": "77",
+              "homeWinGoalMatchCnt": 7,
+              "totalLegCnt": 10
+            }
+          },
+          "feature_analysis": {
+            "source_field_map": {
+              "goals_avg": "feature.goalAvg",
+              "conceded_avg": "feature.lossGoalAvg",
+              "h2h_last7": "feature.last",
+              "recent_home_away": "feature.eachHomeAway",
+              "same_home_away_recent": "feature.sameHomeAway",
+              "same_home_away_extended": "feature.eachSameHomeAway"
+            },
+            "goals_avg": {
+              "awayGoalAvgCnt": "1.6",
+              "awayGoalAvgCntRatio": "50.0",
+              "homeGoalAvgCnt": "1.6",
+              "homeGoalAvgCntRatio": "50.0",
+              "totalLegCnt": 10
+            },
+            "conceded_avg": {
+              "awayLossGoalAvgCnt": "1.1",
+              "awayLossGoalAvgCntRatio": "55.0",
+              "homeLossGoalAvgCnt": "0.9",
+              "homeLossGoalAvgCntRatio": "45.0",
+              "totalLegCnt": 10
+            },
+            "h2h_last7": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 6,
+              "awayScoreRatio": "33",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "63",
+              "homeWinGoalMatchCnt": 6,
+              "totalLegCnt": 10
+            },
+            "recent_home_away": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 2,
+              "awayScoreRatio": "60",
+              "awayWinGoalMatchCnt": 5,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "63",
+              "homeWinGoalMatchCnt": 6,
+              "totalLegCnt": 10
+            },
+            "same_home_away_recent": {
+              "awayDrawMatchCnt": 0,
+              "awayLossGoalMatchCnt": 4,
+              "awayScoreRatio": "43",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 0,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "57",
+              "homeWinGoalMatchCnt": 4,
+              "totalLegCnt": 7
+            },
+            "same_home_away_extended": {
+              "awayDrawMatchCnt": 4,
+              "awayLossGoalMatchCnt": 3,
+              "awayScoreRatio": "43",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 1,
+              "homeScoreRatio": "77",
+              "homeWinGoalMatchCnt": 7,
+              "totalLegCnt": 10
+            }
+          },
+          "home_standing": [
+            {
+              "drawMatchCnt": 4,
+              "groupId": 0,
+              "groupName": "",
+              "lossGoalMatchCnt": 6,
+              "phaseName": "",
+              "points": "34",
+              "ranking": "3",
+              "sportteryTeamId": 297,
+              "teamId": 0,
+              "teamShortName": "赫尔辛基",
+              "totalLegCnt": 20,
+              "uniformTeamId": 1821,
+              "winGoalMatchCnt": 10,
+              "winProbability": "50%"
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041007",
+        "refreshed_at": "2026-08-23T10:14:45+00:00",
+        "missing_reason": null
+      },
+      "recent_form": {
+        "status": "PARTIAL",
+        "value": {
+          "home": [
+            {
+              "date": "2026-08-16",
+              "home": "赫尔辛基",
+              "away": "雅罗",
+              "score_90": "3:0",
+              "score_ht": "2:0",
+              "league_id": null,
+              "home_team_id": 297,
+              "away_team_id": 597
+            },
+            {
+              "date": "2026-08-14",
+              "home": "马瑟韦尔",
+              "away": "赫尔辛基",
+              "score_90": "2:0",
+              "score_ht": "0:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 297
+            },
+            {
+              "date": "2026-08-10",
+              "home": "AC奥卢",
+              "away": "赫尔辛基",
+              "score_90": "0:1",
+              "score_ht": "0:1",
+              "league_id": null,
+              "home_team_id": 1040074,
+              "away_team_id": 297
+            },
+            {
+              "date": "2026-08-07",
+              "home": "赫尔辛基",
+              "away": "马瑟韦尔",
+              "score_90": "1:1",
+              "score_ht": "0:0",
+              "league_id": null,
+              "home_team_id": 297,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-08-04",
+              "home": "塞伊奈",
+              "away": "赫尔辛基",
+              "score_90": "3:0",
+              "score_ht": "0:0",
+              "league_id": null,
+              "home_team_id": 2348,
+              "away_team_id": 297
+            }
+          ],
+          "away": [
+            {
+              "date": "2026-08-17",
+              "home": "赫尔火花",
+              "away": "坦山猫",
+              "score_90": "3:2",
+              "score_ht": "2:2",
+              "league_id": null,
+              "home_team_id": 2064951,
+              "away_team_id": 1040076
+            },
+            {
+              "date": "2026-08-08",
+              "home": "塞伊奈",
+              "away": "赫尔火花",
+              "score_90": "2:2",
+              "score_ht": "1:2",
+              "league_id": null,
+              "home_team_id": 2348,
+              "away_team_id": 2064951
+            },
+            {
+              "date": "2026-08-02",
+              "home": "赫尔火花",
+              "away": "库奥皮奥",
+              "score_90": "0:1",
+              "score_ht": "0:1",
+              "league_id": null,
+              "home_team_id": 2064951,
+              "away_team_id": 586
+            },
+            {
+              "date": "2026-07-26",
+              "home": "国际图尔",
+              "away": "赫尔火花",
+              "score_90": "1:2",
+              "score_ht": "0:2",
+              "league_id": null,
+              "home_team_id": 588,
+              "away_team_id": 2064951
+            },
+            {
+              "date": "2026-07-18",
+              "home": "AC奥卢",
+              "away": "赫尔火花",
+              "score_90": "0:2",
+              "score_ht": "0:1",
+              "league_id": null,
+              "home_team_id": 1040074,
+              "away_team_id": 2064951
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041007",
+        "refreshed_at": "2026-08-23T10:14:45+00:00",
+        "missing_reason": "RECENT_FORM_SCOPE_UNVERIFIED"
+      },
+      "injury": {
+        "status": "VALID",
+        "value": {
+          "home": {
+            "team": "赫尔辛基",
+            "team_id": 820,
+            "count": 0,
+            "status": "UNAVAILABLE",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [],
+            "list": []
+          },
+          "away": {
+            "team": "赫尔火花",
+            "team_id": 845,
+            "count": 0,
+            "status": "UNAVAILABLE",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [],
+            "list": []
+          }
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041007",
+        "refreshed_at": "2026-08-23T10:14:45+00:00",
+        "missing_reason": null
+      },
+      "suspensions": {
+        "status": "UNAVAILABLE",
+        "value": {
+          "home": [],
+          "away": []
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041007",
+        "refreshed_at": "2026-08-23T10:14:45+00:00",
+        "missing_reason": "SUSPENSION_ENDPOINT_EMPTY"
+      },
+      "starting_xi": {
+        "status": "PENDING_REFRESH",
+        "value": null,
+        "source_id": "official.lineup.pending",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041007",
+        "refreshed_at": "2026-08-23T10:14:45+00:00",
+        "missing_reason": "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+      }
+    },
+    "missing_fields": [
+      "recent_form",
+      "suspensions",
+      "starting_xi"
+    ],
+    "evidence_gap": true,
+    "evidence_status": "GAP",
+    "evidence_gap_reasons": [
+      "RECENT_FORM_RECENT_FORM_SCOPE_UNVERIFIED",
+      "SUSPENSIONS_SUSPENSION_ENDPOINT_EMPTY",
+      "STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+    ],
+    "kickoff": "2026-08-23T20:00:00+08:00",
+    "collected_at": "2026-08-23T10:14:45+00:00",
+    "lineup_refresh_schedule": [
+      "2026-08-23T18:00:00+08:00",
+      "2026-08-23T18:30:00+08:00",
+      "2026-08-23T19:00:00+08:00",
+      "2026-08-23T19:15:00+08:00",
+      "2026-08-23T19:30:00+08:00",
+      "2026-08-23T19:45:00+08:00"
+    ],
+    "source_policy": {
+      "sporttery_preview": "official mobile endpoint",
+      "third_party_content_notice": "page-level notice may apply; preserve field-level provenance",
+      "international": "research_only"
+    }
+  }
+}

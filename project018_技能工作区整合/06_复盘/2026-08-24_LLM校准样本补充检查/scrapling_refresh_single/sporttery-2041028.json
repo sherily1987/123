@@ -1,0 +1,133 @@
+{
+  "status": "ok",
+  "schema_version": "scrapling-generic-evidence-1.0",
+  "provider": "scrapling_predicted_xi_source",
+  "research_only": true,
+  "match_id": "sporttery-2041028",
+  "identity": {
+    "home": "博洛尼亚",
+    "away": "拉齐奥",
+    "competition": "意甲",
+    "kickoff": "2026-08-25T00:30:00+08:00"
+  },
+  "collected_at": "2026-08-23T20:25:06+00:00",
+  "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+  "facts": {
+    "team_stats": [],
+    "recent_form": [
+      "* L",
+      "* D",
+      "* W",
+      "* W",
+      "* L",
+      "* L",
+      "* L"
+    ],
+    "injuries": [
+      "While Nicolo Casale is the hosts' sole fitness doubt, Lazio could be missing Gustav Isaksen and Patric, plus Danilo Cataldi, who has been nursing a groin problem."
+    ],
+    "suspensions": [],
+    "predicted_lineup": [
+      "Skorupski; Zortea, Vitik, Heggem, Miranda; Moro, Ferguson; Orsolini, Bernardeschi, Rowe; Dovbyk"
+    ]
+  },
+  "evidence_audit": {
+    "schema_version": "evidence-audit-1.1",
+    "critical_fields": [
+      "team_stats",
+      "recent_form",
+      "injury",
+      "suspensions",
+      "starting_xi"
+    ],
+    "entries": {
+      "team_stats": {
+        "status": "UNAVAILABLE",
+        "value": {
+          "raw_rows": []
+        },
+        "source_id": "predicted_xi.source",
+        "source_tier": "C",
+        "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+        "refreshed_at": "2026-08-23T20:25:06+00:00",
+        "missing_reason": "GENERIC_PAGE_HAS_NO_EXPLICIT_XG_OR_STRENGTH"
+      },
+      "recent_form": {
+        "status": "VALID",
+        "value": {
+          "raw_rows": [
+            "* L",
+            "* D",
+            "* W",
+            "* W",
+            "* L",
+            "* L",
+            "* L"
+          ]
+        },
+        "source_id": "predicted_xi.source",
+        "source_tier": "C",
+        "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+        "refreshed_at": "2026-08-23T20:25:06+00:00",
+        "missing_reason": null
+      },
+      "injury": {
+        "status": "VALID",
+        "value": {
+          "raw_rows": [
+            "While Nicolo Casale is the hosts' sole fitness doubt, Lazio could be missing Gustav Isaksen and Patric, plus Danilo Cataldi, who has been nursing a groin problem."
+          ]
+        },
+        "source_id": "predicted_xi.source",
+        "source_tier": "C",
+        "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+        "refreshed_at": "2026-08-23T20:25:06+00:00",
+        "missing_reason": null
+      },
+      "suspensions": {
+        "status": "UNAVAILABLE",
+        "value": {
+          "raw_rows": []
+        },
+        "source_id": "predicted_xi.source",
+        "source_tier": "C",
+        "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+        "refreshed_at": "2026-08-23T20:25:06+00:00",
+        "missing_reason": "SUSPENSION_SECTION_MISSING"
+      },
+      "starting_xi": {
+        "status": "PREDICTED",
+        "value": {
+          "raw_rows": [
+            "Skorupski; Zortea, Vitik, Heggem, Miranda; Moro, Ferguson; Orsolini, Bernardeschi, Rowe; Dovbyk"
+          ]
+        },
+        "source_id": "predicted_xi.source",
+        "source_tier": "C",
+        "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+        "refreshed_at": "2026-08-23T20:25:06+00:00",
+        "missing_reason": null
+      }
+    },
+    "missing_fields": [
+      "team_stats",
+      "suspensions"
+    ],
+    "evidence_gap": true,
+    "evidence_status": "GAP",
+    "evidence_gap_reasons": [
+      "TEAM_STATS_GENERIC_PAGE_HAS_NO_EXPLICIT_XG_OR_STRENGTH",
+      "SUSPENSIONS_SUSPENSION_SECTION_MISSING"
+    ],
+    "source_policy": {
+      "provider": "research_only",
+      "sporttery": "production_market_only"
+    }
+  },
+  "scrapling_attempts": [
+    {
+      "source_url": "https://www.sportsmole.co.uk/football/bologna/preview/bologna-vs-lazio-prediction-team-news-lineups_603503.html",
+      "status": "ok"
+    }
+  ]
+}

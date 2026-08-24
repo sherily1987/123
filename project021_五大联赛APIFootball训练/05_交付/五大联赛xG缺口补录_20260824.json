@@ -1,0 +1,21 @@
+{
+  "schema": "big5-xg-backfill-audit-1.0",
+  "as_of": "2026-08-24",
+  "source_for_backfill": "api-sports.io fixtures/statistics",
+  "xg_formula": "proxy_xg coefficients inside_outside; existing shared coefficient file",
+  "leagues": {
+    "英超": {"events": 1908, "stats_before": 1807, "stats_added": 101, "stats_after": 1908, "xg_after": 1896, "xg_missing_after": 12, "unmatched": 0},
+    "德甲": {"events": 1553, "stats_before": 1445, "stats_added": 107, "stats_after": 1552, "xg_after": 1539, "xg_missing_after": 14, "unmatched": 1},
+    "法甲": {"events": 1682, "stats_before": 1601, "stats_added": 79, "stats_after": 1680, "xg_after": 1670, "xg_missing_after": 12, "unmatched": 2},
+    "意甲": {"events": 1901, "stats_before": 1799, "stats_added": 102, "stats_after": 1901, "xg_after": 1892, "xg_missing_after": 9, "unmatched": 0},
+    "西甲": {"events": 1912, "stats_before": 1803, "stats_added": 108, "stats_after": 1911, "xg_after": 1900, "xg_missing_after": 12, "unmatched": 1}
+  },
+  "totals": {"events": 8956, "stats_added": 497, "xg_missing_before": 556, "xg_missing_after": 59},
+  "decision": "PARTIAL_PASS",
+  "limitations": [
+    "剩余59场没有可用禁区内/外射门切分，未用进球倒推xG",
+    "4场因API-Sports球队名称无法可靠匹配，保留缺口",
+    "新增统计来自赛后数据，只用于生成历史代理xG，不作为赛前实时证据",
+    "生产模型参数、m4版本和概率签名未修改"
+  ]
+}

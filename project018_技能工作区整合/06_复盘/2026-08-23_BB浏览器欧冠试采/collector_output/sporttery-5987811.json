@@ -1,0 +1,912 @@
+{
+  "status": "ok",
+  "schema_version": "bb-browser-evidence-snapshot-1.0",
+  "provider": "fotmob_via_bb_browser",
+  "research_only": true,
+  "match_id": "sporttery-5987811",
+  "identity": {
+    "home": "Bodø/Glimt",
+    "away": "NEC Nijmegen",
+    "competition": "Champions League Qualification",
+    "kickoff": "2026-08-25T19:00:00.000Z"
+  },
+  "collected_at": "2026-08-23T09:56:44+00:00",
+  "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+  "fotmob_match_id": "5987811",
+  "facts": {
+    "team_form": {
+      "home": [
+        {
+          "date": "2026-07-31T19:00:00.000Z",
+          "score": "4 - 0",
+          "result": "W",
+          "home": "Bodø/Glimt",
+          "away": "Lillestrøm"
+        },
+        {
+          "date": "2026-08-04T18:00:00.000Z",
+          "score": "3 - 3",
+          "result": "D",
+          "home": "Union St.Gilloise",
+          "away": "Bodø/Glimt"
+        },
+        {
+          "date": "2026-08-08T12:00:00.000Z",
+          "score": "1 - 2",
+          "result": "W",
+          "home": "Vålerenga",
+          "away": "Bodø/Glimt"
+        },
+        {
+          "date": "2026-08-11T16:00:00.000Z",
+          "score": "3 - 2",
+          "result": "W",
+          "home": "Bodø/Glimt",
+          "away": "Union St.Gilloise"
+        },
+        {
+          "date": "2026-08-19T19:00:00.000Z",
+          "score": "1 - 3",
+          "result": "W",
+          "home": "NEC Nijmegen",
+          "away": "Bodø/Glimt"
+        }
+      ],
+      "away": [
+        {
+          "date": "2026-08-04T18:00:00.000Z",
+          "score": "0 - 0",
+          "result": "D",
+          "home": "Olympiacos",
+          "away": "NEC Nijmegen"
+        },
+        {
+          "date": "2026-08-08T14:30:00.000Z",
+          "score": "1 - 2",
+          "result": "L",
+          "home": "NEC Nijmegen",
+          "away": "Telstar"
+        },
+        {
+          "date": "2026-08-11T17:30:00.000Z",
+          "score": "2 - 1",
+          "result": "W",
+          "home": "NEC Nijmegen",
+          "away": "Olympiacos"
+        },
+        {
+          "date": "2026-08-15T14:30:00.000Z",
+          "score": "1 - 4",
+          "result": "W",
+          "home": "Willem II",
+          "away": "NEC Nijmegen"
+        },
+        {
+          "date": "2026-08-19T19:00:00.000Z",
+          "score": "1 - 3",
+          "result": "L",
+          "home": "NEC Nijmegen",
+          "away": "Bodø/Glimt"
+        }
+      ]
+    },
+    "unavailable": {
+      "home": [
+        {
+          "player": "Jostein Gundersen",
+          "type": "injury",
+          "return": "Doubtful"
+        },
+        {
+          "player": "Håkon Evjen",
+          "type": "injury",
+          "return": "Early September 2026"
+        },
+        {
+          "player": "August Mikkelsen",
+          "type": "injury",
+          "return": "Early September 2026"
+        }
+      ],
+      "away": [
+        {
+          "player": "Philippe Sandler",
+          "type": "injury",
+          "return": "Early September 2026"
+        },
+        {
+          "player": "Sami Ouaissa",
+          "type": "injury",
+          "return": "Early September 2026"
+        },
+        {
+          "player": "Yassin Moslih",
+          "type": "injury",
+          "return": "Early September 2026"
+        },
+        {
+          "player": "Koki Ogawa",
+          "type": "injury",
+          "return": "About 1-2 weeks"
+        },
+        {
+          "player": "Ahmetcan Kaplan",
+          "type": "injury",
+          "return": "Day to day"
+        }
+      ]
+    },
+    "lineup": {
+      "source": "lastStartingLineups",
+      "home": "4-3-3",
+      "away": "3-4-2-1"
+    },
+    "aggregate": "3 - 1"
+  },
+  "evidence_audit": {
+    "schema_version": "evidence-audit-1.1",
+    "critical_fields": [
+      "team_stats",
+      "recent_form",
+      "injury",
+      "suspensions",
+      "starting_xi"
+    ],
+    "entries": {
+      "team_stats": {
+        "status": "UNAVAILABLE",
+        "value": null,
+        "source_id": "fotmob.bb_browser",
+        "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+        "refreshed_at": "2026-08-23T09:56:44+00:00",
+        "missing_reason": "FOTMOB_MATCH_DETAIL_HAS_NO_OFFICIAL_TEAM_XG_STATS"
+      },
+      "recent_form": {
+        "status": "VALID",
+        "value": {
+          "home": [
+            {
+              "date": "2026-07-31T19:00:00.000Z",
+              "score": "4 - 0",
+              "result": "W",
+              "home": "Bodø/Glimt",
+              "away": "Lillestrøm"
+            },
+            {
+              "date": "2026-08-04T18:00:00.000Z",
+              "score": "3 - 3",
+              "result": "D",
+              "home": "Union St.Gilloise",
+              "away": "Bodø/Glimt"
+            },
+            {
+              "date": "2026-08-08T12:00:00.000Z",
+              "score": "1 - 2",
+              "result": "W",
+              "home": "Vålerenga",
+              "away": "Bodø/Glimt"
+            },
+            {
+              "date": "2026-08-11T16:00:00.000Z",
+              "score": "3 - 2",
+              "result": "W",
+              "home": "Bodø/Glimt",
+              "away": "Union St.Gilloise"
+            },
+            {
+              "date": "2026-08-19T19:00:00.000Z",
+              "score": "1 - 3",
+              "result": "W",
+              "home": "NEC Nijmegen",
+              "away": "Bodø/Glimt"
+            }
+          ],
+          "away": [
+            {
+              "date": "2026-08-04T18:00:00.000Z",
+              "score": "0 - 0",
+              "result": "D",
+              "home": "Olympiacos",
+              "away": "NEC Nijmegen"
+            },
+            {
+              "date": "2026-08-08T14:30:00.000Z",
+              "score": "1 - 2",
+              "result": "L",
+              "home": "NEC Nijmegen",
+              "away": "Telstar"
+            },
+            {
+              "date": "2026-08-11T17:30:00.000Z",
+              "score": "2 - 1",
+              "result": "W",
+              "home": "NEC Nijmegen",
+              "away": "Olympiacos"
+            },
+            {
+              "date": "2026-08-15T14:30:00.000Z",
+              "score": "1 - 4",
+              "result": "W",
+              "home": "Willem II",
+              "away": "NEC Nijmegen"
+            },
+            {
+              "date": "2026-08-19T19:00:00.000Z",
+              "score": "1 - 3",
+              "result": "L",
+              "home": "NEC Nijmegen",
+              "away": "Bodø/Glimt"
+            }
+          ]
+        },
+        "source_id": "fotmob.bb_browser",
+        "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+        "refreshed_at": "2026-08-23T09:56:44+00:00",
+        "missing_reason": null
+      },
+      "injury": {
+        "status": "VALID",
+        "value": {
+          "home": [
+            {
+              "player": "Jostein Gundersen",
+              "type": "injury",
+              "return": "Doubtful"
+            },
+            {
+              "player": "Håkon Evjen",
+              "type": "injury",
+              "return": "Early September 2026"
+            },
+            {
+              "player": "August Mikkelsen",
+              "type": "injury",
+              "return": "Early September 2026"
+            }
+          ],
+          "away": [
+            {
+              "player": "Philippe Sandler",
+              "type": "injury",
+              "return": "Early September 2026"
+            },
+            {
+              "player": "Sami Ouaissa",
+              "type": "injury",
+              "return": "Early September 2026"
+            },
+            {
+              "player": "Yassin Moslih",
+              "type": "injury",
+              "return": "Early September 2026"
+            },
+            {
+              "player": "Koki Ogawa",
+              "type": "injury",
+              "return": "About 1-2 weeks"
+            },
+            {
+              "player": "Ahmetcan Kaplan",
+              "type": "injury",
+              "return": "Day to day"
+            }
+          ]
+        },
+        "source_id": "fotmob.bb_browser",
+        "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+        "refreshed_at": "2026-08-23T09:56:44+00:00",
+        "missing_reason": null
+      },
+      "suspensions": {
+        "status": "UNAVAILABLE",
+        "value": null,
+        "source_id": "fotmob.bb_browser",
+        "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+        "refreshed_at": "2026-08-23T09:56:44+00:00",
+        "missing_reason": "NO_SEPARATE_SUSPENSION_CONFIRMATION"
+      },
+      "starting_xi": {
+        "status": "PENDING_REFRESH",
+        "value": {
+          "source": "lastStartingLineups",
+          "home": [
+            {
+              "id": 625360,
+              "age": 31,
+              "name": "Nikita Haikin",
+              "positionId": 11,
+              "usualPlayingPositionId": 0,
+              "shirtNumber": "12",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.1,
+                "y": 0.5,
+                "height": 0.25,
+                "width": 0.2
+              },
+              "verticalLayout": {
+                "x": 0.5,
+                "y": 0.1,
+                "height": 0.2,
+                "width": 1
+              },
+              "marketValue": 1561320,
+              "firstName": "Nikita",
+              "lastName": "Haikin",
+              "rankings": null
+            },
+            {
+              "id": 1281021,
+              "age": 23,
+              "name": "Fredrik Sjøvold",
+              "positionId": 32,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "20",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.357,
+                "y": 0.875,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.125,
+                "y": 0.357,
+                "height": 0.2,
+                "width": 0.25
+              },
+              "marketValue": 9176922,
+              "firstName": "Fredrik",
+              "lastName": "Sjøvold",
+              "rankings": null
+            },
+            {
+              "id": 917774,
+              "age": 27,
+              "name": "Odin Lurås Bjørtuft",
+              "positionId": 34,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "4",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.357,
+                "y": 0.625,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.375,
+                "y": 0.357,
+                "height": 0.2,
+                "width": 0.25
+              },
+              "marketValue": 2511173,
+              "firstName": "Odin Lurås",
+              "lastName": "Bjørtuft",
+              "rankings": null
+            },
+            {
+              "id": 215158,
+              "age": 35,
+              "name": "Haitam Aleesami",
+              "positionId": 36,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "5",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.357,
+                "y": 0.375,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.625,
+                "y": 0.357,
+                "height": 0.2,
+                "width": 0.25
+              },
+              "marketValue": 278822,
+              "firstName": "Haitam",
+              "lastName": "Aleesami",
+              "rankings": null
+            },
+            {
+              "id": 630228,
+              "age": 28,
+              "name": "Fredrik André Bjørkan",
+              "positionId": 38,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "15",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.357,
+                "y": 0.125,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.875,
+                "y": 0.357,
+                "height": 0.2,
+                "width": 0.25
+              },
+              "marketValue": 2193833,
+              "firstName": "Fredrik André",
+              "lastName": "Bjørkan",
+              "rankings": null
+            },
+            {
+              "id": 1160076,
+              "age": 23,
+              "name": "Sondre Auklend",
+              "positionId": 73,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "8",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.613,
+                "y": 0.79,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.21,
+                "y": 0.613,
+                "height": 0.2,
+                "width": 0.29
+              },
+              "marketValue": 2296339,
+              "firstName": "Sondre",
+              "lastName": "Auklend",
+              "rankings": null
+            },
+            {
+              "id": 530635,
+              "age": 28,
+              "name": "Patrick Berg",
+              "positionId": 75,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "7",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.613,
+                "y": 0.5,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.5,
+                "y": 0.613,
+                "height": 0.2,
+                "width": 0.29
+              },
+              "marketValue": 3342727,
+              "firstName": "Patrick",
+              "lastName": "Berg",
+              "rankings": null
+            },
+            {
+              "id": 540975,
+              "age": 29,
+              "name": "Sondre Brunstad Fet",
+              "positionId": 77,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "19",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.613,
+                "y": 0.21,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.79,
+                "y": 0.613,
+                "height": 0.2,
+                "width": 0.29
+              },
+              "marketValue": 806342,
+              "firstName": "Sondre Brunstad",
+              "lastName": "Fet",
+              "rankings": null
+            },
+            {
+              "id": 1086551,
+              "age": 26,
+              "name": "Ole Blomberg",
+              "positionId": 103,
+              "usualPlayingPositionId": 3,
+              "shirtNumber": "11",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.87,
+                "y": 0.79,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.21,
+                "y": 0.87,
+                "height": 0.2,
+                "width": 0.29
+              },
+              "marketValue": 1463023,
+              "firstName": "Ole",
+              "lastName": "Blomberg",
+              "rankings": null
+            },
+            {
+              "id": 615292,
+              "age": 28,
+              "name": "Andreas Helmersen",
+              "positionId": 105,
+              "usualPlayingPositionId": 3,
+              "shirtNumber": "9",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.87,
+                "y": 0.5,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.5,
+                "y": 0.87,
+                "height": 0.2,
+                "width": 0.29
+              },
+              "marketValue": 944570,
+              "firstName": "Andreas",
+              "lastName": "Helmersen",
+              "rankings": null
+            },
+            {
+              "id": 741397,
+              "age": 26,
+              "name": "Jens Petter Hauge",
+              "positionId": 107,
+              "usualPlayingPositionId": 3,
+              "shirtNumber": "10",
+              "countryName": "Norway",
+              "countryCode": "NOR",
+              "horizontalLayout": {
+                "x": 0.87,
+                "y": 0.21,
+                "height": 0.25,
+                "width": 0.257
+              },
+              "verticalLayout": {
+                "x": 0.79,
+                "y": 0.87,
+                "height": 0.2,
+                "width": 0.29
+              },
+              "marketValue": 4288600,
+              "firstName": "Jens Petter",
+              "lastName": "Hauge",
+              "rankings": null
+            }
+          ],
+          "away": [
+            {
+              "id": 1082954,
+              "age": 26,
+              "name": "Gonzalo Crettaz",
+              "positionId": 11,
+              "usualPlayingPositionId": 0,
+              "shirtNumber": "1",
+              "countryName": "Argentina",
+              "countryCode": "ARG",
+              "horizontalLayout": {
+                "x": 0.1,
+                "y": 0.5,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.5,
+                "y": 0.1,
+                "height": 0.192,
+                "width": 1
+              },
+              "marketValue": 2353759,
+              "firstName": "Gonzalo",
+              "lastName": "Crettaz",
+              "rankings": null
+            },
+            {
+              "id": 1192053,
+              "age": 23,
+              "name": "Brayann Pereira",
+              "positionId": 33,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "2",
+              "countryName": "France",
+              "countryCode": "FRA",
+              "horizontalLayout": {
+                "x": 0.292,
+                "y": 0.79,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.21,
+                "y": 0.292,
+                "height": 0.192,
+                "width": 0.29
+              },
+              "marketValue": 992849,
+              "firstName": "Brayann",
+              "lastName": "Pereira",
+              "rankings": null
+            },
+            {
+              "id": 1386070,
+              "age": 22,
+              "name": "Tobias Storm",
+              "positionId": 35,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "21",
+              "countryName": "Denmark",
+              "countryCode": "DEN",
+              "horizontalLayout": {
+                "x": 0.292,
+                "y": 0.5,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.5,
+                "y": 0.292,
+                "height": 0.192,
+                "width": 0.29
+              },
+              "marketValue": 1054507,
+              "firstName": "Tobias",
+              "lastName": "Storm",
+              "rankings": null
+            },
+            {
+              "id": 1335315,
+              "age": 23,
+              "name": "Deveron Fonville",
+              "positionId": 37,
+              "usualPlayingPositionId": 1,
+              "shirtNumber": "24",
+              "countryName": "Curacao",
+              "countryCode": "CUW",
+              "horizontalLayout": {
+                "x": 0.292,
+                "y": 0.21,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.79,
+                "y": 0.292,
+                "height": 0.192,
+                "width": 0.29
+              },
+              "marketValue": 1283978,
+              "firstName": "Deveron",
+              "lastName": "Fonville",
+              "rankings": null
+            },
+            {
+              "id": 683333,
+              "age": 29,
+              "name": "Emre Mor",
+              "positionId": 62,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "7",
+              "countryName": "Turkiye",
+              "countryCode": "TUR",
+              "horizontalLayout": {
+                "x": 0.485,
+                "y": 0.875,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.125,
+                "y": 0.485,
+                "height": 0.192,
+                "width": 0.25
+              },
+              "marketValue": 515059,
+              "firstName": "Emre",
+              "lastName": "Mor",
+              "rankings": null
+            },
+            {
+              "id": 1052861,
+              "age": 27,
+              "name": "Darko Nejasmic",
+              "positionId": 64,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "6",
+              "countryName": "Croatia",
+              "countryCode": "CRO",
+              "horizontalLayout": {
+                "x": 0.485,
+                "y": 0.625,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.375,
+                "y": 0.485,
+                "height": 0.192,
+                "width": 0.25
+              },
+              "marketValue": 1868449,
+              "firstName": "Darko",
+              "lastName": "Nejasmic",
+              "rankings": null
+            },
+            {
+              "id": 1366049,
+              "age": 22,
+              "name": "Noé Lebreton",
+              "positionId": 66,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "20",
+              "countryName": "France",
+              "countryCode": "FRA",
+              "horizontalLayout": {
+                "x": 0.485,
+                "y": 0.375,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.625,
+                "y": 0.485,
+                "height": 0.192,
+                "width": 0.25
+              },
+              "marketValue": 1873223,
+              "firstName": "Noé",
+              "lastName": "Lebreton",
+              "rankings": null
+            },
+            {
+              "id": 1436850,
+              "age": 20,
+              "name": "Clement Bischoff",
+              "positionId": 68,
+              "usualPlayingPositionId": 3,
+              "shirtNumber": "99",
+              "countryName": "Denmark",
+              "countryCode": "DEN",
+              "horizontalLayout": {
+                "x": 0.485,
+                "y": 0.125,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.875,
+                "y": 0.485,
+                "height": 0.192,
+                "width": 0.25
+              },
+              "marketValue": 4783861,
+              "firstName": "Clement",
+              "lastName": "Bischoff",
+              "rankings": null
+            },
+            {
+              "id": 117541,
+              "age": 38,
+              "name": "Tjaronn Chery",
+              "positionId": 84,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "9",
+              "countryName": "Suriname",
+              "countryCode": "SUR",
+              "horizontalLayout": {
+                "x": 0.678,
+                "y": 0.7,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.3,
+                "y": 0.678,
+                "height": 0.192,
+                "width": 0.4
+              },
+              "marketValue": 723887,
+              "firstName": "Tjaronn",
+              "lastName": "Chery",
+              "rankings": null
+            },
+            {
+              "id": 94267,
+              "age": 37,
+              "name": "Dusan Tadic",
+              "positionId": 86,
+              "usualPlayingPositionId": 2,
+              "shirtNumber": "10",
+              "countryName": "Serbia",
+              "countryCode": "SRB",
+              "horizontalLayout": {
+                "x": 0.678,
+                "y": 0.3,
+                "height": 0.25,
+                "width": 0.193
+              },
+              "verticalLayout": {
+                "x": 0.7,
+                "y": 0.678,
+                "height": 0.192,
+                "width": 0.4
+              },
+              "marketValue": 1002579,
+              "firstName": "Dusan",
+              "lastName": "Tadic",
+              "rankings": null
+            },
+            {
+              "id": 147594,
+              "age": 35,
+              "name": "Bryan Linssen",
+              "positionId": 105,
+              "usualPlayingPositionId": 3,
+              "shirtNumber": "30",
+              "countryName": "Netherlands",
+              "countryCode": "NED",
+              "horizontalLayout": {
+                "x": 0.87,
+                "y": 0.5,
+                "height": 0.25,
+                "width": 0.192
+              },
+              "verticalLayout": {
+                "x": 0.5,
+                "y": 0.87,
+                "height": 0.192,
+                "width": 1
+              },
+              "marketValue": 721964,
+              "firstName": "Bryan",
+              "lastName": "Linssen",
+              "rankings": null
+            }
+          ]
+        },
+        "source_id": "fotmob.bb_browser",
+        "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+        "refreshed_at": "2026-08-23T09:56:44+00:00",
+        "missing_reason": "LAST_STARTING_LINEUPS_NOT_OFFICIAL_XI"
+      }
+    },
+    "missing_fields": [
+      "team_stats",
+      "suspensions",
+      "starting_xi"
+    ],
+    "evidence_gap": true,
+    "evidence_status": "GAP",
+    "evidence_gap_reasons": [
+      "TEAM_STATS_FOTMOB_MATCH_DETAIL_HAS_NO_OFFICIAL_TEAM_XG_STATS",
+      "SUSPENSIONS_NO_SEPARATE_SUSPENSION_CONFIRMATION",
+      "STARTING_XI_LAST_STARTING_LINEUPS_NOT_OFFICIAL_XI"
+    ],
+    "source_policy": {
+      "fotmob": "research_only",
+      "sporttery": "production_market_only"
+    }
+  }
+}

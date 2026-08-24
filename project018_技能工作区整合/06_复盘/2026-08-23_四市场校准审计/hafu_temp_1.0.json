@@ -1,0 +1,64 @@
+{
+  "schema": "derivative-diagnostics-1.0",
+  "research_only": true,
+  "store": "project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+  "snapshot_policy": "latest_before_kickoff",
+  "record_sample_size": 204,
+  "metrics": {
+    "ou_2_5": {
+      "n": 204,
+      "brier": 0.243754,
+      "accuracy_pct": 56.37
+    },
+    "ou_3_5": {
+      "n": 204,
+      "brier": 0.16658,
+      "accuracy_pct": 78.43
+    },
+    "ou_calibration_comparison": {
+      "ou_2_5": {
+        "n": 195,
+        "calibrated_brier": 0.243832,
+        "raw_brier": 0.24775,
+        "delta_calibrated_minus_raw": -0.003918
+      },
+      "ou_3_5": {
+        "n": 195,
+        "calibrated_brier": 0.166271,
+        "raw_brier": 0.172236,
+        "delta_calibrated_minus_raw": -0.005965
+      }
+    },
+    "hafu": {
+      "n": 0,
+      "accuracy_pct": null,
+      "brier": null,
+      "log_loss": null,
+      "excluded_unverified_evidence": 0,
+      "excluded_unfitted_prediction": 194
+    },
+    "hafu_temperature_shadow": {
+      "research_only": true,
+      "n": 73,
+      "temperature": 1.0,
+      "raw": {
+        "n": 73,
+        "accuracy_pct": 32.88,
+        "brier": 0.816963,
+        "log_loss": 1.915956
+      },
+      "candidate": {
+        "n": 73,
+        "accuracy_pct": 32.88,
+        "brier": 0.816963,
+        "log_loss": 1.915956
+      },
+      "delta_candidate_minus_raw": {
+        "brier": 0.0,
+        "log_loss": 0.0
+      }
+    }
+  },
+  "half_time_evidence_input": "project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\research\\half-time-evidence\\apifootball_verified_merged_20260823.json",
+  "note": "半全场只在status=verified的独立半场证据上评分；UNFITTED输出不进入分母。"
+}

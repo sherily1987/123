@@ -1,0 +1,50 @@
+{
+  "schema_version": "sporttery-hafu-had-shadow-1.0",
+  "research_only": true,
+  "source_policy": {
+    "baseline": "closing_pre_match.hafu: official nine-state quote",
+    "candidate": "closing_pre_match.had only: power devig -> 1X2 lambda inverse -> HAFU convolution",
+    "outcome": "match_result_list code=HAFU official settlement"
+  },
+  "split": {
+    "method": "chronological",
+    "train_n": 912,
+    "test_n": 391,
+    "train_through": "2026-06-07T06:00:00+08:00",
+    "test_from": "2026-06-07T06:00:00+08:00"
+  },
+  "test": {
+    "baseline": {
+      "n": 391,
+      "multiclass_brier": 0.79574015,
+      "log_loss": 1.84972494,
+      "top1_accuracy_pct": 31.97
+    },
+    "candidate": {
+      "n": 391,
+      "multiclass_brier": 0.79499934,
+      "log_loss": 1.84912572,
+      "top1_accuracy_pct": 32.23
+    }
+  },
+  "test_paired_bootstrap": {
+    "draws": 2000,
+    "seed": 20260821,
+    "brier": {
+      "delta_candidate_minus_baseline": -0.0007408,
+      "ci95_low": -0.00619983,
+      "ci95_high": 0.00459333
+    },
+    "log_loss": {
+      "delta_candidate_minus_baseline": -0.00059922,
+      "ci95_low": -0.01943675,
+      "ci95_high": 0.01921901
+    }
+  },
+  "admission": {
+    "decision": "hold",
+    "reason_code": "NO_DUAL_METRIC_IMPROVEMENT"
+  },
+  "valid_sample_n": 1303,
+  "source_file": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\research\\hafu-training\\sporttery_history_probe_20260203_20260821.json"
+}

@@ -58,6 +58,15 @@ version: 3.4.4
 17. 有`ou:{line,odds:[over,under]}`、`ttg:{odds:[0..6,7+]}`或`hafu:{odds:[hh,hd,ha,dh,dd,da,ah,ad,aa]}`时，必须与HAD/HHAD联合拟合λ，并输出`multi_market_fit`；不得继续按HAD-only解释比分与大小球。
     - 拟合权重按实测边际分档（HAD/HHAD≈12.9%、TTG≈25.1%、HAFU≈25.5%、CRS≈40.9%）：`had 1.0 / hhad 0.9 / ou 0.8 / ttg 0.5 / hafu 0.35`。边际越高噪声越大，权重越低。**CRS边际过高，不进拟合**，只作同场内比分相对排序。
     - HAFU是唯一能给**半场**提供市场锚的盘口，有它时半场Top比分不再纯靠常数拆分。官方完整采集器取得TTG后优先使用官方TTG；用户截图仅在官方接口缺项或需要页面核对时使用，并标记`IMAGE_EXTRACTED`。若官方TTG与旧截图不一致，以最新官方接口快照为准，同时保留旧截图数据作为历史来源，不覆盖原始文件。
+
+### TTG联合样本固化门禁
+
+- 每次采集必须把完整8档TTG原始赔率保存为`ttg.odds=[0,1,2,3,4,5,6,7+]`，并同时保存官方接口URL、`match_id`、盘口更新时间和采集时间；缺一项就标记为不可审计，不得补齐。
+- 联合样本的唯一主键是`match_id`，不能按文件名、销售日或数组顺序关联赛果。赛后只接受`results/<match_id>.json`中的官方90分钟`score_90`。
+- 联合拟合回测必须先运行：
+  `python project021_五大联赛APIFootball训练/02_脚本/audit_joint_had_ttg_samples.py --store <唯一事实源>`。
+- `joint_settled_rows < 120` 时状态必须为`BLOCKED`：只允许继续采集和登记，不允许拟合新权重、替换M4参数或宣称联合约束改善。
+- 达到120场后仍需按时间切分，与M4 HAD-only基线同时报告比分LogLoss、Top1、Top3、TTG一致性和不确定性；样本外不优于基线则保持研究状态。
 18. **官方前瞻数据（独立强度锚）**：页面 `m.sporttery.cn/zqlszl/bssj/?mid=` 背后有8个官方接口，全部走 webapi.sporttery.cn：
     ```sh
     python3 scripts/fetch_match_preview.py --from-collect raw_sporttery.json --output prev.json --terms 10

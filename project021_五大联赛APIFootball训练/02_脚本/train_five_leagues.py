@@ -78,7 +78,7 @@ def train_one_league(input_path: Path, league: dict, output_dir: Path, baseline_
         return result
     final_model.update({
         "schema_version": "team-strength-apifootball-1.0",
-        "source": "apifootball.com_event_results",
+        "source": "api-sports.io_event_results",
         "lifecycle": "candidate",
         "league_id": league["id"],
         "league_name": league["name"],

@@ -40,6 +40,12 @@ DEFAULT_OFFICIAL_DOMAINS = (
     "ligue1.com/", "seriea.com/", "legaseriea.it/", "eredivisie.eu/", "ligaportugal.pt/",
     "jleague.jp/", "mlssoccer.com/", "fifa.com/",
 )
+MEDIA_EVIDENCE_DOMAINS = (
+    "bbc.com/", "skysports.com/", "espn.com/", "goal.com/", "90min.com/",
+    "sportsmole.co.uk/", "transfermarkt.com/", "theathletic.com/",
+    "football-italia.net/", "sportwitness.co.uk/", "givemesport.com/",
+    "soccerway.com/", "worldfootball.net/",
+)
 OFFICIAL_TEAM_SOURCES = Path(__file__).resolve().parents[1] / "config" / "official_team_sources_top20.json"
 
 
@@ -272,23 +278,35 @@ def _scrapling_generic_snapshot(match: dict[str, Any], mapping: dict[str, Any],
     os.close(fd)
     output_path = Path(name)
     try:
-        proc = subprocess.run(
-            ["scrapling", "extract", "fetch", url, str(output_path),
-             "--ai-targeted", "--wait", "1000", "--timeout", "45000"],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=90,
-        )
-        if proc.returncode != 0:
-            raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_FETCH_FAILED")[-300:])
+        # Dynamic official pages are rendered first.  If the normal dynamic
+        # browser gets an empty shell or a challenge page, retry with the
+        # stealth browser before declaring the source unavailable.  Both
+        # commands use --ai-targeted so page text is sanitized before parsing.
+        attempts = []
+        for mode, command in (("dynamic", "fetch"), ("stealth", "stealthy-fetch")):
+            proc = subprocess.run(
+                ["scrapling", "extract", command, url, str(output_path),
+                 "--ai-targeted", "--wait", "1500", "--timeout", "45000"],
+                capture_output=True, text=True, encoding="utf-8", errors="replace",
+                timeout=90,
+            )
+            text = output_path.read_text(encoding="utf-8", errors="replace") if output_path.is_file() else ""
+            attempts.append({"mode": mode, "returncode": proc.returncode, "text_length": len(text)})
+            if proc.returncode == 0 and len(text.strip()) >= 200:
+                break
+        else:
+            raise RuntimeError((proc.stderr or proc.stdout or "SCRAPLING_DYNAMIC_AND_STEALTH_FETCH_FAILED")[-300:])
         source_id = str(mapping.get("source_id") or urllib.parse.urlparse(url).netloc or "scrapling.generic")
         provider = str(mapping.get("provider") or source_id)
         source_tier = str(mapping.get("source_tier") or "C").upper()
         if source_tier not in {"A", "B", "C", "D"}:
             source_tier = "C"
         text = output_path.read_text(encoding="utf-8", errors="replace")
-        return module.parse_markdown(text, match, url, collected_at,
-                                     source_id=source_id, provider=provider,
-                                     source_tier=source_tier)
+        row = module.parse_markdown(text, match, url, collected_at,
+                                    source_id=source_id, provider=provider,
+                                    source_tier=source_tier)
+        row["scrapling_fetch"] = {"attempts": attempts, "selected": attempts[-1]["mode"]}
+        return row
     finally:
         output_path.unlink(missing_ok=True)
 
@@ -409,6 +427,9 @@ def _discovered_mapping(discovered: dict[str, Any]) -> dict[str, Any] | None:
     for url in (discovered.get("official_candidates") or []):
         candidates.append({"scrapling_url": url, "source_id": "discovered.official",
                            "provider": "discovered_official", "source_tier": "A"})
+    for url in (discovered.get("media_candidates") or []):
+        candidates.append({"scrapling_url": url, "source_id": "discovered.media",
+                           "provider": "discovered_media_preview", "source_tier": "B"})
     for url in (discovered.get("third_party_candidates") or []):
         candidates.append({"scrapling_url": url, "source_id": "discovered.third_party",
                            "provider": "discovered_third_party", "source_tier": "C"})
@@ -511,7 +532,7 @@ def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
     query = " ".join(filter(None, [str(match.get("competition") or ""),
                                     str(match.get("home") or ""),
                                     str(match.get("away") or ""), kickoff,
-                                    "official match"])).strip()
+                                    "predicted lineup team news injuries suspension"])).strip()
     search_url = "https://www.google.com/search?" + urllib.parse.urlencode({"q": query})
     tab = None
     try:
@@ -534,11 +555,13 @@ def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
                               if str(domain).strip())
         official_domains = DEFAULT_OFFICIAL_DOMAINS + custom_domains
         official = [link for link in links if any(domain in link.lower() for domain in official_domains)]
-        third_party = [link for link in links if link not in official and any(domain in link for domain in
+        media = [link for link in links if link not in official and any(domain in link.lower() for domain in MEDIA_EVIDENCE_DOMAINS)]
+        third_party = [link for link in links if link not in official and link not in media and any(domain in link.lower() for domain in
                       ("fotmob.com/", "sofascore.com/"))]
-        unclassified = [link for link in links if link not in official and link not in third_party]
+        unclassified = [link for link in links if link not in official and link not in media and link not in third_party]
         return {"status": "source_candidates_found", "query": query,
-                "official_candidates": official, "third_party_candidates": third_party,
+                "official_candidates": official, "media_candidates": media,
+                "third_party_candidates": third_party,
                 "unclassified_candidates": unclassified}
     except Exception as exc:
         return {"status": "source_discovery_error", "query": query, "reason": str(exc)[:300]}

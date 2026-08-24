@@ -81,6 +81,10 @@ python $cli --help
 
 ## 数据与市场状态
 
+### HAD+TTG联合样本门禁
+
+采集器必须原样保存完整8档`ttg.odds`、官方来源、盘口更新时间、采集时间和同场`match_id`。赛果只能从`results/<match_id>.json`读取90分钟分数；不得用文件顺序或队名模糊匹配替代主键。联合拟合前运行`audit_joint_had_ttg_samples.py --store <唯一事实源>`；已结算联合样本少于120场时必须标记`BLOCKED`，不拟合新权重、不替换当前生产参数。达到门槛后仍须时间切分，并与M4 HAD-only基线比较LogLoss、Top1、Top3及TTG一致性。
+
 输入至少要能唯一确认主客队、赛事、开球时间/时区，并具有完整体彩1X2或成对独立强度锚。只有市场时固定为 `market_only`，只描述市场概率结构，不声称价值优势。
 
 每个衍生市场必须单独给状态，不得因1X2可用而推断其他市场可用：
@@ -118,7 +122,7 @@ BB-browser/Scrapling 成功行还会在输出目录生成
 在没有主证据时作为受限主证据，并重新执行开球时间、来源、缺口和完整哈希门禁；因此只保存
 JSON 路径不会被 LLM 当成事实，必须把该 Markdown 目录作为 `--evidence-dir` 输入。
 
-证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发；官方首发未发布时可采集预计首发并标记 `starting_xi.status=PREDICTED`，不得改写为官方确认。
+证据链在单次采集窗口内尽量采集两队最近5场、CRS/TTG/HAFU、伤停和首发。提前一天预测时，官方首发通常尚未发布，采集器应优先搜索带明确比赛身份和时间戳的媒体“预计首发”和“预计伤停”，并分别标记为 `PREDICTED`；这类信息可以进入赛前研究输入，但必须显示“媒体预测、非官方确认”。至少使用两个不同发布域名交叉验证后，才可把字段标为 `cross_validated=true`；来源冲突时保留 `alternatives`、降级置信度并保留风险标签，不得静默选择。官方名单发布后再生成 `VALID` 快照覆盖研究快照。
 本地 HTTP/Playwright 优先；失败项写入 `browser_tasks.json`，由当前 Codex 浏览器回补并落成可审计快照。
 BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射至少包含该场 URL 和
 来源所需的比赛 ID；可选 `official_domains`（比赛级官方域名提示）、`source_id`、`provider`

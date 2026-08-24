@@ -1,0 +1,29 @@
+{
+  "schema": "league-history-backfill-audit-1.0",
+  "source": "football-data.co.uk",
+  "as_of": "2026-08-24",
+  "leagues": {
+    "美职联": {
+      "slug": "fd_usa",
+      "rows": 6085,
+      "actual_rows": 6085,
+      "duplicate_match_ids": 0,
+      "kickoff_range": ["2012-03-10T23:00:00", "2026-08-08T21:30:00"],
+      "seasons": 15,
+      "latest_season_rows": 269,
+      "status": "ALREADY_STANDARDIZED"
+    },
+    "巴甲": {
+      "slug": "fd_bra",
+      "rows": 5534,
+      "actual_rows": 5534,
+      "duplicate_match_ids": 0,
+      "kickoff_range": ["2012-05-19T22:30:00", "2026-08-09T23:30:00"],
+      "seasons": 15,
+      "latest_season_rows": 215,
+      "status": "ALREADY_STANDARDIZED"
+    }
+  },
+  "decision": "NO_DUPLICATE_DOWNLOAD",
+  "note": "两联赛原始与标准化数据均已覆盖2026赛季，重复下载会造成重复赛季和样本污染；本轮改为重新回测并更新报告。"
+}

@@ -2,7 +2,7 @@
 """按联赛组网格搜索比分 BP 的 λ3 与温度 T（研究，不改生产常数）。
 
 λ 一律从市场 1X2 反解（与正式 market_only 同一口径）。
-生产默认仍是 λ3=0.05、T=1.30；本脚本只写 05_交付 报告。
+当前生产 M4 默认是 λ3=0.20、T=1.30；本脚本只写 05_交付 报告。
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ import predict as P  # noqa: E402
 PROJ = ROOT / "project021_五大联赛APIFootball训练"
 N = 11
 GRID = np.arange(0, N)
-DEFAULT_LAM3 = 0.05
+DEFAULT_LAM3 = 0.20
 DEFAULT_T = 1.30
 LAM3_GRID = (0.02, 0.05, 0.08, 0.10, 0.15)
 T_GRID = (1.0, 1.1, 1.2, 1.3, 1.4, 1.5)
@@ -225,7 +225,7 @@ def main() -> None:
     report = {
         "schema": "score-params-by-league-1.0",
         "research_only": True,
-        "production_unchanged": "SCORE_LAMBDA3=0.05 SCORE_TEMPERATURE_FT=1.30",
+        "production_unchanged": "M4 SCORE_LAMBDA3=0.20 SCORE_TEMPERATURE_FT=1.30",
         "ran_at": datetime.now().isoformat(timespec="seconds"),
         "grid": {"lambda3": list(LAM3_GRID), "temperature": list(T_GRID)},
         "groups": {},

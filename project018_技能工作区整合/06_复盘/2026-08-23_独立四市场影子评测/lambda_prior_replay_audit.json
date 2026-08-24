@@ -1,0 +1,3423 @@
+{
+  "schema": "lambda-prior-replay-audit-1.0",
+  "generated_at": "2026-08-23T01:52:09.883051+00:00",
+  "research_only": true,
+  "production_change_allowed": false,
+  "source_rows": {
+    "understat": 3503,
+    "events": 96942
+  },
+  "counts": {
+    "total": 83,
+    "equivalent": 83,
+    "mismatch": 0,
+    "not_reproduced": 0,
+    "skipped": 0
+  },
+  "rows": [
+    {
+      "match_id": "sporttery-2040874",
+      "kickoff": "2026-08-16T00:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.321043,
+        "lambda_away": 1.623579,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 278,
+        "team_sample_sizes": {
+          "home": 141,
+          "away": 146
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.321043,
+        "lambda_away": 1.623579,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 278,
+        "team_sample_sizes": {
+          "home": 141,
+          "away": 146
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T16:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 278,
+        "history_latest": "2026-06-27T22:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040874.json"
+    },
+    {
+      "match_id": "sporttery-2040875",
+      "kickoff": "2026-08-16T00:15:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.533109,
+        "lambda_away": 1.229517,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 286,
+        "team_sample_sizes": {
+          "home": 162,
+          "away": 132
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.533109,
+        "lambda_away": 1.229517,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 286,
+        "team_sample_sizes": {
+          "home": 162,
+          "away": 132
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T16:15:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 286,
+        "history_latest": "2026-05-22T02:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040875.json"
+    },
+    {
+      "match_id": "sporttery-2040876",
+      "kickoff": "2026-08-16T00:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.441304,
+        "lambda_away": 1.050932,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 544,
+        "team_sample_sizes": {
+          "home": 230,
+          "away": 322
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.441304,
+        "lambda_away": 1.050932,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 544,
+        "team_sample_sizes": {
+          "home": 230,
+          "away": 322
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T16:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 544,
+        "history_latest": "2026-05-02T12:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040876.json"
+    },
+    {
+      "match_id": "sporttery-2040877",
+      "kickoff": "2026-08-16T00:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.42114,
+        "lambda_away": 1.632706,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 340,
+        "team_sample_sizes": {
+          "home": 174,
+          "away": 176
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.42114,
+        "lambda_away": 1.632706,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 340,
+        "team_sample_sizes": {
+          "home": 174,
+          "away": 176
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T16:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 340,
+        "history_latest": "2026-05-22T03:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040877.json"
+    },
+    {
+      "match_id": "sporttery-2040879",
+      "kickoff": "2026-08-16T01:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.311749,
+        "lambda_away": 1.182906,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.311749,
+        "lambda_away": 1.182906,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-15T17:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040879.json"
+    },
+    {
+      "match_id": "sporttery-2040880",
+      "kickoff": "2026-08-16T02:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.903686,
+        "lambda_away": 1.148057,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 226,
+        "team_sample_sizes": {
+          "home": 162,
+          "away": 68
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.903686,
+        "lambda_away": 1.148057,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 226,
+        "team_sample_sizes": {
+          "home": 162,
+          "away": 68
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T18:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 226,
+        "history_latest": "2026-05-22T02:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040880.json"
+    },
+    {
+      "match_id": "sporttery-2040882",
+      "kickoff": "2026-08-16T02:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.229888,
+        "lambda_away": 2.409752,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 276,
+        "team_sample_sizes": {
+          "home": 111,
+          "away": 171
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.229888,
+        "lambda_away": 2.409752,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 276,
+        "team_sample_sizes": {
+          "home": 111,
+          "away": 171
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T18:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 276,
+        "history_latest": "2026-05-17T20:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040882.json"
+    },
+    {
+      "match_id": "sporttery-2040883",
+      "kickoff": "2026-08-16T03:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.599288,
+        "lambda_away": 1.461353,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 236,
+        "team_sample_sizes": {
+          "home": 171,
+          "away": 69
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.599288,
+        "lambda_away": 1.461353,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 236,
+        "team_sample_sizes": {
+          "home": 171,
+          "away": 69
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T19:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 236,
+        "history_latest": "2026-05-17T20:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040883.json"
+    },
+    {
+      "match_id": "sporttery-2040884",
+      "kickoff": "2026-08-16T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.304243,
+        "lambda_away": 1.460946,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.304243,
+        "lambda_away": 1.460946,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-15T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040884.json"
+    },
+    {
+      "match_id": "sporttery-2040885",
+      "kickoff": "2026-08-16T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 0.894118,
+        "lambda_away": 1.766176,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "team_sample_sizes": {
+          "home": 136,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 0.894118,
+        "lambda_away": 1.766176,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "team_sample_sizes": {
+          "home": 136,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "history_latest": "2026-05-17T01:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040885.json"
+    },
+    {
+      "match_id": "sporttery-2040886",
+      "kickoff": "2026-08-16T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.128491,
+        "lambda_away": 1.33099,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 1043,
+        "team_sample_sizes": {
+          "home": 554,
+          "away": 516
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.128491,
+        "lambda_away": 1.33099,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 1043,
+        "team_sample_sizes": {
+          "home": 554,
+          "away": 516
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-15T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 1043,
+        "history_latest": "2026-08-09T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040886.json"
+    },
+    {
+      "match_id": "sporttery-2040887",
+      "kickoff": "2026-08-16T09:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.470541,
+        "lambda_away": 1.432613,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 812,
+        "team_sample_sizes": {
+          "home": 507,
+          "away": 327
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.470541,
+        "lambda_away": 1.432613,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 812,
+        "team_sample_sizes": {
+          "home": 507,
+          "away": 327
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T01:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 812,
+        "history_latest": "2026-08-02T01:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040887.json"
+    },
+    {
+      "match_id": "sporttery-2040889",
+      "kickoff": "2026-08-16T18:15:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.566689,
+        "lambda_away": 1.542137,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 11,
+          "away": 137
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.566689,
+        "lambda_away": 1.542137,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 11,
+          "away": 137
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T10:15:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 148,
+        "history_latest": "2026-05-22T00:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040889.json"
+    },
+    {
+      "match_id": "sporttery-2040891",
+      "kickoff": "2026-08-16T18:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.17915,
+        "lambda_away": 1.230769,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 186,
+        "team_sample_sizes": {
+          "home": 114,
+          "away": 78
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.17915,
+        "lambda_away": 1.230769,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 186,
+        "team_sample_sizes": {
+          "home": 114,
+          "away": 78
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T10:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 186,
+        "history_latest": "2024-11-24T13:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040891.json"
+    },
+    {
+      "match_id": "sporttery-2040892",
+      "kickoff": "2026-08-16T20:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.767157,
+        "lambda_away": 1.370098,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 113,
+        "team_sample_sizes": {
+          "home": 102,
+          "away": 12
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.767157,
+        "lambda_away": 1.370098,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 113,
+        "team_sample_sizes": {
+          "home": 102,
+          "away": 12
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T12:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 113,
+        "history_latest": "2026-05-31T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040892.json"
+    },
+    {
+      "match_id": "sporttery-2040893",
+      "kickoff": "2026-08-16T20:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.218615,
+        "lambda_away": 1.558671,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 267,
+        "team_sample_sizes": {
+          "home": 122,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.218615,
+        "lambda_away": 1.558671,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 267,
+        "team_sample_sizes": {
+          "home": 122,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T12:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 267,
+        "history_latest": "2026-05-31T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040893.json"
+    },
+    {
+      "match_id": "sporttery-2040894",
+      "kickoff": "2026-08-16T20:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.406653,
+        "lambda_away": 1.243726,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 292,
+        "team_sample_sizes": {
+          "home": 151,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.406653,
+        "lambda_away": 1.243726,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 292,
+        "team_sample_sizes": {
+          "home": 151,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T12:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 292,
+        "history_latest": "2026-05-30T21:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040894.json"
+    },
+    {
+      "match_id": "sporttery-2040895",
+      "kickoff": "2026-08-16T20:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.803172,
+        "lambda_away": 1.135168,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 303,
+        "team_sample_sizes": {
+          "home": 175,
+          "away": 136
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.803172,
+        "lambda_away": 1.135168,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 303,
+        "team_sample_sizes": {
+          "home": 175,
+          "away": 136
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T12:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 303,
+        "history_latest": "2026-05-17T20:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040895.json"
+    },
+    {
+      "match_id": "sporttery-2040896",
+      "kickoff": "2026-08-16T20:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.929207,
+        "lambda_away": 1.218092,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 332,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 172
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.929207,
+        "lambda_away": 1.218092,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 332,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 172
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T12:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 332,
+        "history_latest": "2026-05-17T20:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040896.json"
+    },
+    {
+      "match_id": "sporttery-2040897",
+      "kickoff": "2026-08-16T20:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.291973,
+        "lambda_away": 1.699989,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 190,
+        "team_sample_sizes": {
+          "home": 73,
+          "away": 121
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.291973,
+        "lambda_away": 1.699989,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 190,
+        "team_sample_sizes": {
+          "home": 73,
+          "away": 121
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T12:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 190,
+        "history_latest": "2026-05-30T01:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040897.json"
+    },
+    {
+      "match_id": "sporttery-2040899",
+      "kickoff": "2026-08-16T22:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.3,
+        "lambda_away": 1.572414,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 278,
+        "team_sample_sizes": {
+          "home": 145,
+          "away": 145
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.3,
+        "lambda_away": 1.572414,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 278,
+        "team_sample_sizes": {
+          "home": 145,
+          "away": 145
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T14:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 278,
+        "history_latest": "2026-06-28T02:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040899.json"
+    },
+    {
+      "match_id": "sporttery-2040900",
+      "kickoff": "2026-08-16T22:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.272059,
+        "lambda_away": 1.345588,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 234,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.272059,
+        "lambda_away": 1.345588,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 234,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T14:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 234,
+        "history_latest": "2026-05-17T03:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040900.json"
+    },
+    {
+      "match_id": "sporttery-2040901",
+      "kickoff": "2026-08-16T22:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.173685,
+        "lambda_away": 1.597075,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 268,
+        "team_sample_sizes": {
+          "home": 122,
+          "away": 153
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.173685,
+        "lambda_away": 1.597075,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 268,
+        "team_sample_sizes": {
+          "home": 122,
+          "away": 153
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T14:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 268,
+        "history_latest": "2026-05-31T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040901.json"
+    },
+    {
+      "match_id": "sporttery-2040902",
+      "kickoff": "2026-08-16T22:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.199655,
+        "lambda_away": 1.45201,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 217,
+        "team_sample_sizes": {
+          "home": 71,
+          "away": 151
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.199655,
+        "lambda_away": 1.45201,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 217,
+        "team_sample_sizes": {
+          "home": 71,
+          "away": 151
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T14:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 217,
+        "history_latest": "2026-05-30T21:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040902.json"
+    },
+    {
+      "match_id": "sporttery-2040903",
+      "kickoff": "2026-08-16T22:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.981177,
+        "lambda_away": 1.240298,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 337,
+        "team_sample_sizes": {
+          "home": 171,
+          "away": 176
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.981177,
+        "lambda_away": 1.240298,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 337,
+        "team_sample_sizes": {
+          "home": 171,
+          "away": 176
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T14:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 337,
+        "history_latest": "2026-05-22T03:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040903.json"
+    },
+    {
+      "match_id": "sporttery-2040904",
+      "kickoff": "2026-08-16T23:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.68227,
+        "lambda_away": 1.32031,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 295,
+        "team_sample_sizes": {
+          "home": 151,
+          "away": 154
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.68227,
+        "lambda_away": 1.32031,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 295,
+        "team_sample_sizes": {
+          "home": 151,
+          "away": 154
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T15:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 295,
+        "history_latest": "2026-05-30T22:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040904.json"
+    },
+    {
+      "match_id": "sporttery-2040905",
+      "kickoff": "2026-08-16T23:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.682156,
+        "lambda_away": 1.32314,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 245,
+        "team_sample_sizes": {
+          "home": 122,
+          "away": 130
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.682156,
+        "lambda_away": 1.32314,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 245,
+        "team_sample_sizes": {
+          "home": 122,
+          "away": 130
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T15:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 245,
+        "history_latest": "2026-05-30T01:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040905.json"
+    },
+    {
+      "match_id": "sporttery-2040906",
+      "kickoff": "2026-08-16T23:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.653469,
+        "lambda_away": 1.593451,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "team_sample_sizes": {
+          "home": 153,
+          "away": 156
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.653469,
+        "lambda_away": 1.593451,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "team_sample_sizes": {
+          "home": 153,
+          "away": 156
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T15:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "history_latest": "2026-05-30T22:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-16\\sporttery-2040906.json"
+    },
+    {
+      "match_id": "sporttery-2040907",
+      "kickoff": "2026-08-17T01:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.476055,
+        "lambda_away": 1.584864,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.476055,
+        "lambda_away": 1.584864,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-16T17:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040907.json"
+    },
+    {
+      "match_id": "sporttery-2040908",
+      "kickoff": "2026-08-17T01:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.271654,
+        "lambda_away": 1.286914,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 300,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 138
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.271654,
+        "lambda_away": 1.286914,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 300,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 138
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T17:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 300,
+        "history_latest": "2026-05-17T01:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040908.json"
+    },
+    {
+      "match_id": "sporttery-2040909",
+      "kickoff": "2026-08-17T01:15:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.54133,
+        "lambda_away": 1.236262,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 188,
+        "team_sample_sizes": {
+          "home": 71,
+          "away": 122
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.54133,
+        "lambda_away": 1.236262,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 188,
+        "team_sample_sizes": {
+          "home": 71,
+          "away": 122
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T17:15:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 188,
+        "history_latest": "2026-05-30T01:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040909.json"
+    },
+    {
+      "match_id": "sporttery-2040910",
+      "kickoff": "2026-08-17T03:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.113258,
+        "lambda_away": 1.323507,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 897,
+        "team_sample_sizes": {
+          "home": 401,
+          "away": 515
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.113258,
+        "lambda_away": 1.323507,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 897,
+        "team_sample_sizes": {
+          "home": 401,
+          "away": 515
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T19:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 897,
+        "history_latest": "2026-08-09T22:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040910.json"
+    },
+    {
+      "match_id": "sporttery-2040911",
+      "kickoff": "2026-08-17T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.398679,
+        "lambda_away": 1.130563,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 235,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 69
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.398679,
+        "lambda_away": 1.130563,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 235,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 69
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 235,
+        "history_latest": "2026-05-17T03:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040911.json"
+    },
+    {
+      "match_id": "sporttery-2040913",
+      "kickoff": "2026-08-17T06:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.45522,
+        "lambda_away": 1.434825,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 883,
+        "team_sample_sizes": {
+          "home": 408,
+          "away": 503
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.45522,
+        "lambda_away": 1.434825,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 883,
+        "team_sample_sizes": {
+          "home": 408,
+          "away": 503
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-16T22:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 883,
+        "history_latest": "2026-08-02T00:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040913.json"
+    },
+    {
+      "match_id": "sporttery-2040914",
+      "kickoff": "2026-08-17T23:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.390417,
+        "lambda_away": 1.693611,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 212,
+        "team_sample_sizes": {
+          "home": 75,
+          "away": 144
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.390417,
+        "lambda_away": 1.693611,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 212,
+        "team_sample_sizes": {
+          "home": 75,
+          "away": 144
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-17T15:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 212,
+        "history_latest": "2026-06-28T00:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-17\\sporttery-2040914.json"
+    },
+    {
+      "match_id": "sporttery-2040915",
+      "kickoff": "2026-08-18T01:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.699915,
+        "lambda_away": 1.187712,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 269,
+        "team_sample_sizes": {
+          "home": 152,
+          "away": 124
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.699915,
+        "lambda_away": 1.187712,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 269,
+        "team_sample_sizes": {
+          "home": 152,
+          "away": 124
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-17T17:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 269,
+        "history_latest": "2026-05-31T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-18\\sporttery-2040915.json"
+    },
+    {
+      "match_id": "sporttery-2040916",
+      "kickoff": "2026-08-18T03:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.297101,
+        "lambda_away": 1.431159,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 322,
+        "team_sample_sizes": {
+          "home": 276,
+          "away": 46
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.297101,
+        "lambda_away": 1.431159,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 322,
+        "team_sample_sizes": {
+          "home": 276,
+          "away": 46
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-17T19:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 322,
+        "history_latest": "2026-05-02T12:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-18\\sporttery-2040916.json"
+    },
+    {
+      "match_id": "sporttery-2040918",
+      "kickoff": "2026-08-18T07:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.444151,
+        "lambda_away": 1.126762,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 537,
+        "team_sample_sizes": {
+          "home": 516,
+          "away": 22
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.444151,
+        "lambda_away": 1.126762,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 537,
+        "team_sample_sizes": {
+          "home": 516,
+          "away": 22
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-17T23:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 537,
+        "history_latest": "2026-08-09T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-18\\sporttery-2040918.json"
+    },
+    {
+      "match_id": "sporttery-2040962",
+      "kickoff": "2026-08-22T00:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.020879,
+        "lambda_away": 2.046841,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 258,
+        "team_sample_sizes": {
+          "home": 102,
+          "away": 162
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.020879,
+        "lambda_away": 2.046841,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 258,
+        "team_sample_sizes": {
+          "home": 102,
+          "away": 162
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-21T16:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 258,
+        "history_latest": "2026-05-22T02:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040962.json"
+    },
+    {
+      "match_id": "sporttery-2040963",
+      "kickoff": "2026-08-22T00:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.604542,
+        "lambda_away": 1.277277,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 251,
+        "team_sample_sizes": {
+          "home": 146,
+          "away": 114
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.604542,
+        "lambda_away": 1.277277,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 251,
+        "team_sample_sizes": {
+          "home": 146,
+          "away": 114
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-21T16:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 251,
+        "history_latest": "2026-06-28T02:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040963.json"
+    },
+    {
+      "match_id": "sporttery-2040964",
+      "kickoff": "2026-08-22T01:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.526316,
+        "lambda_away": 1.720395,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 294,
+        "team_sample_sizes": {
+          "home": 152,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.526316,
+        "lambda_away": 1.720395,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 294,
+        "team_sample_sizes": {
+          "home": 152,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-21T17:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 294,
+        "history_latest": "2026-05-31T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040964.json"
+    },
+    {
+      "match_id": "sporttery-2040965",
+      "kickoff": "2026-08-22T02:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.552469,
+        "lambda_away": 1.462509,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 226,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 162
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.552469,
+        "lambda_away": 1.462509,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 226,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 162
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-21T18:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 226,
+        "history_latest": "2026-05-22T02:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040965.json"
+    },
+    {
+      "match_id": "sporttery-2040966",
+      "kickoff": "2026-08-22T02:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.025327,
+        "lambda_away": 1.262663,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 176,
+        "team_sample_sizes": {
+          "home": 144,
+          "away": 34
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.025327,
+        "lambda_away": 1.262663,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 176,
+        "team_sample_sizes": {
+          "home": 144,
+          "away": 34
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-21T18:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 176,
+        "history_latest": "2026-05-09T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040966.json"
+    },
+    {
+      "match_id": "sporttery-2040968",
+      "kickoff": "2026-08-22T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.822141,
+        "lambda_away": 1.556728,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 132,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 68
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.822141,
+        "lambda_away": 1.556728,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 132,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 68
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-21T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 132,
+        "history_latest": "2026-05-17T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040968.json"
+    },
+    {
+      "match_id": "sporttery-2040969",
+      "kickoff": "2026-08-22T03:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.525066,
+        "lambda_away": 1.379322,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.525066,
+        "lambda_away": 1.379322,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-21T19:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040969.json"
+    },
+    {
+      "match_id": "sporttery-2040974",
+      "kickoff": "2026-08-22T17:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.268868,
+        "lambda_away": 1.018868,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 206,
+        "team_sample_sizes": {
+          "home": 106,
+          "away": 106
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.268868,
+        "lambda_away": 1.018868,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 206,
+        "team_sample_sizes": {
+          "home": 106,
+          "away": 106
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-22T09:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 206,
+        "history_latest": "2024-12-08T13:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040974.json"
+    },
+    {
+      "match_id": "sporttery-2040976",
+      "kickoff": "2026-08-22T18:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.397891,
+        "lambda_away": 1.222531,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 138,
+        "team_sample_sizes": {
+          "home": 106,
+          "away": 34
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.397891,
+        "lambda_away": 1.222531,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 138,
+        "team_sample_sizes": {
+          "home": 106,
+          "away": 34
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-22T10:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 138,
+        "history_latest": "2024-12-08T13:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040976.json"
+    },
+    {
+      "match_id": "sporttery-2040978",
+      "kickoff": "2026-08-22T18:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.172565,
+        "lambda_away": 1.367211,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 219,
+        "team_sample_sizes": {
+          "home": 116,
+          "away": 114
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.172565,
+        "lambda_away": 1.367211,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 219,
+        "team_sample_sizes": {
+          "home": 116,
+          "away": 114
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-22T10:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 219,
+        "history_latest": "2024-12-08T13:25:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040978.json"
+    },
+    {
+      "match_id": "sporttery-2040982",
+      "kickoff": "2026-08-22T22:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.418883,
+        "lambda_away": 1.604574,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.418883,
+        "lambda_away": 1.604574,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T14:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T15:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040982.json"
+    },
+    {
+      "match_id": "sporttery-2040983",
+      "kickoff": "2026-08-22T22:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.410114,
+        "lambda_away": 1.580254,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.410114,
+        "lambda_away": 1.580254,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T14:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "history_latest": "2026-05-24T15:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040983.json"
+    },
+    {
+      "match_id": "sporttery-2040984",
+      "kickoff": "2026-08-22T22:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.325757,
+        "lambda_away": 1.669329,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 76,
+        "team_sample_sizes": {
+          "home": 38,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.325757,
+        "lambda_away": 1.669329,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 76,
+        "team_sample_sizes": {
+          "home": 38,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T14:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 76,
+        "history_latest": "2026-05-24T15:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040984.json"
+    },
+    {
+      "match_id": "sporttery-2040986",
+      "kickoff": "2026-08-22T22:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.195591,
+        "lambda_away": 1.843434,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 337,
+        "team_sample_sizes": {
+          "home": 171,
+          "away": 176
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.195591,
+        "lambda_away": 1.843434,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 337,
+        "team_sample_sizes": {
+          "home": 171,
+          "away": 176
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-22T14:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 337,
+        "history_latest": "2026-05-17T20:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040986.json"
+    },
+    {
+      "match_id": "sporttery-2040988",
+      "kickoff": "2026-08-22T23:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.496506,
+        "lambda_away": 1.146464,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.496506,
+        "lambda_away": 1.146464,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T15:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040988.json"
+    },
+    {
+      "match_id": "sporttery-2040989",
+      "kickoff": "2026-08-22T23:15:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.808744,
+        "lambda_away": 1.278994,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 132,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 68
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.808744,
+        "lambda_away": 1.278994,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 132,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 68
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T15:15:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 132,
+        "history_latest": "2026-05-17T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-22\\sporttery-2040989.json"
+    },
+    {
+      "match_id": "sporttery-2040991",
+      "kickoff": "2026-08-23T00:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.193689,
+        "lambda_away": 1.537347,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.193689,
+        "lambda_away": 1.537347,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T16:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T18:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040991.json"
+    },
+    {
+      "match_id": "sporttery-2040993",
+      "kickoff": "2026-08-23T01:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.365282,
+        "lambda_away": 1.458948,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.365282,
+        "lambda_away": 1.458948,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T17:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040993.json"
+    },
+    {
+      "match_id": "sporttery-2040995",
+      "kickoff": "2026-08-23T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.061349,
+        "lambda_away": 1.473277,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.061349,
+        "lambda_away": 1.473277,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T18:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040995.json"
+    },
+    {
+      "match_id": "sporttery-2040996",
+      "kickoff": "2026-08-23T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.362304,
+        "lambda_away": 1.449181,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.362304,
+        "lambda_away": 1.449181,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T18:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040996.json"
+    },
+    {
+      "match_id": "sporttery-2040997",
+      "kickoff": "2026-08-23T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.613086,
+        "lambda_away": 1.49962,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 100,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 34
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.613086,
+        "lambda_away": 1.49962,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 100,
+        "team_sample_sizes": {
+          "home": 68,
+          "away": 34
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 100,
+        "history_latest": "2026-05-17T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040997.json"
+    },
+    {
+      "match_id": "sporttery-2040998",
+      "kickoff": "2026-08-23T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.462916,
+        "lambda_away": 1.507732,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 131,
+        "team_sample_sizes": {
+          "home": 67,
+          "away": 68
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.462916,
+        "lambda_away": 1.507732,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 131,
+        "team_sample_sizes": {
+          "home": 67,
+          "away": 68
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 131,
+        "history_latest": "2026-05-17T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040998.json"
+    },
+    {
+      "match_id": "sporttery-2040999",
+      "kickoff": "2026-08-23T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.198127,
+        "lambda_away": 1.916295,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.198127,
+        "lambda_away": 1.916295,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-22T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2040999.json"
+    },
+    {
+      "match_id": "sporttery-2041000",
+      "kickoff": "2026-08-23T09:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.390438,
+        "lambda_away": 1.433267,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 970,
+        "team_sample_sizes": {
+          "home": 502,
+          "away": 502
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.390438,
+        "lambda_away": 1.433267,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 970,
+        "team_sample_sizes": {
+          "home": 502,
+          "away": 502
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T01:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 970,
+        "history_latest": "2026-08-02T03:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041000.json"
+    },
+    {
+      "match_id": "sporttery-2041001",
+      "kickoff": "2026-08-23T18:15:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.666755,
+        "lambda_away": 1.494715,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 183,
+        "team_sample_sizes": {
+          "home": 172,
+          "away": 11
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.666755,
+        "lambda_away": 1.494715,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 183,
+        "team_sample_sizes": {
+          "home": 172,
+          "away": 11
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T10:15:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 183,
+        "history_latest": "2026-05-17T20:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041001.json"
+    },
+    {
+      "match_id": "sporttery-2041002",
+      "kickoff": "2026-08-23T18:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.234111,
+        "lambda_away": 1.103029,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 142,
+        "team_sample_sizes": {
+          "home": 38,
+          "away": 106
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.234111,
+        "lambda_away": 1.103029,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 142,
+        "team_sample_sizes": {
+          "home": 38,
+          "away": 106
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T10:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 142,
+        "history_latest": "2024-12-08T13:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041002.json"
+    },
+    {
+      "match_id": "sporttery-2041003",
+      "kickoff": "2026-08-23T18:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.319629,
+        "lambda_away": 1.300177,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 187,
+        "team_sample_sizes": {
+          "home": 78,
+          "away": 116
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.319629,
+        "lambda_away": 1.300177,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 187,
+        "team_sample_sizes": {
+          "home": 78,
+          "away": 116
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T10:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 187,
+        "history_latest": "2024-11-24T13:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041003.json"
+    },
+    {
+      "match_id": "sporttery-2041004",
+      "kickoff": "2026-08-23T19:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 0.975932,
+        "lambda_away": 1.402174,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 410,
+        "team_sample_sizes": {
+          "home": 322,
+          "away": 92
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 0.975932,
+        "lambda_away": 1.402174,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 410,
+        "team_sample_sizes": {
+          "home": 322,
+          "away": 92
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T11:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 410,
+        "history_latest": "2026-05-02T12:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041004.json"
+    },
+    {
+      "match_id": "sporttery-2041006",
+      "kickoff": "2026-08-23T20:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.273026,
+        "lambda_away": 1.552632,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 293,
+        "team_sample_sizes": {
+          "home": 152,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.273026,
+        "lambda_away": 1.552632,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 293,
+        "team_sample_sizes": {
+          "home": 152,
+          "away": 152
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T12:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 293,
+        "history_latest": "2026-05-31T20:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041006.json"
+    },
+    {
+      "match_id": "sporttery-2041007",
+      "kickoff": "2026-08-23T20:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.737949,
+        "lambda_away": 1.269277,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 211,
+        "team_sample_sizes": {
+          "home": 143,
+          "away": 75
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.737949,
+        "lambda_away": 1.269277,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 211,
+        "team_sample_sizes": {
+          "home": 143,
+          "away": 75
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T12:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 211,
+        "history_latest": "2026-06-28T00:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041007.json"
+    },
+    {
+      "match_id": "sporttery-2041020",
+      "kickoff": "2026-08-24T01:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.094118,
+        "lambda_away": 1.288971,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "team_sample_sizes": {
+          "home": 136,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.094118,
+        "lambda_away": 1.288971,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "team_sample_sizes": {
+          "home": 136,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T17:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 298,
+        "history_latest": "2026-05-17T03:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041020.json"
+    },
+    {
+      "match_id": "sporttery-2041022",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.198916,
+        "lambda_away": 1.654452,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.198916,
+        "lambda_away": 1.654452,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-23T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T18:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041022.json"
+    },
+    {
+      "match_id": "sporttery-2041023",
+      "kickoff": "2026-08-24T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.78063,
+        "lambda_away": 1.250466,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.78063,
+        "lambda_away": 1.250466,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-23T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "history_latest": "2026-05-24T13:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041023.json"
+    },
+    {
+      "match_id": "sporttery-2041024",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.250143,
+        "lambda_away": 2.217021,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 38,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.250143,
+        "lambda_away": 2.217021,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 38,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-23T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041024.json"
+    },
+    {
+      "match_id": "sporttery-2041025",
+      "kickoff": "2026-08-24T03:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.785294,
+        "lambda_away": 0.944118,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 330,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.785294,
+        "lambda_away": 0.944118,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 330,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 170
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T19:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 330,
+        "history_latest": "2026-05-17T01:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041025.json"
+    },
+    {
+      "match_id": "sporttery-2041026",
+      "kickoff": "2026-08-24T04:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.378441,
+        "lambda_away": 1.523216,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 880,
+        "team_sample_sizes": {
+          "home": 500,
+          "away": 408
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.378441,
+        "lambda_away": 1.523216,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 880,
+        "team_sample_sizes": {
+          "home": 500,
+          "away": 408
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T20:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 880,
+        "history_latest": "2026-08-08T21:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041026.json"
+    },
+    {
+      "match_id": "sporttery-2041027",
+      "kickoff": "2026-08-24T05:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.218726,
+        "lambda_away": 1.299424,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 571,
+        "team_sample_sizes": {
+          "home": 515,
+          "away": 59
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.218726,
+        "lambda_away": 1.299424,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 571,
+        "team_sample_sizes": {
+          "home": 515,
+          "away": 59
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-23T21:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 571,
+        "history_latest": "2026-08-09T22:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-23\\sporttery-2041027.json"
+    },
+    {
+      "match_id": "sporttery-2041028",
+      "kickoff": "2026-08-25T00:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.313887,
+        "lambda_away": 1.34066,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.313887,
+        "lambda_away": 1.34066,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-24T16:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-23T18:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041028.json"
+    },
+    {
+      "match_id": "sporttery-2041030",
+      "kickoff": "2026-08-25T01:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.470199,
+        "lambda_away": 1.327815,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 292,
+        "team_sample_sizes": {
+          "home": 151,
+          "away": 151
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.470199,
+        "lambda_away": 1.327815,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 292,
+        "team_sample_sizes": {
+          "home": 151,
+          "away": 151
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-24T17:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 292,
+        "history_latest": "2026-05-30T21:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041030.json"
+    },
+    {
+      "match_id": "sporttery-2041031",
+      "kickoff": "2026-08-25T01:30:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.540778,
+        "lambda_away": 1.508902,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.540778,
+        "lambda_away": 1.508902,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 38
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-24T17:30:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 112,
+        "history_latest": "2026-05-23T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041031.json"
+    },
+    {
+      "match_id": "sporttery-2041033",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.506128,
+        "lambda_away": 1.295635,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.506128,
+        "lambda_away": 1.295635,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-24T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T18:45:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041033.json"
+    },
+    {
+      "match_id": "sporttery-2041034",
+      "kickoff": "2026-08-25T02:45:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.414828,
+        "lambda_away": 1.136234,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 176,
+        "team_sample_sizes": {
+          "home": 34,
+          "away": 144
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.414828,
+        "lambda_away": 1.136234,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 176,
+        "team_sample_sizes": {
+          "home": 34,
+          "away": 144
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-24T18:45:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 176,
+        "history_latest": "2026-05-09T19:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041034.json"
+    },
+    {
+      "match_id": "sporttery-2041035",
+      "kickoff": "2026-08-25T03:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.447133,
+        "lambda_away": 1.680303,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.447133,
+        "lambda_away": 1.680303,
+        "weight": 0.05,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "team_sample_sizes": {
+          "home": 76,
+          "away": 76
+        },
+        "note": "开球前历史滚动xG生成λ候选"
+      },
+      "routing_audit": {
+        "route": "understat_xg",
+        "as_of": "2026-08-24T19:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "understat_rolling_xg",
+        "sample_legs": 148,
+        "history_latest": "2026-05-24T15:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041035.json"
+    },
+    {
+      "match_id": "sporttery-2041036",
+      "kickoff": "2026-08-25T03:15:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.286147,
+        "lambda_away": 1.157928,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 300,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 138
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.286147,
+        "lambda_away": 1.157928,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 300,
+        "team_sample_sizes": {
+          "home": 170,
+          "away": 138
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-24T19:15:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 300,
+        "history_latest": "2026-05-29T03:00:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041036.json"
+    },
+    {
+      "match_id": "sporttery-2041038",
+      "kickoff": "2026-08-25T07:00:00+08:00",
+      "saved_prior": {
+        "lambda_home": 1.158189,
+        "lambda_away": 1.193681,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 934,
+        "team_sample_sizes": {
+          "home": 477,
+          "away": 478
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "status": "equivalent",
+      "replayed_prior": {
+        "lambda_home": 1.158189,
+        "lambda_away": 1.193681,
+        "weight": 0.02,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 934,
+        "team_sample_sizes": {
+          "home": 477,
+          "away": 478
+        },
+        "note": "开球前APIfootball Finished历史进球生成λ候选"
+      },
+      "routing_audit": {
+        "route": "apifootball_goals_only",
+        "as_of": "2026-08-24T23:00:00+00:00",
+        "no_future_leakage": true,
+        "fallback_reason": null,
+        "source": "apifootball_events_goals_only",
+        "sample_legs": 934,
+        "history_latest": "2026-08-09T22:30:00+00:00"
+      },
+      "equivalent": true,
+      "mismatches": [],
+      "job_path": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\jobs\\2026-08-24\\sporttery-2041038.json"
+    }
+  ],
+  "note": "equivalent仅证明当前时间过滤路由可从历史源重建相同λ；不改写原工单。"
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "league-history-backfill-audit-1.0",
+  "league": "日乙",
+  "provider": "api-sports.io",
+  "league_id": 99,
+  "source_type": "event_result",
+  "seasons_requested": [2021, 2022, 2023, 2024, 2025, 2026],
+  "rows": 2538,
+  "finished_with_score": 2188,
+  "not_started_or_missing_score": 350,
+  "duplicate_match_ids": 0,
+  "season_rows": {
+    "2021": 462,
+    "2022": 465,
+    "2023": 465,
+    "2024": 383,
+    "2025": 383,
+    "2026": 380
+  },
+  "kickoff_range": {
+    "min": "2021-02-27T05:00:00",
+    "max": "2027-05-23T10:00:00"
+  },
+  "quality_decision": "PASS_WITH_FUTURE_FIXTURES_EXCLUDED",
+  "training_eligible_rows": 2188,
+  "limitations": [
+    "API-Sports赛果源不含体彩历史赔率，不能与closing_market训练口径混合",
+    "2026赛季返回了未来未开赛场次，训练时必须按Finished且有90分钟比分过滤",
+    "当前仅完成历史数据补录，尚未将日乙加入生产模型或current cohort"
+  ],
+  "next_step": "建立fd/apisports_j2训练评估并与频率基线比较"
+}

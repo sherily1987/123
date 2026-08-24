@@ -1,0 +1,145 @@
+{
+  "league": {
+    "id": 99,
+    "slug": "apisports_japan_j2_league",
+    "name": "J2 League"
+  },
+  "eligibility": {
+    "tier": "independent",
+    "reasons": [],
+    "completed_n": 2188,
+    "season_count": 6,
+    "team_id_coverage": 1.0,
+    "team_count": 40,
+    "train_n": 1312,
+    "validation_n": 438,
+    "test_n": 438
+  },
+  "lifecycle": "candidate",
+  "status": "trained",
+  "model_path": "project021_五大联赛APIFootball训练\\03_模型\\apisports_japan_j2_league_candidate.json",
+  "training_quality": {
+    "validation_fit": {
+      "status": "PASS",
+      "eligible_for_candidate": true,
+      "reasons": [],
+      "team_count": 31
+    },
+    "final_fit": {
+      "status": "PASS",
+      "eligible_for_candidate": true,
+      "reasons": [],
+      "team_count": 32
+    }
+  },
+  "validation": {
+    "n": 401,
+    "skip": 36,
+    "model": {
+      "n": 401,
+      "brier_mean": 0.629954,
+      "log_loss": 1.048372,
+      "accuracy_pct": 47.88,
+      "score": {
+        "n_scored": 401,
+        "top1_accuracy_pct": 11.97,
+        "top3_accuracy_pct": 30.42,
+        "top5_accuracy_pct": 49.88
+      }
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 401,
+      "brier_mean": 0.658333,
+      "log_loss": 1.085703,
+      "probs": [
+        0.3688,
+        0.292,
+        0.3392
+      ]
+    },
+    "by_league": {
+      "99": {
+        "n": 401,
+        "model": {
+          "n": 401,
+          "brier_mean": 0.629954,
+          "log_loss": 1.048372,
+          "accuracy_pct": 47.88,
+          "score": {
+            "n_scored": 401,
+            "top1_accuracy_pct": 11.97,
+            "top3_accuracy_pct": 30.42,
+            "top5_accuracy_pct": 49.88
+          }
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  },
+  "test": {
+    "n": 277,
+    "skip": 159,
+    "model": {
+      "n": 277,
+      "brier_mean": 0.648163,
+      "log_loss": 1.073675,
+      "accuracy_pct": 44.4,
+      "score": {
+        "n_scored": 277,
+        "top1_accuracy_pct": 13.72,
+        "top3_accuracy_pct": 33.94,
+        "top5_accuracy_pct": 50.9
+      }
+    },
+    "model_on_baseline_subset": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "market": {
+      "status": "UNAVAILABLE",
+      "reason": "no_pre_match_odds"
+    },
+    "frequency_baseline": {
+      "n": 277,
+      "brier_mean": 0.661582,
+      "log_loss": 1.091246,
+      "probs": [
+        0.3744,
+        0.2791,
+        0.3465
+      ]
+    },
+    "by_league": {
+      "99": {
+        "n": 277,
+        "model": {
+          "n": 277,
+          "brier_mean": 0.648163,
+          "log_loss": 1.073675,
+          "accuracy_pct": 44.4,
+          "score": {
+            "n_scored": 277,
+            "top1_accuracy_pct": 13.72,
+            "top3_accuracy_pct": 33.94,
+            "top5_accuracy_pct": 50.9
+          }
+        },
+        "market": {
+          "status": "UNAVAILABLE",
+          "reason": "no_pre_match_odds"
+        }
+      }
+    }
+  }
+}

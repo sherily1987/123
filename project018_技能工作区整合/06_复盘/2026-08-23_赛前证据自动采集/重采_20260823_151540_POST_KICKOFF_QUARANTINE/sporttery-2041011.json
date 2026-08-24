@@ -1,0 +1,1019 @@
+{
+  "schema_version": "prematch-evidence-snapshot-1.0",
+  "match_id": "sporttery-2041011",
+  "identity": {
+    "home": "不伦瑞克",
+    "away": "柏林联合",
+    "competition": "德国杯",
+    "kickoff": "2026-08-23T21:30:00+08:00",
+    "match_num": null
+  },
+  "collected_at": "2026-08-23T07:18:10+00:00",
+  "facts": {
+    "match_id": 2041011,
+    "home": "不伦瑞克",
+    "away": "柏林联合",
+    "kickoff": "2026-08-23 21:30",
+    "team_ids": {
+      "home": 0,
+      "away": 0
+    },
+    "strength": {
+      "lambda_home": 1.8,
+      "lambda_away": 1.75,
+      "sample_legs": 10,
+      "raw": {
+        "home_goal_avg": 1.9,
+        "away_goal_avg": 2.7,
+        "home_loss_avg": 0.8,
+        "away_loss_avg": 1.7
+      },
+      "status": "VALID",
+      "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+    },
+    "feature": {
+      "goalAvg": {
+        "awayGoalAvgCnt": "2.7",
+        "awayGoalAvgCntRatio": "58.7",
+        "homeGoalAvgCnt": "1.9",
+        "homeGoalAvgCntRatio": "41.3",
+        "totalLegCnt": 10
+      },
+      "lossGoalAvg": {
+        "awayLossGoalAvgCnt": "1.7",
+        "awayLossGoalAvgCntRatio": "68.0",
+        "homeLossGoalAvgCnt": "0.8",
+        "homeLossGoalAvgCntRatio": "32.0",
+        "totalLegCnt": 10
+      },
+      "last": {
+        "awayDrawMatchCnt": 2,
+        "awayLossGoalMatchCnt": 5,
+        "awayScoreRatio": "37",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "57",
+        "homeWinGoalMatchCnt": 5,
+        "totalLegCnt": 10
+      },
+      "eachHomeAway": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 4,
+        "awayScoreRatio": "40",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 4,
+        "homeScoreRatio": "53",
+        "homeWinGoalMatchCnt": 5,
+        "totalLegCnt": 10
+      },
+      "sameHomeAway": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 5,
+        "awayScoreRatio": "19",
+        "awayWinGoalMatchCnt": 1,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 1,
+        "homeScoreRatio": "76",
+        "homeWinGoalMatchCnt": 5,
+        "totalLegCnt": 7
+      },
+      "eachSameHomeAway": {
+        "awayDrawMatchCnt": 2,
+        "awayLossGoalMatchCnt": 6,
+        "awayScoreRatio": "27",
+        "awayWinGoalMatchCnt": 2,
+        "homeDrawMatchCnt": 4,
+        "homeLossGoalMatchCnt": 3,
+        "homeScoreRatio": "43",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      }
+    },
+    "h2h": [
+      {
+        "date": "2022-07-07",
+        "home": "不伦瑞克",
+        "away": "柏林联合",
+        "score_90": "1:0",
+        "score_ht": "-:-",
+        "result": "home",
+        "league_id": 0,
+        "home_team_id": 1015,
+        "away_team_id": 1026
+      },
+      {
+        "date": "2021-03-25",
+        "home": "柏林联合",
+        "away": "不伦瑞克",
+        "score_90": "1:2",
+        "score_ht": "-:-",
+        "result": "home",
+        "league_id": 0,
+        "home_team_id": 1026,
+        "away_team_id": 1015
+      },
+      {
+        "date": "2018-02-18",
+        "home": "不伦瑞克",
+        "away": "柏林联合",
+        "score_90": "1:0",
+        "score_ht": "1:0",
+        "result": "home",
+        "league_id": 0,
+        "home_team_id": 1015,
+        "away_team_id": 1026
+      },
+      {
+        "date": "2017-09-16",
+        "home": "柏林联合",
+        "away": "不伦瑞克",
+        "score_90": "1:1",
+        "score_ht": "0:0",
+        "result": "draw",
+        "league_id": 34,
+        "home_team_id": 1026,
+        "away_team_id": 1015
+      },
+      {
+        "date": "2017-05-09",
+        "home": "不伦瑞克",
+        "away": "柏林联合",
+        "score_90": "3:1",
+        "score_ht": "1:0",
+        "result": "home",
+        "league_id": 34,
+        "home_team_id": 1015,
+        "away_team_id": 1026
+      }
+    ],
+    "h2h_statistics": {
+      "drawMatchCnt": 1,
+      "drawProbability": "20%",
+      "goalCnt": 0,
+      "lossGoalCnt": 0,
+      "lossGoalMatchCnt": 0,
+      "lossProbability": "0%",
+      "netGoal": 0,
+      "sportteryTeamId": 0,
+      "teamId": 0,
+      "teamShortName": "不伦瑞克",
+      "totalLegCnt": 5,
+      "winGoalMatchCnt": 4,
+      "winProbability": "80%"
+    },
+    "recent_home": [
+      {
+        "date": "2026-08-15",
+        "home": "不伦瑞克",
+        "away": "波鸿",
+        "score_90": "0:1",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 163,
+        "away_team_id": 139
+      },
+      {
+        "date": "2026-08-08",
+        "home": "马格德堡",
+        "away": "不伦瑞克",
+        "score_90": "1:6",
+        "score_ht": "0:4",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 163
+      },
+      {
+        "date": "2026-08-01",
+        "home": "不伦瑞克",
+        "away": "La Louvière",
+        "score_90": "0:0",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 163,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-25",
+        "home": "不伦瑞克",
+        "away": "南安普敦",
+        "score_90": "0:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 163,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-15",
+        "home": "不伦瑞克",
+        "away": "Havelse",
+        "score_90": "2:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 163,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-05",
+        "home": "布劳斯维格",
+        "away": "不伦瑞克",
+        "score_90": "0:7",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 163
+      },
+      {
+        "date": "2026-05-17",
+        "home": "沙尔克04",
+        "away": "不伦瑞克",
+        "score_90": "1:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 151,
+        "away_team_id": 163
+      },
+      {
+        "date": "2026-05-09",
+        "home": "不伦瑞克",
+        "away": "德累斯顿",
+        "score_90": "2:1",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 163,
+        "away_team_id": 516
+      },
+      {
+        "date": "2026-05-02",
+        "home": "基尔",
+        "away": "不伦瑞克",
+        "score_90": "2:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 697,
+        "away_team_id": 163
+      },
+      {
+        "date": "2026-04-25",
+        "home": "凯泽",
+        "away": "不伦瑞克",
+        "score_90": "0:2",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 145,
+        "away_team_id": 163
+      }
+    ],
+    "recent_away": [
+      {
+        "date": "2026-08-15",
+        "home": "柏林联合",
+        "away": "伊普斯",
+        "score_90": "2:4",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 1270,
+        "away_team_id": 48
+      },
+      {
+        "date": "2026-08-02",
+        "home": "柏林联合",
+        "away": "卡利亚里",
+        "score_90": "2:2",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 1270,
+        "away_team_id": 120
+      },
+      {
+        "date": "2026-08-01",
+        "home": "德累斯顿",
+        "away": "柏林联合",
+        "score_90": "2:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 1270
+      },
+      {
+        "date": "2026-07-18",
+        "home": "阿劳",
+        "away": "柏林联合",
+        "score_90": "2:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 1270
+      },
+      {
+        "date": "2026-07-18",
+        "home": "温特图尔",
+        "away": "柏林联合",
+        "score_90": "1:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 1270
+      },
+      {
+        "date": "2026-07-12",
+        "home": "耶拿",
+        "away": "柏林联合",
+        "score_90": "2:0",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 1270
+      },
+      {
+        "date": "2026-07-10",
+        "home": "开姆尼茨",
+        "away": "柏林联合",
+        "score_90": "1:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 1270
+      },
+      {
+        "date": "2026-07-04",
+        "home": "奥普迪克",
+        "away": "柏林联合",
+        "score_90": "2:12",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 1270
+      },
+      {
+        "date": "2026-05-16",
+        "home": "柏林联合",
+        "away": "奥格斯堡",
+        "score_90": "4:0",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 1270,
+        "away_team_id": 808
+      },
+      {
+        "date": "2026-05-11",
+        "home": "美因茨",
+        "away": "柏林联合",
+        "score_90": "1:3",
+        "score_ht": "0:1",
+        "league_id": null,
+        "home_team_id": 147,
+        "away_team_id": 1270
+      }
+    ],
+    "injuries": {
+      "home": {
+        "team": "不伦瑞克",
+        "team_id": 1015,
+        "count": 0,
+        "status": "UNAVAILABLE",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [],
+        "list": []
+      },
+      "away": {
+        "team": "柏林联合",
+        "team_id": 1026,
+        "count": 3,
+        "status": "VALID",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [
+          {
+            "name": "伦诺",
+            "pos": "守门员",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "M. Raab",
+            "pos": "守门员",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "埃比舍尔",
+            "pos": "中场",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          }
+        ],
+        "list": [
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 158351,
+            "personName": "伦诺",
+            "playerPositionCode": "Goalkeeper",
+            "playerPositionDesc": "守门员",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "1"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 451280,
+            "personName": "M. Raab",
+            "playerPositionCode": "Goalkeeper",
+            "playerPositionDesc": "守门员",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "31"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 459532,
+            "personName": "埃比舍尔",
+            "playerPositionCode": "Midfielder",
+            "playerPositionDesc": "中场",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "20"
+          }
+        ]
+      }
+    },
+    "tables": [],
+    "players": {
+      "home": {
+        "playerList": [],
+        "sportteryTeamId": 163,
+        "teamId": 1015,
+        "teamShortName": "不伦瑞克",
+        "uniformTeamId": 907
+      },
+      "away": {
+        "playerList": [],
+        "sportteryTeamId": 1270,
+        "teamId": 1026,
+        "teamShortName": "柏林联合",
+        "uniformTeamId": 348
+      }
+    },
+    "future": {
+      "home": {
+        "matchList": [
+          {
+            "awayTeamId": 974,
+            "awayTeamShortName": "柏林赫塔",
+            "gameweek": "3",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 1015,
+            "homeTeamShortName": "不伦瑞克",
+            "matchDateTime": "2026-08-29 00:30:00",
+            "matchId": 2554353,
+            "phaseId": 48636,
+            "phaseName": "Regular Season",
+            "seasonId": 15232,
+            "sportteryAwayTeamId": 144,
+            "sportteryHomeTeamId": 163,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 247,
+            "tournamentShortName": "德乙",
+            "uniformAwayTeamId": 120,
+            "uniformHomeTeamId": 907
+          },
+          {
+            "awayTeamId": 1015,
+            "awayTeamShortName": "不伦瑞克",
+            "gameweek": "4",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 1027,
+            "homeTeamShortName": "奥斯纳",
+            "matchDateTime": "2026-09-06 19:30:00",
+            "matchId": 2554480,
+            "phaseId": 48636,
+            "phaseName": "Regular Season",
+            "seasonId": 15232,
+            "sportteryAwayTeamId": 163,
+            "sportteryHomeTeamId": 0,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 247,
+            "tournamentShortName": "德乙",
+            "uniformAwayTeamId": 907,
+            "uniformHomeTeamId": 170
+          },
+          {
+            "awayTeamId": 995,
+            "awayTeamShortName": "德累斯顿",
+            "gameweek": "5",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 1015,
+            "homeTeamShortName": "不伦瑞克",
+            "matchDateTime": "2026-09-12 19:00:00",
+            "matchId": 2554344,
+            "phaseId": 48636,
+            "phaseName": "Regular Season",
+            "seasonId": 15232,
+            "sportteryAwayTeamId": 516,
+            "sportteryHomeTeamId": 163,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 247,
+            "tournamentShortName": "德乙",
+            "uniformAwayTeamId": 479,
+            "uniformHomeTeamId": 907
+          },
+          {
+            "awayTeamId": 1015,
+            "awayTeamShortName": "不伦瑞克",
+            "gameweek": "6",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 973,
+            "homeTeamShortName": "凯泽",
+            "matchDateTime": "2026-09-19 19:00:00",
+            "matchId": 2554473,
+            "phaseId": 48636,
+            "phaseName": "Regular Season",
+            "seasonId": 15232,
+            "sportteryAwayTeamId": 163,
+            "sportteryHomeTeamId": 145,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 247,
+            "tournamentShortName": "德乙",
+            "uniformAwayTeamId": 907,
+            "uniformHomeTeamId": 701
+          }
+        ],
+        "sportteryTeamId": 163,
+        "teamId": 1015,
+        "teamShortName": "不伦瑞克",
+        "uniformTeamId": 907
+      },
+      "away": {
+        "matchList": [
+          {
+            "awayTeamId": 979,
+            "awayTeamShortName": "法兰克福",
+            "gameweek": "1",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 1026,
+            "homeTeamShortName": "柏林联合",
+            "matchDateTime": "2026-08-29 21:30:00",
+            "matchId": 2554016,
+            "phaseId": 48637,
+            "phaseName": "Regular Season",
+            "seasonId": 15235,
+            "sportteryAwayTeamId": 0,
+            "sportteryHomeTeamId": 1270,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 78,
+            "tournamentShortName": "德甲",
+            "uniformAwayTeamId": 538,
+            "uniformHomeTeamId": 348
+          },
+          {
+            "awayTeamId": 1026,
+            "awayTeamShortName": "柏林联合",
+            "gameweek": "2",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 963,
+            "homeTeamShortName": "勒沃库森",
+            "matchDateTime": "2026-09-05 21:30:00",
+            "matchId": 2554011,
+            "phaseId": 48637,
+            "phaseName": "Regular Season",
+            "seasonId": 15235,
+            "sportteryAwayTeamId": 1270,
+            "sportteryHomeTeamId": 146,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 78,
+            "tournamentShortName": "德甲",
+            "uniformAwayTeamId": 348,
+            "uniformHomeTeamId": 195
+          },
+          {
+            "awayTeamId": 966,
+            "awayTeamShortName": "沙尔克04",
+            "gameweek": "3",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 1026,
+            "homeTeamShortName": "柏林联合",
+            "matchDateTime": "2026-09-12 02:30:00",
+            "matchId": 2553998,
+            "phaseId": 48637,
+            "phaseName": "Regular Season",
+            "seasonId": 15235,
+            "sportteryAwayTeamId": 0,
+            "sportteryHomeTeamId": 1270,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 78,
+            "tournamentShortName": "德甲",
+            "uniformAwayTeamId": 191,
+            "uniformHomeTeamId": 348
+          },
+          {
+            "awayTeamId": 1026,
+            "awayTeamShortName": "柏林联合",
+            "gameweek": "4",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 961,
+            "homeTeamShortName": "拜仁",
+            "matchDateTime": "2026-09-19 02:30:00",
+            "matchId": 2553995,
+            "phaseId": 48637,
+            "phaseName": "Regular Season",
+            "seasonId": 15235,
+            "sportteryAwayTeamId": 0,
+            "sportteryHomeTeamId": 137,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 78,
+            "tournamentShortName": "德甲",
+            "uniformAwayTeamId": 348,
+            "uniformHomeTeamId": 197
+          }
+        ],
+        "sportteryTeamId": 1270,
+        "teamId": 1026,
+        "teamShortName": "柏林联合",
+        "uniformTeamId": 348
+      }
+    },
+    "available": true
+  },
+  "evidence_audit": {
+    "schema_version": "evidence-audit-1.1",
+    "critical_fields": [
+      "team_stats",
+      "recent_form",
+      "injury",
+      "suspensions",
+      "starting_xi"
+    ],
+    "entries": {
+      "team_stats": {
+        "status": "VALID",
+        "value": {
+          "strength": {
+            "lambda_home": 1.8,
+            "lambda_away": 1.75,
+            "sample_legs": 10,
+            "raw": {
+              "home_goal_avg": 1.9,
+              "away_goal_avg": 2.7,
+              "home_loss_avg": 0.8,
+              "away_loss_avg": 1.7
+            },
+            "status": "VALID",
+            "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+          },
+          "feature": {
+            "goalAvg": {
+              "awayGoalAvgCnt": "2.7",
+              "awayGoalAvgCntRatio": "58.7",
+              "homeGoalAvgCnt": "1.9",
+              "homeGoalAvgCntRatio": "41.3",
+              "totalLegCnt": 10
+            },
+            "lossGoalAvg": {
+              "awayLossGoalAvgCnt": "1.7",
+              "awayLossGoalAvgCntRatio": "68.0",
+              "homeLossGoalAvgCnt": "0.8",
+              "homeLossGoalAvgCntRatio": "32.0",
+              "totalLegCnt": 10
+            },
+            "last": {
+              "awayDrawMatchCnt": 2,
+              "awayLossGoalMatchCnt": 5,
+              "awayScoreRatio": "37",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "57",
+              "homeWinGoalMatchCnt": 5,
+              "totalLegCnt": 10
+            },
+            "eachHomeAway": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 4,
+              "awayScoreRatio": "40",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 4,
+              "homeScoreRatio": "53",
+              "homeWinGoalMatchCnt": 5,
+              "totalLegCnt": 10
+            },
+            "sameHomeAway": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 5,
+              "awayScoreRatio": "19",
+              "awayWinGoalMatchCnt": 1,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 1,
+              "homeScoreRatio": "76",
+              "homeWinGoalMatchCnt": 5,
+              "totalLegCnt": 7
+            },
+            "eachSameHomeAway": {
+              "awayDrawMatchCnt": 2,
+              "awayLossGoalMatchCnt": 6,
+              "awayScoreRatio": "27",
+              "awayWinGoalMatchCnt": 2,
+              "homeDrawMatchCnt": 4,
+              "homeLossGoalMatchCnt": 3,
+              "homeScoreRatio": "43",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            }
+          },
+          "home_standing": []
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041011",
+        "refreshed_at": "2026-08-23T07:18:10+00:00",
+        "missing_reason": null
+      },
+      "recent_form": {
+        "status": "PARTIAL",
+        "value": {
+          "home": [
+            {
+              "date": "2026-08-15",
+              "home": "不伦瑞克",
+              "away": "波鸿",
+              "score_90": "0:1",
+              "score_ht": "0:1",
+              "league_id": null,
+              "home_team_id": 163,
+              "away_team_id": 139
+            },
+            {
+              "date": "2026-08-08",
+              "home": "马格德堡",
+              "away": "不伦瑞克",
+              "score_90": "1:6",
+              "score_ht": "0:4",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 163
+            },
+            {
+              "date": "2026-08-01",
+              "home": "不伦瑞克",
+              "away": "La Louvière",
+              "score_90": "0:0",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 163,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-07-25",
+              "home": "不伦瑞克",
+              "away": "南安普敦",
+              "score_90": "0:1",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 163,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-07-15",
+              "home": "不伦瑞克",
+              "away": "Havelse",
+              "score_90": "2:1",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 163,
+              "away_team_id": 0
+            }
+          ],
+          "away": [
+            {
+              "date": "2026-08-15",
+              "home": "柏林联合",
+              "away": "伊普斯",
+              "score_90": "2:4",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 1270,
+              "away_team_id": 48
+            },
+            {
+              "date": "2026-08-02",
+              "home": "柏林联合",
+              "away": "卡利亚里",
+              "score_90": "2:2",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 1270,
+              "away_team_id": 120
+            },
+            {
+              "date": "2026-08-01",
+              "home": "德累斯顿",
+              "away": "柏林联合",
+              "score_90": "2:1",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 1270
+            },
+            {
+              "date": "2026-07-18",
+              "home": "阿劳",
+              "away": "柏林联合",
+              "score_90": "2:1",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 1270
+            },
+            {
+              "date": "2026-07-18",
+              "home": "温特图尔",
+              "away": "柏林联合",
+              "score_90": "1:1",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 1270
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041011",
+        "refreshed_at": "2026-08-23T07:18:10+00:00",
+        "missing_reason": "RECENT_FORM_SCOPE_UNVERIFIED"
+      },
+      "injury": {
+        "status": "VALID",
+        "value": {
+          "home": {
+            "team": "不伦瑞克",
+            "team_id": 1015,
+            "count": 0,
+            "status": "UNAVAILABLE",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [],
+            "list": []
+          },
+          "away": {
+            "team": "柏林联合",
+            "team_id": 1026,
+            "count": 3,
+            "status": "VALID",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [
+              {
+                "name": "伦诺",
+                "pos": "守门员",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "M. Raab",
+                "pos": "守门员",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "埃比舍尔",
+                "pos": "中场",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              }
+            ],
+            "list": [
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 158351,
+                "personName": "伦诺",
+                "playerPositionCode": "Goalkeeper",
+                "playerPositionDesc": "守门员",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "1"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 451280,
+                "personName": "M. Raab",
+                "playerPositionCode": "Goalkeeper",
+                "playerPositionDesc": "守门员",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "31"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 459532,
+                "personName": "埃比舍尔",
+                "playerPositionCode": "Midfielder",
+                "playerPositionDesc": "中场",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "20"
+              }
+            ]
+          }
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041011",
+        "refreshed_at": "2026-08-23T07:18:10+00:00",
+        "missing_reason": null
+      },
+      "suspensions": {
+        "status": "UNAVAILABLE",
+        "value": {
+          "home": [],
+          "away": []
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041011",
+        "refreshed_at": "2026-08-23T07:18:10+00:00",
+        "missing_reason": "SUSPENSION_ENDPOINT_EMPTY"
+      },
+      "starting_xi": {
+        "status": "PENDING_REFRESH",
+        "value": null,
+        "source_id": "official.lineup.pending",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041011",
+        "refreshed_at": "2026-08-23T07:18:10+00:00",
+        "missing_reason": "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+      }
+    },
+    "missing_fields": [
+      "recent_form",
+      "suspensions",
+      "starting_xi"
+    ],
+    "evidence_gap": true,
+    "evidence_status": "GAP",
+    "evidence_gap_reasons": [
+      "RECENT_FORM_RECENT_FORM_SCOPE_UNVERIFIED",
+      "SUSPENSIONS_SUSPENSION_ENDPOINT_EMPTY",
+      "STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+    ],
+    "kickoff": "2026-08-23T21:30:00+08:00",
+    "collected_at": "2026-08-23T07:18:10+00:00",
+    "lineup_refresh_schedule": [
+      "2026-08-23T19:30:00+08:00",
+      "2026-08-23T20:00:00+08:00",
+      "2026-08-23T20:30:00+08:00",
+      "2026-08-23T20:45:00+08:00",
+      "2026-08-23T21:00:00+08:00",
+      "2026-08-23T21:15:00+08:00"
+    ],
+    "source_policy": {
+      "sporttery_preview": "official pre-match facts",
+      "international": "research_only"
+    }
+  }
+}

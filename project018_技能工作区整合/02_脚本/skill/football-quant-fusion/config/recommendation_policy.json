@@ -4,6 +4,19 @@
  "production_recommendations_disabled_reason": "当前版本及各独立市场尚未分别满足样本量、样本外校准、收益稳定性与发布门禁",
  "recreational_strategy_enabled": true,
  "recreational_allowed_markets_with_pending_lineup": ["HAD", "TTG"],
+ "pre_match_media_evidence": {
+  "enabled": true,
+  "allowed_statuses": ["PREDICTED", "PARTIAL"],
+  "lineup_label": "预计首发（媒体预测，非官方确认）",
+  "absence_label": "预计伤停（媒体预测，非官方确认）",
+  "cross_validation": {
+   "required_for_research_upgrade": true,
+   "minimum_distinct_sources": 2,
+   "same_publisher_domains_count_once": true,
+   "conflict_action": "retain_alternatives_and_keep_risk_flag"
+  },
+  "source_order": ["official_preview", "league_media", "club_media", "specialist_database", "general_media"]
+ },
  "recreational_required_evidence_statuses": {
   "team_stats": ["VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG", "EXPLICIT_XG"],
   "recent_form": ["VALID", "PARTIAL", "OK", "AVAILABLE", "FRESH", "AGING"]

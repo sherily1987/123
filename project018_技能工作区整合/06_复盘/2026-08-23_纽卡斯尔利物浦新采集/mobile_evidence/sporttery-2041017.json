@@ -1,0 +1,1370 @@
+{
+  "schema_version": "prematch-evidence-snapshot-1.0",
+  "match_id": "sporttery-2041017",
+  "identity": {
+    "home": "纽卡斯尔",
+    "away": "利物浦",
+    "competition": "英超",
+    "kickoff": "2026-08-23T23:30:00+08:00",
+    "match_num": null
+  },
+  "collected_at": "2026-08-23T10:16:02+00:00",
+  "facts": {
+    "match_id": 2041017,
+    "home": "纽卡斯尔",
+    "away": "利物浦",
+    "kickoff": "2026-08-23 23:30",
+    "team_ids": {
+      "home": 0,
+      "away": 0
+    },
+    "strength": {
+      "lambda_home": 1.6,
+      "lambda_away": 1.65,
+      "sample_legs": 10,
+      "raw": {
+        "home_goal_avg": 1.4,
+        "away_goal_avg": 1.7,
+        "home_loss_avg": 1.6,
+        "away_loss_avg": 1.8
+      },
+      "status": "VALID",
+      "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+    },
+    "feature": {
+      "goalAvg": {
+        "awayGoalAvgCnt": "1.7",
+        "awayGoalAvgCntRatio": "54.8",
+        "homeGoalAvgCnt": "1.4",
+        "homeGoalAvgCntRatio": "45.2",
+        "totalLegCnt": 10
+      },
+      "lossGoalAvg": {
+        "awayLossGoalAvgCnt": "1.8",
+        "awayLossGoalAvgCntRatio": "52.9",
+        "homeLossGoalAvgCnt": "1.6",
+        "homeLossGoalAvgCntRatio": "47.1",
+        "totalLegCnt": 10
+      },
+      "last": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 1,
+        "awayScoreRatio": "83",
+        "awayWinGoalMatchCnt": 8,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 8,
+        "homeScoreRatio": "13",
+        "homeWinGoalMatchCnt": 1,
+        "totalLegCnt": 10
+      },
+      "eachHomeAway": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 4,
+        "awayScoreRatio": "40",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 3,
+        "homeLossGoalMatchCnt": 4,
+        "homeScoreRatio": "40",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      },
+      "sameHomeAway": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 1,
+        "awayScoreRatio": "70",
+        "awayWinGoalMatchCnt": 6,
+        "homeDrawMatchCnt": 3,
+        "homeLossGoalMatchCnt": 6,
+        "homeScoreRatio": "20",
+        "homeWinGoalMatchCnt": 1,
+        "totalLegCnt": 10
+      },
+      "eachSameHomeAway": {
+        "awayDrawMatchCnt": 0,
+        "awayLossGoalMatchCnt": 7,
+        "awayScoreRatio": "30",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "37",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      }
+    },
+    "h2h": [
+      {
+        "date": "2026-02-01",
+        "home": "利物浦",
+        "away": "纽卡斯尔",
+        "score_90": "4:1",
+        "score_ht": "2:1",
+        "result": "away",
+        "league_id": 25,
+        "home_team_id": 663,
+        "away_team_id": 664
+      },
+      {
+        "date": "2025-08-26",
+        "home": "纽卡斯尔",
+        "away": "利物浦",
+        "score_90": "2:3",
+        "score_ht": "0:1",
+        "result": "away",
+        "league_id": 25,
+        "home_team_id": 664,
+        "away_team_id": 663
+      },
+      {
+        "date": "2025-03-17",
+        "home": "利物浦",
+        "away": "纽卡斯尔",
+        "score_90": "1:2",
+        "score_ht": "0:1",
+        "result": "home",
+        "league_id": 24,
+        "home_team_id": 663,
+        "away_team_id": 664
+      },
+      {
+        "date": "2025-02-27",
+        "home": "利物浦",
+        "away": "纽卡斯尔",
+        "score_90": "2:0",
+        "score_ht": "1:0",
+        "result": "away",
+        "league_id": 25,
+        "home_team_id": 663,
+        "away_team_id": 664
+      },
+      {
+        "date": "2024-12-05",
+        "home": "纽卡斯尔",
+        "away": "利物浦",
+        "score_90": "3:3",
+        "score_ht": "1:0",
+        "result": "draw",
+        "league_id": 25,
+        "home_team_id": 664,
+        "away_team_id": 663
+      }
+    ],
+    "h2h_statistics": {
+      "drawMatchCnt": 1,
+      "drawProbability": "20%",
+      "goalCnt": 0,
+      "lossGoalCnt": 0,
+      "lossGoalMatchCnt": 3,
+      "lossProbability": "60%",
+      "netGoal": 0,
+      "sportteryTeamId": 0,
+      "teamId": 0,
+      "teamShortName": "纽卡斯尔",
+      "totalLegCnt": 5,
+      "winGoalMatchCnt": 1,
+      "winProbability": "20%"
+    },
+    "recent_home": [
+      {
+        "date": "2026-08-16",
+        "home": "纽卡斯尔",
+        "away": "斯特拉斯",
+        "score_90": "1:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 15,
+        "away_team_id": 191
+      },
+      {
+        "date": "2026-08-15",
+        "home": "纽卡斯尔",
+        "away": "勒沃库森",
+        "score_90": "1:2",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 15,
+        "away_team_id": 146
+      },
+      {
+        "date": "2026-08-13",
+        "home": "纽卡斯尔",
+        "away": "埃弗顿",
+        "score_90": "1:3",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 15,
+        "away_team_id": 9
+      },
+      {
+        "date": "2026-08-09",
+        "home": "巴伦西亚",
+        "away": "纽卡斯尔",
+        "score_90": "1:2",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 678,
+        "away_team_id": 15
+      },
+      {
+        "date": "2026-07-30",
+        "home": "布城",
+        "away": "纽卡斯尔",
+        "score_90": "4:1",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 15
+      },
+      {
+        "date": "2026-07-25",
+        "home": "盖茨海德",
+        "away": "纽卡斯尔",
+        "score_90": "1:1",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 15
+      },
+      {
+        "date": "2026-07-18",
+        "home": "纽卡斯尔",
+        "away": "达灵顿",
+        "score_90": "3:0",
+        "score_ht": "",
+        "league_id": null,
+        "home_team_id": 15,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-05-24",
+        "home": "富勒姆",
+        "away": "纽卡斯尔",
+        "score_90": "2:0",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 10,
+        "away_team_id": 15
+      },
+      {
+        "date": "2026-05-18",
+        "home": "纽卡斯尔",
+        "away": "西汉姆联",
+        "score_90": "3:1",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 15,
+        "away_team_id": 62
+      },
+      {
+        "date": "2026-05-10",
+        "home": "诺丁汉",
+        "away": "纽卡斯尔",
+        "score_90": "1:1",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 52,
+        "away_team_id": 15
+      }
+    ],
+    "recent_away": [
+      {
+        "date": "2026-08-17",
+        "home": "利物浦",
+        "away": "科莫",
+        "score_90": "2:0",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-08-16",
+        "home": "利物浦",
+        "away": "科莫",
+        "score_90": "0:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-08-09",
+        "home": "利物浦",
+        "away": "摩纳哥",
+        "score_90": "2:3",
+        "score_ht": "2:1",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-08-03",
+        "home": "利物浦",
+        "away": "利兹联",
+        "score_90": "2:4",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-30",
+        "home": "利物浦",
+        "away": "雷克斯",
+        "score_90": "1:0",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-07-26",
+        "home": "利物浦",
+        "away": "桑德兰",
+        "score_90": "4:2",
+        "score_ht": "1:1",
+        "league_id": null,
+        "home_team_id": 0,
+        "away_team_id": 0
+      },
+      {
+        "date": "2026-05-24",
+        "home": "利物浦",
+        "away": "布伦特",
+        "score_90": "1:1",
+        "score_ht": "0:0",
+        "league_id": null,
+        "home_team_id": 11,
+        "away_team_id": 69
+      },
+      {
+        "date": "2026-05-16",
+        "home": "维拉",
+        "away": "利物浦",
+        "score_90": "4:2",
+        "score_ht": "1:0",
+        "league_id": null,
+        "home_team_id": 2,
+        "away_team_id": 11
+      },
+      {
+        "date": "2026-05-09",
+        "home": "利物浦",
+        "away": "切尔西",
+        "score_90": "1:1",
+        "score_ht": "1:1",
+        "league_id": null,
+        "home_team_id": 11,
+        "away_team_id": 7
+      },
+      {
+        "date": "2026-05-03",
+        "home": "曼联",
+        "away": "利物浦",
+        "score_90": "3:2",
+        "score_ht": "2:0",
+        "league_id": null,
+        "home_team_id": 13,
+        "away_team_id": 11
+      }
+    ],
+    "injuries": {
+      "home": {
+        "team": "纽卡斯尔",
+        "team_id": 664,
+        "count": 1,
+        "status": "VALID",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [
+          {
+            "name": "班巴",
+            "pos": "中场",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          }
+        ],
+        "list": [
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 878463,
+            "personName": "班巴",
+            "playerPositionCode": "Midfielder",
+            "playerPositionDesc": "中场",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "8"
+          }
+        ]
+      },
+      "away": {
+        "team": "利物浦",
+        "team_id": 663,
+        "count": 6,
+        "status": "VALID",
+        "confirmed_no_absence": false,
+        "attack_absence": 0.0,
+        "defense_absence": 0.0,
+        "gk_absence": 0.0,
+        "players": [
+          {
+            "name": "F. Woodman",
+            "pos": "守门员",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "R. Araújo",
+            "pos": "后卫",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "亚罗什",
+            "pos": "守门员",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "H. Ekitike",
+            "pos": "前锋",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "C.布拉德利",
+            "pos": "后卫",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          },
+          {
+            "name": "G. Leoni",
+            "pos": "后卫",
+            "apps": 0,
+            "starts": 0,
+            "type": "伤",
+            "weight": 0.0
+          }
+        ],
+        "list": [
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 274762,
+            "personName": "F. Woodman",
+            "playerPositionCode": "Goalkeeper",
+            "playerPositionDesc": "守门员",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "28"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 459276,
+            "personName": "R. Araújo",
+            "playerPositionCode": "Defender",
+            "playerPositionDesc": "后卫",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "33"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 499173,
+            "personName": "亚罗什",
+            "playerPositionCode": "Goalkeeper",
+            "playerPositionDesc": "守门员",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "56"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 624582,
+            "personName": "H. Ekitike",
+            "playerPositionCode": "Attacker",
+            "playerPositionDesc": "前锋",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "22"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 632251,
+            "personName": "C.布拉德利",
+            "playerPositionCode": "Defender",
+            "playerPositionDesc": "后卫",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "12"
+          },
+          {
+            "appearanceCnt": 0,
+            "injuryFlag": 1,
+            "personId": 780973,
+            "personName": "G. Leoni",
+            "playerPositionCode": "Defender",
+            "playerPositionDesc": "后卫",
+            "startedMatchCnt": 0,
+            "substituteMatchCnt": 0,
+            "suspensionFlag": 0,
+            "uniformNo": "15"
+          }
+        ]
+      }
+    },
+    "tables": [
+      {
+        "drawMatchCnt": 0,
+        "groupId": 0,
+        "groupName": "",
+        "lossGoalMatchCnt": 0,
+        "phaseName": "",
+        "points": "0",
+        "ranking": "14",
+        "sportteryTeamId": 15,
+        "teamId": 0,
+        "teamShortName": "纽卡斯尔",
+        "totalLegCnt": 0,
+        "uniformTeamId": 359,
+        "winGoalMatchCnt": 0,
+        "winProbability": "0%"
+      },
+      {
+        "drawMatchCnt": 0,
+        "groupId": 0,
+        "groupName": "",
+        "lossGoalMatchCnt": 0,
+        "phaseName": "",
+        "points": "0",
+        "ranking": "12",
+        "sportteryTeamId": 11,
+        "teamId": 0,
+        "teamShortName": "利物浦",
+        "totalLegCnt": 0,
+        "uniformTeamId": 361,
+        "winGoalMatchCnt": 0,
+        "winProbability": "0%"
+      }
+    ],
+    "players": {
+      "home": {
+        "playerList": [],
+        "sportteryTeamId": 15,
+        "teamId": 664,
+        "teamShortName": "纽卡斯尔",
+        "uniformTeamId": 359
+      },
+      "away": {
+        "playerList": [],
+        "sportteryTeamId": 11,
+        "teamId": 663,
+        "teamShortName": "利物浦",
+        "uniformTeamId": 361
+      }
+    },
+    "future": {
+      "home": {
+        "matchList": [
+          {
+            "awayTeamId": 678,
+            "awayTeamShortName": "西布罗姆",
+            "gameweek": "",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 664,
+            "homeTeamShortName": "纽卡斯尔",
+            "matchDateTime": "2026-08-27 02:45:00",
+            "matchId": 2616481,
+            "phaseId": 48472,
+            "phaseName": "2nd Round",
+            "seasonId": 14884,
+            "sportteryAwayTeamId": 20,
+            "sportteryHomeTeamId": 15,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 585,
+            "tournamentShortName": "英联赛杯",
+            "uniformAwayTeamId": 206,
+            "uniformHomeTeamId": 359
+          },
+          {
+            "awayTeamId": 664,
+            "awayTeamShortName": "纽卡斯尔",
+            "gameweek": "2",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 675,
+            "homeTeamShortName": "热刺",
+            "matchDateTime": "2026-08-30 00:30:00",
+            "matchId": 2535544,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 15,
+            "sportteryHomeTeamId": 19,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 359,
+            "uniformHomeTeamId": 214
+          },
+          {
+            "awayTeamId": 711,
+            "awayTeamShortName": "伯恩茅斯",
+            "gameweek": "3",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 664,
+            "homeTeamShortName": "纽卡斯尔",
+            "matchDateTime": "2026-09-05 19:30:00",
+            "matchId": 2535535,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 67,
+            "sportteryHomeTeamId": 15,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 295,
+            "uniformHomeTeamId": 359
+          },
+          {
+            "awayTeamId": 664,
+            "awayTeamShortName": "纽卡斯尔",
+            "gameweek": "4",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 681,
+            "homeTeamShortName": "利兹联",
+            "matchDateTime": "2026-09-15 03:00:00",
+            "matchId": 2535528,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 15,
+            "sportteryHomeTeamId": 49,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 359,
+            "uniformHomeTeamId": 448
+          }
+        ],
+        "sportteryTeamId": 15,
+        "teamId": 664,
+        "teamShortName": "纽卡斯尔",
+        "uniformTeamId": 359
+      },
+      "away": {
+        "matchList": [
+          {
+            "awayTeamId": 694,
+            "awayTeamShortName": "诺丁汉",
+            "gameweek": "2",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 663,
+            "homeTeamShortName": "利物浦",
+            "matchDateTime": "2026-08-29 19:30:00",
+            "matchId": 2535547,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 52,
+            "sportteryHomeTeamId": 11,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 505,
+            "uniformHomeTeamId": 361
+          },
+          {
+            "awayTeamId": 663,
+            "awayTeamShortName": "利物浦",
+            "gameweek": "3",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 685,
+            "homeTeamShortName": "伊普斯",
+            "matchDateTime": "2026-09-05 03:00:00",
+            "matchId": 2535537,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 11,
+            "sportteryHomeTeamId": 48,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 361,
+            "uniformHomeTeamId": 507
+          },
+          {
+            "awayTeamId": 667,
+            "awayTeamShortName": "富勒姆",
+            "gameweek": "4",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 663,
+            "homeTeamShortName": "利物浦",
+            "matchDateTime": "2026-09-12 22:00:00",
+            "matchId": 2535527,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 0,
+            "sportteryHomeTeamId": 0,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 24,
+            "uniformHomeTeamId": 361
+          },
+          {
+            "awayTeamId": 663,
+            "awayTeamShortName": "利物浦",
+            "gameweek": "5",
+            "groupId": 0,
+            "groupName": "",
+            "homeTeamId": 711,
+            "homeTeamShortName": "伯恩茅斯",
+            "matchDateTime": "2026-09-20 21:00:00",
+            "matchId": 2535523,
+            "phaseId": 48677,
+            "phaseName": "Regular Season",
+            "seasonId": 15374,
+            "sportteryAwayTeamId": 11,
+            "sportteryHomeTeamId": 67,
+            "sportteryMatchId": 0,
+            "sportteryTournamentId": 0,
+            "tournamentId": 127,
+            "tournamentShortName": "英超",
+            "uniformAwayTeamId": 361,
+            "uniformHomeTeamId": 295
+          }
+        ],
+        "sportteryTeamId": 11,
+        "teamId": 663,
+        "teamShortName": "利物浦",
+        "uniformTeamId": 361
+      }
+    },
+    "available": true,
+    "feature_analysis": {
+      "source_field_map": {
+        "goals_avg": "feature.goalAvg",
+        "conceded_avg": "feature.lossGoalAvg",
+        "h2h_last7": "feature.last",
+        "recent_home_away": "feature.eachHomeAway",
+        "same_home_away_recent": "feature.sameHomeAway",
+        "same_home_away_extended": "feature.eachSameHomeAway"
+      },
+      "goals_avg": {
+        "awayGoalAvgCnt": "1.7",
+        "awayGoalAvgCntRatio": "54.8",
+        "homeGoalAvgCnt": "1.4",
+        "homeGoalAvgCntRatio": "45.2",
+        "totalLegCnt": 10
+      },
+      "conceded_avg": {
+        "awayLossGoalAvgCnt": "1.8",
+        "awayLossGoalAvgCntRatio": "52.9",
+        "homeLossGoalAvgCnt": "1.6",
+        "homeLossGoalAvgCntRatio": "47.1",
+        "totalLegCnt": 10
+      },
+      "h2h_last7": {
+        "awayDrawMatchCnt": 1,
+        "awayLossGoalMatchCnt": 1,
+        "awayScoreRatio": "83",
+        "awayWinGoalMatchCnt": 8,
+        "homeDrawMatchCnt": 1,
+        "homeLossGoalMatchCnt": 8,
+        "homeScoreRatio": "13",
+        "homeWinGoalMatchCnt": 1,
+        "totalLegCnt": 10
+      },
+      "recent_home_away": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 4,
+        "awayScoreRatio": "40",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 3,
+        "homeLossGoalMatchCnt": 4,
+        "homeScoreRatio": "40",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      },
+      "same_home_away_recent": {
+        "awayDrawMatchCnt": 3,
+        "awayLossGoalMatchCnt": 1,
+        "awayScoreRatio": "70",
+        "awayWinGoalMatchCnt": 6,
+        "homeDrawMatchCnt": 3,
+        "homeLossGoalMatchCnt": 6,
+        "homeScoreRatio": "20",
+        "homeWinGoalMatchCnt": 1,
+        "totalLegCnt": 10
+      },
+      "same_home_away_extended": {
+        "awayDrawMatchCnt": 0,
+        "awayLossGoalMatchCnt": 7,
+        "awayScoreRatio": "30",
+        "awayWinGoalMatchCnt": 3,
+        "homeDrawMatchCnt": 2,
+        "homeLossGoalMatchCnt": 5,
+        "homeScoreRatio": "37",
+        "homeWinGoalMatchCnt": 3,
+        "totalLegCnt": 10
+      }
+    }
+  },
+  "evidence_audit": {
+    "schema_version": "evidence-audit-1.1",
+    "critical_fields": [
+      "team_stats",
+      "recent_form",
+      "injury",
+      "suspensions",
+      "starting_xi"
+    ],
+    "entries": {
+      "team_stats": {
+        "status": "VALID",
+        "value": {
+          "strength": {
+            "lambda_home": 1.6,
+            "lambda_away": 1.65,
+            "sample_legs": 10,
+            "raw": {
+              "home_goal_avg": 1.4,
+              "away_goal_avg": 1.7,
+              "home_loss_avg": 1.6,
+              "away_loss_avg": 1.8
+            },
+            "status": "VALID",
+            "note": "近10场统计，未做对手强度调整；属公开信息，与市场高度重叠"
+          },
+          "feature": {
+            "goalAvg": {
+              "awayGoalAvgCnt": "1.7",
+              "awayGoalAvgCntRatio": "54.8",
+              "homeGoalAvgCnt": "1.4",
+              "homeGoalAvgCntRatio": "45.2",
+              "totalLegCnt": 10
+            },
+            "lossGoalAvg": {
+              "awayLossGoalAvgCnt": "1.8",
+              "awayLossGoalAvgCntRatio": "52.9",
+              "homeLossGoalAvgCnt": "1.6",
+              "homeLossGoalAvgCntRatio": "47.1",
+              "totalLegCnt": 10
+            },
+            "last": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 1,
+              "awayScoreRatio": "83",
+              "awayWinGoalMatchCnt": 8,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 8,
+              "homeScoreRatio": "13",
+              "homeWinGoalMatchCnt": 1,
+              "totalLegCnt": 10
+            },
+            "eachHomeAway": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 4,
+              "awayScoreRatio": "40",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 3,
+              "homeLossGoalMatchCnt": 4,
+              "homeScoreRatio": "40",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            },
+            "sameHomeAway": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 1,
+              "awayScoreRatio": "70",
+              "awayWinGoalMatchCnt": 6,
+              "homeDrawMatchCnt": 3,
+              "homeLossGoalMatchCnt": 6,
+              "homeScoreRatio": "20",
+              "homeWinGoalMatchCnt": 1,
+              "totalLegCnt": 10
+            },
+            "eachSameHomeAway": {
+              "awayDrawMatchCnt": 0,
+              "awayLossGoalMatchCnt": 7,
+              "awayScoreRatio": "30",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "37",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            }
+          },
+          "feature_analysis": {
+            "source_field_map": {
+              "goals_avg": "feature.goalAvg",
+              "conceded_avg": "feature.lossGoalAvg",
+              "h2h_last7": "feature.last",
+              "recent_home_away": "feature.eachHomeAway",
+              "same_home_away_recent": "feature.sameHomeAway",
+              "same_home_away_extended": "feature.eachSameHomeAway"
+            },
+            "goals_avg": {
+              "awayGoalAvgCnt": "1.7",
+              "awayGoalAvgCntRatio": "54.8",
+              "homeGoalAvgCnt": "1.4",
+              "homeGoalAvgCntRatio": "45.2",
+              "totalLegCnt": 10
+            },
+            "conceded_avg": {
+              "awayLossGoalAvgCnt": "1.8",
+              "awayLossGoalAvgCntRatio": "52.9",
+              "homeLossGoalAvgCnt": "1.6",
+              "homeLossGoalAvgCntRatio": "47.1",
+              "totalLegCnt": 10
+            },
+            "h2h_last7": {
+              "awayDrawMatchCnt": 1,
+              "awayLossGoalMatchCnt": 1,
+              "awayScoreRatio": "83",
+              "awayWinGoalMatchCnt": 8,
+              "homeDrawMatchCnt": 1,
+              "homeLossGoalMatchCnt": 8,
+              "homeScoreRatio": "13",
+              "homeWinGoalMatchCnt": 1,
+              "totalLegCnt": 10
+            },
+            "recent_home_away": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 4,
+              "awayScoreRatio": "40",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 3,
+              "homeLossGoalMatchCnt": 4,
+              "homeScoreRatio": "40",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            },
+            "same_home_away_recent": {
+              "awayDrawMatchCnt": 3,
+              "awayLossGoalMatchCnt": 1,
+              "awayScoreRatio": "70",
+              "awayWinGoalMatchCnt": 6,
+              "homeDrawMatchCnt": 3,
+              "homeLossGoalMatchCnt": 6,
+              "homeScoreRatio": "20",
+              "homeWinGoalMatchCnt": 1,
+              "totalLegCnt": 10
+            },
+            "same_home_away_extended": {
+              "awayDrawMatchCnt": 0,
+              "awayLossGoalMatchCnt": 7,
+              "awayScoreRatio": "30",
+              "awayWinGoalMatchCnt": 3,
+              "homeDrawMatchCnt": 2,
+              "homeLossGoalMatchCnt": 5,
+              "homeScoreRatio": "37",
+              "homeWinGoalMatchCnt": 3,
+              "totalLegCnt": 10
+            }
+          },
+          "home_standing": [
+            {
+              "drawMatchCnt": 0,
+              "groupId": 0,
+              "groupName": "",
+              "lossGoalMatchCnt": 0,
+              "phaseName": "",
+              "points": "0",
+              "ranking": "14",
+              "sportteryTeamId": 15,
+              "teamId": 0,
+              "teamShortName": "纽卡斯尔",
+              "totalLegCnt": 0,
+              "uniformTeamId": 359,
+              "winGoalMatchCnt": 0,
+              "winProbability": "0%"
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041017",
+        "refreshed_at": "2026-08-23T10:16:02+00:00",
+        "missing_reason": null
+      },
+      "recent_form": {
+        "status": "PARTIAL",
+        "value": {
+          "home": [
+            {
+              "date": "2026-08-16",
+              "home": "纽卡斯尔",
+              "away": "斯特拉斯",
+              "score_90": "1:1",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 15,
+              "away_team_id": 191
+            },
+            {
+              "date": "2026-08-15",
+              "home": "纽卡斯尔",
+              "away": "勒沃库森",
+              "score_90": "1:2",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 15,
+              "away_team_id": 146
+            },
+            {
+              "date": "2026-08-13",
+              "home": "纽卡斯尔",
+              "away": "埃弗顿",
+              "score_90": "1:3",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 15,
+              "away_team_id": 9
+            },
+            {
+              "date": "2026-08-09",
+              "home": "巴伦西亚",
+              "away": "纽卡斯尔",
+              "score_90": "1:2",
+              "score_ht": "",
+              "league_id": null,
+              "home_team_id": 678,
+              "away_team_id": 15
+            },
+            {
+              "date": "2026-07-30",
+              "home": "布城",
+              "away": "纽卡斯尔",
+              "score_90": "4:1",
+              "score_ht": "2:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 15
+            }
+          ],
+          "away": [
+            {
+              "date": "2026-08-17",
+              "home": "利物浦",
+              "away": "科莫",
+              "score_90": "2:0",
+              "score_ht": "2:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-08-16",
+              "home": "利物浦",
+              "away": "科莫",
+              "score_90": "0:0",
+              "score_ht": "0:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-08-09",
+              "home": "利物浦",
+              "away": "摩纳哥",
+              "score_90": "2:3",
+              "score_ht": "2:1",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-08-03",
+              "home": "利物浦",
+              "away": "利兹联",
+              "score_90": "2:4",
+              "score_ht": "2:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            },
+            {
+              "date": "2026-07-30",
+              "home": "利物浦",
+              "away": "雷克斯",
+              "score_90": "1:0",
+              "score_ht": "0:0",
+              "league_id": null,
+              "home_team_id": 0,
+              "away_team_id": 0
+            }
+          ]
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041017",
+        "refreshed_at": "2026-08-23T10:16:02+00:00",
+        "missing_reason": "RECENT_FORM_SCOPE_UNVERIFIED"
+      },
+      "injury": {
+        "status": "VALID",
+        "value": {
+          "home": {
+            "team": "纽卡斯尔",
+            "team_id": 664,
+            "count": 1,
+            "status": "VALID",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [
+              {
+                "name": "班巴",
+                "pos": "中场",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              }
+            ],
+            "list": [
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 878463,
+                "personName": "班巴",
+                "playerPositionCode": "Midfielder",
+                "playerPositionDesc": "中场",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "8"
+              }
+            ]
+          },
+          "away": {
+            "team": "利物浦",
+            "team_id": 663,
+            "count": 6,
+            "status": "VALID",
+            "confirmed_no_absence": false,
+            "attack_absence": 0.0,
+            "defense_absence": 0.0,
+            "gk_absence": 0.0,
+            "players": [
+              {
+                "name": "F. Woodman",
+                "pos": "守门员",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "R. Araújo",
+                "pos": "后卫",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "亚罗什",
+                "pos": "守门员",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "H. Ekitike",
+                "pos": "前锋",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "C.布拉德利",
+                "pos": "后卫",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              },
+              {
+                "name": "G. Leoni",
+                "pos": "后卫",
+                "apps": 0,
+                "starts": 0,
+                "type": "伤",
+                "weight": 0.0
+              }
+            ],
+            "list": [
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 274762,
+                "personName": "F. Woodman",
+                "playerPositionCode": "Goalkeeper",
+                "playerPositionDesc": "守门员",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "28"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 459276,
+                "personName": "R. Araújo",
+                "playerPositionCode": "Defender",
+                "playerPositionDesc": "后卫",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "33"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 499173,
+                "personName": "亚罗什",
+                "playerPositionCode": "Goalkeeper",
+                "playerPositionDesc": "守门员",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "56"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 624582,
+                "personName": "H. Ekitike",
+                "playerPositionCode": "Attacker",
+                "playerPositionDesc": "前锋",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "22"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 632251,
+                "personName": "C.布拉德利",
+                "playerPositionCode": "Defender",
+                "playerPositionDesc": "后卫",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "12"
+              },
+              {
+                "appearanceCnt": 0,
+                "injuryFlag": 1,
+                "personId": 780973,
+                "personName": "G. Leoni",
+                "playerPositionCode": "Defender",
+                "playerPositionDesc": "后卫",
+                "startedMatchCnt": 0,
+                "substituteMatchCnt": 0,
+                "suspensionFlag": 0,
+                "uniformNo": "15"
+              }
+            ]
+          }
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041017",
+        "refreshed_at": "2026-08-23T10:16:02+00:00",
+        "missing_reason": null
+      },
+      "suspensions": {
+        "status": "UNAVAILABLE",
+        "value": {
+          "home": [],
+          "away": []
+        },
+        "source_id": "sporttery.preview",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041017",
+        "refreshed_at": "2026-08-23T10:16:02+00:00",
+        "missing_reason": "SUSPENSION_ENDPOINT_EMPTY"
+      },
+      "starting_xi": {
+        "status": "PENDING_REFRESH",
+        "value": null,
+        "source_id": "official.lineup.pending",
+        "source_url": "https://m.sporttery.cn/zqlszl/bssj/?mid=sporttery-2041017",
+        "refreshed_at": "2026-08-23T10:16:02+00:00",
+        "missing_reason": "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+      }
+    },
+    "missing_fields": [
+      "recent_form",
+      "suspensions",
+      "starting_xi"
+    ],
+    "evidence_gap": true,
+    "evidence_status": "GAP",
+    "evidence_gap_reasons": [
+      "RECENT_FORM_RECENT_FORM_SCOPE_UNVERIFIED",
+      "SUSPENSIONS_SUSPENSION_ENDPOINT_EMPTY",
+      "STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+    ],
+    "kickoff": "2026-08-23T23:30:00+08:00",
+    "collected_at": "2026-08-23T10:16:02+00:00",
+    "lineup_refresh_schedule": [
+      "2026-08-23T21:30:00+08:00",
+      "2026-08-23T22:00:00+08:00",
+      "2026-08-23T22:30:00+08:00",
+      "2026-08-23T22:45:00+08:00",
+      "2026-08-23T23:00:00+08:00",
+      "2026-08-23T23:15:00+08:00"
+    ],
+    "source_policy": {
+      "sporttery_preview": "official mobile endpoint",
+      "third_party_content_notice": "page-level notice may apply; preserve field-level provenance",
+      "international": "research_only"
+    }
+  }
+}

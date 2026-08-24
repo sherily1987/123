@@ -171,19 +171,19 @@
       "match_share": 0.0045,
       "skipped_reason": "xG 可用场次仅占完赛 0.4%，低于 60%"
     },
-    "bulgaria_first_league": {
-      "coverage": {
-        "n": 581,
-        "box": 0.0051635111876075735,
-        "sot": 0.8881239242685026,
-        "box_n": 3,
-        "sot_n": 516,
-        "finished": 1378
-      },
-      "basis": null,
-      "match_share": 0.3745,
-      "skipped_reason": "xG 可用场次仅占完赛 37.4%，低于 60%"
-    },
+  "bulgaria_first_league": {
+   "coverage": {
+    "n": 924,
+    "box": 0.003246753246753247,
+    "sot": 0.9296536796536797,
+    "box_n": 3,
+    "sot_n": 859,
+    "finished": 1378
+   },
+   "basis": "shots_on_target",
+   "match_share": 0.6234,
+   "xg_rows": 859
+  },
     "bundesliga": {
       "coverage": {
         "n": 1445,
@@ -212,15 +212,18 @@
     },
     "cyprus_1_division": {
       "coverage": {
-        "n": 537,
+        "n": 653,
         "box": 0.0,
-        "sot": 0.659217877094972,
+        "sot": 0.7200,
         "box_n": 0,
-        "sot_n": 354,
+        "sot_n": 470,
         "finished": 1210
       },
-      "basis": null,
-      "match_share": 0.0
+      "basis": "shots_on_target",
+      "match_share": 0.3884,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 38.8%，低于 60%，仅研究使用",
+      "xg_rows": 470
     },
     "czech_liga": {
       "coverage": {
@@ -326,33 +329,33 @@
       "match_share": 0.9989,
       "xg_rows": 1748
     },
-    "finland_veikkausliiga": {
-      "coverage": {
-        "n": 316,
-        "box": 0.0,
-        "sot": 1.0,
-        "box_n": 0,
-        "sot_n": 316,
-        "finished": 867
-      },
+  "finland_veikkausliiga": {
+   "coverage": {
+    "n": 381,
+    "box": 0.0,
+    "sot": 1.0,
+    "box_n": 0,
+    "sot_n": 381,
+    "finished": 867
+   },
       "basis": "shots_on_target",
-      "match_share": 0.3645,
+   "match_share": 0.4394,
       "forced_low_share": true,
-      "note": "人工豁免第二道门槛：可用场次仅占完赛 36.4%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
-      "xg_rows": 316
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 43.9%，低于 60%，强度由少数比赛拟合，置信度低于其余启用xG的联赛",
+   "xg_rows": 381
     },
     "greece_super_league_1": {
       "coverage": {
-        "n": 1101,
+   "n": 1176,
         "box": 0.7783832879200726,
         "sot": 1.0,
-        "box_n": 857,
+   "box_n": 932,
         "sot_n": 1101,
         "finished": 1194
       },
       "basis": "inside_outside",
-      "match_share": 0.7178,
-      "xg_rows": 856
+   "match_share": 0.7806,
+   "xg_rows": 931
     },
     "hungary_nb_i": {
       "coverage": {
@@ -614,16 +617,18 @@
     },
     "serbia_super_liga": {
       "coverage": {
-        "n": 1136,
-        "box": 0.7940140845070423,
-        "sot": 0.914612676056338,
-        "box_n": 902,
-        "sot_n": 1039,
+        "n": 1179,
+        "box": 0.8015,
+        "sot": 0.9177,
+        "box_n": 945,
+        "sot_n": 1082,
         "finished": 1593
       },
-      "basis": null,
-      "match_share": 0.5662,
-      "skipped_reason": "xG 可用场次仅占完赛 56.6%，低于 60%"
+      "basis": "inside_outside",
+      "match_share": 0.5926,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 59.3%，低于 60%，仅研究使用",
+      "xg_rows": 944
     },
     "serie_a": {
       "coverage": {
@@ -638,18 +643,18 @@
       "match_share": 0.9416,
       "xg_rows": 1790
     },
-    "slovakia_1_liga": {
-      "coverage": {
-        "n": 618,
+  "slovakia_1_liga": {
+   "coverage": {
+    "n": 763,
         "box": 0.38673139158576053,
         "sot": 0.9805825242718447,
         "box_n": 239,
-        "sot_n": 606,
+    "sot_n": 751,
         "finished": 974
       },
       "basis": "shots_on_target",
-      "match_share": 0.6222,
-      "xg_rows": 606
+   "match_share": 0.771,
+   "xg_rows": 751
     },
     "slovenia_1_snl": {
       "coverage": {
@@ -731,16 +736,18 @@
     },
     "ukraine_premier_league": {
       "coverage": {
-        "n": 433,
-        "box": 0.004618937644341801,
-        "sot": 0.9191685912240185,
-        "box_n": 2,
-        "sot_n": 398,
+        "n": 673,
+        "box": 0.216,
+        "sot": 0.948,
+        "box_n": 242,
+        "sot_n": 638,
         "finished": 1117
       },
-      "basis": null,
-      "match_share": 0.3563,
-      "skipped_reason": "xG 可用场次仅占完赛 35.6%，低于 60%"
+      "basis": "shots_on_target",
+      "match_share": 0.5712,
+      "forced_low_share": true,
+      "note": "人工豁免第二道门槛：可用场次仅占完赛 57.1%，低于 60%，仅研究使用",
+      "xg_rows": 638
     },
     "world_cup": {
       "coverage": {

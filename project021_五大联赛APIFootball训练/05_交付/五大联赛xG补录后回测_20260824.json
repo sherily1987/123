@@ -1,0 +1,107 @@
+{
+  "config": {
+    "step_days": 30,
+    "half_life": 500.0,
+    "xg_weight": 0.4,
+    "shrinkage": "off",
+    "metric_basis": "model_on_baseline_subset"
+  },
+  "leagues": {
+    "bundesliga": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "provider_market",
+      "test_from": 739493,
+      "n_all": 310,
+      "skip": 1,
+      "model_all": 0.578032,
+      "n_subset": 276,
+      "model_subset": 0.575647,
+      "market": 0.554001,
+      "frequency": 0.646725,
+      "accuracy_pct": 54.52,
+      "log_loss": 0.976966,
+      "no_market": false,
+      "thin": false
+    },
+    "la_liga": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "provider_market",
+      "test_from": 739483,
+      "n_all": 383,
+      "skip": 0,
+      "model_all": 0.582489,
+      "n_subset": 345,
+      "model_subset": 0.578291,
+      "market": 0.567652,
+      "frequency": 0.631867,
+      "accuracy_pct": 52.48,
+      "log_loss": 0.995358,
+      "no_market": false,
+      "thin": false
+    },
+    "ligue_1": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "provider_market",
+      "test_from": 739369,
+      "n_all": 334,
+      "skip": 3,
+      "model_all": 0.587516,
+      "n_subset": 307,
+      "model_subset": 0.600232,
+      "market": 0.587142,
+      "frequency": 0.640701,
+      "accuracy_pct": 53.29,
+      "log_loss": 0.986213,
+      "no_market": false,
+      "thin": false
+    },
+    "premier_league": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "provider_market",
+      "test_from": 739482,
+      "n_all": 379,
+      "skip": 0,
+      "model_all": 0.623941,
+      "n_subset": 356,
+      "model_subset": 0.61961,
+      "market": 0.607958,
+      "frequency": 0.656125,
+      "accuracy_pct": 47.49,
+      "log_loss": 1.046097,
+      "no_market": false,
+      "thin": false
+    },
+    "serie_a": {
+      "config": "滚动+xG w=0.4 hl=500",
+      "baseline": "provider_market",
+      "test_from": 739487,
+      "n_all": 377,
+      "skip": 3,
+      "model_all": 0.595525,
+      "n_subset": 355,
+      "model_subset": 0.598768,
+      "market": 0.583598,
+      "frequency": 0.658857,
+      "accuracy_pct": 50.4,
+      "log_loss": 0.99753,
+      "no_market": false,
+      "thin": false
+    }
+  },
+  "summary_by_baseline": {
+    "provider_market": {
+      "leagues": [
+        "bundesliga",
+        "la_liga",
+        "ligue_1",
+        "premier_league",
+        "serie_a"
+      ],
+      "n": 1639,
+      "model": 0.5954,
+      "market": 0.5812,
+      "frequency": 0.6471,
+      "gap": 0.0142
+    }
+  }
+}

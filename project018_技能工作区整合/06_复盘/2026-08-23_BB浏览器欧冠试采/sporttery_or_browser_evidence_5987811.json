@@ -1,0 +1,73 @@
+{
+  "schema_version": "bb-browser-evidence-trial-1.0",
+  "collected_at": "2026-08-23T17:45:14+08:00",
+  "collection_method": "BB-browser page navigation plus in-page fetch",
+  "match": {
+    "source": "FotMob matchDetails API",
+    "source_url": "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+    "match_id": "5987811",
+    "competition": "Champions League Qualification",
+    "round": "final, second leg",
+    "home": "Bodø/Glimt",
+    "away": "NEC Nijmegen",
+    "kickoff_utc": "2026-08-25T19:00:00Z",
+    "kickoff_local": "2026-08-26T03:00:00+08:00",
+    "venue": "Aspmyra Stadion",
+    "aggregate_before_match": "3-1",
+    "pre_match": true
+  },
+  "recent_form": {
+    "source_field": "content.matchFacts.teamForm",
+    "home_last5": [
+      {"date": "2026-07-31", "opponent": "Lillestrøm", "score": "4-0", "result": "W"},
+      {"date": "2026-08-04", "opponent": "Union St.Gilloise", "score": "3-3", "result": "D"},
+      {"date": "2026-08-08", "opponent": "Vålerenga", "score": "2-1", "result": "W"},
+      {"date": "2026-08-11", "opponent": "Union St.Gilloise", "score": "3-2", "result": "W"},
+      {"date": "2026-08-19", "opponent": "NEC Nijmegen", "score": "3-1", "result": "W"}
+    ],
+    "away_last5": [
+      {"date": "2026-08-04", "opponent": "Olympiacos", "score": "0-0", "result": "D"},
+      {"date": "2026-08-08", "opponent": "Telstar", "score": "1-2", "result": "L"},
+      {"date": "2026-08-11", "opponent": "Olympiacos", "score": "2-1", "result": "W"},
+      {"date": "2026-08-15", "opponent": "Willem II", "score": "4-1", "result": "W"},
+      {"date": "2026-08-19", "opponent": "Bodø/Glimt", "score": "1-3", "result": "L"}
+    ],
+    "status": "VALID_WITH_SOURCE_SCOPE"
+  },
+  "injury_and_suspension": {
+    "source_field": "lineup.homeTeam.unavailable / lineup.awayTeam.unavailable",
+    "home": [
+      {"player": "Jostein Gundersen", "type": "injury", "return": "Doubtful"},
+      {"player": "Håkon Evjen", "type": "injury", "return": "Early September 2026"},
+      {"player": "August Mikkelsen", "type": "injury", "return": "Early September 2026"}
+    ],
+    "away": [
+      {"player": "Philippe Sandler", "type": "injury", "return": "Early September 2026"},
+      {"player": "Sami Ouaissa", "type": "injury", "return": "Early September 2026"},
+      {"player": "Yassin Moslih", "type": "injury", "return": "Early September 2026"},
+      {"player": "Koki Ogawa", "type": "injury", "return": "About 1-2 weeks"},
+      {"player": "Ahmetcan Kaplan", "type": "injury", "return": "Day to day"}
+    ],
+    "suspensions": "No separate suspension confirmation in this response",
+    "status": "INJURY_AVAILABLE_SUSPENSION_UNCONFIRMED"
+  },
+  "lineup": {
+    "source_field": "lineup.source",
+    "source": "lastStartingLineups",
+    "status": "PREDICTED_OR_LAST_LINEUP_NOT_OFFICIAL_XI",
+    "home_formation": "4-3-3",
+    "away_formation": "3-4-2-1",
+    "official_starting_xi": false
+  },
+  "quality": {
+    "evidence_gap": true,
+    "gap_reasons": ["OFFICIAL_XI_NOT_PUBLISHED", "SUSPENSION_STATUS_NOT_SEPARATELY_CONFIRMED"],
+    "production_recommendation_allowed": false,
+    "research_or_entertainment_only": true
+  },
+  "source_urls": [
+    "https://www.uefa.com/uefachampionsleague/match/2049221--bodo-glimt-vs-n-e-c/",
+    "https://www.fotmob.com/matches/bodoglimt-vs-nec-nijmegen/2cov5v",
+    "https://www.fotmob.com/api/data/matchDetails?matchId=5987811"
+  ]
+}

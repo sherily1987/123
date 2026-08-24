@@ -111,6 +111,9 @@ def parse_markdown(text: str, match: dict[str, Any], source_url: str,
     suspension_rows = _clean_rows(_find(sections, ("suspensions", "suspended", "停赛", "禁赛")))
     team_stats_rows = _clean_rows(_find(sections, ("xg", "expected goals", "attack strength", "defence strength",
                                                    "进攻强度", "防守强度", "预期进球", "球队统计", "数据统计")))
+    media_prediction = str(provider).lower() in {"discovered_media_preview", "media_preview"} or source_tier == "B"
+    injury_status = "PREDICTED" if media_prediction and injury_rows else "VALID" if injury_rows else "UNAVAILABLE"
+    suspension_status = "PREDICTED" if media_prediction and suspension_rows else "VALID" if suspension_rows else "UNAVAILABLE"
     entries = {
         "team_stats": _entry("VALID" if team_stats_rows else "UNAVAILABLE",
                               {"raw_rows": team_stats_rows}, url=source_url, collected_at=collected_at,
@@ -120,10 +123,10 @@ def parse_markdown(text: str, match: dict[str, Any], source_url: str,
                               {"raw_rows": form_rows}, url=source_url, collected_at=collected_at,
                               source_id=source_id, source_tier=source_tier,
                               reason=None if form_rows else "RECENT_FORM_SECTION_MISSING"),
-        "injury": _entry("VALID" if injury_rows else "UNAVAILABLE", {"raw_rows": injury_rows},
+        "injury": _entry(injury_status, {"raw_rows": injury_rows},
                           url=source_url, collected_at=collected_at, source_id=source_id, source_tier=source_tier,
                           reason=None if injury_rows else "INJURY_SECTION_MISSING"),
-        "suspensions": _entry("VALID" if suspension_rows else "UNAVAILABLE", {"raw_rows": suspension_rows},
+        "suspensions": _entry(suspension_status, {"raw_rows": suspension_rows},
                                url=source_url, collected_at=collected_at, source_id=source_id, source_tier=source_tier,
                                reason=None if suspension_rows else "SUSPENSION_SECTION_MISSING"),
         "starting_xi": _entry("PREDICTED" if lineup_rows else "UNAVAILABLE", {"raw_rows": lineup_rows},

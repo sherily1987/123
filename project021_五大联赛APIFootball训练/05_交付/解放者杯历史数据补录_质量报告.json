@@ -1,0 +1,20 @@
+{
+  "schema": "league-history-backfill-audit-1.0",
+  "competition": "解放者杯",
+  "provider": "api-sports.io",
+  "league_id": 13,
+  "source_type": "event_result",
+  "seasons_requested": [2021, 2022, 2023, 2024, 2025, 2026],
+  "rows": 923,
+  "finished_with_score": 914,
+  "excluded_or_unfinished": 9,
+  "duplicate_match_ids": 0,
+  "season_rows": {"2021": 155, "2022": 155, "2023": 155, "2024": 155, "2025": 155, "2026": 148},
+  "status_counts": {"Finished": 914, "Technical loss": 2, "Not Started": 7},
+  "quality_decision": "PASS_FOR_RESEARCH_ONLY",
+  "limitations": [
+    "赛事包含小组赛、淘汰赛和可能的加时/点球，正式训练必须保留90分钟比分字段并单独处理晋级结果",
+    "无体彩历史赔率，不能与closing_market口径混合",
+    "当前仅完成历史数据补录，尚未加入生产模型"
+  ]
+}

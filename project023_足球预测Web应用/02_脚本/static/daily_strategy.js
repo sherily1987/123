@@ -52,8 +52,22 @@
     const profit = Number(s.profit || 0);
     const color = profit > 0 ? "profit" : profit < 0 ? "loss" : "flat";
     const rows = (report.daily || []).flatMap(day => (day.records || []).map(row => ({...row, selected_day: day.selected_day}))).slice(-30).reverse();
-    const detail = rows.map(row => `<div class="strategy-backtest-row"><span>${esc(row.selected_day || "")} ${esc(row.market || "")}</span><span>${esc(row.selection || row.combo_id || "-")}</span><b class="${row.status === "won" ? "profit" : row.status === "lost" ? "loss" : "flat"}">${row.status === "won" ? "中了" : row.status === "lost" ? "没中" : "待结算"} ${row.profit == null ? "" : esc(amount(row.profit)) + "元"}</b></div>`).join("");
-    return `<div class="strategy-backtest"><div><strong>长期策略收益回测</strong><span>${esc(report.snapshot_count)} 个策略日</span></div><div class="strategy-backtest-metrics"><span>已结算 ${esc(s.settled_count || 0)} 注</span><span>中 ${esc(s.won_count || 0)} / 未中 ${esc(s.lost_count || 0)}</span><span>待结算 ${esc(s.pending_count || 0)}</span><b class="${color}">${amount(profit)}元 · ROI ${s.roi_pct == null ? "-" : esc(s.roi_pct) + "%"}</b></div>${detail ? `<div class="strategy-backtest-details">${detail}</div>` : ""}<small>仅按体彩官方赛果结算；历史策略回测，不代表未来收益。</small></div>`;
+    const detail = rows.map(row => {
+      const fixture = row.market === "COMBO"
+        ? (row.legs || []).map(leg => `${leg.match_num || "-"} ${leg.home || ""} vs ${leg.away || ""}`).join(" + ")
+        : `${row.match_num || "-"} ${row.home || ""} vs ${row.away || ""}`;
+      const strategy = `${MARKET_NAMES[row.market] || row.market || "-"} · ${row.selection || row.combo_id || "-"}`;
+      const actual = row.market === "COMBO"
+        ? (row.legs || []).map(leg => `${leg.actual || "待结算"}`).join(" / ")
+        : (row.actual || "待结算");
+      const money = row.stake_amount == null ? "-" : `${amount(row.stake_amount)}元 @${esc(row.odds || "-")}`;
+      const status = row.status === "won" ? "中了" : row.status === "lost" ? "没中" : "待结算";
+      const statusClass = row.status === "won" ? "profit" : row.status === "lost" ? "loss" : "flat";
+      const item = row.market === "COMBO" ? "组合" : (MARKET_NAMES[row.market] || row.market || "-");
+      return `<tr><td><span class="strategy-market">${esc(item)}</span></td><td>${esc(row.match_num || row.selected_day || "-")}</td><td class="match-cell">${esc(fixture)}</td><td class="selection-cell">${esc(row.selection || row.combo_id || "-")}</td><td>${esc(row.odds || "-")}</td><td><strong>${esc(row.stake_amount == null ? "-" : amount(row.stake_amount))}元</strong></td><td class="actual-cell">${esc(actual)}</td><td class="status-cell ${statusClass}">${status}${row.profit == null ? "" : ` ${esc(amount(row.profit))}元`}</td></tr>`;
+    }).join("");
+    const detailHeader = `<table><thead><tr><th>项目</th><th>场次</th><th>比赛</th><th>选择</th><th>赔率</th><th>金额</th><th>官方赛果</th><th>结算</th></tr></thead><tbody>${detail}</tbody></table>`;
+    return `<div class="strategy-backtest"><div><strong>长期策略收益回测</strong><span>${esc(report.snapshot_count)} 个策略日</span></div><div class="strategy-backtest-metrics"><span>已结算 ${esc(s.settled_count || 0)} 注</span><span>中 ${esc(s.won_count || 0)} / 未中 ${esc(s.lost_count || 0)}</span><span>待结算 ${esc(s.pending_count || 0)}</span><b class="${color}">${amount(profit)}元 · ROI ${s.roi_pct == null ? "-" : esc(s.roi_pct) + "%"}</b></div>${detail ? `<div class="strategy-backtest-details">${detailHeader}</div>` : ""}<small>仅按体彩官方赛果结算；历史策略回测，不代表未来收益。</small></div>`;
   }
 
   function formatDailyStrategyHtml(plan) {

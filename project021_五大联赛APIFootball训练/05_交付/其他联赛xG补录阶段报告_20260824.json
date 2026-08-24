@@ -1,0 +1,20 @@
+{
+  "schema": "league-xg-backfill-stage-1.0",
+  "source": "api-sports.io fixtures/statistics",
+  "completed_in_order": ["芬超", "斯洛伐克甲", "希腊超", "塞浦路斯甲", "保加利亚甲", "塞尔维亚甲", "乌超"],
+  "results": {
+    "芬超": {"events": 867, "stats_before": 316, "stats_added": 65, "stats_after": 381, "xg_after": 381, "coverage_pct": 43.94, "decision": "RESEARCH_ONLY_LOW_COVERAGE"},
+    "斯洛伐克甲": {"events": 974, "stats_before": 618, "stats_added": 145, "stats_after": 763, "xg_after": 751, "coverage_pct": 77.1, "decision": "CANDIDATE_XG_COVERAGE"},
+    "希腊超": {"events": 1194, "stats_before": 1101, "stats_added": 75, "stats_after": 1176, "xg_after": 931, "coverage_pct": 78.06, "decision": "CANDIDATE_XG_COVERAGE"},
+    "塞浦路斯甲": {"events": 1210, "stats_before": 537, "stats_added": 116, "stats_after": 653, "xg_after": 470, "coverage_pct": 38.84, "decision": "RESEARCH_ONLY_LOW_COVERAGE"},
+    "保加利亚甲": {"events": 1378, "stats_before": 581, "stats_added": 343, "stats_after": 924, "xg_after": 859, "coverage_pct": 62.34, "decision": "CANDIDATE_XG_COVERAGE"},
+    "塞尔维亚甲": {"events": 1593, "stats_before": 1136, "stats_added": 43, "stats_after": 1179, "xg_after": 944, "coverage_pct": 59.26, "decision": "RESEARCH_ONLY_LOW_COVERAGE"},
+    "乌超": {"events": 1117, "stats_before": 433, "stats_added": 240, "stats_after": 673, "xg_after": 638, "coverage_pct": 57.12, "decision": "RESEARCH_ONLY_LOW_COVERAGE"}
+  },
+  "next": [],
+  "limitations": [
+    "未使用进球倒推xG",
+    "API-Sports无完整射门字段的场次保留缺口",
+    "候选xG覆盖不等于生产放行，仍需样本外回测"
+  ]
+}

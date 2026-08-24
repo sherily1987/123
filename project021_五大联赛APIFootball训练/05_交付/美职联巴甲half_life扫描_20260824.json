@@ -1,0 +1,196 @@
+{
+  "protocol": "rolling walk-forward; validation selects half-life; test is held out",
+  "baseline": "football-data.co.uk closing odds",
+  "results": [
+    {
+      "league": {
+        "slug": "fd_usa",
+        "id": "USA",
+        "name": "美职联"
+      },
+      "cutoffs": {
+        "validation_from": 738079,
+        "test_from": 738998
+      },
+      "half_lives": [
+        120,
+        240,
+        365,
+        500
+      ],
+      "validation": {
+        "120": {
+          "n": 1221,
+          "skip": 5,
+          "brier": 0.650661,
+          "log_loss": 1.078406,
+          "accuracy_pct": 45.95,
+          "market_brier": 0.618726,
+          "frequency_brier": 0.639142
+        },
+        "240": {
+          "n": 1221,
+          "skip": 5,
+          "brier": 0.647044,
+          "log_loss": 1.072466,
+          "accuracy_pct": 46.27,
+          "market_brier": 0.618726,
+          "frequency_brier": 0.639142
+        },
+        "365": {
+          "n": 1221,
+          "skip": 5,
+          "brier": 0.646929,
+          "log_loss": 1.072069,
+          "accuracy_pct": 45.78,
+          "market_brier": 0.618726,
+          "frequency_brier": 0.639142
+        },
+        "500": {
+          "n": 1221,
+          "skip": 5,
+          "brier": 0.647029,
+          "log_loss": 1.072202,
+          "accuracy_pct": 45.45,
+          "market_brier": 0.618726,
+          "frequency_brier": 0.639142
+        }
+      },
+      "validation_best": 365.0,
+      "test": {
+        "120": {
+          "n": 1203,
+          "skip": 4,
+          "brier": 0.625753,
+          "log_loss": 1.044293,
+          "accuracy_pct": 49.88,
+          "market_brier": 0.608364,
+          "frequency_brier": 0.646239
+        },
+        "240": {
+          "n": 1203,
+          "skip": 4,
+          "brier": 0.626246,
+          "log_loss": 1.043153,
+          "accuracy_pct": 48.79,
+          "market_brier": 0.608364,
+          "frequency_brier": 0.646239
+        },
+        "365": {
+          "n": 1203,
+          "skip": 4,
+          "brier": 0.629059,
+          "log_loss": 1.046527,
+          "accuracy_pct": 48.38,
+          "market_brier": 0.608364,
+          "frequency_brier": 0.646239
+        },
+        "500": {
+          "n": 1203,
+          "skip": 4,
+          "brier": 0.631692,
+          "log_loss": 1.049865,
+          "accuracy_pct": 47.38,
+          "market_brier": 0.608364,
+          "frequency_brier": 0.646239
+        }
+      },
+      "xg_status": "UNAVAILABLE"
+    },
+    {
+      "league": {
+        "slug": "fd_bra",
+        "id": "BRA",
+        "name": "巴甲"
+      },
+      "cutoffs": {
+        "validation_from": 737801,
+        "test_from": 738796
+      },
+      "half_lives": [
+        120,
+        240,
+        365,
+        500
+      ],
+      "validation": {
+        "120": {
+          "n": 1102,
+          "skip": 3,
+          "brier": 0.632952,
+          "log_loss": 1.055116,
+          "accuracy_pct": 46.64,
+          "market_brier": 0.604464,
+          "frequency_brier": 0.640717
+        },
+        "240": {
+          "n": 1102,
+          "skip": 3,
+          "brier": 0.62757,
+          "log_loss": 1.045815,
+          "accuracy_pct": 47.55,
+          "market_brier": 0.604464,
+          "frequency_brier": 0.640717
+        },
+        "365": {
+          "n": 1102,
+          "skip": 3,
+          "brier": 0.626742,
+          "log_loss": 1.044145,
+          "accuracy_pct": 47.64,
+          "market_brier": 0.604464,
+          "frequency_brier": 0.640717
+        },
+        "500": {
+          "n": 1102,
+          "skip": 3,
+          "brier": 0.626812,
+          "log_loss": 1.04411,
+          "accuracy_pct": 47.82,
+          "market_brier": 0.604464,
+          "frequency_brier": 0.640717
+        }
+      },
+      "validation_best": 365.0,
+      "test": {
+        "120": {
+          "n": 1098,
+          "skip": 8,
+          "brier": 0.621437,
+          "log_loss": 1.03504,
+          "accuracy_pct": 49.0,
+          "market_brier": 0.596333,
+          "frequency_brier": 0.637299
+        },
+        "240": {
+          "n": 1098,
+          "skip": 8,
+          "brier": 0.615428,
+          "log_loss": 1.025977,
+          "accuracy_pct": 50.36,
+          "market_brier": 0.596333,
+          "frequency_brier": 0.637299
+        },
+        "365": {
+          "n": 1098,
+          "skip": 8,
+          "brier": 0.613331,
+          "log_loss": 1.023232,
+          "accuracy_pct": 49.82,
+          "market_brier": 0.596333,
+          "frequency_brier": 0.637299
+        },
+        "500": {
+          "n": 1098,
+          "skip": 8,
+          "brier": 0.612071,
+          "log_loss": 1.021384,
+          "accuracy_pct": 50.09,
+          "market_brier": 0.596333,
+          "frequency_brier": 0.637299
+        }
+      },
+      "xg_status": "UNAVAILABLE"
+    }
+  ]
+}

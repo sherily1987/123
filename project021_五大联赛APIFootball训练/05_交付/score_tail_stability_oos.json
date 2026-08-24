@@ -1,0 +1,87 @@
+{
+  "schema": "score-tail-stability-oos-1.0",
+  "research_only": true,
+  "production_unchanged": "M4 BP lambda3=0.20, score temperature=1.30",
+  "tail_buffer": 8,
+  "ran_at": "2026-08-24T18:53:54",
+  "groups": {
+    "big5": {
+      "loaded_with_market": 5984,
+      "status": "ok",
+      "n": 5984,
+      "train_n": 4188,
+      "test_n": 1796,
+      "split_day": "2025-05-04",
+      "production_m4": {
+        "n": 1796,
+        "score_log_loss": 2.90179,
+        "top1_acc_pct": 12.75,
+        "top3_acc_pct": 32.57
+      },
+      "stable_tail_buffer": {
+        "buffer": 8,
+        "n": 1796,
+        "score_log_loss": 2.90183,
+        "top1_acc_pct": 12.75,
+        "top3_acc_pct": 32.57
+      },
+      "delta_stable_minus_m4": {
+        "score_log_loss": 4e-05,
+        "top1_acc_pct": 0.0,
+        "top3_acc_pct": 0.0
+      }
+    },
+    "nordic": {
+      "loaded_with_market": 2177,
+      "status": "ok",
+      "n": 2177,
+      "train_n": 1523,
+      "test_n": 654,
+      "split_day": "2025-06-15",
+      "production_m4": {
+        "n": 654,
+        "score_log_loss": 3.04326,
+        "top1_acc_pct": 12.39,
+        "top3_acc_pct": 29.66
+      },
+      "stable_tail_buffer": {
+        "buffer": 8,
+        "n": 654,
+        "score_log_loss": 3.04331,
+        "top1_acc_pct": 12.39,
+        "top3_acc_pct": 29.66
+      },
+      "delta_stable_minus_m4": {
+        "score_log_loss": 5e-05,
+        "top1_acc_pct": 0.0,
+        "top3_acc_pct": 0.0
+      }
+    },
+    "j1": {
+      "loaded_with_market": 992,
+      "status": "ok",
+      "n": 992,
+      "train_n": 694,
+      "test_n": 298,
+      "split_day": "2024-04-20",
+      "production_m4": {
+        "n": 298,
+        "score_log_loss": 2.98082,
+        "top1_acc_pct": 10.4,
+        "top3_acc_pct": 29.53
+      },
+      "stable_tail_buffer": {
+        "buffer": 8,
+        "n": 298,
+        "score_log_loss": 2.98084,
+        "top1_acc_pct": 10.4,
+        "top3_acc_pct": 29.53
+      },
+      "delta_stable_minus_m4": {
+        "score_log_loss": 2e-05,
+        "top1_acc_pct": 0.0,
+        "top3_acc_pct": 0.0
+      }
+    }
+  }
+}

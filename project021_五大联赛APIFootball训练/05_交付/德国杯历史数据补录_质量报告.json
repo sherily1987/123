@@ -1,0 +1,20 @@
+{
+  "schema": "league-history-backfill-audit-1.0",
+  "competition": "德国杯",
+  "provider": "api-sports.io",
+  "league_id": 81,
+  "source_type": "event_result",
+  "seasons_requested": [2021, 2022, 2023, 2024, 2025, 2026],
+  "rows": 347,
+  "finished_with_score": 341,
+  "excluded_or_unfinished": 6,
+  "duplicate_match_ids": 0,
+  "season_rows": {"2021": 63, "2022": 63, "2023": 63, "2024": 63, "2025": 63, "2026": 32},
+  "status_counts": {"Finished": 341, "Not Started": 6},
+  "quality_decision": "PASS_FOR_RESEARCH_ONLY",
+  "limitations": [
+    "杯赛淘汰赛存在加时/点球，不能把最终晋级结果直接当90分钟胜平负",
+    "无体彩历史赔率，不能与closing_market口径混合",
+    "当前仅完成历史数据补录，尚未加入生产模型"
+  ]
+}
