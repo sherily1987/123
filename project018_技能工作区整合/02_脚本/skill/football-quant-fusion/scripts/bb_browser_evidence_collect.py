@@ -322,7 +322,7 @@ def _scrapling_mappings(mapping: dict[str, Any]) -> list[dict[str, Any]]:
             "source_tier": str(mapping.get("source_tier") or "C").upper(),
         })
     # A FotMob mapping has no ``scrapling_url``: its page ``url`` and match id
-    # identify the Scrapling-specific parser used after the API fails.
+    # identify the Scrapling-specific parser used before optional API fill-in.
     if not candidates and mapping.get("url") and mapping.get("fotmob_match_id"):
         candidates.append(dict(mapping))
     return candidates

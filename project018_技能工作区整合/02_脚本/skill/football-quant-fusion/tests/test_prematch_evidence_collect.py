@@ -191,6 +191,46 @@ def test_api_gap_routes_to_scrapling_and_projects_only_missing_fields(monkeypatc
     assert row["evidence_audit"]["entries"]["starting_xi"]["status"] == "PREDICTED"
 
 
+def test_scrapling_is_attempted_before_api_and_api_only_fills_gaps(monkeypatch):
+    monkeypatch.setenv("ENABLE_API_SPORTS_EVIDENCE", "1")
+    monkeypatch.setenv("API_FOOTBALL_KEY", "test-key")
+    monkeypatch.setattr(pec.preview, "collect", lambda mid, terms, hist: {
+        "feature": {}, "strength": None, "recent_home": [], "recent_away": [],
+        "injuries": {}, "tables": [],
+    })
+    calls = []
+
+    def fake_scrapling(match, audit):
+        calls.append("scrapling")
+        return {"status": "ok", "research_only": True, "evidence_audit": {"entries": {
+            "recent_form": {"status": "VALID", "value": {"home": ["S"] * 5, "away": ["S"] * 5},
+                             "source_id": "dynamic.source", "source_url": "https://example.test"},
+            "starting_xi": {"status": "PREDICTED", "value": {"home": ["S"], "away": ["S"]},
+                             "source_id": "dynamic.source", "source_url": "https://example.test"},
+        }}}
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            pass
+
+        def collect_match(self, *args, **kwargs):
+            calls.append("api")
+            return {"status": "ok", "fixture_id": 99,
+                    "recent": {"home": [{"league": "英超"}] * 5,
+                                "away": [{"league": "英超"}] * 5},
+                    "injuries": [], "lineups": []}
+
+    monkeypatch.setattr(pec, "_scrapling_fallback", fake_scrapling)
+    monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
+    row = pec.collect_one({"match_id": "sporttery-8", "home": "A", "away": "B",
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
+    assert calls == ["scrapling", "api"]
+    entries = row["evidence_audit"]["entries"]
+    assert entries["recent_form"]["source_id"] == "dynamic.source"
+    assert entries["starting_xi"]["source_id"] == "dynamic.source"
+    assert row["facts"]["api_sports"]["fixture_id"] == 99
+
+
 def test_collect_file_injects_match_scoped_scrapling_url_map(tmp_path, monkeypatch):
     source = tmp_path / "input.json"
     source.write_text('{"matches":[{"match_id":"sporttery-6","home":"A","away":"B","kickoff":"2026-08-25T20:00:00+08:00"}]}', encoding="utf-8")

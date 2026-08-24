@@ -110,15 +110,17 @@ BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射
 用于跨联赛来源发现和 provenance。自定义来源复用统一 `evidence_audit` 契约时，必须保留
 真实来源身份，不能把其他联赛页面标成 `fotmob.bb_browser`。来源候选只是待审计入口，未取得
 带时间戳的字段事实前不得提升为 `VALID`，也不得进入生产概率。
-API/结构化端点失败或关键字段缺失后，采集器按映射顺序调用 Scrapling 动态页面回退；
-映射既可由 `--url-map` 提供，也可随单场输入放在 `evidence_sources` 中。回退结果始终
-带 `research_only=true`、`scrapling_attempts` 和字段级来源，不会覆盖已有有效 API 字段；
+有经过审计的页面映射或发现候选时，采集器优先按映射顺序调用 Scrapling 动态页面；
+映射既可由 `--url-map` 提供，也可随单场输入放在 `evidence_sources` 中。Scrapling
+结果始终带 `research_only=true`、`scrapling_attempts` 和字段级来源，不会覆盖已有有效字段；
+随后才调用可选的 API-Sports，并且 API-Sports 只能填补 Scrapling 仍缺失的字段，不能反向覆盖
+已取得的预计首发或其他动态证据；
 未提供经过审计的页面映射时只生成待处理任务，不会把搜索候选直接当作事实来源。
 启用 `daily-pipeline --bb-browser-discover` 时，发现到的官方候选优先、已知第三方候选其次，
 会自动进入 Scrapling 有序尝试；只有页面解析出带时间戳的字段事实才写入快照，失败仍保留
-`browser_tasks.json` 待人工复核。这样 API 不可用时会实际执行回退，而不是只记录搜索链接。
-日常流水线默认还会在 API 证据出现 `UNAVAILABLE`、`PARTIAL`、`PENDING_REFRESH` 或
-`EMPTY_UNCONFIRMED` 时自动开启同一发现→Scrapling路径；完整证据批次不会重复搜索。
+`browser_tasks.json` 待人工复核。API-Sports 只在 Scrapling 之后填补剩余缺口。
+日常流水线默认会先尝试同一发现→Scrapling路径，再按字段缺口决定是否调用 API-Sports；
+完整证据批次不会重复搜索。
 如需严格离线运行，可传 `--no-bb-browser-auto`，但这会把缺口留给 `browser_tasks.json`，
 不得把它当作已采集事实。
 所有事实必须通过身份、来源域名、采集时间早于开球和关键词门禁；采集不到就保留缺口，不用投票或常识填充。

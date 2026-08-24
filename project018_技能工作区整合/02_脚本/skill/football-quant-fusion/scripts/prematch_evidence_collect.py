@@ -78,7 +78,7 @@ def _api_sports_payload(match: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _scrapling_fallback(match: dict[str, Any], audit: dict[str, Any]) -> dict[str, Any] | None:
-    """Use Scrapling after the structured API pass leaves critical gaps.
+    """Try the mapped Scrapling source before optional API enrichment.
 
     This is deliberately evidence-only.  It consumes a match-embedded source
     map (``evidence_sources``/``scrapling_sources``) and never invents a URL;
@@ -105,7 +105,7 @@ def _scrapling_fallback(match: dict[str, Any], audit: dict[str, Any]) -> dict[st
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         snapshot = module.collect_one({**match, "evidence_sources": mapping}, mapping)
-        snapshot["route"] = "api_missing_or_gap_then_scrapling"
+        snapshot["route"] = "scrapling_first_then_api"
         snapshot["research_only"] = True
         return snapshot
     except Exception as exc:
@@ -134,6 +134,33 @@ def _merge_scrapling_audit(primary: dict[str, Any], fallback: dict[str, Any]) ->
         f"{name.upper()}_{(primary_entries[name].get('missing_reason') or primary_entries[name].get('status') or 'UNKNOWN')}"
         for name in missing
     ]
+
+
+_PRESENT_STATUSES = {
+    "VALID", "OK", "AVAILABLE", "FRESH", "AGING", "PROXY_XG",
+    "EXPLICIT_XG", "PREDICTED",
+}
+
+
+def _merge_api_audit(primary: dict[str, Any], api_audit: dict[str, Any]) -> None:
+    """Use API-Sports only for fields still missing after Scrapling."""
+    primary_entries = primary.setdefault("entries", {})
+    for name, item in (api_audit.get("entries") or {}).items():
+        if not isinstance(item, dict):
+            continue
+        current = primary_entries.get(name) or {}
+        if str(current.get("status") or "").upper() not in _PRESENT_STATUSES:
+            primary_entries[name] = item
+    missing = [name for name, item in primary_entries.items()
+               if str((item or {}).get("status") or "").upper() not in _PRESENT_STATUSES]
+    primary["missing_fields"] = missing
+    primary["evidence_gap"] = bool(missing)
+    primary["evidence_status"] = "GAP" if missing else "OK"
+    primary["evidence_gap_reasons"] = [
+        f"{name.upper()}_{(primary_entries[name].get('missing_reason') or primary_entries[name].get('status') or 'UNKNOWN')}"
+        for name in missing
+    ]
+    primary["api_sports_attempt"] = api_audit.get("api_sports_attempt") or primary.get("api_sports_attempt")
 
 
 def _feature_analysis(feature: dict[str, Any]) -> dict[str, Any]:
@@ -312,21 +339,21 @@ def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5) -> dic
                 "collected_at": collected_at, "facts": {}, "evidence_audit": audit,
                 "collection_guard": "POST_KICKOFF_NOT_USABLE"}
     facts = preview.collect(int(str(mid).replace("sporttery-", "")), terms=terms, hist=hist)
-    # Optional independent API-Sports enrichment. It is evidence-only and is
-    # never allowed to replace Sporttery odds or mutate a production model.
-    api_payload = _api_sports_payload(match)
-    if api_payload is not None:
-        facts["api_sports"] = api_payload
     audit = _audit(match, facts, collected_at)
-    # API first, Scrapling second: only the still-missing fields are projected
-    # from a browser snapshot.  The snapshot stays embedded for the LLM
-    # evidence chain and is explicitly marked research-only.
+    # Scrapling is the preferred dynamic evidence route.  It runs before the
+    # optional API-Sports call and remains research-only.
     scrapling = _scrapling_fallback(match, audit)
     if scrapling and scrapling.get("status") != "UNAVAILABLE":
         facts["scrapling"] = scrapling
         _merge_scrapling_audit(audit, scrapling)
     elif scrapling:
         facts["scrapling"] = scrapling
+    # API-Sports is a secondary fill-only source.  Re-audit after the call so
+    # it can fill fields Scrapling did not provide, without overwriting them.
+    api_payload = _api_sports_payload(match)
+    if api_payload is not None:
+        facts["api_sports"] = api_payload
+        _merge_api_audit(audit, _audit(match, facts, collected_at))
     facts = {**facts, "feature_analysis": _feature_analysis(facts.get("feature") or {})}
     return {"schema_version": "prematch-evidence-snapshot-1.0", "match_id": mid,
             "identity": {k: match.get(k) for k in ("home", "away", "competition", "kickoff", "match_num")},
@@ -407,7 +434,7 @@ def main() -> int:
     ap.add_argument("--enable-api-sports-evidence", action="store_true",
                     help="启用 API-Sports 近期赛果/伤停/首发证据（研究源，消耗配额）")
     ap.add_argument("--scrapling-url-map", type=Path,
-                    help="optional match_id -> Scrapling source mapping; used only after API gaps")
+                    help="optional match_id -> Scrapling source mapping; preferred before optional API enrichment")
     args = ap.parse_args()
     if args.enable_api_sports_evidence:
         os.environ["ENABLE_API_SPORTS_EVIDENCE"] = "1"
