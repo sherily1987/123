@@ -492,6 +492,24 @@ def test_discover_sources_accepts_match_specific_official_domains(monkeypatch):
     assert row["official_candidates"] == ["https://www.example-league.org/matches/a-vs-b"]
 
 
+def test_discover_sources_adds_audited_top20_club_domain(monkeypatch):
+    def fake_run(args):
+        if args[0] == "open":
+            return "tab: discover-top20\n"
+        if args[0] == "eval":
+            return json.dumps(["https://www.juventus.com/en/news/articles/match-centre"])
+        return "closed\n"
+
+    monkeypatch.setattr(bec, "_run_browser", fake_run)
+    row = bec.discover_sources({
+        "competition": "意甲", "home": "尤文图斯", "away": "那不勒斯",
+        "kickoff": "2026-08-26T03:00:00+08:00",
+    })
+    assert row["official_candidates"] == [
+        "https://www.juventus.com/en/news/articles/match-centre"
+    ]
+
+
 def test_snapshot_preserves_explicit_source_identity_for_other_leagues():
     row = bec._snapshot(
         {"match_id": "sporttery-6", "home": "A", "away": "B"},

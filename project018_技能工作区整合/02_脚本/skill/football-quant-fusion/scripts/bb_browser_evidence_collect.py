@@ -40,6 +40,28 @@ DEFAULT_OFFICIAL_DOMAINS = (
     "ligue1.com/", "seriea.com/", "legaseriea.it/", "eredivisie.eu/", "ligaportugal.pt/",
     "jleague.jp/", "mlssoccer.com/", "fifa.com/",
 )
+OFFICIAL_TEAM_SOURCES = Path(__file__).resolve().parents[1] / "config" / "official_team_sources_top20.json"
+
+
+def _configured_team_domains(match: dict[str, Any]) -> tuple[str, ...]:
+    """Return audited club domains for the high-frequency Sporttery teams.
+
+    The file is a provenance allow-list only: it classifies candidate URLs as
+    club/league official, but never turns a page or search snippet into a
+    confirmed lineup without identity and two-sided XI checks.
+    """
+    try:
+        payload = json.loads(OFFICIAL_TEAM_SOURCES.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ()
+    names = {str(match.get("home") or "").casefold(), str(match.get("away") or "").casefold()}
+    domains: list[str] = []
+    for team in payload.get("teams") or []:
+        candidates = {str(team.get("name") or "").casefold()}
+        candidates.update(str(v).casefold() for v in team.get("aliases") or [])
+        if names & candidates:
+            domains.extend(str(v).strip() for v in team.get("official_domains") or [] if str(v).strip())
+    return tuple(dict.fromkeys(domains))
 
 
 def _parse(value: Any) -> datetime | None:
@@ -506,8 +528,9 @@ def discover_sources(match: dict[str, Any]) -> dict[str, Any]:
             str(link) for link in (links or [])
             if str(link).startswith("http") and not _is_search_engine_url(str(link))
         ))
+        configured = _configured_team_domains(match)
         custom_domains = tuple(str(domain).lower().strip().rstrip("/") + "/"
-                              for domain in (match.get("official_domains") or [])
+                              for domain in (*configured, *(match.get("official_domains") or []))
                               if str(domain).strip())
         official_domains = DEFAULT_OFFICIAL_DOMAINS + custom_domains
         official = [link for link in links if any(domain in link.lower() for domain in official_domains)]
