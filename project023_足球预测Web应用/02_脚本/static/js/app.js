@@ -64,7 +64,12 @@ function setStatus(message, tone = "neutral") { status.textContent = message; st
 
 const refreshController = createRefreshController({ store, modules: dataModules, request: requestJson, setStatus });
 export function refreshModules(keys) { return refreshController.refresh(keys); }
-const autoStrategy = createAutoStrategyRefresh({ store, request: requestJson, setStatus });
+const autoStrategy = createAutoStrategyRefresh({
+  store,
+  request: requestJson,
+  setStatus,
+  isCurrentSalesDay: (salesDay) => Boolean(salesDay) && salesDay === shanghaiSalesDay(),
+});
 
 async function refreshWorkbench({ forceStrategy = false } = {}) {
   const next = await refreshModules();

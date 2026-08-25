@@ -65,7 +65,13 @@ const reviewRows = [
 
 function fakeRoot() {
   const handlers = {};
-  return { innerHTML: "", dataset: {}, addEventListener(type, listener) { handlers[type] = listener; }, handlers };
+  const dispatched = [];
+  return {
+    innerHTML: "", dataset: {}, dispatched,
+    addEventListener(type, listener) { handlers[type] = listener; },
+    dispatchEvent(event) { dispatched.push(event); return true; },
+    handlers,
+  };
 }
 
 test("overview KPI labels and values are exact and missing remains explicit", () => {
@@ -102,6 +108,22 @@ test("overview renders a command hero and live match cards", () => {
   assert.match(root.innerHTML, /class="hero-command"/);
   assert.match(root.innerHTML, /class="live-match-card"/);
   assert.match(root.innerHTML, /class="dashboard-grid"/);
+});
+
+test("overview live match cards expose a reachable detail action and dispatch matchselect", () => {
+  const root = fakeRoot();
+  const selected = [];
+  renderOverview(root, {
+    now: "2026-08-25T10:00:00+08:00", board: { matches: reviewRows },
+    onMatchSelect: (detail) => selected.push(detail),
+  });
+  assert.match(root.innerHTML, /data-overview-match-id="sporttery-a"/);
+  assert.match(root.innerHTML, /查看比赛详情/);
+  const button = { dataset: { overviewMatchId: "sporttery-a" }, focus() {} };
+  root.handlers.click({ target: { closest: () => button } });
+  assert.deepEqual(selected, [{ matchId: "sporttery-a" }]);
+  assert.equal(root.dispatched.at(-1).type, "matchselect");
+  assert.equal(root.dispatched.at(-1).detail.matchId, "sporttery-a");
 });
 
 test("overview keeps todo counts without linking to the retired scanner page", () => {

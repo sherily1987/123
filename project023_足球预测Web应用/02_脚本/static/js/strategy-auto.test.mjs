@@ -59,3 +59,27 @@ test("forced refresh regenerates an existing plan and failure preserves it", asy
   assert.match(store.get().autoStrategy.message, /生成失败/);
   assert.deepEqual(statuses.at(-1), ["策略自动生成失败，保留上次策略", "warning"]);
 });
+
+test("historical sales days never trigger automatic strategy generation", async () => {
+  const existing = { generated_at: "2026-08-25T22:00:00+08:00", snapshot_id: "historical" };
+  const store = createStore({
+    salesDay: "2026-08-24", cache: { dailyStrategy: {} }, cacheTimes: {},
+    activeRuns: {}, moduleErrors: {},
+  });
+  const calls = [];
+  const auto = createAutoStrategyRefresh({
+    store,
+    request: async (...args) => { calls.push(args); return existing; },
+    setStatus: () => {},
+    isCurrentSalesDay: () => false,
+  });
+
+  await auto.ensure({ force: true });
+
+  assert.deepEqual(calls, []);
+  assert.equal(store.get().cache.dailyStrategy.generated_at, undefined);
+  assert.match(store.get().autoStrategy.message, /只读/);
+  const afterFirstRead = store.get();
+  await auto.ensure({ force: true });
+  assert.equal(store.get(), afterFirstRead);
+});

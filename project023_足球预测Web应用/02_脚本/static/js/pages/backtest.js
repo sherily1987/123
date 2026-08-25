@@ -168,7 +168,25 @@ function historyRow(record) {
   const kickoff = String(record.kickoff || "");
   const time = kickoff.includes("T") ? kickoff.split("T")[1].slice(0, 5) : "—";
   const llmDirection = record.llm?.direction ? `LLM：${record.llm.direction}` : "未登记";
-  return `<tr><td>${esc(record.league || "联赛缺失")}</td><td>${esc(record.match_num || "—")}</td><td>${esc(time)}</td><td class="match-cell">${esc(record.home || "—")} vs ${esc(record.away || "—")}</td><td><strong>${esc(record.quant?.direction_label || record.quant?.direction || "—")}</strong><small>${esc(probabilityText(record))}</small></td><td>${esc(scoresText(record.quant?.top_scores))}</td><td><strong>${esc(llmDirection)}</strong><small>${esc(scoresText(record.llm?.top_scores))}</small></td><td>${esc(scoreText(record))}</td><td>${resultBadge(record, "quant")}</td><td>${resultBadge(record, "llm")}</td></tr>`;
+  const detailAction = record.match_id
+    ? `<button type="button" class="match-detail-trigger" data-backtest-match-id="${esc(record.match_id)}">查看详情</button>`
+    : "";
+  return `<tr><td>${esc(record.league || "联赛缺失")}</td><td>${esc(record.match_num || "—")}</td><td>${esc(time)}</td><td class="match-cell">${esc(record.home || "—")} vs ${esc(record.away || "—")}${detailAction}</td><td><strong>${esc(record.quant?.direction_label || record.quant?.direction || "—")}</strong><small>${esc(probabilityText(record))}</small></td><td>${esc(scoresText(record.quant?.top_scores))}</td><td><strong>${esc(llmDirection)}</strong><small>${esc(scoresText(record.llm?.top_scores))}</small></td><td>${esc(scoreText(record))}</td><td>${resultBadge(record, "quant")}</td><td>${resultBadge(record, "llm")}</td></tr>`;
+}
+
+function bindBacktestActions(root, context) {
+  if (!root?.addEventListener || root.dataset?.backtestActionsBound) return;
+  if (root.dataset) root.dataset.backtestActionsBound = "true";
+  root.addEventListener("click", (event) => {
+    const trigger = event.target.closest?.("[data-backtest-match-id]");
+    if (!trigger) return;
+    trigger.focus?.({ preventScroll: true });
+    const detail = { matchId: trigger.dataset.backtestMatchId };
+    if (typeof context.onMatchSelect === "function") context.onMatchSelect(detail);
+    if (typeof globalThis.CustomEvent === "function" && typeof root?.dispatchEvent === "function") {
+      root.dispatchEvent(new CustomEvent("matchselect", { detail }));
+    }
+  });
 }
 
 function groupedHistory(records = []) {
@@ -230,4 +248,5 @@ export function renderBacktest(root, context = {}) {
   const activeView = BACKTEST_VIEW_KEYS.includes(context.params?.view) ? context.params.view : "history";
   const viewLinks = BACKTEST_VIEW_KEYS.map((view) => `<a href="#backtest?view=${esc(view)}"${view === activeView ? ' aria-current="page"' : ""}>${esc(BACKTEST_VIEW_NAMES[view])}</a>`).join(" · ");
   root.innerHTML = `<section class="page-intro" aria-labelledby="page-title"><p class="eyebrow">足球预测工作台 / B3</p><h1 id="page-title">回测</h1><p>历史预测按日期排列，逐场展示联赛、预测、官方90分钟赛果及命中情况。</p></section><nav class="page-intro" aria-label="回测视图">${viewLinks}</nav>${viewBody(activeView, context)}`;
+  bindBacktestActions(root, context);
 }

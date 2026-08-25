@@ -37,3 +37,15 @@ def test_legacy_entry_has_no_task_mutation_controls_or_post_code():
     assert 'method: "POST"' not in text
     assert "method:'POST'" not in text
     assert "runAction(" not in text
+
+
+def test_legacy_entry_is_static_read_only_and_does_not_interpolate_external_data():
+    text = TestClient(web.app).get("/legacy.html").text
+    assert "/api/" not in text
+    assert "fetch(" not in text
+    assert "innerHTML" not in text
+    assert "onclick=" not in text
+    malicious = '<img src=x onerror="alert(1)">'
+    response = TestClient(web.app).get("/legacy.html", params={"match": malicious})
+    assert malicious not in response.text
+    assert "onerror" not in response.text

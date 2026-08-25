@@ -7,11 +7,12 @@ export function autoStrategyChanged(next, previous) {
   return next.autoStrategy !== previous.autoStrategy;
 }
 
-export function createAutoStrategyRefresh({ store, request, setStatus, now = () => new Date().toISOString() }) {
+export function createAutoStrategyRefresh({ store, request, setStatus, now = () => new Date().toISOString(), isCurrentSalesDay = () => true }) {
   let inFlight = null;
 
   async function generate() {
     const salesDay = store.get().salesDay;
+    if (!isCurrentSalesDay(salesDay)) return store.get();
     store.set((state) => ({
       ...state,
       autoStrategy: { status: "running", message: "正在自动生成当前销售日策略…" },
@@ -38,6 +39,16 @@ export function createAutoStrategyRefresh({ store, request, setStatus, now = () 
 
   return {
     ensure({ force = false } = {}) {
+      if (!isCurrentSalesDay(store.get().salesDay)) {
+        const current = store.get().autoStrategy;
+        if (current?.status !== "idle" || current?.message !== "历史销售日只读展示，不自动生成策略。") {
+          store.set((state) => ({
+            ...state,
+            autoStrategy: { status: "idle", message: "历史销售日只读展示，不自动生成策略。" },
+          }));
+        }
+        return Promise.resolve(store.get());
+      }
       if (!force && !strategyNeedsGeneration(store.get().cache?.dailyStrategy)) {
         return Promise.resolve(store.get());
       }

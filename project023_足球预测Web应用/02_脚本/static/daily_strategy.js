@@ -76,7 +76,30 @@
     const singles = plan.single_purchase_recommendations || [];
     const combos = plan.combo_purchase_recommendations || [];
     const evidence = plan.evidence_gap_summary || {};
-    const evidenceBlock = `<div class="strategy-evidence"><strong>证据链状态：</strong>${esc(evidence.evidence_gap_market_rows || 0)} 个市场行存在证据缺口</div>`;
+    const reasonText = Object.entries(evidence.reason_counts || {})
+      .slice(0, 3).map(([key, value]) => `${esc(key)} ${esc(value)}`).join("、");
+    const tags = (plan.risk_tags || []).map(tag => esc(tag)).join("、");
+    const calibrationRows = (plan.market_audit || []).map(row => {
+      const status = row.independent_calibration_status || row.model_calibration_status || "UNFITTED";
+      return `${esc(MARKET_NAMES[row.market] || row.market)}：${esc(status)}`;
+    }).join("、");
+    const evidenceBlock = `<div class="strategy-evidence"><strong>证据链状态：</strong>${esc(evidence.evidence_gap_market_rows || 0)} 个市场行存在证据缺口` +
+      (reasonText ? `（${reasonText}）` : "") +
+      (tags ? ` · 风险标签：${tags}` : "") +
+      ` · 新鲜度：过期 ${esc(evidence.stale_market_rows || 0)} 行 / 老化 ${esc(evidence.aging_market_rows || 0)} 行</div>`;
+    const health = plan.source_health || {};
+    const apiHealth = health.api_sports || {};
+    const scrapeHealth = health.scrapling || {};
+    const sourceHealthBlock = `<div class="strategy-evidence"><strong>采集器：</strong>` +
+      `API-Sports 成功 ${esc(apiHealth.ok || 0)} / 未请求 ${esc(apiHealth.NOT_REQUESTED || 0)} / 失败 ${esc(apiHealth.UNAVAILABLE || 0)}` +
+      ` · Scrapling 尝试 ${esc(scrapeHealth.attempted || 0)}，成功 ${esc(scrapeHealth.ok || 0)}，失败 ${esc(scrapeHealth.UNAVAILABLE || 0)}</div>`;
+    const calibrationBlock = calibrationRows
+      ? `<div class="strategy-evidence"><strong>市场校准状态：</strong>${calibrationRows}</div>`
+      : "";
+    const llm = plan.llm_calibration || {};
+    const llmBlock = `<div class="strategy-evidence"><strong>DeepSeek V4 Flash 校准：</strong>` +
+      `已登记 ${esc(llm.llm_rows || 0)} 场，已结算 ${esc(llm.eligible_settled_rows || 0)}/${esc(llm.minimum_review_rows || 100)} 场` +
+      ` · ${llm.ready_for_review ? "达到复核门槛" : "未达到复核门槛"} · 仅研究观察</div>`;
     const empty = !singles.length && !combos.length;
     const body = empty
       ? `<div class="banner warn">当天没有足够的未开赛候选，保留 ${amount(budget.preserved_amount)} 元，不用已开赛或缺失数据强行凑单。</div>`
@@ -105,6 +128,9 @@
         <div><b>${amount((plan.risk_disclosure || {}).maximum_loss_amount)}元</b><span>最大损失</span></div>
       </div>
       ${evidenceBlock}
+      ${sourceHealthBlock}
+      ${calibrationBlock}
+      ${llmBlock}
       ${body}
       ${backtestBlock(plan.backtest)}
       <p class="strategy-evidence-warning">${esc(display.evidence_warning || "")}</p>

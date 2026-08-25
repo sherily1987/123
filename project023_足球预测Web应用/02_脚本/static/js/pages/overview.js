@@ -26,6 +26,26 @@ export function workflowProgress(matches) {
   ].map(([label, completed]) => ({ label, completed, total }));
 }
 
+function emitMatchSelect(root, matchId, context) {
+  if (!matchId) return;
+  const detail = { matchId };
+  if (typeof context.onMatchSelect === "function") context.onMatchSelect(detail);
+  if (typeof globalThis.CustomEvent === "function" && typeof root?.dispatchEvent === "function") {
+    root.dispatchEvent(new CustomEvent("matchselect", { detail }));
+  }
+}
+
+function bindOverviewActions(root, context) {
+  if (!root?.addEventListener || root.dataset?.overviewActionsBound) return;
+  if (root.dataset) root.dataset.overviewActionsBound = "true";
+  root.addEventListener("click", (event) => {
+    const trigger = event.target.closest?.("[data-overview-match-id]");
+    if (!trigger) return;
+    trigger.focus?.({ preventScroll: true });
+    emitMatchSelect(root, trigger.dataset.overviewMatchId, context);
+  });
+}
+
 export function renderOverview(root, context = {}) {
   const board = context.board || {};
   const strategy = context.dailyStrategy || {};
@@ -53,7 +73,7 @@ export function renderOverview(root, context = {}) {
     renderTodo("身份冲突", value(todoCounts.identity_conflict), "仅显示明确标记的身份冲突"),
   ];
   const matchSummary = (hasMatchRows ? filterMatches(matches, { ...filterOptions, status: "todo" }) : []).slice(0, 5).map((match) =>
-    `<article class="live-match-card"><div class="match-meta"><span>${esc(displayMissing(match.match_num, "未编号"))}</span><time>${esc(displayMissing(match.kickoff, "开球时间未提供"))}</time></div><div class="match-line"><strong>${esc(displayMissing(match.home, "未提供"))}</strong><span>VS</span><strong>${esc(displayMissing(match.away, "未提供"))}</strong></div><div class="match-state"><span>${match.has_odds ? "HAD 已开售" : "等待开售"}</span><b>${match.quant ? "已登记" : "待处理"}</b></div></article>`,
+    `<button type="button" class="live-match-card" data-overview-match-id="${esc(match.match_id)}" aria-label="查看比赛详情：${esc(displayMissing(match.home, "未提供"))} 对 ${esc(displayMissing(match.away, "未提供"))}"><div class="match-meta"><span>${esc(displayMissing(match.match_num, "未编号"))}</span><time>${esc(displayMissing(match.kickoff, "开球时间未提供"))}</time></div><div class="match-line"><strong>${esc(displayMissing(match.home, "未提供"))}</strong><span>VS</span><strong>${esc(displayMissing(match.away, "未提供"))}</strong></div><div class="match-state"><span>${match.has_odds ? "HAD 已开售" : "等待开售"}</span><b>${match.quant ? "已登记" : "待处理"}</b><small>查看比赛详情</small></div></button>`,
   ).join("") || '<div class="empty-panel">当前没有可展示的比赛摘要。</div>';
   const workflow = workflowProgress(hasMatchRows ? matches : null);
   const hasStrategyItems = Array.isArray(strategy.single_purchase_recommendations)
@@ -77,4 +97,5 @@ export function renderOverview(root, context = {}) {
       <article class="dashboard-panel panel-strategy"><div class="section-heading"><div><p class="eyebrow">100 CNY PLAN</p><h2>娱乐策略摘要</h2></div></div><p class="strategy-name">${esc(displayMissing(strategy.display?.strategy_type, "策略数据未提供"))}</p><div class="budget-strip"><span><b>${value(budget.daily_budget_amount)}</b>预算</span><span><b>${value(budget.allocated_amount)}</b>已分配</span><span><b>${value(budget.preserved_amount)}</b>保留</span></div><p class="risk-note">策略项目 ${value(strategyItemCount)} · ${esc(displayMissing(strategy.display?.edge_label, "未提供正EV验证状态"))}</p>${autoStrategyStatus}</article>
       <article class="dashboard-panel panel-workflow"><div class="section-heading"><div><p class="eyebrow">PIPELINE</p><h2>执行流程</h2></div></div><ol class="workflow-list">${workflow.length ? workflow.map((step, index) => `<li><i>${index + 1}</i><span>${esc(step.label)}</span><strong>${esc(step.completed)}/${esc(step.total)} 完成</strong></li>`).join("") : "<li>当前销售日数据未提供</li>"}</ol></article>
     </section>`;
+  bindOverviewActions(root, context);
 }
