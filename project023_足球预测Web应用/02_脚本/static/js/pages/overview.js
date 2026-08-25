@@ -72,7 +72,7 @@ export function renderOverview(root, context = {}) {
     renderTodo("临近开球", value(todoCounts.near_kickoff), "默认未来两小时内开球"),
     renderTodo("身份冲突", value(todoCounts.identity_conflict), "仅显示明确标记的身份冲突"),
   ];
-  const matchSummary = (hasMatchRows ? filterMatches(matches, { ...filterOptions, status: "todo" }) : []).slice(0, 5).map((match) =>
+  const matchSummary = (hasMatchRows ? matches : []).map((match) =>
     `<button type="button" class="live-match-card" data-overview-match-id="${esc(match.match_id)}" aria-label="查看比赛详情：${esc(displayMissing(match.home, "未提供"))} 对 ${esc(displayMissing(match.away, "未提供"))}"><div class="match-meta"><span>${esc(displayMissing(match.match_num, "未编号"))}</span><time>${esc(displayMissing(match.kickoff, "开球时间未提供"))}</time></div><div class="match-line"><strong>${esc(displayMissing(match.home, "未提供"))}</strong><span>VS</span><strong>${esc(displayMissing(match.away, "未提供"))}</strong></div><div class="match-state"><span>${match.has_odds ? "HAD 已开售" : "等待开售"}</span><b>${match.quant ? "已登记" : "待处理"}</b><small>查看比赛详情</small></div></button>`,
   ).join("") || '<div class="empty-panel">当前没有可展示的比赛摘要。</div>';
   const workflow = workflowProgress(hasMatchRows ? matches : null);

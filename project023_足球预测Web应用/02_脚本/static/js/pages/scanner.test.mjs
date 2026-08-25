@@ -126,6 +126,16 @@ test("overview live match cards expose a reachable detail action and dispatch ma
   assert.equal(root.dispatched.at(-1).detail.matchId, "sporttery-a");
 });
 
+test("overview exposes every selected-day match, not only the first todo cards", () => {
+  const root = fakeRoot();
+  renderOverview(root, {
+    now: "2026-08-25T10:00:00+08:00", board: { matches: reviewRows },
+  });
+  for (const matchId of ["sporttery-a", "sporttery-b", "sporttery-c", "sporttery-d"]) {
+    assert.match(root.innerHTML, new RegExp(`data-overview-match-id="${matchId}"`));
+  }
+});
+
 test("overview keeps todo counts without linking to the retired scanner page", () => {
   const now = "2026-08-25T10:00:00+08:00";
   assert.deepEqual(overviewTodoCounts(reviewRows, { now }), {

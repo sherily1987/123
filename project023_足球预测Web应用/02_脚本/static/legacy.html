@@ -3,27 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>足球预测工作台：只读回滚页</title>
+  <title>足球预测工作台：旧版只读回滚</title>
   <style>
     :root { color-scheme: dark; font-family: system-ui, "Microsoft YaHei", sans-serif; background: #101713; color: #e8f0e9; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
-    main { max-width: 42rem; padding: 32px; border: 1px solid #31533d; border-radius: 14px; background: #16251c; }
-    h1 { margin-top: 0; color: #dcbf70; }
-    p, li { line-height: 1.7; color: #c8d3ca; }
-    a { display: inline-block; margin-top: 12px; padding: 10px 14px; border-radius: 8px; color: #101713; background: #dcbf70; text-decoration: none; font-weight: 700; }
+    body { max-width: 1100px; margin: auto; padding: 20px; } header, section { margin: 18px 0; padding: 16px; border: 1px solid #31533d; border-radius: 12px; background: #16251c; }
+    h1, h2 { color: #dcbf70; } button, a { padding: 8px 12px; border: 1px solid #dcbf70; border-radius: 7px; color: #101713; background: #dcbf70; font: inherit; cursor: pointer; text-decoration: none; }
+    input { margin: 0 8px; padding: 7px; } table { width: 100%; border-collapse: collapse; } td, th { padding: 8px; text-align: left; border-bottom: 1px solid #31533d; }
+    .muted { color: #b8c4ba; } .error { color: #ffadad; } .drawer { position: fixed; inset: 10% 8%; overflow: auto; padding: 20px; border: 1px solid #dcbf70; border-radius: 12px; background: #16251c; box-shadow: 0 10px 40px #000; }
   </style>
+  <script defer src="/js/legacy.js"></script>
 </head>
 <body>
+  <header>
+    <p class="muted">旧版只读回滚</p><h1>足球预测工作台</h1>
+    <label>销售日 <input id="sales-day" type="date"></label><button id="refresh" type="button">读取指定日</button>
+    <a href="/api/export/report" download="体彩看板.md">导出只读报告</a><a href="/">进入新版工作台</a>
+    <p id="status" class="muted">正在读取只读数据…</p>
+  </header>
   <main>
-    <p>足球预测工作台</p>
-    <h1>旧版只读回滚页</h1>
-    <p>此页不读取比赛、证据或 LLM 数据，也不会调用任何接口，因此不会写入共享策略、任务或回测数据。</p>
-    <ul>
-      <li>历史销售日只在新版工作台中按所选日期只读查看。</li>
-      <li>当前销售日的策略自动生成仅在新版工作台受日期门禁控制。</li>
-      <li>比赛详情、证据和回测请使用新版的“查看比赛详情”入口。</li>
-    </ul>
-    <a href="/">进入新版工作台</a>
+    <section><h2>策略预览</h2><div id="strategy"></div></section>
+    <section><h2>比赛浏览</h2><div id="matches"></div></section>
+    <section><h2>历史浏览</h2><div id="history"></div></section>
   </main>
+  <aside id="drawer" class="drawer" hidden aria-live="polite"></aside>
 </body>
 </html>

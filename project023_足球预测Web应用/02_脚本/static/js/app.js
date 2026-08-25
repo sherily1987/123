@@ -1,5 +1,5 @@
 import { requestJson } from "./api.js";
-import { esc, shanghaiSalesDay } from "./format.js";
+import { esc } from "./format.js";
 import { createRefreshController } from "./refresh.js";
 import { bindSidebarRouteClosure, closeSidebarOnRoute, createRouter, createSidebarController } from "./router.js";
 import { createStore } from "./store.js";
@@ -40,10 +40,11 @@ export const store = createStore({
 });
 
 const dataModules = [
+  { key: "currentSaleDay", path: () => "/api/current-sale-day" },
   { key: "board", path: () => "/api/board" },
   { key: "matches", path: (salesDay) => `/api/matches?sales_day=${encodeURIComponent(salesDay)}` },
   { key: "lateInfo", path: () => "/api/late-info" },
-  { key: "dailyStrategy", path: (salesDay) => `/api/daily-strategy?day=${encodeURIComponent(salesDay)}` },
+  { key: "dailyStrategy", path: (salesDay) => `/api/daily-strategy/preview?day=${encodeURIComponent(salesDay)}` },
   { key: "strategyBacktest", path: () => "/api/daily-strategy/backtest" },
   { key: "versionProgress", path: () => "/api/version-progress" },
   { key: "versionGovernance", path: () => "/api/version-governance" },
@@ -68,10 +69,16 @@ const autoStrategy = createAutoStrategyRefresh({
   store,
   request: requestJson,
   setStatus,
-  isCurrentSalesDay: (salesDay) => Boolean(salesDay) && salesDay === shanghaiSalesDay(),
+  isCurrentSalesDay: (salesDay) => Boolean(salesDay) && salesDay === store.get().cache.currentSaleDay?.sales_day,
 });
 
 async function refreshWorkbench({ forceStrategy = false } = {}) {
+  await refreshModules(["currentSaleDay"]);
+  const authorityDay = store.get().cache.currentSaleDay?.sales_day;
+  if (!salesDayInput.value && authorityDay) {
+    salesDayInput.value = authorityDay;
+    store.set((state) => ({ ...state, salesDay: authorityDay }));
+  }
   const next = await refreshModules();
   const dataReady = !next.moduleErrors?.board && !next.moduleErrors?.matches;
   if (dataReady) await autoStrategy.ensure({ force: forceStrategy });
@@ -229,6 +236,7 @@ function pageContext(params) {
     lateInfo: state.cache.lateInfo,
     versionProgress: state.cache.versionProgress,
     versionGovernance: state.cache.versionGovernance,
+    currentSaleDay: state.cache.currentSaleDay,
     cacheTimes: state.cacheTimes,
     moduleErrors: state.moduleErrors,
     activeRuns: state.activeRuns,
@@ -312,8 +320,7 @@ bindSidebarRouteClosure(document.querySelectorAll("[data-route]"), sidebarContro
 sidebarToggle.addEventListener("click", () => sidebarController.toggle());
 mobileSidebar.addEventListener("change", () => sidebarController.sync());
 document.querySelector("#refresh-shell").addEventListener("click", () => { void refreshWorkbench({ forceStrategy: true }); });
-salesDayInput.value = shanghaiSalesDay();
-store.set((state) => ({ ...state, salesDay: salesDayInput.value }));
+store.set((state) => ({ ...state, salesDay: salesDayInput.value || "" }));
 salesDayInput.addEventListener("change", () => {
   store.set((state) => ({ ...state, salesDay: salesDayInput.value }));
   void refreshWorkbench({ forceStrategy: true });

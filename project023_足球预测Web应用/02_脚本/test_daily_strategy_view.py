@@ -209,20 +209,20 @@ def test_daily_strategy_api_exposes_the_selected_day(monkeypatch):
 
     seen = []
 
-    def fake(day):
-        seen.append(day)
+    def fake(day, persist=False):
+        seen.append((day, persist))
         return {"selected_day": day, "budget": {"allocated_amount": 100.0}}
 
     monkeypatch.setattr(web.dsv, "daily_strategy", fake)
     got = web.daily_strategy_api("2026-08-23")
 
-    assert seen == ["2026-08-23"]
+    assert seen == [("2026-08-23", False)]
     assert got["selected_day"] == "2026-08-23"
     assert got["budget"]["allocated_amount"] == 100.0
 
 
-def test_frontend_renderer_shows_only_evidence_gap_count_for_evidence_status():
-    """Catches the strategy card leaking calibration, source, or freshness diagnostics."""
+def test_frontend_renderer_keeps_strategy_audit_diagnostics_visible():
+    """Catches the strategy card dropping calibration, source, or freshness diagnostics."""
     renderer = Path(__file__).resolve().parent / "static" / "daily_strategy.js"
     sample = {
         "selected_day": "2026-08-23",
@@ -275,10 +275,10 @@ def test_frontend_renderer_shows_only_evidence_gap_count_for_evidence_status():
     assert "进球数" in run.stdout
     assert "证据链状态：" in run.stdout
     assert "2 个市场行存在证据缺口" in run.stdout
-    assert "市场校准状态" not in run.stdout
-    assert "新鲜度：" not in run.stdout
-    assert "采集器：" not in run.stdout
-    assert "DeepSeek V4 Flash 校准" not in run.stdout
+    assert "市场校准状态" in run.stdout
+    assert "新鲜度：" in run.stdout
+    assert "采集器：" in run.stdout
+    assert "DeepSeek V4 Flash 校准" in run.stdout
     assert "周日003" in run.stdout and "2球" in run.stdout and "10元" in run.stdout
     assert "2串1" in run.stdout and "16元" in run.stdout
     assert "不是生产胆项" in run.stdout

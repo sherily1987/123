@@ -33,3 +33,13 @@ def test_brand_uses_project_football_svg_instead_of_system_emoji():
     svg = icon.read_text(encoding="utf-8")
     assert "<svg" in svg
     assert 'aria-hidden="true"' in html
+
+
+def test_spa_uses_backend_authority_for_current_sale_day_and_read_only_strategy_preview():
+    static = Path(__file__).parent / "static"
+    app_js = (static / "js" / "app.js").read_text(encoding="utf-8")
+
+    assert '"/api/current-sale-day"' in app_js
+    assert "/api/daily-strategy/preview?day=" in app_js
+    assert "cache.currentSaleDay" in app_js
+    assert "shanghaiSalesDay" not in app_js

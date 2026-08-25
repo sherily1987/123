@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -15,7 +15,6 @@ HERE = Path(__file__).resolve().parent
 import db
 import daily_strategy_view as dsv
 import importlib.util
-import inspect
 import runner
 import store_view as sv
 from workbench_runtime import BUILD_IDENTITY, FUSION_SCRIPTS
@@ -123,13 +122,28 @@ def late_info():
 
 @app.get("/api/daily-strategy")
 def daily_strategy_api(day: str | None = None):
+    """Backward-compatible read-only strategy preview; mutations use POST only."""
     try:
-        kwargs = {"persist": True} if "persist" in inspect.signature(dsv.daily_strategy).parameters else {}
-        return dsv.daily_strategy(day, **kwargs)
+        return dsv.daily_strategy(day, persist=False)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(500, f"每日策略生成失败: {exc}") from exc
+        raise HTTPException(500, f"每日策略预览失败: {exc}") from exc
+
+
+@app.get("/api/daily-strategy/preview")
+def daily_strategy_preview_api(day: str | None = None):
+    """Explicitly read-only strategy preview for legacy and historical browsing."""
+    return daily_strategy_api(day)
+
+
+@app.get("/api/current-sale-day")
+def current_sale_day_api():
+    """The backend is authoritative for the first current/future unstarted sales day."""
+    try:
+        return {"sales_day": dsv.current_sale_day()}
+    except Exception as exc:
+        raise HTTPException(500, f"当前销售日读取失败: {exc}") from exc
 
 
 @app.post("/api/daily-strategy/recommend")
@@ -369,8 +383,7 @@ def job(match_id: str):
     return disk
 
 
-@app.get("/api/export/report")
-def export_report():
+def build_export_report_markdown() -> str:
     data = sv.board()
     L = [
         f"# 体彩看板 {data['as_of'][:16]}",
@@ -400,9 +413,17 @@ def export_report():
                 f"{pcts} | {r.get('bucket')} | {llm.get('direction') or ('已采集' if llm else '未采集')} |"
             )
         L.append("")
-    out = HERE / "data" / "board_report.md"
-    out.write_text("\n".join(L) + "\n", encoding="utf-8")
-    return FileResponse(out, filename="体彩看板.md")
+    return "\n".join(L) + "\n"
+
+
+@app.get("/api/export/report")
+def export_report():
+    """Render the report in memory; downloading it never writes a runtime artifact."""
+    return Response(
+        build_export_report_markdown(),
+        media_type="text/markdown; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=board.md; filename*=UTF-8''%E4%BD%93%E5%BD%A9%E7%9C%8B%E6%9D%BF.md"},
+    )
 
 
 app.mount("/", StaticFiles(directory=str(HERE / "static"), html=True), name="static")

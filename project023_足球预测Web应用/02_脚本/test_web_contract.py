@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 import app as web
@@ -41,11 +43,61 @@ def test_legacy_entry_has_no_task_mutation_controls_or_post_code():
 
 def test_legacy_entry_is_static_read_only_and_does_not_interpolate_external_data():
     text = TestClient(web.app).get("/legacy.html").text
-    assert "/api/" not in text
-    assert "fetch(" not in text
     assert "innerHTML" not in text
     assert "onclick=" not in text
     malicious = '<img src=x onerror="alert(1)">'
     response = TestClient(web.app).get("/legacy.html", params={"match": malicious})
     assert malicious not in response.text
     assert "onerror" not in response.text
+
+
+def test_read_only_strategy_preview_and_current_sale_day_never_persist(monkeypatch):
+    calls = []
+
+    def fake_strategy(day, persist=False):
+        calls.append((day, persist))
+        return {"selected_day": day, "persisted": persist}
+
+    monkeypatch.setattr(web.dsv, "daily_strategy", fake_strategy)
+    monkeypatch.setattr(web.dsv, "current_sale_day", lambda: "2026-08-27")
+    client = TestClient(web.app)
+
+    preview = client.get("/api/daily-strategy/preview", params={"day": "2026-08-26"})
+    current = client.get("/api/current-sale-day")
+
+    assert preview.status_code == 200
+    assert preview.json() == {"selected_day": "2026-08-26", "persisted": False}
+    assert current.status_code == 200
+    assert current.json() == {"sales_day": "2026-08-27"}
+    assert calls == [("2026-08-26", False)]
+
+
+def test_export_report_is_read_only_and_does_not_create_a_runtime_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(web, "HERE", tmp_path)
+    monkeypatch.setattr(web.sv, "board", lambda: {
+        "as_of": "2026-08-26T12:00:00+08:00", "store": "test-store",
+        "summary": {"on_sale": 1, "has_odds": 1, "predicted": 1, "missing_pred": 0},
+        "by_league": [],
+    })
+
+    response = TestClient(web.app).get("/api/export/report")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/markdown")
+    assert "体彩看板" in response.text
+    assert not (tmp_path / "data" / "board_report.md").exists()
+
+
+def test_legacy_browser_is_functional_but_uses_only_safe_read_endpoints():
+    static = Path(__file__).parent / "static"
+    html = (static / "legacy.html").read_text(encoding="utf-8")
+    script = (static / "js" / "legacy.js").read_text(encoding="utf-8")
+
+    assert 'src="/js/legacy.js"' in html
+    for endpoint in ("/api/current-sale-day", "/api/matches", "/api/daily-strategy/preview", "/api/history", "/api/match/", "/api/export/report"):
+        assert endpoint in html + script
+    assert "method: \"POST\"" not in script
+    assert "innerHTML" not in script
+    assert "onclick=" not in html
+    assert "textContent" in script
+    assert "addEventListener" in script
