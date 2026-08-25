@@ -1,0 +1,15 @@
+:root {
+  --sidebar: #11101b; --sidebar-deep: #0c0b13; --accent: #f49a3f; --accent-strong: #ffb24d;
+  --accent-soft: rgb(244 154 63 / 14%); --canvas: #11111a; --surface: #1a1825;
+  --surface-2: #211e2e; --surface-3: #282438; --ok: #35d07f; --warn: #f7c84b;
+  --danger: #ff6666; --focus: #ffb24d; --ink: #f7f3ea; --muted: #aaa5b7;
+  --line: rgb(255 255 255 / 9%); --sidebar-muted: #8f8a9d; --sidebar-line: rgb(255 255 255 / 8%);
+  --shadow: 0 22px 60px rgb(0 0 0 / 28%); --glow: 0 0 35px rgb(244 154 63 / 12%);
+  --radius: 16px; --content-width: 1440px;
+  font-family: "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif; color: var(--ink); background: var(--canvas);
+}
+* { box-sizing: border-box; }
+html { color-scheme: dark; scroll-behavior: smooth; }
+body { min-width: 320px; margin: 0; background: radial-gradient(circle at 18% 5%, rgb(244 154 63 / 7%), transparent 28rem), linear-gradient(180deg, #12111b 0%, #0e0e16 100%); }
+body::before { position: fixed; z-index: -1; inset: 0; content: ""; opacity: .18; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 72px 72px; mask-image: linear-gradient(to bottom, #000, transparent 72%); }
+button, input { font: inherit; }:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
