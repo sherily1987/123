@@ -108,6 +108,37 @@ def test_daily_strategy_view_missing_jobs_preserves_budget(tmp_path: Path):
     assert got["single_purchase_recommendations"] == []
 
 
+def test_first_nonempty_strategy_replaces_and_archives_empty_snapshot_then_freezes(tmp_path: Path):
+    import daily_strategy_view as view
+
+    day = "2026-08-23"
+    empty = view.daily_strategy(
+        day, root=tmp_path, now=datetime(2026, 8, 23, 7, 0, tzinfo=CST), persist=True,
+    )
+    assert empty["budget"]["allocated_amount"] == 0.0
+
+    _write_jobs(tmp_path, day)
+    frozen = view.daily_strategy(
+        day, root=tmp_path, now=datetime(2026, 8, 23, 8, 0, tzinfo=CST), persist=True,
+    )
+    snapshot = tmp_path / "daily_strategy_plans" / f"{day}.json"
+    persisted = json.loads(snapshot.read_text(encoding="utf-8"))
+    archives = list((snapshot.parent / "archive").glob(f"{day}_*_empty.json"))
+
+    assert frozen["budget"]["allocated_amount"] == 100.0
+    assert persisted["single_purchase_recommendations"]
+    assert len(archives) == 1
+
+    for path in (tmp_path / "jobs" / day).glob("*.json"):
+        path.unlink()
+    later = view.daily_strategy(
+        day, root=tmp_path, now=datetime(2026, 8, 23, 9, 0, tzinfo=CST), persist=True,
+    )
+
+    assert later["snapshot_id"] == frozen["snapshot_id"]
+    assert later["single_purchase_recommendations"] == frozen["single_purchase_recommendations"]
+
+
 def test_daily_strategy_view_attaches_forward_pipeline_sidecar(tmp_path: Path):
     """The pipeline's forward snapshot must reach the planner without rewriting jobs."""
     import daily_strategy_view as view
@@ -190,8 +221,8 @@ def test_daily_strategy_api_exposes_the_selected_day(monkeypatch):
     assert got["budget"]["allocated_amount"] == 100.0
 
 
-def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
-    """Catches the Web card hiding stake details or the unverified-edge warning."""
+def test_frontend_renderer_shows_only_evidence_gap_count_for_evidence_status():
+    """Catches the strategy card leaking calibration, source, or freshness diagnostics."""
     renderer = Path(__file__).resolve().parent / "static" / "daily_strategy.js"
     sample = {
         "selected_day": "2026-08-23",
@@ -242,10 +273,12 @@ def test_frontend_renderer_shows_budget_markets_combos_and_edge_boundary():
     assert "固定娱乐预算" in run.stdout
     assert "未验证正EV" in run.stdout
     assert "进球数" in run.stdout
-    assert "市场校准状态" in run.stdout and "UNFITTED" in run.stdout and "VALID" in run.stdout
-    assert "新鲜度：过期 1 行 / 老化 1 行" in run.stdout
-    assert "API-Sports 成功 1" in run.stdout and "Scrapling 尝试 2" in run.stdout
-    assert "DeepSeek V4 Flash 校准" in run.stdout and "已登记 12 场" in run.stdout and "已结算 9/100" in run.stdout
+    assert "证据链状态：" in run.stdout
+    assert "2 个市场行存在证据缺口" in run.stdout
+    assert "市场校准状态" not in run.stdout
+    assert "新鲜度：" not in run.stdout
+    assert "采集器：" not in run.stdout
+    assert "DeepSeek V4 Flash 校准" not in run.stdout
     assert "周日003" in run.stdout and "2球" in run.stdout and "10元" in run.stdout
     assert "2串1" in run.stdout and "16元" in run.stdout
     assert "不是生产胆项" in run.stdout
@@ -261,3 +294,44 @@ def test_workbench_static_responses_disable_browser_cache(path):
 
     assert response.status_code == 200
     assert response.headers["cache-control"] == "no-store"
+
+
+def test_current_sale_day_advances_to_first_day_with_unstarted_fixture(tmp_path):
+    import daily_strategy_view as view
+
+    for day, kickoff in (
+        ("2026-08-25", "2026-08-25T10:00:00+08:00"),
+        ("2026-08-26", "2026-08-26T01:00:00+08:00"),
+        ("2026-08-27", "2026-08-27T01:00:00+08:00"),
+    ):
+        folder = tmp_path / "jobs" / day
+        folder.mkdir(parents=True)
+        (folder / "sporttery-1.json").write_text(
+            json.dumps({"identity": {"match_id": "sporttery-1", "kickoff": kickoff}}),
+            encoding="utf-8",
+        )
+
+    selected = view.current_sale_day(
+        root=tmp_path,
+        now=datetime.fromisoformat("2026-08-25T21:00:00+08:00"),
+    )
+
+    assert selected == "2026-08-26"
+
+
+def test_recommend_endpoint_uses_current_sale_day(monkeypatch):
+    from fastapi.testclient import TestClient
+    import app as web
+
+    calls = []
+    monkeypatch.setattr(web.dsv, "current_sale_day", lambda: "2026-08-26")
+    monkeypatch.setattr(
+        web.dsv, "daily_strategy",
+        lambda day, persist=False: calls.append((day, persist)) or {"selected_day": day},
+    )
+
+    response = TestClient(web.app).post("/api/daily-strategy/recommend")
+
+    assert response.status_code == 200
+    assert response.json()["selected_day"] == "2026-08-26"
+    assert calls == [("2026-08-26", True)]

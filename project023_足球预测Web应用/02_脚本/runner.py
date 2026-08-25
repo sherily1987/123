@@ -8,14 +8,13 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-FUSION_SCRIPTS = (
-    HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts"
-)
+from workbench_runtime import FUSION_SCRIPTS, PRIMARY_WORKSPACE_ROOT
 if str(FUSION_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(FUSION_SCRIPTS))
 from runtime import resolve_python  # noqa: E402
@@ -34,6 +33,116 @@ EVIDENCE_VALID_STATUSES = {
     "VALID", "VALID_EMPTY", "PREDICTED", "OK", "AVAILABLE", "FRESH", "AGING",
     "IMAGE_EXTRACTED", "PROXY_XG", "EXPLICIT_XG",
 }
+RUN_FAILURES_DIR = HERE / "data" / "run_failures"
+ITEMIZED_RUN_TYPES = {"predict", "llm"}
+
+
+def normalize_match_ids(match_ids, *, strict: bool = False) -> list[str]:
+    if match_ids is None:
+        return []
+    if isinstance(match_ids, (str, int)):
+        items = [match_ids]
+    else:
+        try:
+            items = list(match_ids)
+        except TypeError as exc:
+            if strict:
+                raise ValueError("invalid match id collection") from exc
+            return []
+    normalized = set()
+    for raw in items:
+        mid = sv.sporttery_id(raw)
+        if not mid or not re.fullmatch(r"sporttery-\d+", mid):
+            if strict:
+                raise ValueError(f"invalid match id: {raw!r}")
+            continue
+        normalized.add(mid)
+    return sorted(normalized)
+
+
+def valid_sales_day(sales_day: str | None) -> bool:
+    if sales_day is None:
+        return True
+    if not isinstance(sales_day, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", sales_day):
+        return False
+    try:
+        return datetime.strptime(sales_day, "%Y-%m-%d").date().isoformat() == sales_day
+    except ValueError:
+        return False
+
+
+def sales_day_kickoff_dates(sales_day: str) -> list[str]:
+    """A Sporttery sales day can contain fixtures after local midnight."""
+    if not valid_sales_day(sales_day):
+        raise ValueError("invalid sales day")
+    day = datetime.strptime(sales_day, "%Y-%m-%d").date()
+    return [day.isoformat(), (day + timedelta(days=1)).isoformat()]
+
+
+def write_run_failures(
+    run_id: int, run_type: str, sales_day: str | None, match_ids,
+) -> Path:
+    """Atomically persist the server-derived itemized retry scope."""
+    if run_type not in ITEMIZED_RUN_TYPES:
+        raise ValueError(f"unsupported itemized run type: {run_type}")
+    normalized = normalize_match_ids(match_ids, strict=True)
+    if not normalized:
+        raise ValueError("empty failed match list")
+    if not valid_sales_day(sales_day):
+        raise ValueError("invalid sales day")
+    RUN_FAILURES_DIR.mkdir(parents=True, exist_ok=True)
+    destination = RUN_FAILURES_DIR / f"{int(run_id)}.json"
+    payload = {
+        "run_type": run_type,
+        "sales_day": sales_day,
+        "match_ids": normalized,
+    }
+    handle = tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", dir=RUN_FAILURES_DIR,
+        prefix=f".{int(run_id)}.", suffix=".tmp", delete=False,
+    )
+    temporary = Path(handle.name)
+    try:
+        with handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, destination)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+    return destination
+
+
+def read_run_failures(run_id: int) -> dict | None:
+    path = RUN_FAILURES_DIR / f"{int(run_id)}.json"
+    try:
+        if path.resolve().parent != RUN_FAILURES_DIR.resolve():
+            return None
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return None
+    if not isinstance(payload, dict) or set(payload) != {"run_type", "sales_day", "match_ids"}:
+        return None
+    if payload.get("run_type") not in ITEMIZED_RUN_TYPES:
+        return None
+    if not isinstance(payload.get("match_ids"), list):
+        return None
+    try:
+        match_ids = normalize_match_ids(payload.get("match_ids"), strict=True)
+    except ValueError:
+        return None
+    if not match_ids:
+        return None
+    sales_day = payload.get("sales_day")
+    if not valid_sales_day(sales_day):
+        return None
+    return {
+        "run_type": payload["run_type"],
+        "sales_day": sales_day,
+        "match_ids": match_ids,
+    }
 
 
 def _no_proxy_env():
@@ -84,25 +193,29 @@ def _refresh_evidence_audit(match: dict, chain: dict) -> None:
     audit["merged_chain_fields"] = [name for name in EVIDENCE_FIELDS if isinstance(chain.get(name), dict)]
 
 
-def task_collect(kickoff_date: str, run_id: int):
+def task_collect(sales_day: str, run_id: int):
     try:
-        work = forward_work_dir() / kickoff_date
+        work = forward_work_dir() / sales_day
         work.mkdir(parents=True, exist_ok=True)
-        db.run_update(run_id, message=f"采集 {kickoff_date} 开球场次…")
+        db.run_update(run_id, message=f"采集销售日 {sales_day}全部开售有盘场次…")
         r = _cli([
-            "collect", "--kickoff-date", kickoff_date,
+            "collect", "--sales-day", sales_day,
             "--output", str(work / "sporttery_prematch.json"),
             "--emit-input", str(work / "inputs_prematch.json"),
         ], timeout=900)
         if r.returncode != 0:
             db.run_update(run_id, status="error", message=(r.stderr or r.stdout)[-300:])
             return
-        n = 0
         inp = work / "inputs_prematch.json"
+        n = 0
         if inp.exists():
             n = len(json.loads(inp.read_text(encoding="utf-8")).get("matches") or [])
+        if n == 0:
+            db.run_update(run_id, done=0, total=0, status="done",
+                          message="当前销售日没有开售且有HAD赔率的比赛")
+            return
         db.run_update(run_id, done=n, total=n, status="done",
-                      message=f"采集完成，可登记 {n} 场（写入 fusion forward，未改生产概率）")
+                      message=f"销售日采集完成，共采集 {n} 场开售且有HAD赔率比赛（含跨午夜开球；未改生产概率）")
     except Exception as e:
         db.run_update(run_id, status="error", message=f"采集失败: {e}")
 
@@ -121,21 +234,39 @@ def _record_one(match: dict, work: Path) -> str:
     return payload.get("status")
 
 
-def task_predict(run_id: int, kickoff_date: str | None = None):
+def task_predict(
+    run_id: int, kickoff_date: str | None = None, match_ids: list[str] | None = None,
+):
     """只登记看板里「有盘未预测」的场次，mode 固定 market_only。"""
+    requested = set(normalize_match_ids(match_ids)) if match_ids is not None else None
+    wanted: set[str] = set(requested or [])
+    succeeded: set[str] = set()
     try:
         board = sv.board()
         missing = board.get("missing") or []
         if kickoff_date:
-            missing = [m for m in missing if (m.get("kickoff") or "").startswith(kickoff_date)]
+            missing = [m for m in missing if (
+                m.get("sales_day") == kickoff_date
+                if m.get("sales_day") else (m.get("kickoff") or "").startswith(kickoff_date)
+            )]
+        if requested is not None:
+            missing = [m for m in missing if sv.sporttery_id(m.get("match_id")) in requested]
         if not missing:
+            if requested:
+                write_run_failures(run_id, "predict", kickoff_date, requested)
+                db.run_update(
+                    run_id, done=0, total=len(requested), status="error",
+                    message=f"精确重试 0/{len(requested)}：目标已不在待登记集合，保留失败清单",
+                )
+                return
             db.run_update(run_id, status="done", message="没有待补登记的有盘场次")
             return
         days = sorted({(m.get("kickoff") or "")[:10] for m in missing if m.get("kickoff")})
-        want = {m["match_id"] for m in missing}
-        db.run_update(run_id, total=len(want), message=f"补登记 {len(want)} 场 market_only…")
+        resolved = {sv.sporttery_id(m.get("match_id")) for m in missing}
+        resolved.discard(None)
+        wanted = set(requested) if requested is not None else resolved
+        db.run_update(run_id, total=len(wanted), message=f"补登记 {len(wanted)} 场 market_only…")
         done = 0
-        notes = []
         for day in days:
             work = forward_work_dir() / day
             work.mkdir(parents=True, exist_ok=True)
@@ -145,7 +276,6 @@ def task_predict(run_id: int, kickoff_date: str | None = None):
                 "--emit-input", str(work / "inputs_prematch.json"),
             ], timeout=900)
             if r.returncode != 0:
-                notes.append(f"{day} 采集失败")
                 continue
             inp = work / "inputs_prematch.json"
             if not inp.exists():
@@ -155,15 +285,30 @@ def task_predict(run_id: int, kickoff_date: str | None = None):
                 if match.get("mode") != "market_only":
                     continue
                 mid = sv.sporttery_id((match.get("sporttery_meta") or {}).get("match_id"))
-                if mid not in want:
+                if mid not in wanted:
                     continue
-                st = _record_one(match, work)
+                try:
+                    _record_one(match, work)
+                except Exception:
+                    continue
+                succeeded.add(mid)
                 done += 1
-                notes.append(f"{mid} {st}")
-                db.run_update(run_id, done=done, message=f"已登记 {done}/{len(want)}")
-        db.run_update(run_id, done=done, status="done",
+                db.run_update(run_id, done=done, message=f"已登记 {done}/{len(wanted)}")
+        failed = sorted(wanted - succeeded)
+        if failed:
+            sidecar_day = kickoff_date or (days[0] if len(days) == 1 else None)
+            write_run_failures(run_id, "predict", sidecar_day, failed)
+            db.run_update(
+                run_id, done=done, total=len(wanted), status="error",
+                message=f"补登记完成 {done}/{len(wanted)}，{len(failed)} 场可逐项重试",
+            )
+            return
+        db.run_update(run_id, done=done, total=len(wanted), status="done",
                       message=f"补登记完成 {done} 场（market_only）")
     except Exception as e:
+        remaining = wanted - succeeded
+        if remaining:
+            write_run_failures(run_id, "predict", kickoff_date, remaining)
         db.run_update(run_id, status="error", message=f"登记失败: {e}")
 
 
@@ -200,13 +345,10 @@ def llm_repo() -> Path:
             return p
         if (p.parent / "predict.py").is_file():
             return p.parent
-    f = HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"
+    f = PRIMARY_WORKSPACE_ROOT / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"
     if (f / "predict.py").is_file():
         return f
-    c = Path(r"C:\Users\Administrator\football-llm-predictor")
-    if (c / "predict.py").is_file():
-        return c
-    raise FileNotFoundError("未找到 football-llm-predictor（可设 FOOTBALL_LLM_ROOT）")
+    raise FileNotFoundError("仓库内 football-llm-predictor 不可用（可设 FOOTBALL_LLM_ROOT）；拒绝使用 C 盘过期快照")
 
 
 def fusion_to_llm_match(match: dict) -> dict:
@@ -613,6 +755,7 @@ def parse_llm_log(text: str) -> dict:
         strength = int(dm.group(4)) if dm else (audit or {}).get("strength")
         alt_direction = am.group(2) if am else (audit or {}).get("alt_direction")
         rows.append({
+            "match_id": sv.sporttery_id((audit or {}).get("match_id")),
             "num": hm.group(1) if hm else "",
             "home": hm.group(2) if hm else "",
             "away": hm.group(3) if hm else "",
@@ -639,10 +782,25 @@ def parse_llm_log(text: str) -> dict:
             "raw_llm_ou25": raw_audit.get("raw_llm_ou25"),
             "raw_llm_hafu": raw_audit.get("raw_llm_hafu"),
         })
-    skipped = len(re.findall(
-        r'"status":\s*"(evidence_insufficient|evidence_audit_failed)"', text or ""
-    ))
-    return {"rows": rows, "ok": len(rows), "skipped": skipped}
+    skipped_indices = []
+    for line in (text or "").splitlines():
+        try:
+            candidate = json.loads(line.strip())
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(candidate, dict):
+            continue
+        if candidate.get("status") not in {"evidence_insufficient", "evidence_audit_failed"}:
+            continue
+        index = candidate.get("match_index")
+        if isinstance(index, int):
+            skipped_indices.append(index)
+    return {
+        "rows": rows,
+        "ok": len(rows),
+        "skipped": len(skipped_indices),
+        "skipped_indices": skipped_indices,
+    }
 
 
 def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict]) -> int:
@@ -680,7 +838,19 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
             key: src.get(key) for key in ("evidence_snapshot_ref", "browser_evidence_ref")
             if src.get(key)
         }
-        upsert_job(root, ident, llm={
+        conflict_sources = [
+            evidence_audit.get("conflicts"),
+            (evidence_audit.get("browser_merge_audit") or {}).get("conflicts"),
+            (src.get("evidence_snapshot_audit") or {}).get("conflicts"),
+        ]
+        evidence_conflicts = []
+        for conflicts in conflict_sources:
+            if not isinstance(conflicts, list):
+                continue
+            for conflict in conflicts:
+                if conflict not in evidence_conflicts:
+                    evidence_conflicts.append(conflict)
+        llm_payload = {
             "track": "llm",
             "model_id": row.get("model_id") or DEFAULT_LLM_MODEL_ID,
             "llm_prediction_as_of": row.get("prediction_as_of"),
@@ -691,14 +861,6 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
             "evidence_gap": bool(row.get("evidence_gap")),
             # Persist the evidence state alongside the prediction so later
             # calibration can separate model error from stale/missing inputs.
-            "evidence_status": evidence_status,
-            "evidence_missing_fields": evidence_missing_fields,
-            "evidence_collected_at": evidence_collected_at,
-            "evidence_age_minutes": evidence_age_minutes,
-            "evidence_refs": evidence_refs,
-            "evidence_chain_fields": sorted(
-                key for key, value in evidence_chain.items() if isinstance(value, dict)
-            ),
             "score": row.get("score"),
             "top_scores": row.get("top_scores") or ([row.get("score")] if row.get("score") else []),
             # Keep both production and research-only probability fields so a
@@ -713,7 +875,20 @@ def write_llm_jobs(kickoff_date: str, raw_matches: list[dict], parsed: list[dict
             "llm_raw_top_scores": row.get("raw_llm_top_scores") or [],
             "llm_raw_ou25": row.get("raw_llm_ou25"),
             "llm_raw_hafu": row.get("raw_llm_hafu"),
-        })
+        }
+        if evidence_audit or evidence_chain or evidence_refs:
+            llm_payload.update({
+                "evidence_status": evidence_status,
+                "evidence_missing_fields": evidence_missing_fields,
+                "evidence_collected_at": evidence_collected_at,
+                "evidence_age_minutes": evidence_age_minutes,
+                "evidence_refs": evidence_refs,
+                "evidence_conflicts": evidence_conflicts,
+                "evidence_chain_fields": sorted(
+                    key for key, value in evidence_chain.items() if isinstance(value, dict)
+                ),
+            })
+        upsert_job(root, ident, llm=llm_payload)
         n += 1
     return n
 
@@ -775,6 +950,10 @@ def backfill_llm_job_evidence_metadata(
             "evidence_refs": {
                 "evidence_snapshot_ref": str(snap),
             },
+            "evidence_conflicts": list(
+                (audit.get("browser_merge_audit") or {}).get("conflicts")
+                or audit.get("conflicts") or []
+            ),
             "evidence_chain_fields": fields or sorted(chain.keys()),
         })
         upsert_job(root, identity_from(identity), llm=llm)
@@ -799,6 +978,56 @@ def _ensure_prematch(kickoff_date: str, work: Path) -> Path:
     return inp
 
 
+def _sales_day_prematch_matches(sales_day: str) -> list[dict]:
+    matches = []
+    for scan_day in sales_day_kickoff_dates(sales_day):
+        work = forward_work_dir() / scan_day
+        try:
+            inp = _ensure_prematch(scan_day, work)
+        except RuntimeError:
+            continue
+        for match in json.loads(inp.read_text(encoding="utf-8")).get("matches") or []:
+            matches.append((scan_day, match))
+    selected = []
+    seen = set()
+    for scan_day, match in matches:
+        meta = match.get("sporttery_meta") or {}
+        canonical_day = match.get("sales_day") or meta.get("sales_day") or meta.get("sale_date")
+        if canonical_day != sales_day and not (canonical_day is None and scan_day == sales_day):
+            continue
+        mid = sv.sporttery_id(match.get("match_id") or meta.get("match_id"))
+        key = mid or json.dumps(match, sort_keys=True, ensure_ascii=False)
+        if key not in seen:
+            seen.add(key)
+            selected.append(match)
+    return selected
+
+
+def write_scoped_prematch_input(
+    source_path: Path, work: Path, run_id: int, match_ids,
+) -> Path:
+    """Write a retry-only collector input without mutating the full-day source."""
+    wanted = set(normalize_match_ids(match_ids, strict=True))
+    payload = json.loads(Path(source_path).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or not isinstance(payload.get("matches"), list):
+        raise ValueError("invalid inputs_prematch payload")
+    scoped = []
+    for match in payload["matches"]:
+        if not isinstance(match, dict):
+            continue
+        meta = match.get("sporttery_meta") or {}
+        mid = sv.sporttery_id(meta.get("match_id") or match.get("match_id"))
+        if mid in wanted:
+            scoped.append(match)
+    output = Path(work) / f"inputs_prematch_run_{int(run_id)}.json"
+    scoped_payload = dict(payload)
+    scoped_payload["matches"] = scoped
+    if "count" in scoped_payload:
+        scoped_payload["count"] = len(scoped)
+    output.write_text(json.dumps(scoped_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return output
+
+
 def _future_llm_matches(fusion_matches: list[dict], now: datetime) -> list[dict]:
     out = []
     for m in fusion_matches:
@@ -814,19 +1043,110 @@ def _future_llm_matches(fusion_matches: list[dict], now: datetime) -> list[dict]
     return out
 
 
-def task_llm(run_id: int, kickoff_date: str | None = None):
+def filter_llm_retry_matches(matches: list[dict], match_ids) -> list[dict]:
+    """Return only the exact server-side retry targets, preserving batch order."""
+    wanted = set(normalize_match_ids(match_ids))
+    return [
+        match for match in matches
+        if sv.sporttery_id(match.get("match_id")) in wanted
+    ]
+
+
+def _handled_llm_match_ids(
+    matches: list[dict], parsed: dict, *, include_skipped: bool = True,
+) -> set[str]:
+    by_num = {
+        str(match.get("match_num") or ""): sv.sporttery_id(match.get("match_id"))
+        for match in matches
+    }
+    handled = {
+        sv.sporttery_id(row.get("match_id")) or by_num.get(str(row.get("num") or ""))
+        for row in (parsed.get("rows") or [])
+    }
+    if include_skipped:
+        for index in parsed.get("skipped_indices") or []:
+            if isinstance(index, int) and 1 <= index <= len(matches):
+                handled.add(sv.sporttery_id(matches[index - 1].get("match_id")))
+    handled.discard(None)
+    return handled
+
+
+_EVIDENCE_LABELS = {
+    "recent_form": "近5场", "team_stats": "球队数据", "injuries": "伤停",
+    "injury": "伤停", "suspensions": "停赛", "starting_xi": "首发",
+    "lineup": "首发", "weather": "天气", "motivation": "战意",
+}
+
+
+def llm_live_evidence(match: dict) -> dict:
+    """Build a compact, user-facing evidence summary without changing inputs."""
+    audit = match.get("evidence_audit") or {}
+    chain = match.get("evidence_chain") or {}
+    available = []
+    for key, value in chain.items():
+        if isinstance(value, dict) and value:
+            label = _EVIDENCE_LABELS.get(key, key)
+            if label not in available:
+                available.append(label)
+    missing = []
+    for key in audit.get("missing_fields") or []:
+        label = _EVIDENCE_LABELS.get(str(key), str(key))
+        if label not in missing:
+            missing.append(label)
+    status = audit.get("evidence_status") or ("有缺口" if missing else "已采集")
+    return {"status": status, "available": available, "missing": missing}
+
+
+def llm_live_result(row: dict) -> dict:
+    decision = row.get("decision") if isinstance(row.get("decision"), dict) else {}
+    return {
+        "direction": row.get("dir"),
+        "top_scores": list(row.get("top_scores") or [])[:3],
+        "action": decision.get("action") or "observe",
+        "reason": decision.get("reason") or (
+            "证据存在缺口" if row.get("evidence_gap") else "研究输出，等待最终保存"
+        ),
+    }
+
+
+def task_llm(
+    run_id: int, kickoff_date: str | None = None, match_ids: list[str] | None = None,
+):
     """复用当日 fusion 采集，组 LLM raw + 证据，跑 predict.py，落盘到 forward/{date}/。"""
+    day = kickoff_date or datetime.now(CST).date().isoformat()
+    requested_ids = set(normalize_match_ids(match_ids, strict=True)) if match_ids is not None else None
+    target_ids = set(requested_ids or [])
+    handled_ids: set[str] = set()
     try:
-        day = kickoff_date or datetime.now(CST).date().isoformat()
         work = forward_work_dir() / day
+        work.mkdir(parents=True, exist_ok=True)
         db.run_update(run_id, message=f"LLM 轨准备 {day}…")
-        inp = _ensure_prematch(day, work)
-        fusion = json.loads(inp.read_text(encoding="utf-8")).get("matches") or []
+        fusion = _sales_day_prematch_matches(day)
+        combined_input = work / "inputs_sales_day.json"
+        combined_input.write_text(
+            json.dumps({"sales_day": day, "count": len(fusion), "matches": fusion}, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
         matches = _future_llm_matches(fusion, datetime.now(CST))
+        if match_ids is not None:
+            matches = filter_llm_retry_matches(matches, match_ids)
+        selected_ids = {sv.sporttery_id(match.get("match_id")) for match in matches}
+        selected_ids.discard(None)
+        target_ids = set(requested_ids) if requested_ids is not None else selected_ids
         if not matches:
+            if requested_ids:
+                write_run_failures(run_id, "llm", day, requested_ids)
+                db.run_update(
+                    run_id, done=0, total=len(requested_ids), status="error",
+                    message=f"精确重试 0/{len(requested_ids)}：目标不存在或已开球，保留失败清单",
+                )
+                return
             db.run_update(run_id, status="done", message=f"{day} 没有未开球可跑的 LLM 场次")
             return
-        late_info_stats = auto_collect_late_info(inp, day, matches)
+        collector_input = combined_input
+        if requested_ids is not None:
+            collector_input = write_scoped_prematch_input(combined_input, work, run_id, selected_ids)
+        late_info_stats = auto_collect_late_info(collector_input, day, matches)
         raw = {
             "schema_version": "1.0",
             "source": "fusion inputs_prematch",
@@ -844,7 +1164,7 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         if os.environ.get("API_FOOTBALL_KEY", "").strip():
             refresh_ids = [sv.sporttery_id(match.get("match_id")) for match in matches]
             refresh_ids = [mid for mid in refresh_ids if mid]
-        auto_collect = auto_collect_prematch_evidence(inp, day, refresh_ids)
+        auto_collect = auto_collect_prematch_evidence(collector_input, day, refresh_ids)
         if auto_collect.get("attempted"):
             # Re-project after the bounded collector so the exact same batch
             # (and no unrelated fixture) becomes the LLM evidence input.
@@ -854,17 +1174,24 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         raw["evidence_projection"] = evidence_stats
         raw_path = work / "llm_raw.json"
         raw_path.write_text(json.dumps(raw, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        ev_dir = work / "llm_evidence"
+        ev_dir = work / f"llm_evidence_run_{run_id}"
         prepared = prepare_llm_evidence(matches, ev_dir)
         reused = sum(1 for x in prepared if x["source"] == "reuse")
         light = sum(1 for x in prepared if x["source"] == "light")
         db.run_update(
-            run_id, total=len(matches),
+            run_id, total=len(target_ids),
             message=(f"证据就绪 快照{evidence_stats['snapshots_attached']}/"
                      f"{len(matches)}，晚到合并{evidence_stats['late_info_matches_merged']}，"
                      f"自动补采{auto_collect.get('attempted', 0)}，"
                      f"晚到刷新{late_info_stats.get('attempted', 0)}，"
                      f"复用{reused} 轻量{light}，开始跑 {len(matches)} 场…"),
+            progress={
+                "stage": "证据准备完成", "current": {},
+                "evidence": {}, "latest_result": {},
+                "succeeded": 0, "skipped": 0, "failed": 0,
+            },
+            log=(f"证据就绪：快照 {evidence_stats['snapshots_attached']}/{len(matches)}，"
+                 f"复用 {reused}，轻量 {light}"),
         )
         repo = llm_repo()
         log_path = work / "llm_predictions.txt"
@@ -882,28 +1209,63 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
         )
         chunks: list[str] = []
         done = 0
+        skipped = 0
+        current_match: dict = {}
+        match_by_num = {str(m.get("match_num") or ""): m for m in matches}
         assert proc.stdout is not None
         for line in proc.stdout:
             chunks.append(line)
+            head = _LLM_HEAD.search(line)
+            if head:
+                source = match_by_num.get(head.group(1)) or {}
+                current_match = {
+                    "match_id": sv.sporttery_id(source.get("match_id")),
+                    "match_num": head.group(1), "home": head.group(2), "away": head.group(3),
+                }
+                db.run_update(
+                    run_id,
+                    progress={
+                        "stage": "生成分析", "current": current_match,
+                        "evidence": llm_live_evidence(source), "latest_result": {},
+                        "succeeded": done, "skipped": skipped, "failed": 0,
+                    },
+                    log=f"{head.group(1)} {head.group(2)} vs {head.group(3)}：开始生成",
+                )
             # DeepSeek V4 Flash's single-model research output does not print
             # the legacy "综合方向" banner; its one-line JSON is the durable
             # completion marker. Keep the legacy markers for older logs.
             if ("综合方向:" in line or '"status": "evidence_' in line
                     or ('"llm_track_contract"' in line and '"match_id"' in line)):
-                done += 1
-                db.run_update(run_id, done=done, message=f"LLM {done}/{len(matches)}")
+                partial = parse_llm_log("".join(chunks))
+                done = partial["ok"]
+                skipped = partial["skipped"]
+                latest = partial["rows"][-1] if partial["rows"] else None
+                db.run_update(
+                    run_id, done=done, message=f"LLM {done}/{len(matches)}",
+                    progress={
+                        "stage": "逐场结果已生成", "current": current_match,
+                        "evidence": llm_live_evidence(
+                            match_by_num.get(str(current_match.get("match_num") or "")) or {}
+                        ),
+                        "latest_result": llm_live_result(latest) if latest else {},
+                        "succeeded": done, "skipped": skipped, "failed": 0,
+                    },
+                    log=(f"{current_match.get('match_num') or '当前场次'}："
+                         f"{'已生成方向 ' + str(latest.get('dir')) if latest else '证据门禁跳过'}"),
+                )
         rc = proc.wait(timeout=7200)
         log = "".join(chunks)
         log_path.write_text(log, encoding="utf-8")
         immutable_log_path.write_text(log, encoding="utf-8")
-        if rc != 0:
-            db.run_update(run_id, status="error", message=f"predict.py 退出 {rc}，见 {log_path.name}")
-            return
         parsed = parse_llm_log(log)
         (work / "llm_parsed.json").write_text(
             json.dumps(parsed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         jobs_n = write_llm_jobs(day, matches, parsed["rows"])
+        handled_ids = _handled_llm_match_ids(
+            matches, parsed, include_skipped=requested_ids is None,
+        )
+        failed_ids = sorted(target_ids - handled_ids)
         calibration_audit = build_deepseek_calibration_audit(
             work / "deepseek_calibration_audit.json"
         )
@@ -933,11 +1295,33 @@ def task_llm(run_id: int, kickoff_date: str | None = None):
             )
         report.append("")
         (work / "LLM轨.md").write_text("\n".join(report), encoding="utf-8")
+        if failed_ids:
+            write_run_failures(run_id, "llm", day, failed_ids)
+        if rc != 0 or failed_ids:
+            reason = f"predict.py 退出 {rc}" if rc != 0 else "逐场输出不完整"
+            retry_note = f"，{len(failed_ids)} 场可逐项重试" if failed_ids else "，没有安全的失败清单"
+            db.run_update(
+                run_id, done=parsed["ok"], total=len(target_ids), status="error",
+                message=f"LLM {reason}{retry_note}，见 {log_path.name}",
+            )
+            return
         db.run_update(
-            run_id, done=parsed["ok"], total=len(matches), status="done",
+            run_id, done=parsed["ok"], total=len(target_ids), status="done",
             message=f"LLM 完成 {parsed['ok']}/{len(matches)}（跳过 {parsed['skipped']}，轻量 {light}）",
+            progress={
+                "stage": "完成", "current": current_match,
+                "evidence": llm_live_evidence(
+                    match_by_num.get(str(current_match.get("match_num") or "")) or {}
+                ),
+                "latest_result": llm_live_result(parsed["rows"][-1]) if parsed["rows"] else {},
+                "succeeded": parsed["ok"], "skipped": parsed["skipped"], "failed": 0,
+            },
+            log=f"LLM 批次完成：成功 {parsed['ok']}，跳过 {parsed['skipped']}",
         )
     except Exception as e:
+        remaining = target_ids - handled_ids
+        if remaining:
+            write_run_failures(run_id, "llm", day, remaining)
         db.run_update(run_id, status="error", message=f"LLM 轨失败: {e}")
 
 
@@ -976,9 +1360,10 @@ def start_collect(kickoff_date: str) -> int:
     return rid
 
 
-def start_predict(kickoff_date: str | None = None) -> int:
+def start_predict(kickoff_date: str | None = None, match_ids: list[str] | None = None) -> int:
     rid = db.run_start("predict", message="启动补登记")
-    threading.Thread(target=task_predict, args=(rid, kickoff_date), daemon=True).start()
+    targets = normalize_match_ids(match_ids) if match_ids is not None else None
+    threading.Thread(target=task_predict, args=(rid, kickoff_date, targets), daemon=True).start()
     return rid
 
 
@@ -988,9 +1373,10 @@ def start_settle(date: str | None = None) -> int:
     return rid
 
 
-def start_llm(kickoff_date: str | None = None) -> int:
+def start_llm(kickoff_date: str | None = None, match_ids: list[str] | None = None) -> int:
     rid = db.run_start("llm", message="启动 LLM 轨")
-    threading.Thread(target=task_llm, args=(rid, kickoff_date), daemon=True).start()
+    targets = normalize_match_ids(match_ids) if match_ids is not None else None
+    threading.Thread(target=task_llm, args=(rid, kickoff_date, targets), daemon=True).start()
     return rid
 
 

@@ -17,6 +17,14 @@ HERE = Path(__file__).resolve().parent
 DB_PATH = HERE / "data" / "app.db"
 _lock = threading.Lock()
 
+
+class RunAlreadyActive(RuntimeError):
+    """Raised when a run type already has an authoritative running row."""
+
+    def __init__(self, active_run: dict):
+        self.active_run = active_run
+        super().__init__(f"{active_run.get('run_type')} run {active_run.get('id')} is already running")
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS matches (
     sales_day TEXT NOT NULL,
@@ -66,7 +74,9 @@ CREATE TABLE IF NOT EXISTS runs (
     status TEXT,              -- running/done/error
     total INTEGER, done INTEGER,
     message TEXT,
-    started_at TEXT, finished_at TEXT
+    started_at TEXT, finished_at TEXT,
+    progress_json TEXT,          -- JSON：结构化任务运行快照
+    logs_json TEXT               -- JSON：最近的用户可见事件
 );
 """
 
@@ -91,6 +101,8 @@ def init():
         _ensure_column(c, "predictions", "sp_action", "TEXT")
         _ensure_column(c, "predictions", "sp_bettable", "INTEGER")
         _ensure_column(c, "backtests", "match_id", "TEXT")
+        _ensure_column(c, "runs", "progress_json", "TEXT")
+        _ensure_column(c, "runs", "logs_json", "TEXT")
 
 
 def upsert_matches(sales_day: str, rows: list[dict]):
@@ -199,23 +211,72 @@ def list_backtests(sales_day: str = None):
 def run_start(run_type: str, total: int = 0, message: str = "") -> int:
     now = datetime.now(timezone.utc).isoformat()
     with _lock, _conn() as c:
+        c.execute("BEGIN IMMEDIATE")
+        active = c.execute(
+            "SELECT * FROM runs WHERE run_type=? AND status='running' ORDER BY id DESC LIMIT 1",
+            (run_type,),
+        ).fetchone()
+        if active:
+            raise RunAlreadyActive(_run_dict(active))
         cur = c.execute("INSERT INTO runs (run_type, status, total, done, message, started_at) VALUES (?,?,?,?,?,?)",
                         (run_type, "running", total, 0, message, now))
         return cur.lastrowid
 
 
-def run_update(run_id: int, done: int = None, message: str = None, status: str = None, total: int = None):
+def run_active(run_type: str | None = None) -> list[dict]:
     with _lock, _conn() as c:
+        if run_type:
+            rows = c.execute(
+                "SELECT * FROM runs WHERE status='running' AND run_type=? ORDER BY id DESC",
+                (run_type,),
+            ).fetchall()
+        else:
+            rows = c.execute("SELECT * FROM runs WHERE status='running' ORDER BY id DESC").fetchall()
+    return [_run_dict(row) for row in rows]
+
+
+def run_update(run_id: int, done: int = None, message: str = None, status: str = None,
+               total: int = None, progress: dict | None = None, log: str | None = None):
+    with _lock, _conn() as c:
+        current = c.execute(
+            "SELECT logs_json FROM runs WHERE id=?", (run_id,),
+        ).fetchone()
+        logs_json = None
+        if log is not None:
+            try:
+                logs = json.loads(current["logs_json"] or "[]") if current else []
+            except (TypeError, ValueError):
+                logs = []
+            logs.append(str(log)[:500])
+            logs_json = json.dumps(logs[-30:], ensure_ascii=False)
+        progress_json = json.dumps(progress, ensure_ascii=False) if progress is not None else None
         if status:
             now = datetime.now(timezone.utc).isoformat()
-            c.execute("UPDATE runs SET status=?, finished_at=?, done=COALESCE(?,done), total=COALESCE(?,total), message=COALESCE(?,message) WHERE id=?",
-                      (status, now, done, total, message, run_id))
+            c.execute("UPDATE runs SET status=?, finished_at=?, done=COALESCE(?,done), total=COALESCE(?,total), message=COALESCE(?,message), progress_json=COALESCE(?,progress_json), logs_json=COALESCE(?,logs_json) WHERE id=?",
+                      (status, now, done, total, message, progress_json, logs_json, run_id))
         else:
-            c.execute("UPDATE runs SET done=COALESCE(?,done), total=COALESCE(?,total), message=COALESCE(?,message) WHERE id=?",
-                      (done, total, message, run_id))
+            c.execute("UPDATE runs SET done=COALESCE(?,done), total=COALESCE(?,total), message=COALESCE(?,message), progress_json=COALESCE(?,progress_json), logs_json=COALESCE(?,logs_json) WHERE id=?",
+                      (done, total, message, progress_json, logs_json, run_id))
+
+
+def _run_dict(row) -> dict | None:
+    if not row:
+        return None
+    result = dict(row)
+    for source, target, fallback in (
+        ("progress_json", "progress", {}), ("logs_json", "logs", []),
+    ):
+        raw = result.get(source)
+        if raw:
+            try:
+                result[target] = json.loads(raw) or fallback
+            except (TypeError, ValueError):
+                result[target] = fallback
+        result.pop(source, None)
+    return result
 
 
 def run_get(run_id: int):
     with _lock, _conn() as c:
         r = c.execute("SELECT * FROM runs WHERE id=?", (run_id,)).fetchone()
-    return dict(r) if r else None
+    return _run_dict(r)

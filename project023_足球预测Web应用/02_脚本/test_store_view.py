@@ -4,9 +4,57 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
+import app as web
 import store_view as sv
 
 CST = timezone(timedelta(hours=8))
+
+
+def test_board_keeps_sales_day_separate_from_cross_midnight_kickoff(tmp_path: Path):
+    """A 00:30 Wednesday fixture numbered Tuesday belongs to Tuesday's sales day."""
+    now = datetime(2026, 8, 25, 20, 0, tzinfo=CST)
+    live = [{
+        "matchId": 2042001,
+        "matchNumStr": "周二001",
+        "leagueAbbName": "意甲",
+        "homeTeamAbbName": "甲",
+        "awayTeamAbbName": "乙",
+        "matchDate": "2026-08-26",
+        "matchTime": "00:30",
+        "matchStatusName": "已开售",
+        "h": "2.10", "d": "3.20", "a": "3.40",
+    }]
+
+    row = sv.board(now=now, live_rows=live, root=tmp_path)["matches"][0]
+
+    assert row["sales_day"] == "2026-08-25"
+    assert row["kickoff_date"] == "2026-08-26"
+    assert row["kickoff"].startswith("2026-08-26T00:30:00+08:00")
+
+
+def test_matches_api_filters_by_explicit_sales_day_not_kickoff_date(monkeypatch):
+    cross_midnight = {
+        "match_id": "sporttery-2042001",
+        "sales_day": "2026-08-25",
+        "kickoff_date": "2026-08-26",
+        "kickoff": "2026-08-26T00:30:00+08:00",
+    }
+    next_sale = {
+        "match_id": "sporttery-2042002",
+        "sales_day": "2026-08-26",
+        "kickoff_date": "2026-08-26",
+        "kickoff": "2026-08-26T20:00:00+08:00",
+    }
+    monkeypatch.setattr(sv, "board", lambda: {
+        "matches": [cross_midnight, next_sale], "summary": {},
+    })
+
+    payload = TestClient(web.app).get("/api/matches?sales_day=2026-08-25").json()
+
+    assert payload["sales_day"] == "2026-08-25"
+    assert [row["match_id"] for row in payload["matches"]] == ["sporttery-2042001"]
 
 
 def test_light_evidence_discloses_uncollected_lineup_and_form():
@@ -99,7 +147,7 @@ def test_classify_evidence_injury_only_is_not_search_failed():
 
 
 def test_status_zh_unavailable_is_chinese():
-    assert sv.status_zh("UNAVAILABLE") == "暂无数据"
+    assert sv.status_zh("UNAVAILABLE") == "未采集"
     assert sv.status_zh("VALID") == "有效"
     assert sv.status_zh("MARKET_BASELINE") == "市场基线"
 
@@ -122,6 +170,83 @@ def test_load_late_info_exposes_next_scheduled_refresh(tmp_path: Path):
     assert summary["scheduled_refresh_pending"] == 1
     assert summary["next_refresh_at"] == next_refresh
     assert summary["next_refresh_match_id"] == "sporttery-2040999"
+
+
+def test_load_late_info_preserves_detailed_injury_and_lineup(tmp_path: Path):
+    folder = tmp_path / "late_info"
+    folder.mkdir()
+    events = [
+        {
+            "kind": "injury", "match_id": 2041038, "status": "VALID",
+            "collected_at": "2026-08-24T22:30:00+00:00", "snapshot": "T-75",
+            "absence": {
+                "home": {"team": "博塔弗戈", "players": [{"name": "甲球员", "pos": "后卫", "type": "伤"}]},
+                "away": {"team": "巴竞技", "players": [{"name": "乙球员", "pos": "前锋", "type": "停赛"}]},
+            },
+        },
+        {
+            "kind": "lineup", "match_id": 2041038, "status": "VALID",
+            "collected_at": "2026-08-24T22:31:00+00:00", "snapshot": "T-75",
+            "lineup": {
+                "home": {"starting_count": 2, "starting": ["主门将", "主后卫"], "missing": []},
+                "away": {"starting_count": 2, "starting": ["客门将", "客前锋"], "missing": ["客中场"]},
+            },
+        },
+    ]
+    (folder / "events.jsonl").write_text(
+        "\n".join(json.dumps(row, ensure_ascii=False) for row in events) + "\n", encoding="utf-8",
+    )
+
+    by_match, _ = sv.load_late_info(tmp_path)
+
+    detail = by_match["sporttery-2041038"]
+    assert detail["injury_zh"] == "有效"
+    assert detail["injury_detail"]["home"]["players"][0] == {"name": "甲球员", "pos": "后卫", "type": "伤"}
+    assert detail["lineup_zh"] == "有效"
+    assert detail["lineup_detail"]["away"]["starting"] == ["客门将", "客前锋"]
+    assert detail["lineup_detail"]["away"]["missing"] == ["客中场"]
+    assert detail["lineup_collected_at"] == "2026-08-24T22:31:00+00:00"
+
+
+def test_load_evidence_details_projects_audited_collected_facts(tmp_path: Path):
+    folder = tmp_path / "forward" / "2026-08-25" / "evidence_snapshots"
+    folder.mkdir(parents=True)
+    (folder / "sporttery-2041038.json").write_text(json.dumps({
+        "match_id": "sporttery-2041038",
+        "collected_at": "2026-08-24T04:18:25+00:00",
+        "evidence_audit": {"entries": {
+            "team_stats": {"status": "VALID", "source_id": "sporttery.preview", "source_url": "https://example.test/stats", "refreshed_at": "2026-08-24T04:18:25+00:00", "value": {"strength": {"sample_legs": 10, "raw": {"home_goal_avg": 1.6, "away_goal_avg": 2.2, "home_loss_avg": 1.3, "away_loss_avg": 1.5}, "note": "近10场统计"}}},
+            "recent_form": {"status": "VALID", "source_id": "api-sports.io", "source_url": "https://example.test/form", "refreshed_at": "2026-08-24T04:18:25+00:00", "value": {"home": [{"date": "2026-05-23", "league": "意甲", "home": "博洛尼亚", "away": "国际米兰", "score_90": "3-3"}], "away": [{"date": "2026-05-23", "league": "意甲", "home": "拉齐奥", "away": "比萨", "score_90": "2-1"}]}},
+            "injury": {"status": "VALID", "source_id": "sporttery.preview", "value": {"home": {"team": "博洛尼亚", "players": [{"name": "甲", "pos": "中场", "type": "伤"}]}, "away": {"team": "拉齐奥", "players": []}}},
+            "suspensions": {"status": "EMPTY_UNCONFIRMED", "source_id": "api-sports.io", "value": {"home": [], "away": []}},
+            "starting_xi": {"status": "PENDING_REFRESH", "source_id": "official.lineup.pending", "value": None, "missing_reason": "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"},
+        }},
+    }, ensure_ascii=False), encoding="utf-8")
+
+    detail = sv.load_evidence_details(tmp_path)["sporttery-2041038"]
+
+    assert detail["team_stats"]["status_zh"] == "有效"
+    assert detail["team_stats"]["summary"]["home_goal_avg"] == 1.6
+    assert detail["recent_form"]["home"][0]["score_90"] == "3-3"
+    assert detail["injury"]["home"]["players"][0]["name"] == "甲"
+    assert detail["suspensions"]["status_zh"] == "空结果未确认"
+    assert detail["starting_xi"]["status_zh"] == "待刷新"
+    assert detail["starting_xi"]["missing_reason_zh"] == "官方首发尚未发布或未附加"
+
+
+def test_load_evidence_details_can_read_explicit_shared_fact_root(tmp_path: Path):
+    isolated = tmp_path / "isolated"
+    shared = tmp_path / "shared"
+    folder = shared / "forward" / "2026-08-25" / "evidence_snapshots"
+    folder.mkdir(parents=True)
+    (folder / "sporttery-2041038.json").write_text(json.dumps({
+        "match_id": "sporttery-2041038", "collected_at": "2026-08-24T04:18:25+00:00",
+        "evidence_audit": {"entries": {}},
+    }), encoding="utf-8")
+
+    details = sv.load_evidence_details(isolated, shared_root=shared)
+
+    assert "sporttery-2041038" in details
 
 
 def test_extract_quant_reads_registry_output_block():
@@ -228,6 +353,79 @@ def test_board_join_marks_missing_and_keeps_llm_off_quant(tmp_path: Path):
     names = [g["league"] for g in board["by_league"]]
     assert names.index("瑞超") < names.index("英冠")
     assert board["by_league"][0]["n"] == 1
+
+
+def test_matches_api_preserves_explicit_empty_job_evidence_arrays(tmp_path: Path, monkeypatch):
+    """Dropping falsey canonical arrays must make this API-boundary assertion fail."""
+    jobs = tmp_path / "jobs" / "2026-08-25"
+    jobs.mkdir(parents=True)
+    (jobs / "sporttery-2041050.json").write_text(json.dumps({
+        "identity": {"match_id": "sporttery-2041050", "sales_day": "2026-08-25",
+                     "kickoff": "2026-08-26T00:30:00+08:00", "competition": "韩职"},
+        "outputs": [{
+            "track": "llm",
+            "direction": "主胜",
+            "evidence_missing_fields": [],
+            "evidence_chain_fields": [],
+            "evidence_status": "OK",
+            "evidence_collected_at": "2026-08-25T00:00:00+08:00",
+            "evidence_age_minutes": 30.0,
+            "evidence_refs": {"snapshot": "snapshot.json"},
+            "evidence_conflicts": [],
+        }],
+    }), encoding="utf-8")
+    live = [{
+        "matchId": 2041050,
+        "matchNumStr": "周二002",
+        "leagueAbbName": "韩职",
+        "homeTeamAbbName": "济州SK",
+        "awayTeamAbbName": "浦项制铁",
+        "matchDate": "2026-08-25",
+        "matchTime": "18:30",
+        "matchStatusName": "已开售",
+        "h": "2.10",
+        "d": "3.10",
+        "a": "2.92",
+    }]
+    monkeypatch.setattr(sv, "store_root", lambda: tmp_path)
+    monkeypatch.setattr(sv, "fetch_live_selling", lambda now=None: live)
+
+    response = TestClient(web.app).get("/api/matches?sales_day=2026-08-25")
+
+    assert response.status_code == 200
+    llm = response.json()["matches"][0]["llm"]
+    assert llm["evidence_missing_fields"] == []
+    assert llm["evidence_chain_fields"] == []
+    assert llm["evidence_status"] == "OK"
+    assert llm["evidence_collected_at"] == "2026-08-25T00:00:00+08:00"
+    assert llm["evidence_age_minutes"] == 30.0
+    assert llm["evidence_refs"] == {"snapshot": "snapshot.json"}
+    assert llm["evidence_conflicts"] == []
+    assert llm["sales_day"] == "2026-08-25"
+    assert llm["kickoff"] == "2026-08-26T00:30:00+08:00"
+
+
+def test_board_never_attaches_same_team_evidence_from_a_different_match_id(tmp_path: Path):
+    ev_dir = tmp_path / "evidence_old_day"
+    ev_dir.mkdir()
+    (ev_dir / "evidence_001_甲_乙.md").write_text(
+        "赛事：英超\n体彩 sporttery-2040001 周一001 甲 vs 乙\n",
+        encoding="utf-8",
+    )
+    live = [{
+        "matchId": 2049999, "matchNumStr": "周二001", "leagueAbbName": "英超",
+        "homeTeamAbbName": "甲", "awayTeamAbbName": "乙",
+        "matchDate": "2026-08-26", "matchTime": "00:30", "matchStatusName": "已开售",
+        "h": "2.10", "d": "3.20", "a": "3.40",
+    }]
+
+    row = sv.board(
+        now=datetime(2026, 8, 25, 12, 0, tzinfo=CST), live_rows=live, root=tmp_path,
+    )["matches"][0]
+
+    assert row["match_id"] == "sporttery-2049999"
+    assert row["llm"] is None
+    assert row["lights"] is None
 
 
 def test_board_reads_llm_pred_file_scores(tmp_path: Path):
@@ -400,6 +598,24 @@ def test_board_reads_forward_llm_evidence(tmp_path: Path):
     assert board["summary"]["llm_collected"] == 1
 
 
+def test_board_reads_run_isolated_forward_llm_evidence(tmp_path: Path):
+    ev = tmp_path / "forward" / "2026-08-18" / "llm_evidence_run_77"
+    ev.mkdir(parents=True)
+    (ev / "evidence_001_赫根_哈尔姆斯.md").write_text(
+        "赛事：瑞超\n体彩 sporttery-2040915 周一002 赫根 vs 哈尔姆斯\n",
+        encoding="utf-8",
+    )
+    now = datetime(2026, 8, 16, 16, 0, tzinfo=CST)
+    live = [{
+        "matchId": 2040915, "matchNumStr": "周一002", "leagueAbbName": "瑞超",
+        "homeTeamAbbName": "赫根", "awayTeamAbbName": "哈尔姆斯",
+        "matchDate": "2026-08-18", "matchTime": "01:00", "matchStatusName": "已开售",
+        "h": "1.21", "d": "5.6", "a": "8.05",
+    }]
+    board = sv.board(now=now, live_rows=live, root=tmp_path)
+    assert board["matches"][0]["llm"]["source"] == "file"
+
+
 def test_history_skips_registry_without_prediction(tmp_path: Path):
     pred_dir = tmp_path / "backtest" / "predictions"
     pred_dir.mkdir(parents=True)
@@ -507,6 +723,57 @@ def test_parse_llm_pick_splits_double_and_single():
     assert sv.parse_llm_pick("主胜/平局") == {"direction": "主胜", "alt_direction": "平局"}
     assert sv.parse_llm_pick("双选 主胜/平局（H/D）")["direction"] == "主胜"
     assert sv.parse_llm_pick("客胜") == {"direction": "客胜", "alt_direction": None}
+
+
+def test_quant_direction_marks_narrow_home_edge_as_home_or_draw():
+    assert sv.quant_direction([39.4, 29.8, 30.7]) == {
+        "direction": "主胜",
+        "alt_direction": "平局",
+        "label": "主胜略优，防平",
+    }
+    assert sv.quant_direction([37.6, 28.4, 33.9])["alt_direction"] == "平局"
+
+
+def test_quant_direction_keeps_clear_home_edge_as_single_pick():
+    assert sv.quant_direction([55.0, 25.0, 20.0]) == {
+        "direction": "主胜",
+        "alt_direction": None,
+        "label": "主胜",
+    }
+
+
+def test_history_scores_quant_single_and_registered_double_separately(tmp_path: Path):
+    rec = _write_hist_match(
+        tmp_path, 2040888, "欧冠", "2026-08-27T03:00:00+08:00",
+        [39.4, 29.8, 30.7], [1, 1], "周日008",
+    )
+    (tmp_path / "backtest" / "registry.jsonl").write_text(
+        json.dumps(rec) + "\n", encoding="utf-8",
+    )
+
+    row = sv.history_rows(tmp_path, include_shared=False)[0]
+
+    assert row["hit"] is False
+    assert row["quant_double_scored"] is True
+    assert row["quant_double_hit"] is True
+    assert row["quant"]["direction"] == "主胜"
+    assert row["quant"]["alt_direction"] == "平局"
+    assert row["quant"]["direction_label"] == "主胜略优，防平"
+
+
+def test_history_does_not_retroactively_apply_double_direction_policy(tmp_path: Path):
+    rec = _write_hist_match(
+        tmp_path, 2040788, "欧冠", "2026-08-16T03:00:00+08:00",
+        [39.4, 29.8, 30.7], [1, 1], "周日008",
+    )
+    (tmp_path / "backtest" / "registry.jsonl").write_text(
+        json.dumps(rec) + "\n", encoding="utf-8",
+    )
+
+    row = sv.history_rows(tmp_path, include_shared=False)[0]
+
+    assert row["quant"]["alt_direction"] is None
+    assert row["quant_double_hit"] is False
 
 
 def test_history_llm_hit_is_separate_from_quant(tmp_path: Path):

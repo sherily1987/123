@@ -9,11 +9,15 @@ def test_formal_runtime_has_no_worktree_dependency():
         PROJECT_DIR / "启动B3工作台.bat",
         PROJECT_DIR / "启动工作台.bat",
         PROJECT_DIR / "02_脚本" / "launch.py",
-        PROJECT_DIR / "02_脚本" / "workbench_runtime.py",
     ]
     for path in checked:
         assert path.exists(), f"missing formal runtime file: {path}"
         assert ".worktrees" not in path.read_text(encoding="utf-8", errors="ignore")
+
+    import workbench_runtime
+
+    assert workbench_runtime.PROJECT_DIR == PROJECT_DIR.resolve()
+    assert ".worktrees" not in str(workbench_runtime.PROJECT_DIR)
 
 
 def test_formal_launcher_delegates_to_b3_entry():

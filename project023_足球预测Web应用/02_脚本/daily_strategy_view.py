@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -192,9 +193,19 @@ def daily_strategy(
         if snapshot_path.exists():
             try:
                 existing = json.loads(snapshot_path.read_text(encoding="utf-8-sig"))
-                output["snapshot_id"] = existing.get("snapshot_id")
-                output["snapshot_path"] = str(snapshot_path)
-                return output
+                existing_count = len(existing.get("single_purchase_recommendations") or []) + len(
+                    existing.get("combo_purchase_recommendations") or []
+                )
+                current_count = len(output.get("single_purchase_recommendations") or []) + len(
+                    output.get("combo_purchase_recommendations") or []
+                )
+                if existing_count > 0 or current_count == 0:
+                    existing["snapshot_path"] = str(snapshot_path)
+                    return existing
+                archive_dir = snapshot_dir / "archive"
+                archive_dir.mkdir(parents=True, exist_ok=True)
+                archive_id = str(existing.get("snapshot_id") or "unknown")
+                snapshot_path.replace(archive_dir / f"{selected_day}_{archive_id}_empty.json")
             except (OSError, json.JSONDecodeError):
                 pass
         core = json.dumps(output, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -203,3 +214,21 @@ def daily_strategy(
         snapshot_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         output["snapshot_path"] = str(snapshot_path)
     return output
+
+
+def current_sale_day(*, root: Path | None = None, now: datetime | None = None) -> str:
+    """Return the first current/future sales day containing an unstarted fixture."""
+    current = (now or datetime.now(CST)).astimezone(CST)
+    store = root or sv.store_root()
+    jobs_root = store / "jobs"
+    candidates = sorted(
+        path for path in jobs_root.iterdir()
+        if path.is_dir() and re.fullmatch(r"\d{4}-\d{2}-\d{2}", path.name)
+        and path.name >= current.date().isoformat()
+    ) if jobs_root.is_dir() else []
+    for folder in candidates:
+        for job in _load_jobs(folder):
+            kickoff = sv.parse_dt((job.get("identity") or {}).get("kickoff") or job.get("kickoff"))
+            if kickoff is not None and kickoff > current:
+                return folder.name
+    return current.date().isoformat()

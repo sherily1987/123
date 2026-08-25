@@ -12,11 +12,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 VAULT = HERE.parents[1]
-FUSION_SCRIPTS = (
-    VAULT / "project018_技能工作区整合" / "02_脚本" / "skill" / "football-quant-fusion" / "scripts"
-)
+from workbench_runtime import FUSION_SCRIPTS, PRIMARY_WORKSPACE_ROOT
 CORE = (
-    VAULT / "project018_技能工作区整合" / "02_脚本" / "core" / "zu-yu-dashi-3" / "scripts"
+    PRIMARY_WORKSPACE_ROOT / "project018_技能工作区整合" / "02_脚本" / "core" / "zu-yu-dashi-3" / "scripts"
 )
 if str(FUSION_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(FUSION_SCRIPTS))
@@ -24,14 +22,20 @@ from runtime_paths import data_root  # noqa: E402
 
 CST = timezone(timedelta(hours=8))
 LATE_TARGET = 200
+QUANT_DOUBLE_DIRECTION_POLICY = "quant-double-direction-v1"
+QUANT_DOUBLE_DIRECTION_EFFECTIVE_AT = datetime(2026, 8, 25, 22, 30, tzinfo=CST)
 # 临近开球体会把「已开售」改成「暂停销售」，看板仍应列出这些场。
 SALE_WINDOW = ("已开售", "暂停销售")
 LLM_DATA = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
     VAULT / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"
 )) / "data"
-C_LLM_DATA = Path(r"C:\Users\Administrator\football-llm-predictor\data")
 P021_DAILY = (
     VAULT / "project021_五大联赛APIFootball训练" / "05_交付" / "每日开售预测"
+)
+PRIMARY_VAULT = PRIMARY_WORKSPACE_ROOT
+PRIMARY_DATA = (
+    PRIMARY_VAULT / "project018_技能工作区整合" / "04_素材" /
+    "shared-data" / "football-quant-fusion"
 )
 _EVIDENCE_ID_RE = re.compile(
     r"(?:sporttery-|matchId\s*[=:（(\s]+|match_id\s*[=:\s]+)(\d{7})",
@@ -39,13 +43,24 @@ _EVIDENCE_ID_RE = re.compile(
 )
 _EVIDENCE_NAME_RE = re.compile(r"^evidence_\d{3}_(.+)_(.+)\.md$", re.I)
 STATUS_ZH = {
-    "UNAVAILABLE": "暂无数据",
+    "UNAVAILABLE": "未采集",
     "VALID": "有效",
+    "PREDICTED": "预计名单",
+    "PENDING_REFRESH": "待刷新",
+    "EMPTY_UNCONFIRMED": "空结果未确认",
     "NO_API_ID": "无供应商场次号",
     "TOO_EARLY": "未进入动态采集窗口",
     "POST_KICKOFF": "已开球",
     "MISSING": "缺失",
     "MARKET_BASELINE": "市场基线",
+}
+SOURCE_ZH = {
+    "sporttery.preview": "体彩官方赛前数据",
+    "api-sports.io": "API-Sports",
+    "official.lineup.pending": "官方首发待刷新",
+}
+MISSING_REASON_ZH = {
+    "OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED": "官方首发尚未发布或未附加",
 }
 
 
@@ -53,6 +68,130 @@ def status_zh(code):
     if not code:
         return None
     return STATUS_ZH.get(str(code), str(code))
+
+
+def _injury_detail(raw) -> dict | None:
+    if not isinstance(raw, dict):
+        return None
+    projected = {}
+    for side in ("home", "away"):
+        team = raw.get(side)
+        if not isinstance(team, dict):
+            continue
+        players = []
+        for player in team.get("players") or []:
+            if not isinstance(player, dict):
+                continue
+            players.append({
+                "name": player.get("name") or player.get("personName") or "姓名未提供",
+                "pos": player.get("pos") or player.get("playerPositionDesc") or "位置未提供",
+                "type": player.get("type") or "伤停类型未提供",
+            })
+        projected[side] = {"team": team.get("team"), "players": players}
+    return projected or None
+
+
+def _lineup_detail(raw) -> dict | None:
+    if not isinstance(raw, dict):
+        return None
+    projected = {}
+    for side in ("home", "away"):
+        team = raw.get(side)
+        if not isinstance(team, dict):
+            continue
+        starting = [str(name) for name in (team.get("starting") or []) if name not in (None, "")]
+        missing = [str(name) for name in (team.get("missing") or []) if name not in (None, "")]
+        projected[side] = {
+            "starting_count": team.get("starting_count", len(starting)),
+            "starting": starting,
+            "missing": missing,
+        }
+    return projected or None
+
+
+def _entry_meta(entry) -> dict:
+    entry = entry if isinstance(entry, dict) else {}
+    source_id = entry.get("source_id")
+    return {
+        "status": entry.get("status"),
+        "status_zh": status_zh(entry.get("status")) or "未采集",
+        "source_id": SOURCE_ZH.get(source_id, source_id),
+        "source_url": entry.get("source_url"),
+        "refreshed_at": entry.get("refreshed_at"),
+        "missing_reason_zh": MISSING_REASON_ZH.get(
+            entry.get("missing_reason"), entry.get("missing_reason"),
+        ),
+    }
+
+
+def _recent_matches(rows) -> list[dict]:
+    projected = []
+    for row in (rows or [])[:5]:
+        if not isinstance(row, dict):
+            continue
+        projected.append({key: row.get(key) for key in ("date", "league", "home", "away", "score_90")})
+    return projected
+
+
+def project_evidence_snapshot(blob) -> dict:
+    entries = ((blob or {}).get("evidence_audit") or {}).get("entries") or {}
+    stats_entry = entries.get("team_stats") or {}
+    strength = ((stats_entry.get("value") or {}).get("strength") or {})
+    stats = {**_entry_meta(stats_entry), "summary": {
+        "sample_legs": strength.get("sample_legs"),
+        **{key: (strength.get("raw") or {}).get(key) for key in (
+            "home_goal_avg", "away_goal_avg", "home_loss_avg", "away_loss_avg",
+        )},
+        "note": strength.get("note"),
+    }}
+    form_entry = entries.get("recent_form") or {}
+    form_value = form_entry.get("value") or {}
+    recent = {**_entry_meta(form_entry),
+              "home": _recent_matches(form_value.get("home")),
+              "away": _recent_matches(form_value.get("away"))}
+    injury_entry = entries.get("injury") or {}
+    injury = {**_entry_meta(injury_entry), **(_injury_detail(injury_entry.get("value")) or {})}
+    suspension_entry = entries.get("suspensions") or {}
+    suspension_value = suspension_entry.get("value") or {}
+    suspensions = {**_entry_meta(suspension_entry),
+                   "home": suspension_value.get("home") or [],
+                   "away": suspension_value.get("away") or []}
+    lineup_entry = entries.get("starting_xi") or {}
+    lineup = {**_entry_meta(lineup_entry), **(_lineup_detail(lineup_entry.get("value")) or {})}
+    return {
+        "collected_at": (blob or {}).get("collected_at"),
+        "team_stats": stats,
+        "recent_form": recent,
+        "injury": injury,
+        "suspensions": suspensions,
+        "starting_xi": lineup,
+    }
+
+
+def load_evidence_details(root: Path | None = None, shared_root: Path | None = None) -> dict[str, dict]:
+    """Read only canonical per-match snapshots beneath the configured store."""
+    root = root or store_root()
+    details = {}
+    collected = {}
+    roots = [root]
+    if shared_root is not None and shared_root.resolve() != root.resolve():
+        roots.append(shared_root)
+    paths = (path for candidate in roots
+             for path in (candidate / "forward").glob("*/evidence_snapshots/sporttery-*.json"))
+    for path in paths:
+        try:
+            blob = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        mid = sporttery_id(blob.get("match_id"))
+        if not mid or path.stem != mid:
+            continue
+        stamp = str(blob.get("collected_at") or "")
+        if mid in details and stamp < collected[mid]:
+            continue
+        details[mid] = project_evidence_snapshot(blob)
+        collected[mid] = stamp
+    return details
 
 
 def store_root() -> Path:
@@ -73,6 +212,45 @@ def parse_dt(value):
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=CST)
     return dt.astimezone(timezone.utc)
+
+
+_WEEKDAY_LABELS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
+
+
+def valid_day(value) -> str | None:
+    text = str(value or "")
+    try:
+        return text if datetime.strptime(text, "%Y-%m-%d").date().isoformat() == text else None
+    except ValueError:
+        return None
+
+
+def sales_day_for_match(raw: dict, kickoff, *canonical_sources: dict | None) -> str | None:
+    """Resolve sales-day authority without equating it to kickoff date.
+
+    Explicit API/job fields win.  When the upstream list omits them, the
+    Sporttery weekday embedded in ``matchNumStr`` may identify the kickoff day
+    or the immediately preceding sales day.  Any wider mismatch fails closed.
+    """
+    for source in (raw, *canonical_sources):
+        if not isinstance(source, dict):
+            continue
+        for key in ("sales_day", "salesDay", "businessDate", "business_date", "saleDate"):
+            explicit = valid_day(source.get(key))
+            if explicit:
+                return explicit
+    if kickoff is None:
+        return None
+    match_num = str(raw.get("matchNumStr") or raw.get("match_num") or "")
+    label = next((item for item in _WEEKDAY_LABELS if match_num.startswith(item)), None)
+    if not label:
+        return None
+    kickoff_day = kickoff.astimezone(CST).date()
+    for offset in (0, 1):
+        candidate = kickoff_day - timedelta(days=offset)
+        if _WEEKDAY_LABELS[candidate.weekday()] == label:
+            return candidate.isoformat()
+    return None
 
 
 def sporttery_id(value) -> str | None:
@@ -178,6 +356,11 @@ def extract_match_meta(payload: dict) -> dict:
         "league": match.get("competition") or meta.get("league"),
         "match_num": meta.get("match_num"),
         "kickoff": kick.astimezone(CST).isoformat() if kick else None,
+        "sales_day": (
+            valid_day(payload.get("sales_day"))
+            or valid_day(match.get("sales_day"))
+            or valid_day(meta.get("sales_day"))
+        ),
         "snapshot": payload.get("snapshot_type"),
     }
 
@@ -190,6 +373,22 @@ def had_direction(pct) -> str | None:
     except (TypeError, ValueError):
         return None
     return ("主胜", "平局", "客胜")[max(range(3), key=lambda i: vals[i])]
+
+
+def quant_direction(pct) -> dict:
+    """Return the single 1X2 pick and an explicitly registered cover direction."""
+    direction = had_direction(pct)
+    result = {"direction": direction, "alt_direction": None, "label": direction}
+    if direction != "主胜":
+        return result
+    try:
+        home, draw, away = (float(value) for value in pct[:3])
+    except (TypeError, ValueError):
+        return result
+    runner_up = max(draw, away)
+    if home - runner_up <= 10.0 and draw >= 25.0:
+        result.update({"alt_direction": "平局", "label": "主胜略优，防平"})
+    return result
 
 
 def score_direction(score) -> str | None:
@@ -253,6 +452,7 @@ def load_registry_quant(root: Path | None = None) -> dict[str, dict]:
             "league": meta["league"],
             "match_num": meta["match_num"],
             "kickoff": meta["kickoff"],
+            "sales_day": meta["sales_day"],
             "snapshot": meta["snapshot"],
             "hashes": {
                 "engine_bundle_sha256": bi.get("engine_bundle_sha256"),
@@ -277,12 +477,13 @@ def load_jobs_llm(root: Path | None = None) -> dict[str, dict]:
         mid = sporttery_id((job.get("identity") or {}).get("match_id") or path.stem)
         if not mid:
             continue
+        identity = job.get("identity") if isinstance(job.get("identity"), dict) else {}
         llm = next((o for o in (job.get("outputs") or []) if o.get("track") == "llm"), None)
         if not llm:
             continue
         strength = llm.get("strength") if isinstance(llm.get("strength"), dict) else None
         scores = _llm_scores(llm)
-        out[mid] = {
+        projected = {
             "direction": llm.get("direction") or llm.get("dir"),
             "alt_direction": llm.get("alt_direction") or llm.get("alt"),
             "top_scores": scores,
@@ -291,7 +492,19 @@ def load_jobs_llm(root: Path | None = None) -> dict[str, dict]:
             "action": llm.get("action"),
             "note": "证据方向，不是概率",
             "source": "job",
+            "sales_day": valid_day(identity.get("sales_day")),
+            "kickoff": identity.get("kickoff"),
+            "league": identity.get("competition") or identity.get("league"),
         }
+        for field in ("evidence_missing_fields", "evidence_chain_fields", "evidence_conflicts"):
+            if field in llm and isinstance(llm[field], list):
+                projected[field] = list(llm[field])
+        for field in ("evidence_status", "evidence_collected_at", "evidence_age_minutes"):
+            if field in llm:
+                projected[field] = llm[field]
+        if isinstance(llm.get("evidence_refs"), dict):
+            projected["evidence_refs"] = dict(llm["evidence_refs"])
+        out[mid] = projected
     return out
 
 
@@ -345,7 +558,7 @@ def load_llm_pred_files(root: Path | None = None, include_shared: bool = True) -
     if fwd.is_dir():
         folders.extend(sorted(p for p in fwd.iterdir() if p.is_dir()))
     if include_shared:
-        folders.extend([LLM_DATA, C_LLM_DATA])
+        folders.append(LLM_DATA)
     out: dict[str, dict] = {}
     seen: set[Path] = set()
     for folder in folders:
@@ -379,9 +592,18 @@ def iter_evidence_dirs(base: Path) -> list[Path]:
     if not base.is_dir():
         return []
     dirs = [p for p in sorted(base.glob("evidence_*")) if p.is_dir()]
+    dirs.extend(iter_llm_evidence_dirs(base))
+    return dirs
+
+
+def iter_llm_evidence_dirs(base: Path) -> list[Path]:
+    if not base.is_dir():
+        return []
+    dirs = []
     extra = base / "llm_evidence"
     if extra.is_dir():
         dirs.append(extra)
+    dirs.extend(p for p in sorted(base.glob("llm_evidence_run_*")) if p.is_dir())
     return dirs
 
 
@@ -389,13 +611,16 @@ def iter_forward_evidence_dirs(base: Path) -> list[Path]:
     fwd = base / "forward"
     if not fwd.is_dir():
         return []
-    return [day / "llm_evidence" for day in sorted(fwd.iterdir()) if (day / "llm_evidence").is_dir()]
+    dirs = []
+    for day in sorted(fwd.iterdir()):
+        dirs.extend(iter_llm_evidence_dirs(day))
+    return dirs
 
 
 def extra_evidence_dirs() -> list[Path]:
     dirs: list[Path] = []
     seen: set[Path] = set()
-    for base in (LLM_DATA, C_LLM_DATA):
+    for base in (LLM_DATA,):
         for path in iter_evidence_dirs(base):
             key = path.resolve()
             if key not in seen:
@@ -403,8 +628,7 @@ def extra_evidence_dirs() -> list[Path]:
                 dirs.append(path)
     if P021_DAILY.is_dir():
         for day in P021_DAILY.iterdir():
-            ev = day / "llm_evidence"
-            if ev.is_dir():
+            for ev in iter_llm_evidence_dirs(day):
                 key = ev.resolve()
                 if key not in seen:
                     seen.add(key)
@@ -622,7 +846,8 @@ def merge_llm(job: dict | None, ev: dict | None, pred: dict | None = None) -> di
         if not blob:
             continue
         for key, value in blob.items():
-            if value not in (None, [], ""):
+            preserves_empty = key in {"evidence_missing_fields", "evidence_chain_fields", "evidence_conflicts"}
+            if value not in (None, "") and (value != [] or preserves_empty):
                 out[key] = value
         out.setdefault("note", "证据方向，不是概率")
     return out
@@ -673,6 +898,12 @@ def load_late_info(root: Path | None = None) -> tuple[dict[str, dict], dict]:
             if kind in ("injury", "lineup"):
                 slot[kind] = rec.get("status")
                 slot[f"{kind}_zh"] = status_zh(rec.get("status"))
+                slot[f"{kind}_collected_at"] = rec.get("collected_at")
+                slot[f"{kind}_snapshot"] = rec.get("snapshot")
+                if kind == "injury":
+                    slot["injury_detail"] = _injury_detail(rec.get("absence"))
+                else:
+                    slot["lineup_detail"] = _lineup_detail(rec.get("lineup"))
             if (rec.get("gate") or {}).get("late"):
                 slot["late"] = True
                 n_late += 1
@@ -777,13 +1008,9 @@ def board(now=None, live_rows: list[dict] | None = None, root: Path | None = Non
     llm_jobs = load_jobs_llm(root)
     llm_files = load_llm_evidence_files(root, include_shared=use_shared_evidence)
     llm_preds = load_llm_pred_files(root, include_shared=use_shared_evidence)
-    files_by_name = {
-        (rec.get("home"), rec.get("away")): rec
-        for rec in llm_files.values()
-        if rec.get("home") and rec.get("away")
-    }
     results = load_results(root)
     late_by, late_sum = load_late_info(root)
+    evidence_details = load_evidence_details(root, shared_root=PRIMARY_DATA if use_shared_evidence else None)
     rows = []
     for raw in live:
         mid = sporttery_id(raw.get("matchId"))
@@ -793,10 +1020,13 @@ def board(now=None, live_rows: list[dict] | None = None, root: Path | None = Non
         finished = "完成" in st or mid in results
         not_kicked = bool(kick and kick > now_utc) and not finished
         q = quant.get(mid)
+        llm_job = llm_jobs.get(mid)
         bucket = classify(bool(odds), not_kicked, bool(q), finished)
         home = raw.get("homeTeamAbbName")
         away = raw.get("awayTeamAbbName")
-        ev = llm_files.get(mid) or files_by_name.get((home, away))
+        ev = llm_files.get(mid)
+        sales_day = sales_day_for_match(raw, kick, q, llm_job)
+        kickoff_date = kick.astimezone(CST).date().isoformat() if kick else None
         rows.append({
             "match_id": mid,
             "match_num": raw.get("matchNumStr"),
@@ -804,14 +1034,17 @@ def board(now=None, live_rows: list[dict] | None = None, root: Path | None = Non
             "home": home,
             "away": away,
             "kickoff": kick.astimezone(CST).isoformat() if kick else None,
+            "sales_day": sales_day,
+            "kickoff_date": kickoff_date,
             "status_name": st,
             "has_odds": bool(odds),
             "odds": odds,
             "not_kicked": not_kicked,
             "quant": q,
-            "llm": merge_llm(llm_jobs.get(mid), ev, llm_preds.get(mid)),
+            "llm": merge_llm(llm_job, ev, llm_preds.get(mid)),
             "lights": lights_for_file((ev or {}).get("evidence_file")),
             "late_info": late_by.get(mid),
+            "evidence_detail": evidence_details.get(mid),
             "result": results.get(mid),
             "bucket": bucket,
         })
@@ -841,6 +1074,7 @@ def board(now=None, live_rows: list[dict] | None = None, root: Path | None = Non
         "by_league": group_by_league(selling),
         "missing": [{"match_id": r["match_id"], "match_num": r["match_num"],
                      "home": r["home"], "away": r["away"], "kickoff": r["kickoff"],
+                     "sales_day": r["sales_day"], "kickoff_date": r["kickoff_date"],
                      "odds": r["odds"]} for r in missing],
         "late_info": late_sum,
         "note": "量化轨数字来自正式登记；LLM 另列胜平负与比分，不与量化合成。",
@@ -904,12 +1138,28 @@ def history_rows(root: Path | None = None, include_shared: bool = True) -> list[
     rows = []
     for mid, rec in recs.items():
         res = results.get(mid)
-        pred_dir = rec.get("direction")
+        kickoff = parse_dt(rec.get("kickoff"))
+        policy_applies = bool(
+            kickoff and kickoff.astimezone(CST) >= QUANT_DOUBLE_DIRECTION_EFFECTIVE_AT
+        )
+        quant_pick = quant_direction(rec.get("final_1x2_pct")) if policy_applies else {
+            "direction": had_direction(rec.get("final_1x2_pct")),
+            "alt_direction": None,
+            "label": had_direction(rec.get("final_1x2_pct")),
+        }
+        pred_dir = rec.get("direction") or quant_pick["direction"]
         if not pred_dir or not rec.get("final_1x2_pct"):
             continue
         actual = (res or {}).get("direction")
         settled = bool(res and res.get("status") == "finished" and actual)
         hit = settled and pred_dir == actual
+        quant_alt = quant_pick["alt_direction"] if pred_dir == quant_pick["direction"] else None
+        quant_double_scored = bool(settled and quant_alt in _DIR_WORDS)
+        quant_double_hit = bool(
+            quant_double_scored and actual in tuple(
+                direction for direction in (pred_dir, quant_alt) if direction in _DIR_WORDS
+            )
+        )
         llm = merge_llm(llm_jobs.get(mid), llm_files.get(mid), llm_preds.get(mid))
         if llm_idx.get(mid):
             extra = llm_idx[mid]
@@ -941,6 +1191,12 @@ def history_rows(root: Path | None = None, include_shared: bool = True) -> list[
                 "final_1x2_pct": rec.get("final_1x2_pct"),
                 "top_scores": rec.get("top_scores"),
                 "direction": pred_dir,
+                "alt_direction": quant_alt,
+                "direction_label": quant_pick["label"] if quant_alt else pred_dir,
+                "direction_policy": QUANT_DOUBLE_DIRECTION_POLICY if quant_alt else None,
+                "direction_policy_effective_at": (
+                    QUANT_DOUBLE_DIRECTION_EFFECTIVE_AT.isoformat() if quant_alt else None
+                ),
                 "snapshot": rec.get("snapshot"),
             },
             "llm": llm,
@@ -948,6 +1204,8 @@ def history_rows(root: Path | None = None, include_shared: bool = True) -> list[
             "result": res,
             "settled": settled,
             "hit": hit,
+            "quant_double_scored": quant_double_scored,
+            "quant_double_hit": quant_double_hit,
             "llm_scored": llm_scored,
             "llm_hit": llm_hit,
             "llm_double_hit": llm_double_hit,

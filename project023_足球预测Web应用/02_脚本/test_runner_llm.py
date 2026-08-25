@@ -166,7 +166,7 @@ def test_fusion_evidence_markdown_exposes_audit_summary():
     assert "missing_fields=starting_xi" in text
 
 
-def test_fusion_evidence_blockquotes_do_not_break_llm_source_gate():
+def test_fusion_evidence_blockquotes_do_not_break_llm_source_gate(monkeypatch):
     import light_evidence
     import importlib.util
     llm = runner.llm_repo()
@@ -177,19 +177,26 @@ def test_fusion_evidence_blockquotes_do_not_break_llm_source_gate():
     predict = importlib.util.module_from_spec(spec)
     assert spec and spec.loader
     spec.loader.exec_module(predict)
+    monkeypatch.setattr(light_evidence, "NOW_STR", "2026-08-24T12:00:00+08:00")
     match = {
         "match_num": "周一001", "home": "甲", "away": "乙", "league": "测试联赛",
         "kickoff_iso": "2026-08-25T03:00:00+08:00", "match_id": 1,
         "model_odds": [2, 3, 4], "team_ids": {"home_full": "甲", "away_full": "乙"},
         "evidence_chain": {
-            "team_stats": {"status": "VALID", "source_id": "api", "refreshed_at": "2026-08-24T12:00:00+00:00", "value": {"sample": 5}},
-            "recent_form": {"status": "VALID", "source_id": "api", "refreshed_at": "2026-08-24T12:00:00+00:00", "value": {"home": ["W"], "away": ["L"]}},
+            "team_stats": {"status": "VALID", "source_id": "api", "source_url": "https://api.example.test/matches/1/stats", "refreshed_at": "2026-08-24T12:00:00+00:00", "value": {"sample": 5}},
+            "recent_form": {"status": "VALID", "source_id": "api", "source_url": "https://api.example.test/matches/1/form", "refreshed_at": "2026-08-24T12:00:00+00:00", "value": {"home": ["W"], "away": ["L"]}},
         },
         "evidence_audit": {"evidence_status": "OK", "missing_fields": [], "collected_at": "2026-08-24T12:00:00+00:00", "kickoff": "2026-08-25T03:00:00+00:00"},
     }
     text = light_evidence.build_one(1, match, "C")
     result = predict.assess_evidence(text, kickoff=match["kickoff_iso"], now="2026-08-24T20:00:00+08:00")
     assert result["ok"] is True
+    missing_quoted_source = text.replace(
+        " | source(https://api.example.test/matches/1/stats)", "", 1
+    )
+    assert predict.assess_evidence(
+        missing_quoted_source, kickoff=match["kickoff_iso"], now="2026-08-24T20:00:00+08:00"
+    ) == {"ok": False, "reason": "fact_missing_source_or_collected_at"}
 
 
 def test_auto_collect_prematch_evidence_is_id_scoped(tmp_path: Path, monkeypatch):
@@ -326,6 +333,7 @@ def test_write_llm_jobs_persists_evidence_age_and_missing_fields(tmp_path, monke
             "evidence_audit": {
                 "evidence_status": "GAP", "missing_fields": ["starting_xi"],
                 "collected_at": "2026-08-24T00:00:00+00:00",
+                "browser_merge_audit": {"conflicts": ["starting_xi:provider_mismatch"]},
             },
             "evidence_snapshot_ref": "F:/evidence/sporttery-2041028.json",
             "evidence_chain": {"recent_form": {"status": "VALID"}},
@@ -343,6 +351,22 @@ def test_write_llm_jobs_persists_evidence_age_and_missing_fields(tmp_path, monke
     assert captured["llm"]["evidence_age_minutes"] == 60.0
     assert captured["llm"]["evidence_chain_fields"] == ["recent_form"]
     assert captured["llm"]["evidence_refs"]["evidence_snapshot_ref"].endswith("2041028.json")
+    assert captured["llm"]["evidence_conflicts"] == ["starting_xi:provider_mismatch"]
+
+
+def test_write_llm_jobs_does_not_invent_complete_metadata_when_audit_is_absent(tmp_path, monkeypatch):
+    import job_ticket
+    captured = {}
+    monkeypatch.setattr(job_ticket, "jobs_root", lambda: tmp_path)
+    monkeypatch.setattr(job_ticket, "upsert_job", lambda root, identity, **kwargs: captured.update(kwargs) or tmp_path / "job.json")
+    runner.write_llm_jobs("2026-08-24", [{
+        "match_num": "周一001", "home": "主", "away": "客", "kickoff": "2026-08-25T00:30:00+08:00",
+        "sporttery_meta": {"match_id": 2041028, "match_num": "周一001"},
+    }], [{"num": "周一001", "dir": "主胜", "evidence_gap": False}])
+    llm = captured["llm"]
+    assert "evidence_missing_fields" not in llm
+    assert "evidence_chain_fields" not in llm
+    assert "evidence_status" not in llm
 
 
 def test_backfill_llm_job_evidence_metadata_preserves_prediction(tmp_path, monkeypatch):
@@ -368,7 +392,8 @@ def test_backfill_llm_job_evidence_metadata_preserves_prediction(tmp_path, monke
         "match_id": "sporttery-2041028", "collected_at": "2026-08-24T00:00:00+00:00",
         "evidence_audit": {"evidence_status": "GAP", "missing_fields": ["starting_xi"],
                             "collected_at": "2026-08-24T00:00:00+00:00",
-                            "entries": {"recent_form": {"status": "VALID"}}},
+                            "entries": {"recent_form": {"status": "VALID"}},
+                            "browser_merge_audit": {"conflicts": ["lineup:provider_mismatch"]}},
     }), encoding="utf-8")
     monkeypatch.setattr(job_ticket, "jobs_root", lambda: tmp_path / "jobs")
     got = runner.backfill_llm_job_evidence_metadata(
@@ -380,6 +405,7 @@ def test_backfill_llm_job_evidence_metadata_preserves_prediction(tmp_path, monke
     assert out["direction"] == "主胜"
     assert out["evidence_missing_fields"] == ["starting_xi"]
     assert out["evidence_age_minutes"] == 60.0
+    assert out["evidence_conflicts"] == ["lineup:provider_mismatch"]
 
 
 def test_prepare_reuses_existing_and_falls_back_to_light(tmp_path: Path, monkeypatch):
@@ -442,3 +468,13 @@ def test_n8n_llm_workflow_posts_to_api_llm():
     assert any("/api/llm" in u for u in urls)
     assert any("/api/run/" in u for u in urls)
     assert "readWriteFile" not in {n["type"] for n in wf["nodes"]}
+
+def test_llm_repo_never_falls_back_to_stale_c_drive_copy(tmp_path, monkeypatch):
+    """Missing canonical LLM code must fail closed instead of using the old snapshot."""
+    monkeypatch.delenv("FOOTBALL_LLM_ROOT", raising=False)
+    monkeypatch.setattr(runner, "HERE", tmp_path / "project023" / "02_脚本")
+    try:
+        resolved = runner.llm_repo()
+    except FileNotFoundError:
+        return
+    assert resolved.resolve() != Path(r"C:\Users\Administrator\football-llm-predictor").resolve()
