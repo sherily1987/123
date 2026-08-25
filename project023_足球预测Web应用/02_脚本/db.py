@@ -9,8 +9,10 @@
 """
 import json
 import os
+import ctypes
 import sqlite3
 import threading
+from ctypes import wintypes
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -19,6 +21,11 @@ from workbench_runtime import BUILD_IDENTITY
 HERE = Path(__file__).resolve().parent
 DB_PATH = HERE / "data" / "app.db"
 _lock = threading.Lock()
+
+PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+STILL_ACTIVE = 259
+ERROR_INVALID_PARAMETER = 87
+ERROR_NOT_FOUND = 1168
 
 
 class RunAlreadyActive(RuntimeError):
@@ -80,6 +87,7 @@ CREATE TABLE IF NOT EXISTS runs (
     started_at TEXT, finished_at TEXT,
     owner_pid INTEGER,
     owner_identity TEXT,
+    owner_fingerprint TEXT,
     progress_json TEXT,          -- JSON：结构化任务运行快照
     logs_json TEXT               -- JSON：最近的用户可见事件
 );
@@ -110,16 +118,51 @@ def init():
         _ensure_column(c, "runs", "logs_json", "TEXT")
         _ensure_column(c, "runs", "owner_pid", "INTEGER")
         _ensure_column(c, "runs", "owner_identity", "TEXT")
+        _ensure_column(c, "runs", "owner_fingerprint", "TEXT")
 
 
-def _owner_is_alive(pid: int) -> bool:
+def _probe_owner_process(pid: int) -> tuple[str, str | None]:
+    """Return `alive`, `dead`, or `unknown` using non-destructive Windows APIs."""
+    if not isinstance(pid, int) or pid <= 0:
+        return "unknown", None
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+    kernel32.OpenProcess.restype = wintypes.HANDLE
+    kernel32.GetExitCodeProcess.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+    kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+    kernel32.GetProcessTimes.argtypes = (
+        wintypes.HANDLE,
+        ctypes.POINTER(wintypes.FILETIME), ctypes.POINTER(wintypes.FILETIME),
+        ctypes.POINTER(wintypes.FILETIME), ctypes.POINTER(wintypes.FILETIME),
+    )
+    kernel32.GetProcessTimes.restype = wintypes.BOOL
+    kernel32.CloseHandle.argtypes = (wintypes.HANDLE,)
+    kernel32.CloseHandle.restype = wintypes.BOOL
+
+    handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not handle:
+        error = ctypes.get_last_error()
+        if error in (ERROR_INVALID_PARAMETER, ERROR_NOT_FOUND):
+            return "dead", None
+        return "unknown", None
     try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except (OSError, PermissionError):
-        return True
-    return True
+        exit_code = wintypes.DWORD()
+        if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+            return "unknown", None
+        if exit_code.value != STILL_ACTIVE:
+            return "dead", None
+        created = wintypes.FILETIME()
+        exited = wintypes.FILETIME()
+        kernel = wintypes.FILETIME()
+        user = wintypes.FILETIME()
+        if not kernel32.GetProcessTimes(
+            handle, ctypes.byref(created), ctypes.byref(exited), ctypes.byref(kernel), ctypes.byref(user),
+        ):
+            return "unknown", None
+        created_at = (int(created.dwHighDateTime) << 32) | int(created.dwLowDateTime)
+        return "alive", f"{created_at:016x}"
+    finally:
+        kernel32.CloseHandle(handle)
 
 
 def recover_orphaned_runs() -> int:
@@ -133,21 +176,28 @@ def recover_orphaned_runs() -> int:
     recovered = 0
     with _lock, _conn() as c:
         running = c.execute(
-            "SELECT id, owner_pid, owner_identity FROM runs WHERE status='running'"
+            "SELECT id, owner_pid, owner_identity, owner_fingerprint FROM runs WHERE status='running'"
         ).fetchall()
         for row in running:
             owner_pid = row["owner_pid"]
+            owner_fingerprint = row["owner_fingerprint"]
             if (row["owner_identity"] != BUILD_IDENTITY
                     or not isinstance(owner_pid, int) or owner_pid <= 0
-                    or _owner_is_alive(owner_pid)):
+                    or not isinstance(owner_fingerprint, str) or not owner_fingerprint):
+                continue
+            owner_status, current_fingerprint = _probe_owner_process(owner_pid)
+            if owner_status == "unknown" or (
+                owner_status == "alive" and current_fingerprint == owner_fingerprint
+            ):
                 continue
             cursor = c.execute(
                 """UPDATE runs
                    SET status='error', finished_at=?,
                        message=CASE WHEN message IS NULL OR message='' THEN ?
                                     ELSE message || '\n' || ? END
-                   WHERE id=? AND status='running' AND owner_pid=? AND owner_identity=?""",
-                (now, message, message, row["id"], owner_pid, BUILD_IDENTITY),
+                   WHERE id=? AND status='running' AND owner_pid=? AND owner_identity=?
+                     AND owner_fingerprint=?""",
+                (now, message, message, row["id"], owner_pid, BUILD_IDENTITY, owner_fingerprint),
             )
             recovered += cursor.rowcount
     return recovered
@@ -257,10 +307,14 @@ def list_backtests(sales_day: str = None):
 
 # ---- 后台任务 ----
 def run_start(run_type: str, total: int = 0, message: str = "",
-              owner_pid: int | None = None, owner_identity: str | None = None) -> int:
+              owner_pid: int | None = None, owner_identity: str | None = None,
+              owner_fingerprint: str | None = None) -> int:
     now = datetime.now(timezone.utc).isoformat()
     owner_pid = os.getpid() if owner_pid is None else owner_pid
     owner_identity = BUILD_IDENTITY if owner_identity is None else owner_identity
+    if owner_fingerprint is None:
+        status, fingerprint = _probe_owner_process(owner_pid)
+        owner_fingerprint = fingerprint if status == "alive" else None
     with _lock, _conn() as c:
         c.execute("BEGIN IMMEDIATE")
         active = c.execute(
@@ -271,9 +325,9 @@ def run_start(run_type: str, total: int = 0, message: str = "",
             raise RunAlreadyActive(_run_dict(active))
         cur = c.execute(
             """INSERT INTO runs
-               (run_type, status, total, done, message, started_at, owner_pid, owner_identity)
-               VALUES (?,?,?,?,?,?,?,?)""",
-            (run_type, "running", total, 0, message, now, owner_pid, owner_identity),
+               (run_type, status, total, done, message, started_at, owner_pid, owner_identity, owner_fingerprint)
+               VALUES (?,?,?,?,?,?,?,?,?)""",
+            (run_type, "running", total, 0, message, now, owner_pid, owner_identity, owner_fingerprint),
         )
         return cur.lastrowid
 

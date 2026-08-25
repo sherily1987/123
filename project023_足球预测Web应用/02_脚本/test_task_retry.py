@@ -1,5 +1,7 @@
 import json
 import os
+import ctypes
+from ctypes import wintypes
 import pytest
 from pathlib import Path
 from types import SimpleNamespace
@@ -43,9 +45,9 @@ def test_service_startup_recovers_run_with_dead_matching_owner(tmp_path, monkeyp
     web.db.init()
     abandoned_id = web.db.run_start(
         "predict", message="进程关闭前仍在运行",
-        owner_pid=41001, owner_identity=web.BUILD_IDENTITY,
+        owner_pid=41001, owner_identity=web.BUILD_IDENTITY, owner_fingerprint="old-owner",
     )
-    monkeypatch.setattr(web.db, "_owner_is_alive", lambda _pid: False, raising=False)
+    monkeypatch.setattr(web.db, "_probe_owner_process", lambda _pid: ("dead", None), raising=False)
 
     with TestClient(web.app):
         pass
@@ -66,8 +68,9 @@ def test_service_startup_preserves_run_with_live_matching_owner(tmp_path, monkey
     web.db.init()
     live_id = web.db.run_start(
         "llm", owner_pid=os.getpid(), owner_identity=web.BUILD_IDENTITY,
+        owner_fingerprint="live-owner",
     )
-    monkeypatch.setattr(web.db, "_owner_is_alive", lambda _pid: True, raising=False)
+    monkeypatch.setattr(web.db, "_probe_owner_process", lambda _pid: ("alive", "live-owner"), raising=False)
 
     with TestClient(web.app):
         pass
@@ -75,6 +78,69 @@ def test_service_startup_preserves_run_with_live_matching_owner(tmp_path, monkey
     assert web.db.run_get(live_id)["status"] == "running"
     with pytest.raises(web.db.RunAlreadyActive):
         web.db.run_start("llm")
+
+
+def test_service_startup_recovers_reused_pid_with_different_fingerprint(tmp_path, monkeypatch):
+    """Catches PID reuse being mistaken for the original live task owner."""
+    monkeypatch.setattr(web.db, "DB_PATH", tmp_path / "app.db")
+    web.db.init()
+    stale_id = web.db.run_start(
+        "settle", owner_pid=41002, owner_identity=web.BUILD_IDENTITY,
+        owner_fingerprint="old-created-at",
+    )
+    monkeypatch.setattr(
+        web.db, "_probe_owner_process", lambda _pid: ("alive", "reused-created-at"), raising=False,
+    )
+
+    with TestClient(web.app):
+        pass
+
+    assert web.db.run_get(stale_id)["status"] == "error"
+
+
+def test_windows_owner_probe_uses_query_handle_and_creation_time(monkeypatch):
+    """Catches a destructive process probe replacing the read-only Windows query."""
+    calls = []
+
+    class Func:
+        def __init__(self, callback):
+            self.callback = callback
+
+        def __call__(self, *args):
+            return self.callback(*args)
+
+    class Kernel32:
+        def __init__(self):
+            self.OpenProcess = Func(self.open_process)
+            self.GetExitCodeProcess = Func(self.get_exit_code)
+            self.GetProcessTimes = Func(self.get_process_times)
+            self.CloseHandle = Func(self.close_handle)
+
+        def open_process(self, access, inherit, pid):
+            calls.append(("open", access, inherit, pid))
+            return 73
+
+        def get_exit_code(self, handle, exit_code):
+            ctypes.cast(exit_code, ctypes.POINTER(wintypes.DWORD)).contents.value = web.db.STILL_ACTIVE
+            return True
+
+        def get_process_times(self, handle, created, exited, kernel, user):
+            created_time = ctypes.cast(created, ctypes.POINTER(wintypes.FILETIME)).contents
+            created_time.dwLowDateTime = 0x89ABCDEF
+            created_time.dwHighDateTime = 0x01234567
+            return True
+
+        def close_handle(self, handle):
+            calls.append(("close", handle))
+            return True
+
+    monkeypatch.setattr(web.db.ctypes, "WinDLL", lambda *_args, **_kwargs: Kernel32())
+
+    assert web.db._probe_owner_process(4321) == ("alive", "0123456789abcdef")
+    assert calls == [
+        ("open", web.db.PROCESS_QUERY_LIMITED_INFORMATION, False, 4321),
+        ("close", 73),
+    ]
 
 
 def test_run_progress_and_recent_logs_survive_database_reload(tmp_path, monkeypatch):
