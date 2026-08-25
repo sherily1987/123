@@ -42,4 +42,5 @@ def test_spa_uses_backend_authority_for_current_sale_day_and_read_only_strategy_
     assert '"/api/current-sale-day"' in app_js
     assert "/api/daily-strategy/preview?day=" in app_js
     assert "cache.currentSaleDay" in app_js
+    assert "moduleErrors?.currentSaleDay" in app_js
     assert "shanghaiSalesDay" not in app_js

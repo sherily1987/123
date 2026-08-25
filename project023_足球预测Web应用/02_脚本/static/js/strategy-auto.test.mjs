@@ -25,7 +25,7 @@ test("automatic strategy refresh posts once and updates only strategy cache", as
     store,
     request: async (path, options) => {
       calls.push([path, options]);
-      return { generated_at: "2026-08-25T23:00:00+08:00", budget: { daily_budget_amount: 100 } };
+      return { selected_day: "2026-08-26", generated_at: "2026-08-25T23:00:00+08:00", budget: { daily_budget_amount: 100 } };
     },
     setStatus: () => {},
     now: () => "2026-08-25T23:00:01+08:00",
@@ -82,4 +82,23 @@ test("historical sales days never trigger automatic strategy generation", async 
   const afterFirstRead = store.get();
   await auto.ensure({ force: true });
   assert.equal(store.get(), afterFirstRead);
+});
+
+test("a recommend response for another sales day is discarded instead of replacing the current preview", async () => {
+  const previous = { selected_day: "2026-08-27", snapshot_id: "preview" };
+  const store = createStore({ salesDay: "2026-08-27", cache: { dailyStrategy: previous }, cacheTimes: {}, activeRuns: {}, moduleErrors: {} });
+  const statuses = [];
+  const auto = createAutoStrategyRefresh({
+    store,
+    request: async () => ({ selected_day: "2026-08-28", snapshot_id: "wrong-day" }),
+    setStatus: (...args) => statuses.push(args),
+    isCurrentSalesDay: (day) => day === "2026-08-27",
+  });
+
+  await auto.ensure({ force: true });
+
+  assert.equal(store.get().cache.dailyStrategy, previous);
+  assert.equal(store.get().autoStrategy.status, "error");
+  assert.match(store.get().autoStrategy.message, /销售日不一致/);
+  assert.deepEqual(statuses.at(-1), ["策略生成结果销售日不一致，已丢弃", "error"]);
 });

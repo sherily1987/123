@@ -69,11 +69,20 @@ const autoStrategy = createAutoStrategyRefresh({
   store,
   request: requestJson,
   setStatus,
-  isCurrentSalesDay: (salesDay) => Boolean(salesDay) && salesDay === store.get().cache.currentSaleDay?.sales_day,
+  isCurrentSalesDay: (salesDay) => Boolean(salesDay)
+    && !store.get().moduleErrors?.currentSaleDay
+    && salesDay === store.get().cache.currentSaleDay?.sales_day,
 });
 
 async function refreshWorkbench({ forceStrategy = false } = {}) {
   await refreshModules(["currentSaleDay"]);
+  if (store.get().moduleErrors?.currentSaleDay) {
+    store.set((state) => {
+      const { currentSaleDay, ...cache } = state.cache;
+      const { currentSaleDay: _timestamp, ...cacheTimes } = state.cacheTimes;
+      return { ...state, cache, cacheTimes };
+    });
+  }
   const authorityDay = store.get().cache.currentSaleDay?.sales_day;
   if (!salesDayInput.value && authorityDay) {
     salesDayInput.value = authorityDay;

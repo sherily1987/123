@@ -19,7 +19,15 @@ export function createAutoStrategyRefresh({ store, request, setStatus, now = () 
     }));
     try {
       const plan = await request("/api/daily-strategy/recommend", { method: "POST" });
-      if (store.get().salesDay !== salesDay) return store.get();
+      if (store.get().salesDay !== salesDay || !isCurrentSalesDay(salesDay)) return store.get();
+      if (plan?.selected_day !== salesDay) {
+        store.set((state) => ({
+          ...state,
+          autoStrategy: { status: "error", message: "策略生成结果销售日不一致，已丢弃。" },
+        }));
+        setStatus("策略生成结果销售日不一致，已丢弃", "error");
+        return store.get();
+      }
       store.set((state) => ({
         ...state,
         cache: { ...state.cache, dailyStrategy: plan },

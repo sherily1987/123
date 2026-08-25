@@ -63,6 +63,13 @@ function renderStrategy(plan) {
   const budget = plan.budget || {};
   target.append(node("p", `${display(plan.selected_day)} · 预算 ${display(budget.daily_budget_amount, "0")} 元 · 已分配 ${display(budget.allocated_amount, "0")} 元`));
   target.append(node("p", display(plan.display?.warning, "只读策略预览；不生成、不持久化。"), "muted"));
+  const items = node("ul");
+  (plan.single_purchase_recommendations || []).forEach((row) => items.append(node("li", `单关 ${display(row.match_num)} ${display(row.home)} vs ${display(row.away)}：${display(row.selection)} @${display(row.odds)}，${display(row.stake_amount, "0")}元`)));
+  (plan.combo_purchase_recommendations || []).forEach((row) => items.append(node("li", `组合 ${display(row.legs_count)}串1：${(row.legs || []).map((leg) => `${display(leg.match_num)} ${display(leg.selection)}`).join("；")}，${display(row.stake_amount, "0")}元`)));
+  target.append(items);
+  const audit = plan.evidence_gap_summary || {};
+  target.append(node("p", `证据缺口 ${display(audit.evidence_gap_market_rows, "0")}；新鲜度：过期 ${display(audit.stale_market_rows, "0")} / 老化 ${display(audit.aging_market_rows, "0")}`));
+  target.append(node("p", `风险标签：${(plan.risk_tags || []).map(String).join("、") || "无"}；LLM 复核 ${display(plan.llm_calibration?.eligible_settled_rows, "0")}/${display(plan.llm_calibration?.minimum_review_rows, "100")}`));
 }
 
 function renderHistory(payload) {
@@ -70,7 +77,7 @@ function renderHistory(payload) {
   clear(target);
   const matches = (Array.isArray(payload.sections) ? payload.sections : []).flatMap((section) => section.matches || []);
   if (!matches.length) { target.append(node("p", "没有匹配的历史记录。", "muted")); return; }
-  const body = matches.slice(0, 100).map((match) => {
+  const body = matches.map((match) => {
     const row = node("tr");
     row.append(node("td", display(match.day)), node("td", `${display(match.home)} vs ${display(match.away)}`));
     row.append(node("td", display(match.result?.score_90?.join("-") || match.actual, "待结算")));
@@ -95,7 +102,11 @@ async function openDetail(matchId) {
     clear(drawer);
     drawer.append(close, node("h2", display(match.match_id, "比赛详情")));
     drawer.append(node("p", `${display(match.home)} vs ${display(match.away)} · ${display(match.kickoff)}`));
-    drawer.append(node("p", `量化方向：${display(match.quant?.direction)}；LLM 方向：${display(match.llm?.direction)}`));
+    const quant = match.quant || {};
+    drawer.append(node("p", `1X2：${Array.isArray(quant.final_1x2_pct) ? quant.final_1x2_pct.join(" / ") : "未提供"}；Top比分：${Array.isArray(quant.top_scores) ? quant.top_scores.join("、") : "未提供"}`));
+    drawer.append(node("p", `大小球：${display(quant.ou_2_5)}；半全场：${display(quant.hafu)}；门控：${display(quant.recommendation_gate?.status || quant.gate)}；模式：${display(quant.mode)}`));
+    drawer.append(node("p", `证据状态：${display(match.lights?.evidence_status || match.lights?.status)}；官方90分钟赛果：${Array.isArray(match.result?.score_90) ? match.result.score_90.join("-") : "待结算"}；命中：${display(match.hit, "未结算")}`));
+    drawer.append(node("p", `量化方向：${display(quant.direction)}；LLM 方向：${display(match.llm?.direction)}`));
     const facts = Array.isArray(match.evidence_facts) ? match.evidence_facts : [];
     const list = node("ul");
     facts.forEach((fact) => list.append(node("li", fact)));
