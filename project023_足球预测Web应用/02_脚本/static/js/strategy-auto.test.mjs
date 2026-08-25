@@ -25,6 +25,7 @@ test("automatic strategy refresh posts once and updates only strategy cache", as
     store,
     request: async (path, options) => {
       calls.push([path, options]);
+      if (path === "/api/current-sale-day") return { sales_day: "2026-08-26" };
       return { selected_day: "2026-08-26", generated_at: "2026-08-25T23:00:00+08:00", budget: { daily_budget_amount: 100 } };
     },
     setStatus: () => {},
@@ -33,7 +34,11 @@ test("automatic strategy refresh posts once and updates only strategy cache", as
 
   await Promise.all([auto.ensure(), auto.ensure()]);
 
-  assert.deepEqual(calls, [["/api/daily-strategy/recommend", { method: "POST" }]]);
+  assert.deepEqual(calls, [
+    ["/api/current-sale-day", undefined],
+    ["/api/daily-strategy/recommend", { method: "POST" }],
+    ["/api/current-sale-day", undefined],
+  ]);
   assert.equal(store.get().cache.board.marker, 1);
   assert.equal(store.get().cache.dailyStrategy.budget.daily_budget_amount, 100);
   assert.equal(store.get().cacheTimes.dailyStrategy, "2026-08-25T23:00:01+08:00");
@@ -48,7 +53,10 @@ test("forced refresh regenerates an existing plan and failure preserves it", asy
   const statuses = [];
   const auto = createAutoStrategyRefresh({
     store,
-    request: async () => { throw new Error("生成失败"); },
+    request: async (path) => {
+      if (path === "/api/current-sale-day") return { sales_day: "2026-08-26" };
+      throw new Error("生成失败");
+    },
     setStatus: (message, tone) => statuses.push([message, tone]),
   });
 
@@ -90,7 +98,9 @@ test("a recommend response for another sales day is discarded instead of replaci
   const statuses = [];
   const auto = createAutoStrategyRefresh({
     store,
-    request: async () => ({ selected_day: "2026-08-28", snapshot_id: "wrong-day" }),
+    request: async (path) => path === "/api/current-sale-day"
+      ? { sales_day: "2026-08-27" }
+      : { selected_day: "2026-08-28", snapshot_id: "wrong-day" },
     setStatus: (...args) => statuses.push(args),
     isCurrentSalesDay: (day) => day === "2026-08-27",
   });
@@ -101,4 +111,97 @@ test("a recommend response for another sales day is discarded instead of replaci
   assert.equal(store.get().autoStrategy.status, "error");
   assert.match(store.get().autoStrategy.message, /销售日不一致/);
   assert.deepEqual(statuses.at(-1), ["策略生成结果销售日不一致，已丢弃", "error"]);
+});
+
+test("authority-day failure before recommendation blocks POST and clears stale authority cache", async () => {
+  const previous = { selected_day: "2026-08-26", snapshot_id: "preview" };
+  const store = createStore({
+    salesDay: "2026-08-26",
+    cache: { currentSaleDay: { sales_day: "2026-08-26" }, dailyStrategy: previous },
+    cacheTimes: { currentSaleDay: "old", dailyStrategy: "old" }, activeRuns: {}, moduleErrors: {},
+  });
+  let posts = 0;
+  const auto = createAutoStrategyRefresh({
+    store,
+    request: async (path) => {
+      if (path === "/api/current-sale-day") throw new Error("authority unavailable");
+      if (path === "/api/daily-strategy/recommend") posts += 1;
+      return { selected_day: "2026-08-26", snapshot_id: "unexpected" };
+    },
+    setStatus: () => {},
+    isCurrentSalesDay: () => true,
+  });
+
+  await auto.ensure({ force: true });
+
+  assert.equal(posts, 0);
+  assert.equal(store.get().cache.currentSaleDay, undefined);
+  assert.equal(store.get().cacheTimes.currentSaleDay, undefined);
+  assert.equal(store.get().cache.dailyStrategy, previous);
+  assert.notEqual(store.get().autoStrategy.status, "running");
+});
+
+test("input switching during the post-response authority check discards the plan", async () => {
+  const previous = { selected_day: "2026-08-26", snapshot_id: "preview" };
+  const store = createStore({
+    salesDay: "2026-08-26", cache: { currentSaleDay: { sales_day: "2026-08-26" }, dailyStrategy: previous },
+    cacheTimes: {}, activeRuns: {}, moduleErrors: {},
+  });
+  let authorityReads = 0;
+  let latestStarted = false;
+  let releaseLatest;
+  const latest = new Promise((resolve) => { releaseLatest = resolve; });
+  const auto = createAutoStrategyRefresh({
+    store,
+    request: async (path) => {
+      if (path === "/api/current-sale-day") {
+        authorityReads += 1;
+        if (authorityReads === 1) return { sales_day: "2026-08-26" };
+        latestStarted = true;
+        return latest;
+      }
+      return { selected_day: "2026-08-26", snapshot_id: "generated" };
+    },
+    setStatus: () => {},
+    isCurrentSalesDay: () => true,
+  });
+
+  const pending = auto.ensure({ force: true });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(latestStarted, true, "recommend must re-read backend authority after POST");
+  store.set((state) => ({ ...state, salesDay: "2026-08-27" }));
+  releaseLatest({ sales_day: "2026-08-26" });
+  await pending;
+
+  assert.equal(store.get().cache.dailyStrategy, previous);
+  assert.notEqual(store.get().autoStrategy.status, "running");
+});
+
+test("a discarded response releases running state so a later forced run can succeed", async () => {
+  const previous = { selected_day: "2026-08-26", snapshot_id: "preview" };
+  const store = createStore({
+    salesDay: "2026-08-26", cache: { currentSaleDay: { sales_day: "2026-08-26" }, dailyStrategy: previous },
+    cacheTimes: {}, activeRuns: {}, moduleErrors: {},
+  });
+  let posts = 0;
+  const auto = createAutoStrategyRefresh({
+    store,
+    request: async (path) => {
+      if (path === "/api/current-sale-day") return { sales_day: "2026-08-26" };
+      posts += 1;
+      return posts === 1
+        ? { selected_day: "2026-08-27", snapshot_id: "discarded" }
+        : { selected_day: "2026-08-26", snapshot_id: "accepted" };
+    },
+    setStatus: () => {},
+    isCurrentSalesDay: () => true,
+  });
+
+  await auto.ensure({ force: true });
+  assert.notEqual(store.get().autoStrategy.status, "running");
+  await auto.ensure({ force: true });
+
+  assert.equal(posts, 2);
+  assert.equal(store.get().cache.dailyStrategy.snapshot_id, "accepted");
+  assert.equal(store.get().autoStrategy.status, "done");
 });

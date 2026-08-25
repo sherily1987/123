@@ -18,7 +18,13 @@ async function read(path) {
 }
 
 function display(value, fallback = "未提供") {
-  return value === null || value === undefined || value === "" ? fallback : String(value);
+  if (value === null || value === undefined || value === "") return fallback;
+  if (Array.isArray(value)) return value.length ? value.map((item) => display(item, fallback)).join("、") : fallback;
+  if (typeof value === "object") {
+    const entries = Object.entries(value);
+    return entries.length ? entries.map(([key, item]) => `${key}: ${display(item, fallback)}`).join("；") : fallback;
+  }
+  return String(value);
 }
 
 function addTable(target, columns, rows) {
@@ -68,8 +74,17 @@ function renderStrategy(plan) {
   (plan.combo_purchase_recommendations || []).forEach((row) => items.append(node("li", `组合 ${display(row.legs_count)}串1：${(row.legs || []).map((leg) => `${display(leg.match_num)} ${display(leg.selection)}`).join("；")}，${display(row.stake_amount, "0")}元`)));
   target.append(items);
   const audit = plan.evidence_gap_summary || {};
-  target.append(node("p", `证据缺口 ${display(audit.evidence_gap_market_rows, "0")}；新鲜度：过期 ${display(audit.stale_market_rows, "0")} / 老化 ${display(audit.aging_market_rows, "0")}`));
-  target.append(node("p", `风险标签：${(plan.risk_tags || []).map(String).join("、") || "无"}；LLM 复核 ${display(plan.llm_calibration?.eligible_settled_rows, "0")}/${display(plan.llm_calibration?.minimum_review_rows, "100")}`));
+  target.append(node("p", `证据缺口 ${display(audit.evidence_gap_market_rows, "0")}；原因：${display(audit.reason_counts, "无")}`));
+  target.append(node("p", `证据新鲜度：${display(audit.age_status_counts, `STALE: ${display(audit.stale_market_rows, "0")}；AGING: ${display(audit.aging_market_rows, "0")}`)}`));
+  target.append(node("p", `风险标签：${display(plan.risk_tags, "无")}`));
+  const health = plan.source_health || {};
+  target.append(node("p", `采集健康：比赛 ${display(health.matches, "0")}；API-Sports ${display(health.api_sports, "未提供")}；Scrapling ${display(health.scrapling, "未提供")}`));
+  const calibration = (Array.isArray(plan.market_audit) ? plan.market_audit : []).map((row) => (
+    `${display(row.market)}: ${display(row.independent_calibration_status || row.model_calibration_status, "UNFITTED")}`
+  ));
+  target.append(node("p", `市场校准：${calibration.join("；") || "未提供"}`));
+  const llm = plan.llm_calibration || {};
+  target.append(node("p", `LLM 已登记 ${display(llm.llm_rows, "0")}；已结算 ${display(llm.eligible_settled_rows, "0")}/${display(llm.minimum_review_rows, "100")}；${llm.ready_for_review ? "达到复核门槛" : "未达到复核门槛"}；仅研究观察`));
 }
 
 function renderHistory(payload) {
@@ -129,8 +144,8 @@ async function loadSelectedDay() {
     ]);
     renderMatches(matches);
     renderStrategy(strategy);
-    renderHistory({ sections: (history.sections || []).filter((section) => section.day === day) });
-    status.textContent = `${day} 已按只读接口加载。`;
+    renderHistory(history);
+    status.textContent = `${day} 已按只读接口加载；历史区展示全部日期。`;
   } catch (error) {
     status.textContent = `读取失败：${error.message}`;
     status.className = "error";

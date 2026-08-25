@@ -10,23 +10,73 @@ export function autoStrategyChanged(next, previous) {
 export function createAutoStrategyRefresh({ store, request, setStatus, now = () => new Date().toISOString(), isCurrentSalesDay = () => true }) {
   let inFlight = null;
 
-  async function generate() {
-    const salesDay = store.get().salesDay;
-    if (!isCurrentSalesDay(salesDay)) return store.get();
-    store.set((state) => ({
-      ...state,
-      autoStrategy: { status: "running", message: "正在自动生成当前销售日策略…" },
-    }));
+  function setAutoStrategy(status, message) {
+    store.set((state) => ({ ...state, autoStrategy: { status, message } }));
+  }
+
+  function applyAuthority(authority) {
+    const salesDay = authority?.sales_day;
+    if (!salesDay) throw new Error("后端未返回权威销售日");
+    store.set((state) => {
+      const moduleErrors = { ...(state.moduleErrors || {}) };
+      delete moduleErrors.currentSaleDay;
+      return {
+        ...state,
+        cache: { ...state.cache, currentSaleDay: { sales_day: salesDay } },
+        cacheTimes: { ...state.cacheTimes, currentSaleDay: now() },
+        moduleErrors,
+      };
+    });
+    return salesDay;
+  }
+
+  function clearAuthority(error) {
+    store.set((state) => {
+      const { currentSaleDay, ...cache } = state.cache || {};
+      const { currentSaleDay: _timestamp, ...cacheTimes } = state.cacheTimes || {};
+      return {
+        ...state,
+        cache,
+        cacheTimes,
+        moduleErrors: {
+          ...(state.moduleErrors || {}),
+          currentSaleDay: { path: "/api/current-sale-day", message: error?.message || "权威销售日读取失败" },
+        },
+      };
+    });
+  }
+
+  async function readAuthority() {
     try {
+      return applyAuthority(await request("/api/current-sale-day"));
+    } catch (error) {
+      clearAuthority(error);
+      throw error;
+    }
+  }
+
+  function discard(message) {
+    setAutoStrategy("error", message);
+    setStatus(message.replace(/[。.]$/, ""), "error");
+    return store.get();
+  }
+
+  async function generate() {
+    const selectedInputDay = store.get().salesDay;
+    if (!isCurrentSalesDay(selectedInputDay)) return store.get();
+    setAutoStrategy("running", "正在自动生成当前销售日策略…");
+    try {
+      const requestDay = await readAuthority();
+      if (store.get().salesDay !== selectedInputDay || selectedInputDay !== requestDay) {
+        return discard("权威销售日与当前输入不一致，已取消策略生成。");
+      }
       const plan = await request("/api/daily-strategy/recommend", { method: "POST" });
-      if (store.get().salesDay !== salesDay || !isCurrentSalesDay(salesDay)) return store.get();
-      if (plan?.selected_day !== salesDay) {
-        store.set((state) => ({
-          ...state,
-          autoStrategy: { status: "error", message: "策略生成结果销售日不一致，已丢弃。" },
-        }));
-        setStatus("策略生成结果销售日不一致，已丢弃", "error");
-        return store.get();
+      const latestAuthorityDay = await readAuthority();
+      const currentInputDay = store.get().salesDay;
+      if (currentInputDay !== requestDay
+          || plan?.selected_day !== requestDay
+          || latestAuthorityDay !== requestDay) {
+        return discard("策略生成结果销售日不一致，已丢弃。");
       }
       store.set((state) => ({
         ...state,
@@ -36,11 +86,12 @@ export function createAutoStrategyRefresh({ store, request, setStatus, now = () 
       }));
       setStatus("当前销售日策略已自动生成", "ok");
     } catch (error) {
-      store.set((state) => ({
-        ...state,
-        autoStrategy: { status: "error", message: `策略自动生成失败：${error?.message || "未知错误"}` },
-      }));
+      setAutoStrategy("error", `策略自动生成失败：${error?.message || "未知错误"}`);
       setStatus("策略自动生成失败，保留上次策略", "warning");
+    } finally {
+      if (store.get().autoStrategy?.status === "running") {
+        setAutoStrategy("idle", "策略生成未完成，已安全复位，可重新运行。");
+      }
     }
     return store.get();
   }
