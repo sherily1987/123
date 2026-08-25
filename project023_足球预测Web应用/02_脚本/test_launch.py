@@ -37,10 +37,15 @@ def test_quant_runtime_always_resolves_to_primary_workspace():
     )
 
 
-def test_main_skips_occupied_b3_incompatible_server_and_starts_next_free_port(monkeypatch):
+def test_main_skips_occupied_b3_incompatible_server_and_starts_next_free_port(tmp_path, monkeypatch):
     """Deleting the UI-contract identity check must reopen the wrong service on 8766."""
     opened = []
     run_ports = []
+    real_state_path = launch.RUNTIME_STATE
+    real_state_before = (
+        real_state_path.read_bytes() if real_state_path.exists() else None
+    )
+    monkeypatch.setattr(launch, "RUNTIME_STATE", tmp_path / "runtime" / "workbench.json")
 
     def fake_urlopen(url, timeout=0):
         assert timeout > 0
@@ -84,6 +89,10 @@ def test_main_skips_occupied_b3_incompatible_server_and_starts_next_free_port(mo
 
     assert opened == []
     assert run_ports == [("127.0.0.1", 8767, "info")]
+    real_state_after = (
+        real_state_path.read_bytes() if real_state_path.exists() else None
+    )
+    assert real_state_after == real_state_before
 
 
 def test_existing_workbench_rejects_foreign_b3_build_identity(monkeypatch):

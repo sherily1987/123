@@ -53,12 +53,12 @@ def _existing_workbench(url: str = URL) -> bool:
         return False
 
 
-def write_runtime_state(payload: dict, *, path: Path = RUNTIME_STATE) -> Path:
+def write_runtime_state(payload: dict, *, path: Path | None = None) -> Path:
     """Atomically record the exact process that owns this workbench build."""
     required = {"pid", "host", "port", "url", "identity"}
     if not isinstance(payload, dict) or not required.issubset(payload):
         raise ValueError("runtime state missing ownership fields")
-    path = Path(path)
+    path = RUNTIME_STATE if path is None else Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
     try:
