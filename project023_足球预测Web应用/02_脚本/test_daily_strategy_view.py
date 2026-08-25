@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import subprocess
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -324,14 +326,90 @@ def test_recommend_endpoint_uses_current_sale_day(monkeypatch):
     import app as web
 
     calls = []
-    monkeypatch.setattr(web.dsv, "current_sale_day", lambda: "2026-08-26")
-    monkeypatch.setattr(
-        web.dsv, "daily_strategy",
-        lambda day, persist=False: calls.append((day, persist)) or {"selected_day": day},
-    )
+    monkeypatch.setattr(web.dsv, "recommend_daily_strategy", lambda expected_day: (
+        calls.append(expected_day) or {"selected_day": expected_day}
+    ))
 
-    response = TestClient(web.app).post("/api/daily-strategy/recommend")
+    response = TestClient(web.app).post(
+        "/api/daily-strategy/recommend", json={"expected_sales_day": "2026-08-26"},
+    )
 
     assert response.status_code == 200
     assert response.json()["selected_day"] == "2026-08-26"
-    assert calls == [("2026-08-26", True)]
+    assert calls == ["2026-08-26"]
+
+
+def test_recommend_rechecks_authority_before_atomic_commit(tmp_path, monkeypatch):
+    import daily_strategy_view as view
+
+    authority = iter(["2026-08-26", "2026-08-27"])
+    monkeypatch.setattr(view, "current_sale_day", lambda **_kwargs: next(authority))
+    monkeypatch.setattr(view, "daily_strategy", lambda day, **_kwargs: {
+        "selected_day": day,
+        "single_purchase_recommendations": [{"match_id": "sporttery-1"}],
+        "combo_purchase_recommendations": [],
+    })
+
+    with pytest.raises(view.SalesDayAuthorityChanged) as caught:
+        view.recommend_daily_strategy("2026-08-26", root=tmp_path)
+
+    assert caught.value.current_sales_day == "2026-08-27"
+    assert caught.value.phase == "before_commit"
+    assert not (tmp_path / "daily_strategy_plans" / "2026-08-26.json").exists()
+
+
+def test_concurrent_recommend_posts_share_one_atomic_snapshot(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+    import app as web
+
+    day = "2026-08-26"
+    monkeypatch.setattr(web.db, "DB_PATH", tmp_path / "web" / "app.db")
+    monkeypatch.setattr(web.dsv.sv, "store_root", lambda: tmp_path)
+    monkeypatch.setattr(web.dsv, "current_sale_day", lambda **_kwargs: day)
+
+    def generated(selected_day, **_kwargs):
+        time.sleep(0.15)
+        return {
+            "selected_day": selected_day,
+            "generated_at": "2026-08-26T08:00:00+08:00",
+            "single_purchase_recommendations": [{"match_id": "sporttery-1"}],
+            "combo_purchase_recommendations": [],
+        }
+
+    monkeypatch.setattr(web.dsv, "daily_strategy", generated)
+
+    def post_once():
+        return TestClient(web.app).post(
+            "/api/daily-strategy/recommend", json={"expected_sales_day": day},
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        responses = list(pool.map(lambda _index: post_once(), range(2)))
+
+    assert [response.status_code for response in responses] == [200, 200]
+    assert responses[0].json()["snapshot_id"] == responses[1].json()["snapshot_id"]
+    snapshot = tmp_path / "daily_strategy_plans" / f"{day}.json"
+    assert json.loads(snapshot.read_text(encoding="utf-8"))["snapshot_id"] == responses[0].json()["snapshot_id"]
+    assert list(snapshot.parent.glob(".*.tmp")) == []
+
+
+def test_recommend_endpoint_returns_409_when_sales_day_flips(monkeypatch):
+    from fastapi.testclient import TestClient
+    import app as web
+
+    def changed(expected_day):
+        raise web.dsv.SalesDayAuthorityChanged(expected_day, "2026-08-27", "before_commit")
+
+    monkeypatch.setattr(web.dsv, "recommend_daily_strategy", changed)
+
+    response = TestClient(web.app).post(
+        "/api/daily-strategy/recommend", json={"expected_sales_day": "2026-08-26"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == {
+        "code": "sales_day_authority_changed",
+        "expected_sales_day": "2026-08-26",
+        "current_sales_day": "2026-08-27",
+        "phase": "before_commit",
+    }

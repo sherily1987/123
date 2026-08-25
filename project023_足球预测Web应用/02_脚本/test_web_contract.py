@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 from fastapi.testclient import TestClient
 
@@ -101,3 +102,13 @@ def test_legacy_browser_is_functional_but_uses_only_safe_read_endpoints():
     assert "onclick=" not in html
     assert "textContent" in script
     assert "addEventListener" in script
+def test_app_main_delegates_to_managed_launcher(monkeypatch):
+    calls = []
+    monkeypatch.setattr(web.subprocess, "call", lambda command, cwd: calls.append((command, cwd)) or 0)
+
+    result = web.main(["--status"])
+
+    assert result == 0
+    assert calls == [
+        ([sys.executable, str(web.HERE / "launch.py"), "--status"], str(web.HERE)),
+    ]

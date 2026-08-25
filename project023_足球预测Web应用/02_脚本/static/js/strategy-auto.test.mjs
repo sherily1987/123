@@ -36,7 +36,11 @@ test("automatic strategy refresh posts once and updates only strategy cache", as
 
   assert.deepEqual(calls, [
     ["/api/current-sale-day", undefined],
-    ["/api/daily-strategy/recommend", { method: "POST" }],
+    ["/api/daily-strategy/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expected_sales_day: "2026-08-26" }),
+    }],
     ["/api/current-sale-day", undefined],
   ]);
   assert.equal(store.get().cache.board.marker, 1);
@@ -204,4 +208,34 @@ test("a discarded response releases running state so a later forced run can succ
   assert.equal(posts, 2);
   assert.equal(store.get().cache.dailyStrategy.snapshot_id, "accepted");
   assert.equal(store.get().autoStrategy.status, "done");
+});
+
+test("a 409 authority flip never replaces strategy cache and clears stale authority", async () => {
+  const previous = { selected_day: "2026-08-26", snapshot_id: "preview" };
+  const store = createStore({
+    salesDay: "2026-08-26",
+    cache: { currentSaleDay: { sales_day: "2026-08-26" }, dailyStrategy: previous },
+    cacheTimes: { currentSaleDay: "old", dailyStrategy: "old" }, activeRuns: {}, moduleErrors: {},
+  });
+  const auto = createAutoStrategyRefresh({
+    store,
+    request: async (path) => {
+      if (path === "/api/current-sale-day") return { sales_day: "2026-08-26" };
+      const error = new Error("sales day changed");
+      error.status = 409;
+      error.code = "sales_day_authority_changed";
+      throw error;
+    },
+    setStatus: () => {},
+    isCurrentSalesDay: () => true,
+  });
+
+  await auto.ensure({ force: true });
+
+  assert.equal(store.get().cache.dailyStrategy, previous);
+  assert.equal(store.get().cacheTimes.dailyStrategy, "old");
+  assert.equal(store.get().cache.currentSaleDay, undefined);
+  assert.equal(store.get().cacheTimes.currentSaleDay, undefined);
+  assert.equal(store.get().autoStrategy.status, "error");
+  assert.match(store.get().autoStrategy.message, /销售日已切换/);
 });

@@ -1,6 +1,7 @@
 import json
 import os
 import ctypes
+import sqlite3
 from ctypes import wintypes
 import pytest
 from pathlib import Path
@@ -96,6 +97,77 @@ def test_service_startup_recovers_reused_pid_with_different_fingerprint(tmp_path
         pass
 
     assert web.db.run_get(stale_id)["status"] == "error"
+
+
+def test_service_startup_recovers_dead_foreign_owner_row(tmp_path, monkeypatch):
+    db_path = tmp_path / "app.db"
+    monkeypatch.setattr(web.db, "DB_PATH", db_path)
+    web.db.init()
+    run_id = web.db.run_start(
+        "collect", owner_pid=41003, owner_identity="b3:foreign-worktree",
+        owner_fingerprint="foreign-owner", owner_db_path=str(db_path.resolve()),
+    )
+    monkeypatch.setattr(web.db, "_probe_owner_process", lambda _pid: ("dead", None))
+
+    assert web.db.recover_orphaned_runs() == 1
+    recovered = web.db.run_get(run_id)
+    assert recovered["status"] == "error"
+    assert "foreign owner" in recovered["message"]
+
+
+def test_service_startup_recovers_legacy_running_row_with_null_owner_metadata(tmp_path, monkeypatch):
+    db_path = tmp_path / "app.db"
+    monkeypatch.setattr(web.db, "DB_PATH", db_path)
+    web.db.init()
+    with sqlite3.connect(db_path) as conn:
+        run_id = conn.execute(
+            "INSERT INTO runs (run_type, status, total, done, message, started_at) VALUES (?,?,?,?,?,?)",
+            ("backtest", "running", 1, 0, "legacy", "2026-08-25T00:00:00+00:00"),
+        ).lastrowid
+
+    assert web.db.recover_orphaned_runs() == 1
+    recovered = web.db.run_get(run_id)
+    assert recovered["status"] == "error"
+    assert "legacy owner metadata" in recovered["message"]
+
+
+def test_cloned_database_recovers_live_owner_from_different_database_path(tmp_path, monkeypatch):
+    source_path = tmp_path / "source" / "app.db"
+    clone_path = tmp_path / "clone" / "app.db"
+    source_path.parent.mkdir()
+    clone_path.parent.mkdir()
+    monkeypatch.setattr(web.db, "DB_PATH", source_path)
+    web.db.init()
+    run_id = web.db.run_start(
+        "predict", owner_pid=os.getpid(), owner_identity=web.BUILD_IDENTITY,
+        owner_fingerprint="live-original", owner_db_path=str(source_path.resolve()),
+    )
+    with sqlite3.connect(source_path) as source, sqlite3.connect(clone_path) as clone:
+        source.backup(clone)
+    monkeypatch.setattr(web.db, "DB_PATH", clone_path)
+    monkeypatch.setattr(web.db, "_probe_owner_process", lambda _pid: ("alive", "live-original"))
+
+    assert web.db.recover_orphaned_runs() == 1
+    recovered = web.db.run_get(run_id)
+    assert recovered["status"] == "error"
+    assert "cloned database" in recovered["message"]
+
+
+def test_service_startup_fails_closed_for_live_foreign_owner_on_same_database(tmp_path, monkeypatch):
+    db_path = tmp_path / "app.db"
+    monkeypatch.setattr(web.db, "DB_PATH", db_path)
+    web.db.init()
+    run_id = web.db.run_start(
+        "llm", owner_pid=41004, owner_identity="b3:foreign-worktree",
+        owner_fingerprint="still-live", owner_db_path=str(db_path.resolve()),
+    )
+    monkeypatch.setattr(web.db, "_probe_owner_process", lambda _pid: ("alive", "still-live"))
+
+    with pytest.raises(web.db.ForeignRunOwnerActive) as caught:
+        web.db.recover_orphaned_runs()
+
+    assert caught.value.run_id == run_id
+    assert web.db.run_get(run_id)["status"] == "running"
 
 
 def test_windows_owner_probe_uses_query_handle_and_creation_time(monkeypatch):

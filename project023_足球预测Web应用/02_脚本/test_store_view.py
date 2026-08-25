@@ -742,7 +742,7 @@ def test_quant_direction_keeps_clear_home_edge_as_single_pick():
     }
 
 
-def test_history_scores_quant_single_and_registered_double_separately(tmp_path: Path):
+def test_history_labels_unregistered_quant_cover_as_research_and_excludes_it(tmp_path: Path):
     rec = _write_hist_match(
         tmp_path, 2040888, "欧冠", "2026-08-27T03:00:00+08:00",
         [39.4, 29.8, 30.7], [1, 1], "周日008",
@@ -754,18 +754,60 @@ def test_history_scores_quant_single_and_registered_double_separately(tmp_path: 
     row = sv.history_rows(tmp_path, include_shared=False)[0]
 
     assert row["hit"] is False
+    assert row["quant_double_scored"] is False
+    assert row["quant_double_hit"] is False
+    assert row["quant"]["direction"] == "主胜"
+    assert row["quant"]["alt_direction"] is None
+    assert row["quant"]["direction_label"] == "主胜"
+    assert row["quant"]["research_simulation"] == {
+        "direction": "主胜",
+        "alt_direction": "平局",
+        "label": "主胜略优，防平",
+        "policy": sv.QUANT_DOUBLE_DIRECTION_POLICY,
+        "policy_version": sv.QUANT_DOUBLE_DIRECTION_POLICY_VERSION,
+        "excluded_from_formal_stats": True,
+    }
+
+
+def test_history_scores_only_prediction_time_registered_quant_cover(tmp_path: Path):
+    rec = _write_hist_match(
+        tmp_path, 2040889, "欧冠", "2026-08-27T03:00:00+08:00",
+        [39.4, 29.8, 30.7], [1, 1], "周日009",
+    )
+    rec["direction_registration"] = {
+        "alt_direction": "平局",
+        "policy": sv.QUANT_DOUBLE_DIRECTION_POLICY,
+        "policy_version": sv.QUANT_DOUBLE_DIRECTION_POLICY_VERSION,
+        "prediction_as_of": "2026-08-26T18:00:00+08:00",
+    }
+    (tmp_path / "backtest" / "registry.jsonl").write_text(
+        json.dumps(rec) + "\n", encoding="utf-8",
+    )
+
+    row = sv.history_rows(tmp_path, include_shared=False)[0]
+
+    assert row["hit"] is False
     assert row["quant_double_scored"] is True
     assert row["quant_double_hit"] is True
-    assert row["quant"]["direction"] == "主胜"
     assert row["quant"]["alt_direction"] == "平局"
-    assert row["quant"]["direction_label"] == "主胜略优，防平"
+    assert row["quant"]["direction_label"] == "主胜 / 平局"
+    assert row["quant"]["direction_policy"] == sv.QUANT_DOUBLE_DIRECTION_POLICY
+    assert row["quant"]["direction_policy_version"] == sv.QUANT_DOUBLE_DIRECTION_POLICY_VERSION
+    assert row["quant"]["direction_prediction_as_of"] == "2026-08-26T18:00:00+08:00"
+    assert row["quant"]["research_simulation"] is None
 
 
-def test_history_does_not_retroactively_apply_double_direction_policy(tmp_path: Path):
+def test_history_rejects_quant_cover_registered_after_kickoff(tmp_path: Path):
     rec = _write_hist_match(
         tmp_path, 2040788, "欧冠", "2026-08-16T03:00:00+08:00",
         [39.4, 29.8, 30.7], [1, 1], "周日008",
     )
+    rec["direction_registration"] = {
+        "alt_direction": "平局",
+        "policy": sv.QUANT_DOUBLE_DIRECTION_POLICY,
+        "policy_version": sv.QUANT_DOUBLE_DIRECTION_POLICY_VERSION,
+        "prediction_as_of": "2026-08-16T03:01:00+08:00",
+    }
     (tmp_path / "backtest" / "registry.jsonl").write_text(
         json.dumps(rec) + "\n", encoding="utf-8",
     )
@@ -774,6 +816,7 @@ def test_history_does_not_retroactively_apply_double_direction_policy(tmp_path: 
 
     assert row["quant"]["alt_direction"] is None
     assert row["quant_double_hit"] is False
+    assert row["quant"]["research_simulation"]["excluded_from_formal_stats"] is True
 
 
 def test_history_llm_hit_is_separate_from_quant(tmp_path: Path):

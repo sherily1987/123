@@ -35,6 +35,14 @@ class RunAlreadyActive(RuntimeError):
         self.active_run = active_run
         super().__init__(f"{active_run.get('run_type')} run {active_run.get('id')} is already running")
 
+
+class ForeignRunOwnerActive(RuntimeError):
+    """A different live build still owns a running row in this exact database."""
+
+    def __init__(self, run_id: int):
+        self.run_id = run_id
+        super().__init__(f"foreign workbench owner is still active for run {run_id}")
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS matches (
     sales_day TEXT NOT NULL,
@@ -88,6 +96,7 @@ CREATE TABLE IF NOT EXISTS runs (
     owner_pid INTEGER,
     owner_identity TEXT,
     owner_fingerprint TEXT,
+    owner_db_path TEXT,
     progress_json TEXT,          -- JSON：结构化任务运行快照
     logs_json TEXT               -- JSON：最近的用户可见事件
 );
@@ -119,6 +128,7 @@ def init():
         _ensure_column(c, "runs", "owner_pid", "INTEGER")
         _ensure_column(c, "runs", "owner_identity", "TEXT")
         _ensure_column(c, "runs", "owner_fingerprint", "TEXT")
+        _ensure_column(c, "runs", "owner_db_path", "TEXT")
 
 
 def _probe_owner_process(pid: int) -> tuple[str, str | None]:
@@ -172,32 +182,48 @@ def recover_orphaned_runs() -> int:
     process can accept a request and create a new run.
     """
     now = datetime.now(timezone.utc).isoformat()
-    message = "服务重启，任务中断"
+    base_message = "服务重启，任务中断"
     recovered = 0
     with _lock, _conn() as c:
         running = c.execute(
-            "SELECT id, owner_pid, owner_identity, owner_fingerprint FROM runs WHERE status='running'"
+            """SELECT id, owner_pid, owner_identity, owner_fingerprint, owner_db_path
+               FROM runs WHERE status='running' ORDER BY id"""
         ).fetchall()
+        actions = []
+        current_db_path = str(DB_PATH.resolve())
         for row in running:
             owner_pid = row["owner_pid"]
+            owner_identity = row["owner_identity"]
             owner_fingerprint = row["owner_fingerprint"]
-            if (row["owner_identity"] != BUILD_IDENTITY
-                    or not isinstance(owner_pid, int) or owner_pid <= 0
-                    or not isinstance(owner_fingerprint, str) or not owner_fingerprint):
+            owner_db_path = row["owner_db_path"]
+            if (not isinstance(owner_pid, int) or owner_pid <= 0
+                    or not isinstance(owner_identity, str) or not owner_identity
+                    or not isinstance(owner_fingerprint, str) or not owner_fingerprint
+                    or not isinstance(owner_db_path, str) or not owner_db_path):
+                actions.append((row["id"], "legacy owner metadata missing"))
                 continue
             owner_status, current_fingerprint = _probe_owner_process(owner_pid)
-            if owner_status == "unknown" or (
-                owner_status == "alive" and current_fingerprint == owner_fingerprint
-            ):
+            if str(Path(owner_db_path).resolve()) != current_db_path:
+                actions.append((row["id"], "cloned database has a different owner path"))
                 continue
+            live_exact_owner = owner_status == "alive" and current_fingerprint == owner_fingerprint
+            if owner_identity != BUILD_IDENTITY:
+                if live_exact_owner or owner_status == "unknown":
+                    raise ForeignRunOwnerActive(row["id"])
+                actions.append((row["id"], "foreign owner no longer controls this database"))
+                continue
+            if owner_status == "unknown" or live_exact_owner:
+                continue
+            actions.append((row["id"], "matching owner is dead or its PID was reused"))
+        for run_id, reason in actions:
+            message = f"{base_message}（{reason}）"
             cursor = c.execute(
                 """UPDATE runs
                    SET status='error', finished_at=?,
-                       message=CASE WHEN message IS NULL OR message='' THEN ?
-                                    ELSE message || '\n' || ? END
-                   WHERE id=? AND status='running' AND owner_pid=? AND owner_identity=?
-                     AND owner_fingerprint=?""",
-                (now, message, message, row["id"], owner_pid, BUILD_IDENTITY, owner_fingerprint),
+                        message=CASE WHEN message IS NULL OR message='' THEN ?
+                                     ELSE message || '\n' || ? END
+                   WHERE id=? AND status='running'""",
+                (now, message, message, run_id),
             )
             recovered += cursor.rowcount
     return recovered
@@ -308,13 +334,15 @@ def list_backtests(sales_day: str = None):
 # ---- 后台任务 ----
 def run_start(run_type: str, total: int = 0, message: str = "",
               owner_pid: int | None = None, owner_identity: str | None = None,
-              owner_fingerprint: str | None = None) -> int:
+              owner_fingerprint: str | None = None,
+              owner_db_path: str | None = None) -> int:
     now = datetime.now(timezone.utc).isoformat()
     owner_pid = os.getpid() if owner_pid is None else owner_pid
     owner_identity = BUILD_IDENTITY if owner_identity is None else owner_identity
     if owner_fingerprint is None:
         status, fingerprint = _probe_owner_process(owner_pid)
         owner_fingerprint = fingerprint if status == "alive" else None
+    owner_db_path = str(Path(owner_db_path).resolve()) if owner_db_path else str(DB_PATH.resolve())
     with _lock, _conn() as c:
         c.execute("BEGIN IMMEDIATE")
         active = c.execute(
@@ -325,9 +353,11 @@ def run_start(run_type: str, total: int = 0, message: str = "",
             raise RunAlreadyActive(_run_dict(active))
         cur = c.execute(
             """INSERT INTO runs
-               (run_type, status, total, done, message, started_at, owner_pid, owner_identity, owner_fingerprint)
-               VALUES (?,?,?,?,?,?,?,?,?)""",
-            (run_type, "running", total, 0, message, now, owner_pid, owner_identity, owner_fingerprint),
+               (run_type, status, total, done, message, started_at, owner_pid, owner_identity,
+                owner_fingerprint, owner_db_path)
+               VALUES (?,?,?,?,?,?,?,?,?,?)""",
+            (run_type, "running", total, 0, message, now, owner_pid, owner_identity,
+             owner_fingerprint, owner_db_path),
         )
         return cur.lastrowid
 

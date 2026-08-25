@@ -19,7 +19,35 @@ FUSION_SCRIPTS = (
     "skill" / "football-quant-fusion" / "scripts"
 )
 assert ".worktrees" not in str(PROJECT_DIR)
-BUILD_IDENTITY = "b3:" + hashlib.sha256(
-    f"project023-web-workbench\0{PROJECT_DIR}".encode("utf-8")
-).hexdigest()[:24]
+
+
+def build_identity(project_dir: Path, runtime_files) -> str:
+    """Bind a service identity to both its formal path and controlled code bytes."""
+    project_dir = Path(project_dir).resolve()
+    digest = hashlib.sha256()
+    digest.update(f"project023-web-workbench\0{project_dir}\0".encode("utf-8"))
+    for path in sorted((Path(item).resolve() for item in runtime_files), key=lambda item: str(item).casefold()):
+        try:
+            label = path.relative_to(project_dir).as_posix()
+        except ValueError:
+            label = path.name
+        digest.update(label.encode("utf-8"))
+        digest.update(b"\0")
+        try:
+            digest.update(path.read_bytes())
+        except OSError:
+            digest.update(b"<missing>")
+        digest.update(b"\0")
+    return "b3:" + digest.hexdigest()[:24]
+
+
+RUNTIME_IDENTITY_FILES = [
+    SCRIPT_DIR / name
+    for name in (
+        "app.py", "db.py", "launch.py", "workbench_runtime.py", "runner.py",
+        "store_view.py", "daily_strategy_view.py", "static/index.html",
+    )
+]
+RUNTIME_IDENTITY_FILES.extend(sorted((SCRIPT_DIR / "static" / "js").rglob("*.js")))
+BUILD_IDENTITY = build_identity(PROJECT_DIR, RUNTIME_IDENTITY_FILES)
 PROCESS_ID = os.getpid()

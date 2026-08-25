@@ -154,11 +154,23 @@ function scoresText(scores) {
   return Array.isArray(scores) && scores.length ? scores.join("、") : "—";
 }
 
+function formalQuantCover(record = {}) {
+  const quant = record.quant || {};
+  return Boolean(record.quant_double_scored && quant.alt_direction
+    && quant.direction_policy && quant.direction_policy_version && quant.direction_prediction_as_of);
+}
+
+function quantResearchText(record = {}) {
+  const simulation = record.quant?.research_simulation;
+  if (!simulation?.excluded_from_formal_stats || !simulation.label) return "";
+  return `<small>研究模拟：${esc(simulation.label)}（不计正式命中）</small>`;
+}
+
 function resultBadge(record, track) {
   if (!record.settled) return '<span class="result-badge pending">待结算</span>';
   if (track === "llm" && !record.llm_scored) return '<span class="result-badge unavailable">未计分</span>';
-  if (track === "quant" && record.quant?.alt_direction) {
-    return `<span class="result-badge ${record.hit ? "hit" : "miss"}">单项${record.hit ? "命中" : "未命中"}</span><small><span class="result-badge ${record.quant_double_hit ? "hit" : "miss"}">方向${record.quant_double_hit ? "命中" : "未命中"}</span></small>`;
+  if (track === "quant" && formalQuantCover(record)) {
+    return `<span class="result-badge ${record.hit ? "hit" : "miss"}">单项${record.hit ? "命中" : "未命中"}</span><small><span class="result-badge ${record.quant_double_hit ? "hit" : "miss"}">登记双选${record.quant_double_hit ? "命中" : "未命中"}</span></small>`;
   }
   const hit = track === "llm" ? record.llm_hit : record.hit;
   return `<span class="result-badge ${hit ? "hit" : "miss"}">${hit ? "命中" : "未命中"}</span>`;
@@ -171,7 +183,7 @@ function historyRow(record) {
   const detailAction = record.match_id
     ? `<button type="button" class="match-detail-trigger" data-backtest-match-id="${esc(record.match_id)}">查看详情</button>`
     : "";
-  return `<tr><td>${esc(record.league || "联赛缺失")}</td><td>${esc(record.match_num || "—")}</td><td>${esc(time)}</td><td class="match-cell">${esc(record.home || "—")} vs ${esc(record.away || "—")}${detailAction}</td><td><strong>${esc(record.quant?.direction_label || record.quant?.direction || "—")}</strong><small>${esc(probabilityText(record))}</small></td><td>${esc(scoresText(record.quant?.top_scores))}</td><td><strong>${esc(llmDirection)}</strong><small>${esc(scoresText(record.llm?.top_scores))}</small></td><td>${esc(scoreText(record))}</td><td>${resultBadge(record, "quant")}</td><td>${resultBadge(record, "llm")}</td></tr>`;
+  return `<tr><td>${esc(record.league || "联赛缺失")}</td><td>${esc(record.match_num || "—")}</td><td>${esc(time)}</td><td class="match-cell">${esc(record.home || "—")} vs ${esc(record.away || "—")}${detailAction}</td><td><strong>${esc(record.quant?.direction_label || record.quant?.direction || "—")}</strong><small>${esc(probabilityText(record))}</small>${quantResearchText(record)}</td><td>${esc(scoresText(record.quant?.top_scores))}</td><td><strong>${esc(llmDirection)}</strong><small>${esc(scoresText(record.llm?.top_scores))}</small></td><td>${esc(scoreText(record))}</td><td>${resultBadge(record, "quant")}</td><td>${resultBadge(record, "llm")}</td></tr>`;
 }
 
 function bindBacktestActions(root, context) {

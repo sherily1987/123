@@ -2,6 +2,8 @@
 """project023 工作台：只读融合库看板；写操作走 fusion_cli market_only。"""
 import json
 import os
+import subprocess
+import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -42,6 +44,10 @@ class DayReq(BaseModel):
 
     def day(self) -> str | None:
         return self.sales_day or self.kickoff_date
+
+
+class DailyStrategyRecommendReq(BaseModel):
+    expected_sales_day: str
 
 
 def validated_day(req: DayReq, *, required: bool = False) -> str | None:
@@ -147,11 +153,19 @@ def current_sale_day_api():
 
 
 @app.post("/api/daily-strategy/recommend")
-def recommend_daily_strategy_api():
-    """Generate against the current on-sale pool, which may kick off tomorrow."""
+def recommend_daily_strategy_api(req: DailyStrategyRecommendReq):
+    """Commit only if the client's authority remains current through generation."""
     try:
-        day = dsv.current_sale_day()
-        return dsv.daily_strategy(day, persist=True)
+        return dsv.recommend_daily_strategy(req.expected_sales_day)
+    except dsv.SalesDayAuthorityChanged as exc:
+        raise HTTPException(409, {
+            "code": "sales_day_authority_changed",
+            "expected_sales_day": exc.expected_sales_day,
+            "current_sales_day": exc.current_sales_day,
+            "phase": exc.phase,
+        }) from exc
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
     except Exception as exc:
         raise HTTPException(500, f"娱乐策略推荐失败: {exc}") from exc
 
@@ -428,6 +442,13 @@ def export_report():
 
 app.mount("/", StaticFiles(directory=str(HERE / "static"), html=True), name="static")
 
+
+def main(argv: list[str] | None = None) -> int:
+    """Delegate direct execution to the identity-managed launcher."""
+    command = [sys.executable, str(HERE / "launch.py"), *(argv if argv is not None else sys.argv[1:])]
+    print("app.py 不直接启动服务；正在转交正式 launch.py。", flush=True)
+    return subprocess.call(command, cwd=str(HERE))
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8765, log_level="info")
+    raise SystemExit(main())

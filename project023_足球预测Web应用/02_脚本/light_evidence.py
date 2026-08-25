@@ -16,7 +16,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# 2026-08-16：LLM 工程已从 C:/Users/Administrator/football-llm-predictor 迁入仓库
+# 2026-08-16：LLM 工程已迁入仓库内唯一事实源。
 LLM_ROOT = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
     HERE.parents[1] / "project018_技能工作区整合" / "02_脚本" / "llm" / "football-llm-predictor"))
 LLM_DATA = LLM_ROOT / "data"

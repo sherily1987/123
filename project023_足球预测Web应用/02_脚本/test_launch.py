@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import socket
+import time
+import urllib.request
 from pathlib import Path
 from types import SimpleNamespace
 from urllib.error import URLError
@@ -35,6 +39,20 @@ def test_quant_runtime_always_resolves_to_primary_workspace():
         expected / "project018_技能工作区整合" / "02_脚本" /
         "skill" / "football-quant-fusion" / "scripts"
     )
+
+
+def test_build_identity_changes_when_controlled_runtime_code_changes(tmp_path):
+    project = tmp_path / "project023"
+    script = project / "02_脚本"
+    script.mkdir(parents=True)
+    runtime_file = script / "app.py"
+    runtime_file.write_text("VERSION = 1\n", encoding="utf-8")
+
+    first = workbench_runtime.build_identity(project, [runtime_file])
+    runtime_file.write_text("VERSION = 2\n", encoding="utf-8")
+    second = workbench_runtime.build_identity(project, [runtime_file])
+
+    assert first != second
 
 
 def test_main_skips_occupied_b3_incompatible_server_and_starts_next_free_port(tmp_path, monkeypatch):
@@ -188,3 +206,131 @@ def test_select_launch_target_reuses_recorded_dynamic_port_before_searching(tmp_
     monkeypatch.setattr(launch, "_port_is_free", lambda host, port: port == 8766)
 
     assert launch.select_launch_target() == ("http://127.0.0.1:8767", 8767, True)
+
+
+def test_main_waits_for_matching_starting_owner_instead_of_selecting_another_port(tmp_path, monkeypatch):
+    state_path = tmp_path / "runtime" / "workbench.json"
+    launch.write_runtime_state({
+        "pid": 2468,
+        "host": "127.0.0.1",
+        "port": 8766,
+        "url": "http://127.0.0.1:8766",
+        "identity": launch.BUILD_IDENTITY,
+        "status": "starting",
+    }, path=state_path)
+    monkeypatch.setattr(launch, "RUNTIME_STATE", state_path)
+    monkeypatch.setattr(launch, "launch_serialization", lambda: _NullContext())
+    monkeypatch.setattr(launch, "wait_for_starting_owner", lambda state: True)
+    monkeypatch.setattr(launch, "select_launch_target", lambda: (_ for _ in ()).throw(
+        AssertionError("a second launcher must not select another port while an owner is starting")
+    ))
+    opened = []
+    monkeypatch.setattr(launch.webbrowser, "open", opened.append)
+
+    launch.main([])
+
+    assert opened == ["http://127.0.0.1:8766"]
+
+
+class _NullContext:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+
+def _free_local_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return int(sock.getsockname()[1])
+
+
+def _wait_for_json(path: Path, predicate, timeout: float = 10.0) -> dict:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            time.sleep(0.05)
+            continue
+        if predicate(payload):
+            return payload
+        time.sleep(0.05)
+    raise AssertionError(f"timed out waiting for runtime state: {path}")
+
+
+def test_two_real_launcher_processes_serialize_and_reuse_one_owner(tmp_path):
+    """Deleting the cross-process lock lets both launchers overwrite state or choose two ports."""
+    script_dir = Path(__file__).resolve().parent
+    state_path = tmp_path / "runtime" / "workbench.json"
+    db_path = tmp_path / "data" / "app.db"
+    store_root = tmp_path / "store"
+    (store_root / "backtest").mkdir(parents=True)
+    port = _free_local_port()
+    env = os.environ.copy()
+    env.update({
+        "PYTHONUNBUFFERED": "1",
+        "B3_TEST_SCRIPT_DIR": str(script_dir),
+        "B3_TEST_RUNTIME_STATE": str(state_path),
+        "B3_TEST_DB_PATH": str(db_path),
+        "B3_TEST_PORT": str(port),
+        "FUSION_DATA_ROOT": str(store_root),
+    })
+    worker = r'''
+import os
+import sys
+import time
+from pathlib import Path
+
+script_dir = Path(os.environ["B3_TEST_SCRIPT_DIR"])
+sys.path.insert(0, str(script_dir))
+import launch
+launch.RUNTIME_STATE = Path(os.environ["B3_TEST_RUNTIME_STATE"])
+launch.PORT = int(os.environ["B3_TEST_PORT"])
+launch.URL = f"http://127.0.0.1:{launch.PORT}"
+launch.webbrowser.open = lambda *_args, **_kwargs: None
+import db
+db.DB_PATH = Path(os.environ["B3_TEST_DB_PATH"])
+import uvicorn
+real_run = uvicorn.run
+def delayed_run(*args, **kwargs):
+    time.sleep(1.0)
+    return real_run(*args, **kwargs)
+uvicorn.run = delayed_run
+launch.main([])
+'''
+    first = subprocess.Popen(
+        [sys.executable, "-c", worker], cwd=script_dir, env=env,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+    )
+    second = None
+    try:
+        starting = _wait_for_json(
+            state_path,
+            lambda payload: payload.get("status") == "starting" and payload.get("pid") == first.pid,
+        )
+        assert starting["port"] == port
+        second = subprocess.Popen(
+            [sys.executable, "-c", worker], cwd=script_dir, env=env,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+        )
+        second_output, _ = second.communicate(timeout=20)
+        assert second.returncode == 0, second_output
+        assert "已确认 B3 身份后复用" in second_output
+        running = _wait_for_json(
+            state_path,
+            lambda payload: payload.get("status") == "running" and payload.get("pid") == first.pid,
+        )
+        assert running["port"] == port
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/ui-contract", timeout=3) as response:
+            contract = json.loads(response.read().decode("utf-8"))
+        assert contract["process_id"] == first.pid
+        assert contract["build_identity"] == running["identity"]
+    finally:
+        if second is not None and second.poll() is None:
+            second.terminate()
+            second.wait(timeout=5)
+        if first.poll() is None:
+            first.terminate()
+            first.wait(timeout=10)

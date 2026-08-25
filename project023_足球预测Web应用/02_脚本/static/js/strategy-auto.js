@@ -70,7 +70,11 @@ export function createAutoStrategyRefresh({ store, request, setStatus, now = () 
       if (store.get().salesDay !== selectedInputDay || selectedInputDay !== requestDay) {
         return discard("权威销售日与当前输入不一致，已取消策略生成。");
       }
-      const plan = await request("/api/daily-strategy/recommend", { method: "POST" });
+      const plan = await request("/api/daily-strategy/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_sales_day: requestDay }),
+      });
       const latestAuthorityDay = await readAuthority();
       const currentInputDay = store.get().salesDay;
       if (currentInputDay !== requestDay
@@ -86,6 +90,12 @@ export function createAutoStrategyRefresh({ store, request, setStatus, now = () 
       }));
       setStatus("当前销售日策略已自动生成", "ok");
     } catch (error) {
+      if (error?.status === 409 || error?.code === "sales_day_authority_changed") {
+        clearAuthority(error);
+        setAutoStrategy("error", "销售日已切换，服务端未提交且本地未缓存新策略，请刷新后重试。");
+        setStatus("销售日已切换，策略未缓存", "warning");
+        return store.get();
+      }
       setAutoStrategy("error", `策略自动生成失败：${error?.message || "未知错误"}`);
       setStatus("策略自动生成失败，保留上次策略", "warning");
     } finally {

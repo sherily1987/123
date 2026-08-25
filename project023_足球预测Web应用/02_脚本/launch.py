@@ -12,6 +12,7 @@ import threading
 import time
 import urllib.request
 import webbrowser
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -21,6 +22,8 @@ HOST = "127.0.0.1"
 PORT = 8766
 URL = f"http://{HOST}:{PORT}"
 PORT_ATTEMPTS = 20
+LAUNCH_LOCK_TIMEOUT = 15.0
+STARTING_OWNER_TIMEOUT = 12.0
 RUNTIME_STATE = Path(__file__).resolve().parent / "data" / "runtime" / "workbench.json"
 
 
@@ -84,6 +87,86 @@ def read_runtime_state(path: Path | None = None) -> dict | None:
     except (OSError, ValueError):
         return None
     return payload if isinstance(payload, dict) else None
+
+
+def _launch_lock_path() -> Path:
+    return RUNTIME_STATE.with_name(f"{RUNTIME_STATE.stem}.launch.lock")
+
+
+@contextmanager
+def launch_serialization(timeout: float = LAUNCH_LOCK_TIMEOUT):
+    """Serialize launch target selection and starting-state ownership across processes."""
+    path = _launch_lock_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = path.open("a+b")
+    if path.stat().st_size == 0:
+        handle.write(b"\0")
+        handle.flush()
+    deadline = time.monotonic() + timeout
+    acquired = False
+    try:
+        while not acquired:
+            handle.seek(0)
+            try:
+                if os.name == "nt":
+                    import msvcrt
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                acquired = True
+            except OSError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError("等待工作台启动锁超时")
+                time.sleep(0.05)
+        yield
+    finally:
+        if acquired:
+            handle.seek(0)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        handle.close()
+
+
+def _matching_starting_state() -> dict | None:
+    state = read_runtime_state()
+    if not state or state.get("status") != "starting":
+        return None
+    port = state.get("port")
+    pid = state.get("pid")
+    if (state.get("identity") != BUILD_IDENTITY or state.get("host") != HOST
+            or not isinstance(port, int) or not 1 <= port <= 65535
+            or not isinstance(pid, int) or pid <= 0):
+        return None
+    url = f"http://{HOST}:{port}"
+    return state if state.get("url") == url else None
+
+
+def wait_for_starting_owner(state: dict, timeout: float = STARTING_OWNER_TIMEOUT) -> bool:
+    """Wait only for the exact owner already recorded as starting."""
+    expected = {key: state.get(key) for key in ("pid", "host", "port", "url", "identity")}
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        current = read_runtime_state()
+        if not current or any(current.get(key) != value for key, value in expected.items()):
+            return False
+        if _existing_workbench(state["url"]) and _runtime_matches(state["url"], state["port"]):
+            return True
+        time.sleep(0.1)
+    return False
+
+
+def _mark_runtime_running(pid: int, url: str) -> None:
+    state = read_runtime_state()
+    if (not state or state.get("pid") != pid or state.get("identity") != BUILD_IDENTITY
+            or state.get("url") != url):
+        return
+    state["status"] = "running"
+    write_runtime_state(state)
 
 
 def _runtime_matches(url: str, port: int) -> bool:
@@ -166,8 +249,9 @@ def _port_is_free(host: str, port: int) -> bool:
         return False
 
 
-def select_launch_target(host: str = HOST, start_port: int = PORT) -> tuple[str, int, bool]:
+def select_launch_target(host: str = HOST, start_port: int | None = None) -> tuple[str, int, bool]:
     """Choose a matching B3 service or the first free local port."""
+    start_port = PORT if start_port is None else start_port
     state = read_runtime_state()
     if (state and state.get("host") == host and state.get("identity") == BUILD_IDENTITY
             and isinstance(state.get("port"), int)):
@@ -187,9 +271,11 @@ def select_launch_target(host: str = HOST, start_port: int = PORT) -> tuple[str,
     )
 
 
-def wait_and_open(url: str) -> None:
+def wait_and_open(url: str, pid: int | None = None) -> None:
     for _ in range(40):
         if _existing_workbench(url):
+            if pid is not None:
+                _mark_runtime_running(pid, url)
             webbrowser.open(url)
             print(f"已打开 {url}  关掉本窗口即停止。", flush=True)
             return
@@ -211,25 +297,41 @@ def main(argv: list[str] | None = None) -> None:
         return
     if argv:
         raise ValueError(f"不支持的参数: {' '.join(argv)}")
-    url, port, reuse = select_launch_target()
+    starting_state = None
+    with launch_serialization():
+        starting_state = _matching_starting_state()
+        if starting_state:
+            url = starting_state["url"]
+            port = starting_state["port"]
+            reuse = False
+        else:
+            url, port, reuse = select_launch_target()
+            if not reuse:
+                write_runtime_state({
+                    "pid": os.getpid(),
+                    "host": HOST,
+                    "port": port,
+                    "url": url,
+                    "identity": BUILD_IDENTITY,
+                    "status": "starting",
+                    "started_at": datetime.now().astimezone().isoformat(),
+                })
+    if starting_state:
+        if not wait_for_starting_owner(starting_state):
+            raise RuntimeError("已记录的工作台启动者未在限定时间内就绪；为避免双实例，本次安全退出。")
+        print(f"工作台已在运行：{url}，已确认 B3 身份后复用。", flush=True)
+        webbrowser.open(url)
+        return
     if reuse:
         print(f"工作台已在运行：{url}，已确认 B3 身份后复用。", flush=True)
         webbrowser.open(url)
         return
     print(f"工作台启动中… {url}", flush=True)
     pid = os.getpid()
-    write_runtime_state({
-        "pid": pid,
-        "host": HOST,
-        "port": port,
-        "url": url,
-        "identity": BUILD_IDENTITY,
-        "started_at": datetime.now().astimezone().isoformat(),
-    })
-    threading.Thread(target=wait_and_open, args=(url,), daemon=True).start()
-    import uvicorn
-    import app as web
     try:
+        threading.Thread(target=wait_and_open, args=(url, pid), daemon=True).start()
+        import uvicorn
+        import app as web
         uvicorn.run(web.app, host=HOST, port=port, log_level="info")
     finally:
         _remove_runtime_state_if_owned(pid)

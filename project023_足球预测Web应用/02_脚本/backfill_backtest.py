@@ -12,9 +12,16 @@ import sys
 import urllib.request
 from collections import defaultdict
 from datetime import datetime, timedelta
+from pathlib import Path
 
-sys.path.insert(0, r'F:/HM足球比赛预测/project023_足球预测Web应用/02_脚本')
-DB_PATH = r'F:/HM足球比赛预测/project023_足球预测Web应用/02_脚本/data/app.db'
+from workbench_runtime import PRIMARY_WORKSPACE_ROOT
+
+HERE = Path(__file__).resolve().parent
+DB_PATH = HERE / 'data' / 'app.db'
+LLM_DATA = (
+    PRIMARY_WORKSPACE_ROOT / 'project018_技能工作区整合' / '02_脚本' /
+    'llm' / 'football-llm-predictor' / 'data'
+)
 
 LEAGUE_MAP = {
     '荷甲': 'eredivisie', '瑞超': 'allsvenskan', '挪超': 'eliteserien',
@@ -45,7 +52,8 @@ for m in data:
 # 2) 体彩赛果（match_num 精确）
 tix = {}
 for d in ('2026-08-15', '2026-08-16', '2026-08-17'):
-    r = json.load(open(f'C:/Users/Administrator/football-llm-predictor/data/results_{d}.json', encoding='utf-8'))
+    with (LLM_DATA / f'results_{d}.json').open(encoding='utf-8') as handle:
+        r = json.load(handle)
     for mm in r.get('results', []):
         if mm.get('finished') and mm.get('score_90'):
             tix[mm['match_num']] = mm['score_90']

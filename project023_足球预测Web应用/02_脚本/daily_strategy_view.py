@@ -4,8 +4,13 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
 import re
 import sys
+import tempfile
+import threading
+import time
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -13,12 +18,116 @@ import store_view as sv
 
 
 CST = timezone(timedelta(hours=8))
+_STRATEGY_THREAD_LOCK = threading.Lock()
 if str(sv.FUSION_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(sv.FUSION_SCRIPTS))
 
 from daily_strategy_planner import build_daily_strategy  # noqa: E402
 from recommendation_policy import load_policy  # noqa: E402
 from evidence_merge import merge_late_info_events  # noqa: E402
+
+
+class SalesDayAuthorityChanged(RuntimeError):
+    def __init__(self, expected_sales_day: str, current_sales_day: str, phase: str):
+        self.expected_sales_day = expected_sales_day
+        self.current_sales_day = current_sales_day
+        self.phase = phase
+        super().__init__(
+            f"sales-day authority changed from {expected_sales_day} to {current_sales_day} ({phase})"
+        )
+
+
+@contextmanager
+def strategy_generation_lock(*, root: Path | None = None, timeout: float = 30.0):
+    """Serialize strategy authority checks and commit across threads and processes."""
+    store = Path(root or sv.store_root())
+    lock_path = store / "daily_strategy_plans" / ".recommend.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    if not _STRATEGY_THREAD_LOCK.acquire(timeout=timeout):
+        raise TimeoutError("等待每日策略线程锁超时")
+    handle = lock_path.open("a+b")
+    if lock_path.stat().st_size == 0:
+        handle.write(b"\0")
+        handle.flush()
+    acquired = False
+    deadline = time.monotonic() + timeout
+    try:
+        while not acquired:
+            handle.seek(0)
+            try:
+                if os.name == "nt":
+                    import msvcrt
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                acquired = True
+            except OSError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError("等待每日策略跨进程锁超时")
+                time.sleep(0.05)
+        yield store
+    finally:
+        if acquired:
+            handle.seek(0)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        handle.close()
+        _STRATEGY_THREAD_LOCK.release()
+
+
+def _atomic_write_json(path: Path, payload: dict) -> None:
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=path.parent,
+            prefix=f".{path.stem}.", suffix=".tmp", delete=False,
+        ) as handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+            temporary = Path(handle.name)
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
+def _persist_strategy_output(output: dict, store: Path) -> dict:
+    result = dict(output)
+    selected_day = _validated_day(result.get("selected_day"), datetime.now(CST))
+    snapshot_dir = store / "daily_strategy_plans"
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    snapshot_path = snapshot_dir / f"{selected_day}.json"
+    if snapshot_path.exists():
+        try:
+            existing = json.loads(snapshot_path.read_text(encoding="utf-8-sig"))
+            existing_count = len(existing.get("single_purchase_recommendations") or []) + len(
+                existing.get("combo_purchase_recommendations") or []
+            )
+            current_count = len(result.get("single_purchase_recommendations") or []) + len(
+                result.get("combo_purchase_recommendations") or []
+            )
+            if existing_count > 0 or current_count == 0:
+                existing["snapshot_path"] = str(snapshot_path)
+                return existing
+            archive_dir = snapshot_dir / "archive"
+            archive_dir.mkdir(parents=True, exist_ok=True)
+            archive_id = str(existing.get("snapshot_id") or "unknown")
+            snapshot_path.replace(archive_dir / f"{selected_day}_{archive_id}_empty.json")
+        except (OSError, json.JSONDecodeError):
+            pass
+    core = json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    result["snapshot_schema"] = "daily_strategy_plan.v1"
+    result["snapshot_id"] = hashlib.sha256(core.encode("utf-8")).hexdigest()[:16]
+    _atomic_write_json(snapshot_path, result)
+    result["snapshot_path"] = str(snapshot_path)
+    return result
 
 
 def _validated_day(day: str | None, now: datetime) -> str:
@@ -187,32 +296,8 @@ def daily_strategy(
         },
     }
     if persist:
-        snapshot_dir = store / "daily_strategy_plans"
-        snapshot_dir.mkdir(parents=True, exist_ok=True)
-        snapshot_path = snapshot_dir / f"{selected_day}.json"
-        if snapshot_path.exists():
-            try:
-                existing = json.loads(snapshot_path.read_text(encoding="utf-8-sig"))
-                existing_count = len(existing.get("single_purchase_recommendations") or []) + len(
-                    existing.get("combo_purchase_recommendations") or []
-                )
-                current_count = len(output.get("single_purchase_recommendations") or []) + len(
-                    output.get("combo_purchase_recommendations") or []
-                )
-                if existing_count > 0 or current_count == 0:
-                    existing["snapshot_path"] = str(snapshot_path)
-                    return existing
-                archive_dir = snapshot_dir / "archive"
-                archive_dir.mkdir(parents=True, exist_ok=True)
-                archive_id = str(existing.get("snapshot_id") or "unknown")
-                snapshot_path.replace(archive_dir / f"{selected_day}_{archive_id}_empty.json")
-            except (OSError, json.JSONDecodeError):
-                pass
-        core = json.dumps(output, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        output["snapshot_schema"] = "daily_strategy_plan.v1"
-        output["snapshot_id"] = hashlib.sha256(core.encode("utf-8")).hexdigest()[:16]
-        snapshot_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        output["snapshot_path"] = str(snapshot_path)
+        with strategy_generation_lock(root=store):
+            output = _persist_strategy_output(output, store)
     return output
 
 
@@ -232,3 +317,24 @@ def current_sale_day(*, root: Path | None = None, now: datetime | None = None) -
             if kickoff is not None and kickoff > current:
                 return folder.name
     return current.date().isoformat()
+
+
+def recommend_daily_strategy(
+    expected_sales_day: str,
+    *,
+    root: Path | None = None,
+    now: datetime | None = None,
+) -> dict:
+    """Generate and commit only while the client's sales-day authority stays current."""
+    current = now or datetime.now(CST)
+    expected = _validated_day(expected_sales_day, current)
+    store = Path(root or sv.store_root())
+    with strategy_generation_lock(root=store):
+        before = current_sale_day(root=store, now=now)
+        if before != expected:
+            raise SalesDayAuthorityChanged(expected, before, "before_generate")
+        output = daily_strategy(expected, root=store, now=now, persist=False)
+        after = current_sale_day(root=store, now=now)
+        if after != expected:
+            raise SalesDayAuthorityChanged(expected, after, "before_commit")
+        return _persist_strategy_output(output, store)

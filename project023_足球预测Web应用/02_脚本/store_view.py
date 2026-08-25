@@ -23,7 +23,7 @@ from runtime_paths import data_root  # noqa: E402
 CST = timezone(timedelta(hours=8))
 LATE_TARGET = 200
 QUANT_DOUBLE_DIRECTION_POLICY = "quant-double-direction-v1"
-QUANT_DOUBLE_DIRECTION_EFFECTIVE_AT = datetime(2026, 8, 25, 22, 30, tzinfo=CST)
+QUANT_DOUBLE_DIRECTION_POLICY_VERSION = "1"
 # 临近开球体会把「已开售」改成「暂停销售」，看板仍应列出这些场。
 SALE_WINDOW = ("已开售", "暂停销售")
 LLM_DATA = Path(os.environ.get("FOOTBALL_LLM_ROOT") or (
@@ -376,7 +376,7 @@ def had_direction(pct) -> str | None:
 
 
 def quant_direction(pct) -> dict:
-    """Return the single 1X2 pick and an explicitly registered cover direction."""
+    """Simulate the current cover rule for research; never registers a formal pick."""
     direction = had_direction(pct)
     result = {"direction": direction, "alt_direction": None, "label": direction}
     if direction != "主胜":
@@ -389,6 +389,29 @@ def quant_direction(pct) -> dict:
     if home - runner_up <= 10.0 and draw >= 25.0:
         result.update({"alt_direction": "平局", "label": "主胜略优，防平"})
     return result
+
+
+def _direction_registration(rec: dict, payload: dict) -> dict:
+    """Project only explicitly persisted prediction-time cover metadata."""
+    sources = []
+    for container in (rec, payload):
+        nested = container.get("direction_registration")
+        if isinstance(nested, dict):
+            sources.append(nested)
+    sources.extend((rec, payload))
+    for source in sources:
+        alt = source.get("alt_direction")
+        policy = source.get("policy") or source.get("direction_policy")
+        version = source.get("policy_version") or source.get("direction_policy_version")
+        prediction_as_of = source.get("prediction_as_of")
+        if alt or policy or version or prediction_as_of:
+            return {
+                "alt_direction": alt,
+                "policy": policy,
+                "policy_version": None if version is None else str(version),
+                "prediction_as_of": prediction_as_of,
+            }
+    return {}
 
 
 def score_direction(score) -> str | None:
@@ -435,6 +458,7 @@ def load_registry_quant(root: Path | None = None) -> dict[str, dict]:
         extracted = extract_quant(payload)
         meta = extract_match_meta(payload)
         bi = payload.get("build_identity") or payload.get("model") or {}
+        direction_registration = _direction_registration(rec, payload)
         out[mid] = {
             "predicted": True,
             "mode": payload.get("mode") or (payload.get("output") or {}).get("mode"),
@@ -445,6 +469,7 @@ def load_registry_quant(root: Path | None = None) -> dict[str, dict]:
             "hafu": extracted.get("hafu"),
             "direction": had_direction(extracted["final_1x2_pct"]),
             "prediction_as_of": payload.get("prediction_as_of") or rec.get("created_at"),
+            "direction_registration": direction_registration,
             "prediction_id": rec.get("prediction_id"),
             "path": str(path),
             "home": meta["home"],
@@ -1139,21 +1164,35 @@ def history_rows(root: Path | None = None, include_shared: bool = True) -> list[
     for mid, rec in recs.items():
         res = results.get(mid)
         kickoff = parse_dt(rec.get("kickoff"))
-        policy_applies = bool(
-            kickoff and kickoff.astimezone(CST) >= QUANT_DOUBLE_DIRECTION_EFFECTIVE_AT
-        )
-        quant_pick = quant_direction(rec.get("final_1x2_pct")) if policy_applies else {
-            "direction": had_direction(rec.get("final_1x2_pct")),
-            "alt_direction": None,
-            "label": had_direction(rec.get("final_1x2_pct")),
-        }
-        pred_dir = rec.get("direction") or quant_pick["direction"]
+        research_pick = quant_direction(rec.get("final_1x2_pct"))
+        pred_dir = rec.get("direction") or research_pick["direction"]
         if not pred_dir or not rec.get("final_1x2_pct"):
             continue
         actual = (res or {}).get("direction")
         settled = bool(res and res.get("status") == "finished" and actual)
         hit = settled and pred_dir == actual
-        quant_alt = quant_pick["alt_direction"] if pred_dir == quant_pick["direction"] else None
+        registration = rec.get("direction_registration") or {}
+        registered_as_of = parse_dt(registration.get("prediction_as_of"))
+        registration_valid = bool(
+            registration.get("alt_direction") in _DIR_WORDS
+            and registration.get("alt_direction") != pred_dir
+            and registration.get("policy")
+            and registration.get("policy_version")
+            and registered_as_of
+            and kickoff
+            and registered_as_of <= kickoff
+        )
+        quant_alt = registration.get("alt_direction") if registration_valid else None
+        research_simulation = None
+        if not registration_valid and research_pick.get("alt_direction") in _DIR_WORDS:
+            research_simulation = {
+                "direction": research_pick["direction"],
+                "alt_direction": research_pick["alt_direction"],
+                "label": research_pick["label"],
+                "policy": QUANT_DOUBLE_DIRECTION_POLICY,
+                "policy_version": QUANT_DOUBLE_DIRECTION_POLICY_VERSION,
+                "excluded_from_formal_stats": True,
+            }
         quant_double_scored = bool(settled and quant_alt in _DIR_WORDS)
         quant_double_hit = bool(
             quant_double_scored and actual in tuple(
@@ -1192,11 +1231,11 @@ def history_rows(root: Path | None = None, include_shared: bool = True) -> list[
                 "top_scores": rec.get("top_scores"),
                 "direction": pred_dir,
                 "alt_direction": quant_alt,
-                "direction_label": quant_pick["label"] if quant_alt else pred_dir,
-                "direction_policy": QUANT_DOUBLE_DIRECTION_POLICY if quant_alt else None,
-                "direction_policy_effective_at": (
-                    QUANT_DOUBLE_DIRECTION_EFFECTIVE_AT.isoformat() if quant_alt else None
-                ),
+                "direction_label": f"{pred_dir} / {quant_alt}" if quant_alt else pred_dir,
+                "direction_policy": registration.get("policy") if quant_alt else None,
+                "direction_policy_version": registration.get("policy_version") if quant_alt else None,
+                "direction_prediction_as_of": registration.get("prediction_as_of") if quant_alt else None,
+                "research_simulation": research_simulation,
                 "snapshot": rec.get("snapshot"),
             },
             "llm": llm,

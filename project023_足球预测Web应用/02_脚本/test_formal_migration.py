@@ -2,6 +2,9 @@ from pathlib import Path
 
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
+RUNTIME_REFERENCE_ALLOWLIST = {
+    "workbench_runtime.py": {".worktrees"},  # fail-closed formal-path assertion
+}
 
 
 def test_windows_batch_entrypoints_use_crlf():
@@ -33,6 +36,28 @@ def test_formal_runtime_has_no_worktree_dependency():
 
     assert workbench_runtime.PROJECT_DIR == PROJECT_DIR.resolve()
     assert ".worktrees" not in str(workbench_runtime.PROJECT_DIR)
+
+
+def test_all_formal_python_runtime_paths_use_explicit_reference_allowlist():
+    script_dir = PROJECT_DIR / "02_脚本"
+    forbidden = (
+        ".worktrees", "b3-web-workbench",
+        r"C:\Users\Administrator\football-llm-predictor",
+        "C:/Users/Administrator/football-llm-predictor",
+    )
+    unexpected = []
+    scanned = set()
+    for path in sorted(script_dir.glob("*.py")):
+        if path.name.startswith("test_") or path.name == "conftest.py":
+            continue
+        scanned.add(path.name)
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        allowed = RUNTIME_REFERENCE_ALLOWLIST.get(path.name, set())
+        for token in forbidden:
+            if token in text and token not in allowed:
+                unexpected.append((path.name, token))
+    assert set(RUNTIME_REFERENCE_ALLOWLIST) <= scanned
+    assert unexpected == []
 
 
 def test_formal_launcher_delegates_to_b3_entry():
