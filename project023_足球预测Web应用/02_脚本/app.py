@@ -20,6 +20,7 @@ import store_view as sv
 from workbench_runtime import BUILD_IDENTITY, FUSION_SCRIPTS
 
 db.init()
+db.recover_orphaned_runs()
 app = FastAPI(title="足球预测工作台", version="0.3.0")
 
 

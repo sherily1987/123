@@ -105,6 +105,26 @@ def init():
         _ensure_column(c, "runs", "logs_json", "TEXT")
 
 
+def recover_orphaned_runs() -> int:
+    """Mark work left by a previous service process as interrupted.
+
+    This is intentionally called only during application startup, before the
+    process can accept a request and create a new run.
+    """
+    now = datetime.now(timezone.utc).isoformat()
+    message = "服务重启，任务中断"
+    with _lock, _conn() as c:
+        cursor = c.execute(
+            """UPDATE runs
+               SET status='error', finished_at=?,
+                   message=CASE WHEN message IS NULL OR message='' THEN ?
+                                ELSE message || '\n' || ? END
+               WHERE status='running'""",
+            (now, message, message),
+        )
+    return cursor.rowcount
+
+
 def upsert_matches(sales_day: str, rows: list[dict]):
     """rows: 采集到的场次 dict 列表（match_num/match_id/league/home/away/kickoff/odds/quant_tier/status_name）。"""
     now = datetime.now(timezone.utc).isoformat()

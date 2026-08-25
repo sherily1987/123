@@ -1,4 +1,5 @@
 import json
+import importlib
 import pytest
 from pathlib import Path
 from types import SimpleNamespace
@@ -34,6 +35,24 @@ def test_run_start_atomically_rejects_a_second_running_run_type(tmp_path, monkey
     assert [row["id"] for row in web.db.run_active("predict")] == [first_id]
     web.db.run_update(first_id, status="done")
     assert web.db.run_start("predict") != first_id
+
+
+def test_service_restart_aborts_preexisting_run_before_accepting_same_type(tmp_path, monkeypatch):
+    """Catches a crashed daemon leaving a permanent same-type 409 behind."""
+    monkeypatch.setattr(web.db, "DB_PATH", tmp_path / "app.db")
+    web.db.init()
+    abandoned_id = web.db.run_start("predict", message="进程关闭前仍在运行")
+
+    importlib.reload(web)
+
+    abandoned = web.db.run_get(abandoned_id)
+    assert abandoned["status"] == "error"
+    assert "服务重启" in abandoned["message"]
+    assert abandoned["finished_at"]
+
+    current_id = web.db.run_start("predict")
+    assert current_id != abandoned_id
+    assert web.db.run_get(current_id)["status"] == "running"
 
 
 def test_run_progress_and_recent_logs_survive_database_reload(tmp_path, monkeypatch):
