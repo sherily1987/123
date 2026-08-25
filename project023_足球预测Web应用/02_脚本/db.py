@@ -8,10 +8,13 @@
   runs        后台任务运行状态（采集/预测/回测进度）
 """
 import json
+import os
 import sqlite3
 import threading
 from pathlib import Path
 from datetime import datetime, timezone
+
+from workbench_runtime import BUILD_IDENTITY
 
 HERE = Path(__file__).resolve().parent
 DB_PATH = HERE / "data" / "app.db"
@@ -75,6 +78,8 @@ CREATE TABLE IF NOT EXISTS runs (
     total INTEGER, done INTEGER,
     message TEXT,
     started_at TEXT, finished_at TEXT,
+    owner_pid INTEGER,
+    owner_identity TEXT,
     progress_json TEXT,          -- JSON：结构化任务运行快照
     logs_json TEXT               -- JSON：最近的用户可见事件
 );
@@ -103,6 +108,18 @@ def init():
         _ensure_column(c, "backtests", "match_id", "TEXT")
         _ensure_column(c, "runs", "progress_json", "TEXT")
         _ensure_column(c, "runs", "logs_json", "TEXT")
+        _ensure_column(c, "runs", "owner_pid", "INTEGER")
+        _ensure_column(c, "runs", "owner_identity", "TEXT")
+
+
+def _owner_is_alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, PermissionError):
+        return True
+    return True
 
 
 def recover_orphaned_runs() -> int:
@@ -113,16 +130,27 @@ def recover_orphaned_runs() -> int:
     """
     now = datetime.now(timezone.utc).isoformat()
     message = "服务重启，任务中断"
+    recovered = 0
     with _lock, _conn() as c:
-        cursor = c.execute(
-            """UPDATE runs
-               SET status='error', finished_at=?,
-                   message=CASE WHEN message IS NULL OR message='' THEN ?
-                                ELSE message || '\n' || ? END
-               WHERE status='running'""",
-            (now, message, message),
-        )
-    return cursor.rowcount
+        running = c.execute(
+            "SELECT id, owner_pid, owner_identity FROM runs WHERE status='running'"
+        ).fetchall()
+        for row in running:
+            owner_pid = row["owner_pid"]
+            if (row["owner_identity"] != BUILD_IDENTITY
+                    or not isinstance(owner_pid, int) or owner_pid <= 0
+                    or _owner_is_alive(owner_pid)):
+                continue
+            cursor = c.execute(
+                """UPDATE runs
+                   SET status='error', finished_at=?,
+                       message=CASE WHEN message IS NULL OR message='' THEN ?
+                                    ELSE message || '\n' || ? END
+                   WHERE id=? AND status='running' AND owner_pid=? AND owner_identity=?""",
+                (now, message, message, row["id"], owner_pid, BUILD_IDENTITY),
+            )
+            recovered += cursor.rowcount
+    return recovered
 
 
 def upsert_matches(sales_day: str, rows: list[dict]):
@@ -228,8 +256,11 @@ def list_backtests(sales_day: str = None):
 
 
 # ---- 后台任务 ----
-def run_start(run_type: str, total: int = 0, message: str = "") -> int:
+def run_start(run_type: str, total: int = 0, message: str = "",
+              owner_pid: int | None = None, owner_identity: str | None = None) -> int:
     now = datetime.now(timezone.utc).isoformat()
+    owner_pid = os.getpid() if owner_pid is None else owner_pid
+    owner_identity = BUILD_IDENTITY if owner_identity is None else owner_identity
     with _lock, _conn() as c:
         c.execute("BEGIN IMMEDIATE")
         active = c.execute(
@@ -238,8 +269,12 @@ def run_start(run_type: str, total: int = 0, message: str = "") -> int:
         ).fetchone()
         if active:
             raise RunAlreadyActive(_run_dict(active))
-        cur = c.execute("INSERT INTO runs (run_type, status, total, done, message, started_at) VALUES (?,?,?,?,?,?)",
-                        (run_type, "running", total, 0, message, now))
+        cur = c.execute(
+            """INSERT INTO runs
+               (run_type, status, total, done, message, started_at, owner_pid, owner_identity)
+               VALUES (?,?,?,?,?,?,?,?)""",
+            (run_type, "running", total, 0, message, now, owner_pid, owner_identity),
+        )
         return cur.lastrowid
 
 

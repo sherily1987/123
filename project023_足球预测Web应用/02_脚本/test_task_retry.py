@@ -1,5 +1,5 @@
 import json
-import importlib
+import os
 import pytest
 from pathlib import Path
 from types import SimpleNamespace
@@ -37,13 +37,18 @@ def test_run_start_atomically_rejects_a_second_running_run_type(tmp_path, monkey
     assert web.db.run_start("predict") != first_id
 
 
-def test_service_restart_aborts_preexisting_run_before_accepting_same_type(tmp_path, monkeypatch):
+def test_service_startup_recovers_run_with_dead_matching_owner(tmp_path, monkeypatch):
     """Catches a crashed daemon leaving a permanent same-type 409 behind."""
     monkeypatch.setattr(web.db, "DB_PATH", tmp_path / "app.db")
     web.db.init()
-    abandoned_id = web.db.run_start("predict", message="进程关闭前仍在运行")
+    abandoned_id = web.db.run_start(
+        "predict", message="进程关闭前仍在运行",
+        owner_pid=41001, owner_identity=web.BUILD_IDENTITY,
+    )
+    monkeypatch.setattr(web.db, "_owner_is_alive", lambda _pid: False, raising=False)
 
-    importlib.reload(web)
+    with TestClient(web.app):
+        pass
 
     abandoned = web.db.run_get(abandoned_id)
     assert abandoned["status"] == "error"
@@ -53,6 +58,23 @@ def test_service_restart_aborts_preexisting_run_before_accepting_same_type(tmp_p
     current_id = web.db.run_start("predict")
     assert current_id != abandoned_id
     assert web.db.run_get(current_id)["status"] == "running"
+
+
+def test_service_startup_preserves_run_with_live_matching_owner(tmp_path, monkeypatch):
+    """Catches a second service instance aborting an owner that is still alive."""
+    monkeypatch.setattr(web.db, "DB_PATH", tmp_path / "app.db")
+    web.db.init()
+    live_id = web.db.run_start(
+        "llm", owner_pid=os.getpid(), owner_identity=web.BUILD_IDENTITY,
+    )
+    monkeypatch.setattr(web.db, "_owner_is_alive", lambda _pid: True, raising=False)
+
+    with TestClient(web.app):
+        pass
+
+    assert web.db.run_get(live_id)["status"] == "running"
+    with pytest.raises(web.db.RunAlreadyActive):
+        web.db.run_start("llm")
 
 
 def test_run_progress_and_recent_logs_survive_database_reload(tmp_path, monkeypatch):

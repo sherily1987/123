@@ -2,6 +2,7 @@
 """project023 工作台：只读融合库看板；写操作走 fusion_cli market_only。"""
 import json
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -19,9 +20,14 @@ import runner
 import store_view as sv
 from workbench_runtime import BUILD_IDENTITY, FUSION_SCRIPTS
 
-db.init()
-db.recover_orphaned_runs()
-app = FastAPI(title="足球预测工作台", version="0.3.0")
+@asynccontextmanager
+async def workbench_lifespan(_app):
+    db.init()
+    db.recover_orphaned_runs()
+    yield
+
+
+app = FastAPI(title="足球预测工作台", version="0.3.0", lifespan=workbench_lifespan)
 
 
 @app.middleware("http")
