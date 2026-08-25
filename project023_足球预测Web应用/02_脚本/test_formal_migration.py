@@ -4,6 +4,21 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 
 
+def test_windows_batch_entrypoints_use_crlf():
+    entrypoints = [
+        PROJECT_DIR / "启动B3工作台.bat",
+        PROJECT_DIR / "启动工作台.bat",
+        PROJECT_DIR / "02_脚本" / "start.bat",
+        PROJECT_DIR / "02_脚本" / "stop.bat",
+    ]
+    for path in entrypoints:
+        payload = path.read_bytes()
+        assert b"\r\n" in payload, f"Windows cmd requires CRLF line endings: {path}"
+        assert b"\n" not in payload.replace(b"\r\n", b""), (
+            f"bare LF line ending breaks Windows cmd parsing: {path}"
+        )
+
+
 def test_formal_runtime_has_no_worktree_dependency():
     checked = [
         PROJECT_DIR / "启动B3工作台.bat",
