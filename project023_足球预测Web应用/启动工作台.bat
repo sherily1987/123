@@ -1,18 +1,4 @@
 @echo off
-cd /d "%~dp0"
-if exist "02_scripts\start.bat" (
-  cd /d "02_scripts"
-  call start.bat
-  goto :eof
-)
-for /d %%D in (02_*) do (
-  if exist "%%D\start.bat" (
-    cd /d "%%D"
-    call start.bat
-    goto :eof
-  )
-)
-echo Cannot find start.bat
-echo cwd=%CD%
-pause
-exit /b 1
+echo [提示] 旧入口已废弃，正在转到 B3 正式工作台。
+call "%~dp0启动B3工作台.bat"
+exit /b %ERRORLEVEL%

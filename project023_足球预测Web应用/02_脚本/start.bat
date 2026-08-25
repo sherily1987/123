@@ -22,10 +22,10 @@ if not exist "%~dp0launch.py" (
 
 echo Starting workbench
 echo PY=%PY%
-echo URL=http://127.0.0.1:8765
+echo URL will be selected safely and printed by launch.py.
 echo Close this window to stop.
 echo.
-"%PY%" -u launch.py 1>"%LOG%" 2>&1
+"%PY%" -u launch.py
 set ERR=%ERRORLEVEL%
 echo.
 echo Stopped. exit=%ERR%
