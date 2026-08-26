@@ -90,10 +90,32 @@ def test_valid_policy_carries_auditable_identity_source_and_signature():
     assert len(result["decision_policy_signature"]) == 64
 
 
-def test_policy_signature_changes_when_canonical_config_changes(tmp_path):
+def test_policy_signature_changes_when_canonical_config_changes():
     first = build([0.44, 0.28, 0.28])
     changed = dict(POLICY, alternative_min_probability=0.29)
     second = build([0.44, 0.28, 0.28], policy=changed)
+
+    assert first["decision_policy_signature"] != second["decision_policy_signature"]
+
+
+def test_direction_implementation_is_governed_as_decision_policy_not_probability_code():
+    manifest = json.loads(
+        (SKILL_ROOT / "config" / "version_manifest.json").read_text(encoding="utf-8")
+    )
+
+    assert "scripts/direction_policy.py" in manifest["decision_policy_files"]
+    assert "scripts/direction_policy.py" not in manifest["probability_files"]
+
+
+def test_policy_signature_changes_when_governed_implementation_bytes_change(
+        monkeypatch, tmp_path):
+    governed_code = tmp_path / "direction_policy.py"
+    governed_code.write_bytes(b"original direction behavior")
+    monkeypatch.setattr(direction_policy, "POLICY_IMPLEMENTATION_FILE", governed_code)
+    first = build([0.44, 0.28, 0.28])
+
+    governed_code.write_bytes(b"changed direction behavior")
+    second = build([0.44, 0.28, 0.28])
 
     assert first["decision_policy_signature"] != second["decision_policy_signature"]
 

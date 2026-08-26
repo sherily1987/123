@@ -17,6 +17,7 @@ from typing import Any
 
 HERE = Path(__file__).resolve().parent
 POLICY_FILE = HERE.parent / "config" / "direction_policy.json"
+POLICY_IMPLEMENTATION_FILE = Path(__file__).resolve()
 DIRECTIONS = ("H", "D", "A")
 SUM_TOLERANCE_PP = 0.5
 REQUIRED_POLICY_FIELDS = (
@@ -37,9 +38,23 @@ def canonical_json(value: Any) -> str:
                       separators=(",", ":"), allow_nan=False)
 
 
+def policy_signature_components(policy: dict[str, Any]) -> dict[str, str]:
+    """Return the complete, non-runtime inputs to a policy signature."""
+    return {
+        "policy_canonical_sha256": hashlib.sha256(
+            canonical_json(policy).encode("utf-8")
+        ).hexdigest(),
+        "implementation_sha256": hashlib.sha256(
+            POLICY_IMPLEMENTATION_FILE.read_bytes()
+        ).hexdigest(),
+    }
+
+
 def canonical_policy_signature(policy: dict[str, Any]) -> str:
-    """Hash exactly the policy object, so any config change changes its ID."""
-    return hashlib.sha256(canonical_json(policy).encode("utf-8")).hexdigest()
+    """Hash the actual policy values and the governing implementation bytes."""
+    return hashlib.sha256(
+        canonical_json(policy_signature_components(policy)).encode("utf-8")
+    ).hexdigest()
 
 
 def load_policy(path: Path | None = None) -> dict[str, Any]:
@@ -144,8 +159,10 @@ def _unavailable(*, policy: Any, probabilities: Any, prediction_as_of: Any,
     rule_version = policy.get("rule_version") if isinstance(policy, dict) else None
     schema_version = policy.get("schema_version") if isinstance(policy, dict) else None
     signature = None
+    signature_components = None
     if isinstance(policy, dict):
         try:
+            signature_components = policy_signature_components(policy)
             signature = canonical_policy_signature(policy)
         except (TypeError, ValueError):
             signature = None
@@ -167,6 +184,7 @@ def _unavailable(*, policy: Any, probabilities: Any, prediction_as_of: Any,
         "model_version": identity[0] if identity else None,
         "probability_signature": identity[1] if identity else None,
         "decision_policy_signature": signature,
+        "decision_policy_signature_components": signature_components,
         "reason": reason,
     }
 
@@ -238,6 +256,7 @@ def build_direction_policy(probabilities: Any, *, prediction_as_of: Any,
         values_pp[primary_index] - values_pp[selected_alternative_index]
         if alternative_direction is not None else None
     )
+    signature_components = policy_signature_components(policy)
     return {
         "schema_version": policy["schema_version"],
         "rule_version": policy["rule_version"],
@@ -268,5 +287,6 @@ def build_direction_policy(probabilities: Any, *, prediction_as_of: Any,
         "model_version": identity[0],
         "probability_signature": identity[1],
         "decision_policy_signature": canonical_policy_signature(policy),
+        "decision_policy_signature_components": signature_components,
         "reason": None,
     }

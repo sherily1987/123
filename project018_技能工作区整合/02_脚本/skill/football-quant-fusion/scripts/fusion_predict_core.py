@@ -203,7 +203,13 @@ def build_identity():
                         CORE_FILE, CORE_DIR / "market_fit.py",
                         CORE_DIR / "odds_methods.py", CORE_DIR / "team_strength.py"]
     probability_config = [WEIGHTS_FILE]
-    decision_policy_files = [HERE / "recommendation_policy.py", policy_file]
+    decision_policy_files = [
+        HERE.parent / relative_path
+        for relative_path in manifest.get("decision_policy_files", [])
+        if isinstance(relative_path, str) and relative_path
+    ]
+    if not decision_policy_files:
+        decision_policy_files = [HERE / "recommendation_policy.py", policy_file]
     evidence_pipeline_files = [HERE / "sales_day_collect.py", HERE / "apifootball_model_features.py",
                                HERE / "mcp_model_adapter.py"]
     return {
