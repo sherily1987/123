@@ -39,6 +39,13 @@ def validate_replay_attestation(report: dict[str, Any], *, previous_lock: dict[s
     current_mv, current_sig = _identity_pair(current_identity)
     if not previous_mv or not previous_sig or not current_mv or not current_sig:
         raise ReleaseGovernanceError("发布锁或当前身份缺少模型版本/概率签名")
+    # New replay reports state their selected-record completeness explicitly.
+    # Legacy complete reports lack these fields and retain their historical
+    # validation path, but any report that declares itself partial is never a
+    # release proof even if one selected row happens to be identical.
+    if (report.get("is_complete_replay") is False
+            or str(report.get("verdict") or "") in {"partial", "limited"}):
+        raise ReleaseGovernanceError("重放证明不完整（partial/limited），不得用于发布锁迁移")
     if str(report.get("verdict") or "") != "equivalent":
         raise ReleaseGovernanceError("重放报告显示数值不等价；必须升级模型版本")
     if str(report.get("replayed_model_version") or "") != current_mv:

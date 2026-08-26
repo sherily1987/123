@@ -260,6 +260,21 @@ def test_legacy_build_report_fails_closed_for_invalid_record_signature(monkeypat
     assert report["results"][0]["time_audit"]["reason"] == "probability_signature_invalid"
 
 
+def test_numeric_json_signature_is_invalid_even_when_its_decimal_text_has_64_digits(monkeypatch, tmp_path):
+    row = record("m-1")
+    row["model"]["probability_signature"] = int("1" * 64)
+    prediction_path = tmp_path / "prediction.json"
+    prediction_path.write_text(json.dumps(row), encoding="utf-8")
+    (tmp_path / "registry.jsonl").write_text(json.dumps({"path": str(prediction_path)}) + "\n",
+                                                encoding="utf-8")
+    monkeypatch.setattr(replay_check, "_run_replay", lambda _payload: pytest.fail("must not replay"))
+
+    report = replay_check.build_report(tmp_path, "m4")
+
+    assert report["results"][0]["status"] == "UNREPLAYABLE"
+    assert report["results"][0]["time_audit"]["reason"] == "probability_signature_invalid"
+
+
 def test_limited_legacy_report_does_not_claim_coverage_for_unreplayed_signature(monkeypatch, tmp_path):
     second_sig = "c" * 64
     first, second = record("m-1"), record("m-2", route="hybrid")
@@ -278,12 +293,63 @@ def test_limited_legacy_report_does_not_claim_coverage_for_unreplayed_signature(
 
     assert report["replayed_probability_signatures"] == [OLD_SIG]
     assert report["replayed_modes"] == ["market_only"]
-    with pytest.raises(release_governance.ReleaseGovernanceError, match="未覆盖"):
+    with pytest.raises(release_governance.ReleaseGovernanceError, match="不完整|未覆盖"):
         release_governance.validate_replay_attestation(
             report,
             previous_lock={"model_version": "m4", "probability_signature": second_sig},
             current_identity=CURRENT,
         )
+
+
+def test_limited_report_with_same_signature_and_route_is_explicitly_partial_and_rejected(
+        monkeypatch, tmp_path):
+    first, second = record("m-1"), record("m-2")
+    entries = []
+    for index, row in enumerate((first, second)):
+        path = tmp_path / f"prediction-{index}.json"
+        path.write_text(json.dumps(row), encoding="utf-8")
+        entries.append({"path": str(path)})
+    (tmp_path / "registry.jsonl").write_text(
+        "".join(json.dumps(entry) + "\n" for entry in entries), encoding="utf-8")
+    monkeypatch.setattr(replay_check, "build_identity", lambda: CURRENT)
+    monkeypatch.setattr(replay_check, "replay_one", lambda item: identical_result(item))
+
+    report = replay_check.build_report(tmp_path, "m4", limit=1)
+
+    assert report["records_total"] == 2
+    assert report["records_selected"] == 1
+    assert report["is_complete_replay"] is False
+    assert report["verdict"] == "partial"
+    with pytest.raises(release_governance.ReleaseGovernanceError, match="不完整"):
+        release_governance.validate_replay_attestation(
+            report,
+            previous_lock={"model_version": "m4", "probability_signature": OLD_SIG},
+            current_identity=CURRENT,
+        )
+
+
+def test_complete_multi_record_report_remains_valid_for_release_governance(monkeypatch, tmp_path):
+    first, second = record("m-1"), record("m-2")
+    entries = []
+    for index, row in enumerate((first, second)):
+        path = tmp_path / f"prediction-{index}.json"
+        path.write_text(json.dumps(row), encoding="utf-8")
+        entries.append({"path": str(path)})
+    (tmp_path / "registry.jsonl").write_text(
+        "".join(json.dumps(entry) + "\n" for entry in entries), encoding="utf-8")
+    monkeypatch.setattr(replay_check, "build_identity", lambda: CURRENT)
+    monkeypatch.setattr(replay_check, "replay_one", lambda item: identical_result(item))
+
+    report = replay_check.build_report(tmp_path, "m4")
+    validated = release_governance.validate_replay_attestation(
+        report,
+        previous_lock={"model_version": "m4", "probability_signature": OLD_SIG},
+        current_identity=CURRENT,
+    )
+
+    assert report["is_complete_replay"] is True
+    assert report["verdict"] == "equivalent"
+    assert validated["replay_verdict"] == "equivalent"
 
 
 def test_attestation_write_is_read_only_and_hashes_its_canonical_content(monkeypatch, tmp_path):

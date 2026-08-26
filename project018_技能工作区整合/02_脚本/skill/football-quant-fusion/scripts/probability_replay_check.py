@@ -35,7 +35,9 @@ FLOAT_TOLERANCE = 1e-10
 
 def is_complete_signature(value: Any) -> bool:
     """A probability signature is usable only as a complete SHA-256 hex value."""
-    text = str(value or "")
+    if not isinstance(value, str):
+        return False
+    text = value
     return len(text) == 64 and all(char in "0123456789abcdef" for char in text.lower())
 
 
@@ -283,8 +285,11 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
                                   for record, _ in successful_pairs})
     replayed_modes = sorted({str(result.get("route")) for _, result in successful_pairs
                             if result.get("route")})
-    verdict = ("equivalent" if results and all(item.get("status") == "identical" for item in results)
-               else "changed" if any(item.get("status") == "differs" for item in results)
+    records_total, records_selected = len(records), len(replayed_records)
+    is_complete_replay = records_selected == records_total
+    verdict = ("changed" if any(item.get("status") == "differs" for item in results)
+               else "partial" if not is_complete_replay
+               else "equivalent" if results and all(item.get("status") == "identical" for item in results)
                else "inconclusive")
     return {"schema_version": "fusion-probability-replay-2.0",
             "replayed_model_version": model_version,
@@ -293,6 +298,8 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
             "compare_fields": list(COMPARE_FIELDS), "float_tolerance": FLOAT_TOLERANCE,
             "replayed_probability_signatures": replayed_signatures,
             "replayed_modes": replayed_modes, "verdict": verdict,
+            "records_total": records_total, "records_selected": records_selected,
+            "is_complete_replay": is_complete_replay,
             "replayed_n": len(results), "counts": counts, "results": results,
             "note": "Evidence only; this script never creates or loads aliases."}
 
