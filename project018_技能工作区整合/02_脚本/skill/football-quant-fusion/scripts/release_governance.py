@@ -1,6 +1,7 @@
 """Shared release-lock checks for formal football-quant-fusion registration."""
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,6 +35,100 @@ def _identity_pair(identity: dict[str, Any]) -> tuple[str, str]:
 
 def _is_non_negative_int(value: Any) -> bool:
     return type(value) is int and value >= 0
+
+
+def _is_sha256(value: Any) -> bool:
+    return (isinstance(value, str) and len(value) == 64
+            and all(char in "0123456789abcdef" for char in value.lower()))
+
+
+def _canonical_json(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":"), allow_nan=False)
+
+
+def validate_grouped_alias_attestation(
+    report: dict[str, Any], *, current_identity: dict[str, Any]
+) -> dict[str, Any]:
+    """Validate a Task 2 group proof before an exact alias can be approved.
+
+    This validator accepts machine evidence only.  It does not mutate the
+    proof, release lock, historical predictions, or alias configuration.
+    """
+    if report.get("schema_version") != "signature-drift-attestation-1.0":
+        raise ReleaseGovernanceError("不是 Task 2 签名漂移证明")
+    if report.get("status") != "PENDING_REVIEW":
+        raise ReleaseGovernanceError("证明状态必须为 PENDING_REVIEW")
+    if report.get("alias_eligible") is not False:
+        raise ReleaseGovernanceError("机器证明不得自行批准别名")
+
+    old_identity = report.get("old_identity")
+    target_identity = report.get("current_identity")
+    old_model_version = old_identity.get("model_version") if isinstance(old_identity, dict) else None
+    if (not isinstance(old_model_version, str) or not old_model_version.strip()
+            or old_model_version != old_model_version.strip()):
+        raise ReleaseGovernanceError("证明缺少旧模型身份")
+    if not _is_sha256(old_identity.get("probability_signature")):
+        raise ReleaseGovernanceError("旧概率签名不是完整 SHA256")
+    target_model_version = (target_identity.get("model_version")
+                            if isinstance(target_identity, dict) else None)
+    if (not isinstance(target_model_version, str) or not target_model_version.strip()
+            or target_model_version != target_model_version.strip()):
+        raise ReleaseGovernanceError("证明缺少目标模型身份")
+    if not _is_sha256(target_identity.get("probability_signature")):
+        raise ReleaseGovernanceError("目标概率签名不是完整 SHA256")
+    if _identity_pair(target_identity) != _identity_pair(current_identity):
+        raise ReleaseGovernanceError("证明目标身份与当前发布锁不一致")
+
+    route = report.get("route")
+    if not isinstance(route, str) or not route.strip() or route != route.strip():
+        raise ReleaseGovernanceError("证明缺少精确登记路由")
+    fields = report.get("compare_fields")
+    if (not isinstance(fields, list) or len(fields) != len(REQUIRED_REPLAY_FIELDS)
+            or set(fields) != set(REQUIRED_REPLAY_FIELDS)):
+        raise ReleaseGovernanceError("证明比较字段不是完整必需九字段")
+
+    record_count = report.get("record_count")
+    results = report.get("results")
+    if (type(record_count) is not int or record_count < 1
+            or not isinstance(results, list) or len(results) != record_count):
+        raise ReleaseGovernanceError("证明全组记录数量不完整")
+    for result in results:
+        if not isinstance(result, dict) or result.get("status") != "identical":
+            raise ReleaseGovernanceError("证明不是全组等价")
+        if result.get("route") != route:
+            raise ReleaseGovernanceError("逐场路由与证明组路由不一致")
+        if not _is_sha256(result.get("input_sha256")):
+            raise ReleaseGovernanceError("逐场证明缺少完整输入 SHA256")
+        if not isinstance(result.get("prediction_as_of"), str) or not result["prediction_as_of"].strip():
+            raise ReleaseGovernanceError("逐场证明缺少 prediction_as_of")
+        if (result.get("time_audit") or {}).get("usable") is not True:
+            raise ReleaseGovernanceError("逐场时间审计未通过")
+        if result.get("diffs") not in ({}, None):
+            raise ReleaseGovernanceError("完全一致记录仍包含差异")
+
+    hash_input = report.get("report_hash_input")
+    expected_hash_input = {key: value for key, value in report.items() if key not in {
+        "generated_at", "report_sha256", "report_hash_input", "attestation_path",
+    }}
+    if hash_input != expected_hash_input:
+        raise ReleaseGovernanceError("证明内部哈希输入与报告内容不一致")
+    try:
+        internal_hash = hashlib.sha256(
+            _canonical_json(hash_input).encode("utf-8")
+        ).hexdigest()
+    except (TypeError, ValueError) as exc:
+        raise ReleaseGovernanceError("证明内部哈希输入无法规范化") from exc
+    if report.get("report_sha256") != internal_hash:
+        raise ReleaseGovernanceError("证明内部 SHA256 校验失败")
+
+    return {
+        "model_version": str(old_identity["model_version"]),
+        "probability_signature": str(old_identity["probability_signature"]),
+        "route": route,
+        "alias_to_model_version": str(target_identity["model_version"]),
+        "alias_to_probability_signature": str(target_identity["probability_signature"]),
+    }
 
 
 def validate_replay_attestation(report: dict[str, Any], *, previous_lock: dict[str, Any],

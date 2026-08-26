@@ -20,16 +20,71 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
 from fusion_backtest import (load_jsonl, load_version_aliases, resolve_path,
                              select_primary_rows)
 from fusion_predict_core import build_identity
+from probability_aliases import matches as alias_matches
 from runtime_paths import assert_writable_target, backtest_store, data_root
 
 MIN_RECALIBRATION = 100
 THRESHOLD_REVIEW = 200
+_DRIFT_STATUSES = {
+    "PENDING_REVIEW",
+    "UNREPLAYABLE",
+    "CHANGED_REQUIRES_VERSION_BUMP",
+}
+
+
+def _canonical_json(value) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":"), allow_nan=False)
+
+
+def load_drift_group_statuses(root: Path, current_identity: dict) -> dict[tuple[str, str, str], str]:
+    """Load self-consistent Task 2 group states for read-only decomposition."""
+    statuses: dict[tuple[str, str, str], tuple[str, str]] = {}
+    proof_root = Path(root) / "signature-drift-attestations"
+    if not proof_root.exists():
+        return {}
+    target = (str(current_identity.get("model_version") or ""),
+              str(current_identity.get("probability_signature") or ""))
+    for path in proof_root.rglob("signature-drift-*.json"):
+        try:
+            report = json.loads(path.read_text(encoding="utf-8-sig"))
+            if not isinstance(report, dict):
+                continue
+            hash_input = report.get("report_hash_input")
+            expected_hash_input = {key: value for key, value in report.items() if key not in {
+                "generated_at", "report_sha256", "report_hash_input", "attestation_path",
+            }}
+            if hash_input != expected_hash_input:
+                continue
+            digest = hashlib.sha256(_canonical_json(hash_input).encode("utf-8")).hexdigest()
+            if report.get("report_sha256") != digest:
+                continue
+            old = report.get("old_identity") or {}
+            current = report.get("current_identity") or {}
+            route = report.get("route")
+            status = report.get("status")
+            if ((str(current.get("model_version") or ""),
+                 str(current.get("probability_signature") or "")) != target
+                    or not isinstance(route, str) or not route
+                    or status not in _DRIFT_STATUSES):
+                continue
+            key = (str(old.get("model_version") or ""),
+                   str(old.get("probability_signature") or ""), route)
+            if not key[0] or not key[1]:
+                continue
+            generated_at = str(report.get("generated_at") or "")
+            if key not in statuses or generated_at > statuses[key][0]:
+                statuses[key] = (generated_at, status)
+        except (OSError, ValueError, TypeError):
+            continue
+    return {key: value[1] for key, value in statuses.items()}
 
 
 def settled_status(root: Path) -> dict:
@@ -49,10 +104,23 @@ def registered_route(record: dict) -> str | None:
         if isinstance(container, dict):
             value = container.get("route") or container.get("mode")
             if value not in (None, ""):
-                values.append(str(value).strip())
+                if not isinstance(value, str):
+                    return None
+                values.append(value.strip())
     if not values or not values[0] or any(value != values[0] for value in values):
         return None
     return values[0]
+
+
+def _signature_group_value(value) -> str:
+    """Keep valid string signatures exact; isolate corrupt JSON types."""
+    if isinstance(value, str):
+        return value
+    try:
+        encoded = _canonical_json(value)
+    except (TypeError, ValueError):
+        encoded = repr(value)
+    return f"(invalid-{type(value).__name__}:{encoded})"
 
 
 def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
@@ -78,7 +146,7 @@ def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
             "prediction_as_of": rec.get("prediction_as_of") or "",
             "kickoff": rec.get("kickoff") or "",
             "model_version": str(model.get("model_version") or "unattributable"),
-            "probability_signature": str(model.get("probability_signature") or ""),
+            "probability_signature": model.get("probability_signature"),
             "route": registered_route(rec),
         })
     return rows, unreadable
@@ -99,15 +167,21 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
     primary = select_primary_rows(rows, snapshot_policy)
     status = settled_status(root)
     # 经重放验证等价的旧版本按 current 计（与 fusion_backtest.version_cohort 同一口径）
-    aliases = {(a["model_version"], a["probability_signature"])
-               for a in load_version_aliases(cur_mv)
-               if str(a.get("equivalent_to_model_version")) == cur_mv}
-    alias_versions = sorted({mv for mv, _ in aliases})
+    aliases = [a for a in load_version_aliases(cur_mv)
+               if str(a.get("alias_to_model_version")) == cur_mv
+               and str(a.get("alias_to_probability_signature")) == cur_sig]
+    alias_keys = {(str(a.get("model_version") or ""),
+                   str(a.get("probability_signature") or ""),
+                   str(a.get("route") or "")) for a in aliases}
+    alias_versions = sorted({mv for mv, _, _ in alias_keys})
+    drift_statuses = load_drift_group_statuses(root, identity)
     # 按当前 model_version 审计主库全量记录；签名另行分布，避免把漂移样本隐藏。
     main_current = [row for row in main_rows if row["model_version"] == cur_mv]
     main_signature_counts = {}
     for row in main_current:
-        sig = row["probability_signature"] or "(none)"
+        sig = _signature_group_value(row["probability_signature"])
+        if not sig:
+            sig = "(none)"
         main_signature_counts[sig[:12]] = main_signature_counts.get(sig[:12], 0) + 1
     main_not_in_backtest = [row for row in main_current
                             if str(row.get("prediction_id")) not in backtest_prediction_ids]
@@ -117,15 +191,21 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
     signature_drift_groups: dict[tuple[str, str, str], int] = {}
     current_settled = 0
     current_pending = 0
+    raw_current_n = 0
+    approved_alias_n = 0
     for row in primary:
         bucket = by_version.setdefault(row["model_version"], {
             "settled": 0, "pending": 0, "cancelled": 0, "signatures": {},
         })
-        sig = row["probability_signature"] or "(none)"
+        sig = _signature_group_value(row["probability_signature"])
+        if not sig:
+            sig = "(none)"
         bucket["signatures"][sig[:12]] = bucket["signatures"].get(sig[:12], 0) + 1
-        counts_as_current = (row["model_version"] == cur_mv
-                             and row["probability_signature"] == cur_sig) or \
-                            (row["model_version"], row["probability_signature"]) in aliases
+        is_raw_current = (row["model_version"] == cur_mv
+                          and row["probability_signature"] == cur_sig)
+        matching_alias = next((alias for alias in aliases if alias_matches(row, alias)), None)
+        is_approved_alias = matching_alias is not None
+        counts_as_current = is_raw_current or is_approved_alias
         state = status.get(row["match_id"])
         if state is None:
             bucket["pending"] += 1
@@ -135,16 +215,21 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         else:
             bucket["settled"] += 1
             current_settled += counts_as_current
+            raw_current_n += int(is_raw_current)
+            approved_alias_n += int(is_approved_alias)
         # 同版本但概率签名不同 = 改了概率文件却没 bump 版本，这些样本会被静默排除出 current
         if (row["model_version"] == cur_mv and cur_sig
                 and row["probability_signature"] != cur_sig
-                and (row["model_version"], row["probability_signature"]) not in aliases):
+                and (row["model_version"], row["probability_signature"],
+                     row["route"] or "") not in alias_keys):
             signature_drift.append({
                 "prediction_id": row["prediction_id"],
                 "match_id": row["match_id"],
-                "signature": row["probability_signature"][:12] or "(none)",
+                "signature": sig[:12] or "(none)",
             })
-            key = (row["model_version"], row["probability_signature"], row["route"] or "")
+            key = (row["model_version"],
+                   _signature_group_value(row["probability_signature"]),
+                   row["route"] or "")
             signature_drift_groups[key] = signature_drift_groups.get(key, 0) + 1
 
     settled = current_settled
@@ -160,6 +245,12 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
             for candidate in rows if candidate.get("match_id") == row.get("match_id"))
         for row in exact_current_primary
     )
+    drift_groups = [
+        {"model_version": model_version, "probability_signature": signature,
+         "route": route or None, "record_count": record_count,
+         "status": drift_statuses.get((model_version, signature, route), "UNREPLAYED")}
+        for (model_version, signature, route), record_count in sorted(signature_drift_groups.items())
+    ]
     return {
         "schema_version": "fusion-version-progress-1.0",
         "store": str(root),
@@ -167,6 +258,8 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         "current_model_version": cur_mv,
         "current_probability_signature": cur_sig[:12],
         "counted_as_current_aliases": alias_versions,
+        "raw_current_n": raw_current_n,
+        "approved_alias_n": approved_alias_n,
         "current": {
             "settled": settled,
             "pending": pending,
@@ -178,11 +271,14 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         },
         "by_model_version": {k: v for k, v in sorted(by_version.items())},
         "signature_drift": signature_drift,
-        "signature_drift_groups": [
-            {"model_version": model_version, "probability_signature": signature,
-             "route": route or None, "record_count": record_count, "status": "UNREPLAYED"}
-            for (model_version, signature, route), record_count in sorted(signature_drift_groups.items())
-        ],
+        "signature_drift_groups": drift_groups,
+        "drift_groups": drift_groups,
+        "unreplayable_groups": [group for group in drift_groups
+                                if group["status"] == "UNREPLAYABLE"],
+        "changed_groups": [group for group in drift_groups
+                           if group["status"] == "CHANGED_REQUIRES_VERSION_BUMP"],
+        "pending_review_groups": [group for group in drift_groups
+                                  if group["status"] == "PENDING_REVIEW"],
         "superseded_snapshot_count": max(0, len(rows) - len(primary)),
         "reissued_current_snapshot_count": reissued_current_snapshot_count,
         "unreadable_records": unreadable,

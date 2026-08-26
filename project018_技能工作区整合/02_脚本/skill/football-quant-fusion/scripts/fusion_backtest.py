@@ -24,11 +24,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from runtime_paths import assert_writable_target, backtest_store
+from probability_aliases import load_approved_aliases, matches as alias_matches
 
 # 2026-08-16 修正：原默认值硬编码指向外部 football-quant-fusion-suite。
 # 那是一份物理拷贝、且比仓库内唯一事实源旧，忘了传 --store 就会**静默评测错的库**
 # （calibration_gate、current_version_n 全部跟着错）。改走 runtime_paths 的仓库内默认值。
 DEFAULT_STORE = backtest_store()
+CONFIG_ROOT = Path(__file__).resolve().parent.parent / "config"
+DEFAULT_ALIAS_PATH = CONFIG_ROOT / "probability_aliases.json"
+DEFAULT_RELEASE_LOCK_PATH = CONFIG_ROOT / "release_lock.json"
 
 
 # [中文功能] 按行读取 jsonl
@@ -173,32 +177,18 @@ def engine_build_key(row):
 
 
 def load_version_aliases(target_model_version=None):
-    """读取 manifest 里经重放验证的等价旧版本清单。
+    """Load only exact aliases whose proof and current release lock revalidate.
 
-    2026-08-16 新增。`probability_signature` 是概率文件的**字节**哈希，所以对
-    `probability_files` 名单里的文件而言，「改一个字节就重置样本」的死锁原样存在——
-    m1→m2 就是这么丢掉 34 场的（影子路由重构，生产路由概率一位没变）。
-
-    别名的唯一合法来源是 `probability_replay_check.py` 的 `equivalent` 判定：
-    用旧样本登记时保存的 input 重跑当前代码，概率逐场一致才可写进 manifest。
-    匹配要求 (model_version, probability_signature, equivalent_to_model_version)
-    **精确成对**：别名只属于当时已重放验证的目标版本，不能跨越之后的
-    概率变更（例如 m3 的1X2等价不能把 m4 的比分/O-U样本也算作已验证）。
+    Historical ``version_manifest.model_version_aliases`` remain preserved as
+    evidence.  They are intentionally not consumed here: none carries the
+    proof-file SHA-256 plus an exact route and all nine fields required by the
+    new loader, so silently converting them would weaken the cohort boundary.
     """
-    path = Path(__file__).resolve().parent.parent / "config" / "version_manifest.json"
-    if not path.exists():
-        return []
-    try:
-        manifest = json.loads(path.read_text(encoding="utf-8-sig"))
-    except Exception:
-        return []
-    aliases = manifest.get("model_version_aliases") or []
-    valid = [a for a in aliases if isinstance(a, dict)
-             and a.get("model_version") and _is_sha256(a.get("probability_signature"))
-             and a.get("equivalent_to_model_version")]
+    valid = load_approved_aliases(DEFAULT_ALIAS_PATH, DEFAULT_RELEASE_LOCK_PATH)
     if target_model_version is None:
         return valid
-    return [a for a in valid if str(a["equivalent_to_model_version"]) == str(target_model_version)]
+    return [a for a in valid
+            if str(a.get("alias_to_model_version")) == str(target_model_version)]
 
 
 def version_cohort(row, current_identity):
@@ -212,17 +202,21 @@ def version_cohort(row, current_identity):
     也算 current——否则一次数值中性的重构就要重新攒 100 场。
     """
     model = row.get("model") or {}
-    row_mv = str(model.get("model_version") or "").strip()
-    row_ps = str(model.get("probability_signature") or "").strip()
-    cur_mv = str(current_identity.get("model_version") or "").strip()
-    cur_ps = str(current_identity.get("probability_signature") or "").strip()
+    raw_row_mv = model.get("model_version")
+    raw_row_ps = model.get("probability_signature")
+    raw_cur_mv = current_identity.get("model_version")
+    raw_cur_ps = current_identity.get("probability_signature")
+    row_mv = raw_row_mv.strip() if isinstance(raw_row_mv, str) else ""
+    row_ps = raw_row_ps.strip() if isinstance(raw_row_ps, str) else ""
+    cur_mv = raw_cur_mv.strip() if isinstance(raw_cur_mv, str) else ""
+    cur_ps = raw_cur_ps.strip() if isinstance(raw_cur_ps, str) else ""
     if cur_mv and cur_mv != "unknown" and cur_ps and _is_sha256(cur_ps):
         if row_mv == cur_mv and row_ps == cur_ps:
             return "current"
         for alias in load_version_aliases(cur_mv):
-            if (str(alias.get("equivalent_to_model_version")) == cur_mv
-                    and row_mv == alias["model_version"]
-                    and row_ps == alias["probability_signature"]):
+            if (str(alias.get("alias_to_model_version")) == cur_mv
+                    and str(alias.get("alias_to_probability_signature")) == cur_ps
+                    and alias_matches(row, alias)):
                 return "current"
     version = str(row.get("version") or "").strip().lower()
     identifiable = version and version not in {"unknown", "offline", "none"} and "unknown" not in version

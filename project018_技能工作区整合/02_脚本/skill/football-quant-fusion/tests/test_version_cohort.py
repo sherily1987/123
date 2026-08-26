@@ -25,8 +25,11 @@ IDENTITY = {
 }
 
 
-def _row(model, core_engine_version=None, version=None):
-    return {"model": model, "core_engine_version": core_engine_version, "version": version}
+def _row(model, core_engine_version=None, version=None, route=None):
+    row = {"model": model, "core_engine_version": core_engine_version, "version": version}
+    if route is not None:
+        row["input"] = {"mode": route}
+    return row
 
 
 # ---- 新逻辑：model_version + probability_signature 判定 current ----
@@ -42,6 +45,14 @@ def test_probability_signature_mismatch_is_legacy():
     row = _row({"model_version": "m1", "probability_signature": SHA_B},
                version="fusion-1.4.0-core-3.4.4")
     assert fb.version_cohort(row, IDENTITY) == "legacy"
+
+
+def test_numeric_probability_signature_is_not_coerced_into_current():
+    digits = "1" * 64
+    row = _row({"model_version": "m1", "probability_signature": int(digits)},
+               version="fusion-1.4.0-core-3.4.4")
+    current = {"model_version": "m1", "probability_signature": digits}
+    assert fb.version_cohort(row, current) == "legacy"
 
 
 def test_model_version_mismatch_is_legacy():
@@ -99,45 +110,55 @@ def test_truncated_hash_is_not_accepted_as_identity():
 
 ALIAS_SHA = "5b608c3debf8d1de2659d552e5569f84e684e7e86105255e5de76f03a7d5b633"
 CURRENT_IDENTITY = {"model_version": "m2", "probability_signature": SHA_B}
-ALIAS_ENTRY = {"model_version": "m1", "probability_signature": ALIAS_SHA,
-               "equivalent_to_model_version": "m2"}
+ALIAS_ENTRY = {
+    "status": "EQUIVALENT_ALIAS",
+    "model_version": "m1",
+    "probability_signature": ALIAS_SHA,
+    "route": "market_only",
+    "alias_to_model_version": "m2",
+    "alias_to_probability_signature": SHA_B,
+}
 
 
 def test_verified_equivalent_alias_counts_as_current(monkeypatch):
     """m1→m2 的 bump 数值中性时，m1 样本不该被迫从零重攒。"""
     monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
     row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
-               version="fusion-1.4.0-core-3.4.4")
+               version="fusion-1.4.0-core-3.4.4", route="market_only")
     assert fb.version_cohort(row, CURRENT_IDENTITY) == "current"
+
+
+def test_verified_alias_requires_exact_registered_route(monkeypatch):
+    monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
+    row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
+               version="fusion-1.4.0-core-3.4.4", route="hybrid")
+    assert fb.version_cohort(row, CURRENT_IDENTITY) == "legacy"
 
 
 def test_alias_requires_exact_signature_pair(monkeypatch):
     """同为 m1 但签名不是登记的那个 → 不享受别名，仍归 legacy。"""
     monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
     row = _row({"model_version": "m1", "probability_signature": SHA_A},
-               version="fusion-1.4.0-core-3.4.4")
+               version="fusion-1.4.0-core-3.4.4", route="market_only")
     assert fb.version_cohort(row, CURRENT_IDENTITY) == "legacy"
 
 
 def test_no_alias_configured_keeps_old_version_legacy(monkeypatch):
     monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [])
     row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
-               version="fusion-1.4.0-core-3.4.4")
+               version="fusion-1.4.0-core-3.4.4", route="market_only")
     assert fb.version_cohort(row, CURRENT_IDENTITY) == "legacy"
 
 
-def test_manifest_aliases_reject_malformed_entries():
-    """真实 manifest 里的别名必须成对且签名合法，否则不予采信。"""
-    for alias in fb.load_version_aliases():
-        assert alias["model_version"]
-        assert len(alias["probability_signature"]) == 64
-        assert alias["equivalent_to_model_version"]
+def test_legacy_manifest_aliases_are_not_silently_loaded_without_new_proofs():
+    """历史配置保留作证据，但没有九字段可验新证明就不能继续计数。"""
+    assert fb.load_version_aliases() == []
 
 
 def test_alias_is_not_carried_into_a_new_probability_version(monkeypatch):
     """m1→m2 1X2 equivalence cannot make score/O-U-changing m4 look current."""
     monkeypatch.setattr(fb, "load_version_aliases", lambda _=None: [ALIAS_ENTRY])
     row = _row({"model_version": "m1", "probability_signature": ALIAS_SHA},
-               version="fusion-1.4.0-core-3.4.4")
+               version="fusion-1.4.0-core-3.4.4", route="market_only")
     current = {"model_version": "m4", "probability_signature": SHA_B}
     assert fb.version_cohort(row, current) == "legacy"

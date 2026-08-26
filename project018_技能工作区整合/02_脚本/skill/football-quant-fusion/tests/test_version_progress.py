@@ -119,6 +119,12 @@ class VersionProgressTests(unittest.TestCase):
         )
 
         self.assertEqual(report["current"]["settled"], 1)
+        self.assertEqual(report["raw_current_n"], 1)
+        self.assertEqual(report["approved_alias_n"], 0)
+        self.assertEqual(report["drift_groups"], report["signature_drift_groups"])
+        self.assertEqual(report["unreplayable_groups"], [])
+        self.assertEqual(report["changed_groups"], [])
+        self.assertEqual(report["pending_review_groups"], [])
         self.assertEqual(report["signature_drift_groups"], [
             {"model_version": "m2", "probability_signature": OTHER_SIG,
              "route": "hybrid", "record_count": 1, "status": "UNREPLAYED"},
@@ -147,8 +153,10 @@ class VersionProgressTests(unittest.TestCase):
         self.assertEqual(report["by_model_version"]["m4"]["pending"], 1)
 
     def test_verified_alias_versions_count_toward_current(self):
-        alias = {"model_version": "m1", "probability_signature": OTHER_SIG,
-                 "equivalent_to_model_version": "m2"}
+        alias = {"status": "EQUIVALENT_ALIAS", "model_version": "m1",
+                 "probability_signature": OTHER_SIG, "route": "market_only",
+                 "alias_to_model_version": "m2",
+                 "alias_to_probability_signature": CURRENT_SIG}
         predictions = [prediction("m-1", "2026-08-10T00:00:00Z", "m1", OTHER_SIG),
                        prediction("m-2", "2026-08-16T00:00:00Z", "m1", OTHER_SIG)]
         results = [{"match_id": "m-1"}]
@@ -159,13 +167,17 @@ class VersionProgressTests(unittest.TestCase):
         with_alias = self._report(predictions, results, aliases=[alias])
         self.assertEqual((with_alias["current"]["settled"], with_alias["current"]["pending"]), (1, 1))
         self.assertEqual(with_alias["counted_as_current_aliases"], ["m1"])
+        self.assertEqual(with_alias["raw_current_n"], 0)
+        self.assertEqual(with_alias["approved_alias_n"], 1)
         # 分版本明细仍按原始 model_version 展示，不把 m1 改写成 m2
         self.assertEqual(with_alias["by_model_version"]["m1"]["settled"], 1)
 
     def test_verified_same_version_alias_is_not_signature_drift(self):
         """重放确认数值等价的旧 m2 签名应计入 current，不能再告警为未 bump。"""
-        alias = {"model_version": "m2", "probability_signature": OTHER_SIG,
-                 "equivalent_to_model_version": "m2"}
+        alias = {"status": "EQUIVALENT_ALIAS", "model_version": "m2",
+                 "probability_signature": OTHER_SIG, "route": "market_only",
+                 "alias_to_model_version": "m2",
+                 "alias_to_probability_signature": CURRENT_SIG}
         report = self._report(
             [prediction("m-current", "2026-08-10T00:00:00Z", "m2", CURRENT_SIG),
              prediction("m-alias", "2026-08-11T00:00:00Z", "m2", OTHER_SIG)],
@@ -176,15 +188,75 @@ class VersionProgressTests(unittest.TestCase):
         self.assertEqual(report["current"]["settled"], 2)
         self.assertEqual(report["signature_drift"], [])
 
+    def test_numeric_signature_cannot_be_coerced_into_an_approved_alias(self):
+        numeric_signature = int("1" * 64)
+        alias = {"status": "EQUIVALENT_ALIAS", "model_version": "m2",
+                 "probability_signature": "1" * 64, "route": "market_only",
+                 "alias_to_model_version": "m2",
+                 "alias_to_probability_signature": CURRENT_SIG}
+        report = self._report(
+            [prediction("m-corrupt", "2026-08-10T00:00:00Z", "m2", numeric_signature)],
+            [{"match_id": "m-corrupt"}], aliases=[alias],
+        )
+
+        self.assertEqual(report["current"]["settled"], 0)
+        self.assertEqual(report["approved_alias_n"], 0)
+
+    def test_numeric_registered_route_cannot_be_coerced_into_an_approved_alias(self):
+        alias = {"status": "EQUIVALENT_ALIAS", "model_version": "m2",
+                 "probability_signature": OTHER_SIG, "route": "1",
+                 "alias_to_model_version": "m2",
+                 "alias_to_probability_signature": CURRENT_SIG}
+        report = self._report(
+            [prediction("m-corrupt", "2026-08-10T00:00:00Z", "m2", OTHER_SIG,
+                        route=1)],
+            [{"match_id": "m-corrupt"}], aliases=[alias],
+        )
+
+        self.assertEqual(report["current"]["settled"], 0)
+        self.assertEqual(report["approved_alias_n"], 0)
+
     def test_alias_targeting_an_older_version_does_not_count_for_new_version(self):
-        alias = {"model_version": "m1", "probability_signature": OTHER_SIG,
-                 "equivalent_to_model_version": "m2"}
+        alias = {"status": "EQUIVALENT_ALIAS", "model_version": "m1",
+                 "probability_signature": OTHER_SIG, "route": "market_only",
+                 "alias_to_model_version": "m2",
+                 "alias_to_probability_signature": CURRENT_SIG}
         report = self._report(
             [prediction("m-old", "2026-08-10T00:00:00Z", "m1", OTHER_SIG)],
             [{"match_id": "m-old"}], model_version="m4", aliases=[alias],
         )
         self.assertEqual(report["current"]["settled"], 0)
         self.assertEqual(report["counted_as_current_aliases"], [])
+
+    def test_grouped_attestation_states_are_split_without_admitting_them(self):
+        predictions = [
+            prediction("m-pending", "2026-08-10T00:00:00Z", "m2", OTHER_SIG,
+                       route="market_only"),
+            prediction("m-changed", "2026-08-11T00:00:00Z", "m2", "c" * 64,
+                       route="hybrid"),
+            prediction("m-unreplayable", "2026-08-12T00:00:00Z", "m2", "d" * 64,
+                       route="model_first"),
+        ]
+        states = {
+            ("m2", OTHER_SIG, "market_only"): "PENDING_REVIEW",
+            ("m2", "c" * 64, "hybrid"): "CHANGED_REQUIRES_VERSION_BUMP",
+            ("m2", "d" * 64, "model_first"): "UNREPLAYABLE",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = build_store(Path(tmp), predictions, [])
+            with patch.object(version_progress, "build_identity", return_value={
+                    "model_version": "m2", "probability_signature": CURRENT_SIG}), \
+                 patch.object(version_progress, "load_version_aliases", return_value=[]), \
+                 patch.object(version_progress, "load_drift_group_statuses", return_value=states):
+                report = version_progress.build_report(store)
+
+        self.assertEqual(report["current"]["settled"], 0)
+        self.assertEqual([group["status"] for group in report["pending_review_groups"]],
+                         ["PENDING_REVIEW"])
+        self.assertEqual([group["status"] for group in report["changed_groups"]],
+                         ["CHANGED_REQUIRES_VERSION_BUMP"])
+        self.assertEqual([group["status"] for group in report["unreplayable_groups"]],
+                         ["UNREPLAYABLE"])
 
     def test_cli_help_lists_version_progress(self):
         self.assertIn("version-progress", fusion_cli.HELP)
