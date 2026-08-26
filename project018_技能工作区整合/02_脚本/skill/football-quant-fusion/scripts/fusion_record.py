@@ -6,6 +6,7 @@ match_id 优先用 sporttery_meta.match_id（如 sporttery-2040688），
 回退为 comp/season/kickoff/队名拼接。同一 (match_id, snapshot_type) 幂等。
 """
 import argparse
+import copy
 import hashlib
 import json
 import sys
@@ -13,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from release_governance import ReleaseGovernanceError, assert_output_matches_release_lock
+from direction_policy import build_direction_policy, load_policy
 
 HERE = Path(__file__).resolve().parent
 LOCK_FILE = HERE.parent / 'config' / 'release_lock.json'
@@ -60,6 +62,123 @@ def formal_prediction_as_of(inp, kickoff):
     if as_of.astimezone(timezone.utc) >= kickoff.astimezone(timezone.utc):
         sys.exit('prediction_as_of must be strictly before kickoff for formal snapshot=prematch registration')
     return value
+
+
+def _final_probabilities(out):
+    """Read the registry-compatible probability vector without deriving it."""
+    direct = out.get('final_1x2_pct')
+    if direct is not None:
+        return direct
+    forecast = out.get('forecast') or {}
+    if forecast.get('final_1x2_pct') is not None:
+        return forecast.get('final_1x2_pct')
+    core_output = out.get('core_output') or {}
+    return core_output.get('final_1x2_pct')
+
+
+def _aware_datetime(value):
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = parse_dt(value.strip())
+    except (TypeError, ValueError):
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+def _direction_validation_error(candidate, expected, *, probabilities,
+                                build, prediction_as_of, kickoff):
+    """Return a stable error code, or None when a policy is safe to persist."""
+    if not isinstance(candidate, dict):
+        return 'direction_policy_must_be_object'
+    if set(candidate) != set(expected):
+        return 'schema_fields_mismatch'
+    raw_probabilities = candidate.get('probabilities')
+    expected_probabilities = (
+        dict(zip(('H', 'D', 'A'), probabilities))
+        if isinstance(probabilities, (list, tuple)) and len(probabilities) == 3
+        else None
+    )
+    if raw_probabilities != expected_probabilities:
+        return 'probabilities_mismatch'
+    if (candidate.get('model_version') != build.get('model_version')
+            or candidate.get('probability_signature') != build.get('probability_signature')):
+        return 'model_identity_mismatch'
+    policy_time = _aware_datetime(candidate.get('prediction_as_of'))
+    if policy_time is None or policy_time >= kickoff.astimezone(timezone.utc):
+        return 'prediction_as_of_not_aware_prematch'
+    if candidate.get('prediction_as_of') != prediction_as_of:
+        return 'prediction_as_of_mismatch'
+    if candidate.get('schema_version') != expected.get('schema_version'):
+        return 'schema_version_mismatch'
+    if candidate.get('rule_version') != expected.get('rule_version'):
+        return 'rule_version_mismatch'
+    if candidate.get('policy_version') != expected.get('policy_version'):
+        return 'policy_version_mismatch'
+    signature = candidate.get('decision_policy_signature')
+    if (not is_complete_sha256(signature)
+            or signature != expected.get('decision_policy_signature')):
+        return 'decision_policy_signature_mismatch'
+    components = candidate.get('decision_policy_signature_components')
+    if (not isinstance(components, dict)
+            or set(components) != {'policy_canonical_sha256', 'implementation_sha256'}
+            or not all(is_complete_sha256(value) for value in components.values())
+            or components != expected.get('decision_policy_signature_components')):
+        return 'decision_policy_signature_components_mismatch'
+    for field in ('classification', 'primary_direction', 'alternative_direction',
+                  'status', 'probability_unit', 'probability_source', 'trigger',
+                  'gap_pp', 'reason'):
+        if candidate.get(field) != expected.get(field):
+            return f'{field}_mismatch'
+    return None
+
+
+def _unavailable_direction_policy(expected, *, error):
+    """Remove every direction claim while retaining auditable policy identity."""
+    unavailable = copy.deepcopy(expected) if isinstance(expected, dict) else {}
+    unavailable.update({
+        'status': 'UNAVAILABLE',
+        'classification': 'UNAVAILABLE',
+        'primary_direction': None,
+        'alternative_direction': None,
+        'trigger': None,
+        'gap_pp': None,
+        'reason': 'validation_error',
+        'validation_error': error,
+    })
+    return unavailable
+
+
+def validate_direction_registration(out, *, build, prediction_as_of, kickoff):
+    """Validate a supplied policy; never synthesize a missing historical one."""
+    candidate = out.get('direction_policy')
+    if candidate is None:
+        return 'NOT_REGISTERED', None
+    probabilities = _final_probabilities(out)
+    try:
+        expected = build_direction_policy(
+            probabilities,
+            prediction_as_of=prediction_as_of,
+            model_identity=build,
+            policy=load_policy(),
+        )
+    except Exception as exc:
+        return 'UNAVAILABLE', _unavailable_direction_policy(
+            {}, error=f'policy_validation_failed:{type(exc).__name__}'
+        )
+    if expected.get('status') != 'AVAILABLE':
+        return 'UNAVAILABLE', _unavailable_direction_policy(
+            expected, error='expected_policy_unavailable'
+        )
+    error = _direction_validation_error(
+        candidate, expected, probabilities=probabilities, build=build,
+        prediction_as_of=prediction_as_of, kickoff=kickoff,
+    )
+    if error is not None:
+        return 'UNAVAILABLE', _unavailable_direction_policy(expected, error=error)
+    return 'REGISTERED', copy.deepcopy(candidate)
 
 
 def cohort_key(model_version, probability_signature, route, mode, llm_model_pool_sha256=None):
@@ -156,6 +275,9 @@ def main():
     # T-minus snapshot, must prove it was generated before kickoff.  Labels
     # are not a waiver for the no-future-leakage boundary.
     prediction_as_of = formal_prediction_as_of(inp, kd)
+    direction_policy_status, registered_direction_policy = validate_direction_registration(
+        out, build=build, prediction_as_of=prediction_as_of, kickoff=kd,
+    )
 
     route = inp.get('route') or out.get('route') or 'unknown'
     mode = inp.get('mode') or out.get('mode') or 'unknown'
@@ -233,11 +355,14 @@ def main():
                   'sporttery_meta': sm},
         'input': inp,
         'output': out,
+        'direction_policy_status': direction_policy_status,
         'hashes': {
             'input_sha256': sha(inp), 'output_sha256': sha(out),
             'input_raw_sha256': raw_sha256(input_raw), 'output_raw_sha256': raw_sha256(output_raw),
         },
     }
+    if registered_direction_policy is not None:
+        rec['direction_policy'] = registered_direction_policy
     if has_llm_audit:
         rec.update(llm_audit)
     if is_llm_registration and not has_complete_llm_audit:
