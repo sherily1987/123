@@ -32,6 +32,10 @@ def _identity_pair(identity: dict[str, Any]) -> tuple[str, str]:
             str(identity.get("probability_signature") or ""))
 
 
+def _is_non_negative_int(value: Any) -> bool:
+    return type(value) is int and value >= 0
+
+
 def validate_replay_attestation(report: dict[str, Any], *, previous_lock: dict[str, Any],
                                 current_identity: dict[str, Any]) -> dict[str, Any]:
     """Validate a same-version signature migration before a lock may be replaced."""
@@ -39,12 +43,22 @@ def validate_replay_attestation(report: dict[str, Any], *, previous_lock: dict[s
     current_mv, current_sig = _identity_pair(current_identity)
     if not previous_mv or not previous_sig or not current_mv or not current_sig:
         raise ReleaseGovernanceError("发布锁或当前身份缺少模型版本/概率签名")
-    # New replay reports state their selected-record completeness explicitly.
-    # Legacy complete reports lack these fields and retain their historical
-    # validation path, but any report that declares itself partial is never a
-    # release proof even if one selected row happens to be identical.
-    if (report.get("is_complete_replay") is False
-            or str(report.get("verdict") or "") in {"partial", "limited"}):
+    schema_version = report.get("schema_version")
+    incomplete_verdicts = {"partial", "limited", "incomplete"}
+    if schema_version == "fusion-probability-replay-2.0":
+        total = report.get("records_total")
+        selected = report.get("records_selected")
+        if (not _is_non_negative_int(total) or not _is_non_negative_int(selected)
+                or total != selected
+                or report.get("is_complete_replay") is not True
+                or str(report.get("verdict") or "") in incomplete_verdicts):
+            raise ReleaseGovernanceError("重放证明不完整（partial/limited/incomplete），不得用于发布锁迁移")
+    elif schema_version not in (None, "", "fusion-probability-replay-1.0"):
+        raise ReleaseGovernanceError(f"不支持的重放证明 schema：{schema_version}")
+    # Genuine historical reports may predate explicit coverage fields, but a
+    # legacy report that does declare itself incomplete still fails closed.
+    elif (report.get("is_complete_replay") is False
+          or str(report.get("verdict") or "") in incomplete_verdicts):
         raise ReleaseGovernanceError("重放证明不完整（partial/limited），不得用于发布锁迁移")
     if str(report.get("verdict") or "") != "equivalent":
         raise ReleaseGovernanceError("重放报告显示数值不等价；必须升级模型版本")

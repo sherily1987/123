@@ -36,6 +36,26 @@ def _attestation(*, fields=None, verdict="equivalent"):
     }
 
 
+def _schema_2_attestation(**overrides):
+    report = _attestation()
+    report.update({
+        "schema_version": "fusion-probability-replay-2.0",
+        "records_total": 2,
+        "records_selected": 2,
+        "is_complete_replay": True,
+    })
+    report.update(overrides)
+    return report
+
+
+def _validate(report):
+    return governance.validate_replay_attestation(
+        report,
+        previous_lock=_identity(OLD_SIG),
+        current_identity=_identity(),
+    )
+
+
 def test_same_version_signature_transition_requires_complete_equivalent_attestation(tmp_path):
     lock_path = tmp_path / "release_lock.json"
     lock_path.write_text(json.dumps(_identity(OLD_SIG)), encoding="utf-8")
@@ -59,6 +79,58 @@ def test_same_version_signature_transition_writes_audited_lock(tmp_path):
     assert locked["replay_attestation"]["previous_probability_signature"] == OLD_SIG
     assert locked["replay_attestation"]["replayed_modes"] == ["market_only"]
     assert json.loads(lock_path.read_text(encoding="utf-8"))["probability_signature"] == CURRENT_SIG
+
+
+def test_schema_2_complete_full_replay_remains_valid():
+    assert _validate(_schema_2_attestation())["replay_verdict"] == "equivalent"
+
+
+def test_historical_schema_1_complete_replay_remains_valid_without_new_fields():
+    report = _attestation()
+    report["schema_version"] = "fusion-probability-replay-1.0"
+
+    assert _validate(report)["replay_verdict"] == "equivalent"
+
+
+@pytest.mark.parametrize("missing_field", [
+    "records_total", "records_selected", "is_complete_replay",
+])
+def test_schema_2_rejects_missing_completeness_field(missing_field):
+    report = _schema_2_attestation()
+    report.pop(missing_field)
+
+    with pytest.raises(governance.ReleaseGovernanceError, match="不完整"):
+        _validate(report)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("records_total", -1),
+    ("records_selected", -1),
+    ("records_total", True),
+    ("records_selected", False),
+    ("records_total", 2.0),
+    ("records_selected", "2"),
+])
+def test_schema_2_rejects_tampered_non_negative_integer_counts(field, value):
+    with pytest.raises(governance.ReleaseGovernanceError, match="不完整"):
+        _validate(_schema_2_attestation(**{field: value}))
+
+
+def test_schema_2_rejects_unequal_total_and_selected_counts():
+    with pytest.raises(governance.ReleaseGovernanceError, match="不完整"):
+        _validate(_schema_2_attestation(records_total=2, records_selected=1))
+
+
+@pytest.mark.parametrize("completion", [False, None, 1, "true"])
+def test_schema_2_requires_literal_true_complete_replay(completion):
+    with pytest.raises(governance.ReleaseGovernanceError, match="不完整"):
+        _validate(_schema_2_attestation(is_complete_replay=completion))
+
+
+@pytest.mark.parametrize("verdict", ["partial", "limited", "incomplete"])
+def test_schema_2_explicitly_rejects_incomplete_verdicts(verdict):
+    with pytest.raises(governance.ReleaseGovernanceError, match="不完整"):
+        _validate(_schema_2_attestation(verdict=verdict))
 
 
 def test_same_version_signature_transition_rejects_any_probability_difference(tmp_path):

@@ -94,6 +94,24 @@ def test_invalid_or_truncated_signature_makes_the_whole_group_unreplayable(monke
     assert report["alias_eligible"] is False
 
 
+def test_grouped_numeric_signature_makes_every_member_unreplayable_without_replay(monkeypatch):
+    numeric_signature = int("1" * 64)
+    rows = [record("m-1"), record("m-2")]
+    for row in rows:
+        row["model"]["probability_signature"] = numeric_signature
+    monkeypatch.setattr(governance, "replay_one", lambda _row: pytest.fail("must not replay"))
+
+    groups = governance.group_records(rows)
+    report = governance.evaluate_group(next(iter(groups.values())), current_identity=CURRENT)
+
+    assert set(groups) == {("m4", numeric_signature, "market_only")}
+    assert report["status"] == "UNREPLAYABLE"
+    assert [item["status"] for item in report["results"]] == ["UNREPLAYABLE", "UNREPLAYABLE"]
+    assert {item["time_audit"]["reason"] for item in report["results"]} == {
+        "probability_signature_invalid"
+    }
+
+
 def test_equivalent_group_stays_pending_review_and_never_alias_eligible(monkeypatch):
     rows = [record("m-1"), record("m-2")]
     monkeypatch.setattr(governance, "replay_one", lambda row: identical_result(row))

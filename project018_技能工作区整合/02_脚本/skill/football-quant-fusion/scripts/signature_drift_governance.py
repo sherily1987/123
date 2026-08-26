@@ -18,21 +18,30 @@ from probability_replay_check import (COMPARE_FIELDS, FLOAT_TOLERANCE,
                                       registered_route, replay_one)
 
 
-def _identity(record: dict[str, Any]) -> tuple[str, str]:
+def _identity(record: dict[str, Any]) -> tuple[str, Any]:
     model = record.get("model") or {}
     return (str(model.get("model_version") or ""),
-            str(model.get("probability_signature") or ""))
+            model.get("probability_signature"))
 
 
-def group_records(records: list[dict]) -> dict[tuple[str, str, str], list[dict]]:
+def _signature_group_key(signature: Any) -> Any:
+    """Keep scalar types intact and make malformed containers groupable."""
+    try:
+        hash(signature)
+    except TypeError:
+        return ("invalid-non-string-signature", type(signature).__name__, canonical_json(signature))
+    return signature
+
+
+def group_records(records: list[dict]) -> dict[tuple[str, Any, str], list[dict]]:
     """Group strictly by stored model version, complete signature, and route."""
-    groups: dict[tuple[str, str, str], list[dict]] = {}
+    groups: dict[tuple[str, Any, str], list[dict]] = {}
     for record in records:
         model_version, signature = _identity(record)
         # A missing route stays isolated and unreplayable.  It is never filled
         # from what today's prediction happens to output.
         route = registered_route(record) or ""
-        groups.setdefault((model_version, signature, route), []).append(record)
+        groups.setdefault((model_version, _signature_group_key(signature), route), []).append(record)
     return groups
 
 
@@ -53,13 +62,15 @@ def evaluate_group(records: list[dict], *, current_identity: dict) -> dict:
     model_version, signature = _identity(records[0])
     route = registered_route(records[0]) or ""
     expected_key = (model_version, signature, route)
-    current_signature = str(current_identity.get("probability_signature") or "")
+    current_signature = current_identity.get("probability_signature")
     current_identity_valid = bool(str(current_identity.get("model_version") or "")) and \
         is_complete_signature(current_signature)
     results = []
     for record in records:
-        actual_key = (*_identity(record), registered_route(record) or "")
-        record_signature_valid = is_complete_signature(actual_key[1])
+        actual_identity = _identity(record)
+        actual_key = (actual_identity[0], _signature_group_key(actual_identity[1]),
+                      registered_route(record) or "")
+        record_signature_valid = is_complete_signature(actual_identity[1])
         if not record_signature_valid:
             result = {
                 "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
