@@ -40,6 +40,7 @@ Supported commands:
   odds-add | odds-drift | odds-intl | odds-intl-capture | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
   version-progress | version-admission | direction-governance-report
+  signature-replay | signature-alias-approve
   derivative-diagnostics | half-time-enrichment | score-shadow-compare
   league-capability-matrix
   draw-watch-evaluate | draw-ttg-shadow-research
@@ -251,6 +252,12 @@ def main():
     # caller from silently bypassing the repository fact source with an
     # explicit legacy ``--store`` or ``--odds-store`` override.
     validate_cli_paths(rest)
+    if cmd == "signature-replay":
+        run_script("signature_drift_governance.py", rest)
+        return
+    if cmd == "signature-alias-approve":
+        run_script("probability_aliases.py", rest)
+        return
     copy_status = core_copy_status()
     if copy_status["status"] == "MISMATCH":
         raise SystemExit(

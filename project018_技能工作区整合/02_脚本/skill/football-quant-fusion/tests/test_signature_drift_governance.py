@@ -526,3 +526,42 @@ def test_corrupt_signature_path_characters_cannot_escape_attestation_directory(
         "model_version": "m4",
         "probability_signature": "bad/signature:stream",
     }
+
+
+def test_runtime_replay_reads_store_but_writes_only_to_explicit_evidence_dir(
+        monkeypatch, tmp_path):
+    store = tmp_path / "canonical-read-only-store"
+    evidence = tmp_path / "governance-evidence"
+    target = record("m-target")
+    unrelated = record("m-unrelated")
+    unrelated["model"]["probability_signature"] = "c" * 64
+    monkeypatch.setattr(governance, "load_registered_records", lambda root: (
+        [target, unrelated] if root == store else pytest.fail("wrong store")
+    ))
+    monkeypatch.setattr(governance, "replay_one", lambda item: identical_result(item))
+
+    reports = governance.build_drift_attestations(
+        store,
+        CURRENT,
+        output_dir=evidence,
+        model_version="m4",
+        probability_signature=OLD_SIG,
+    )
+
+    assert len(reports) == 1
+    assert reports[0]["record_count"] == 1
+    assert Path(reports[0]["attestation_path"]).parent == evidence
+    assert not store.exists()
+
+
+def test_runtime_cli_rejects_evidence_output_inside_read_only_store(tmp_path):
+    store = tmp_path / "canonical-store"
+    store.mkdir()
+
+    with pytest.raises(SystemExit, match="output-dir must be outside"):
+        governance.main([
+            "--store", str(store),
+            "--output-dir", str(store / "forbidden-write"),
+            "--model-version", "m4",
+            "--probability-signature", OLD_SIG,
+        ])

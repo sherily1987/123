@@ -129,6 +129,26 @@ def _approve(tmp_path: Path) -> tuple[dict, Path, Path, Path]:
     return approved, report, alias_file, lock_file
 
 
+def test_approval_cli_rejects_unreviewable_proof_without_touching_alias_file(tmp_path):
+    report = tmp_path / "unreplayable.json"
+    alias_file = tmp_path / "probability_aliases.json"
+    lock_file = tmp_path / "release_lock.json"
+    _write_lock(lock_file)
+    _write_attestation(report, status="UNREPLAYABLE", result_statuses=("UNREPLAYABLE",))
+    alias_file.write_text(
+        '{"schema_version":"probability-aliases-1.0","aliases":[]}\n',
+        encoding="utf-8",
+    )
+    before = alias_file.read_bytes()
+
+    assert aliases.main([
+        "--attestation", str(report),
+        "--aliases", str(alias_file),
+        "--release-lock", str(lock_file),
+    ]) == 1
+    assert alias_file.read_bytes() == before
+
+
 def test_approval_writes_exact_route_scoped_alias_from_proof(tmp_path):
     approved, report, alias_file, lock_file = _approve(tmp_path)
 

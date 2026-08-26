@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tempfile
@@ -275,6 +276,45 @@ class VersionProgressTests(unittest.TestCase):
                          ["CHANGED_REQUIRES_VERSION_BUMP"])
         self.assertEqual([group["status"] for group in report["unreplayable_groups"]],
                          ["UNREPLAYABLE"])
+
+    def test_external_missing_route_unreplayable_proof_is_visible_read_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = root / "canonical-store"
+            evidence = root / "governance-evidence"
+            evidence.mkdir()
+            core = {
+                "schema_version": "signature-drift-attestation-1.0",
+                "old_identity": {"model_version": "m4", "probability_signature": OTHER_SIG},
+                "route": None,
+                "current_identity": {
+                    "model_version": "m4", "probability_signature": CURRENT_SIG,
+                },
+                "compare_fields": ["final_1x2_pct"],
+                "float_tolerance": 1e-10,
+                "record_count": 1,
+                "results": [],
+                "status": "UNREPLAYABLE",
+                "alias_eligible": False,
+            }
+            report = dict(core)
+            report["report_hash_input"] = core
+            report["report_sha256"] = hashlib.sha256(
+                version_progress._canonical_json(core).encode("utf-8")
+            ).hexdigest()
+            report["generated_at"] = "2026-08-26T04:00:00+00:00"
+            report["attestation_path"] = str(evidence / "signature-drift-proof.json")
+            (evidence / "signature-drift-proof.json").write_text(
+                json.dumps(report), encoding="utf-8",
+            )
+
+            statuses = version_progress.load_drift_group_statuses(
+                store,
+                {"model_version": "m4", "probability_signature": CURRENT_SIG},
+                attestation_root=evidence,
+            )
+
+        self.assertEqual(statuses, {("m4", OTHER_SIG, ""): "UNREPLAYABLE"})
 
     def test_cli_help_lists_version_progress(self):
         self.assertIn("version-progress", fusion_cli.HELP)

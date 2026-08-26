@@ -1,0 +1,102 @@
+{
+  "schema_version": "task7-runtime-acceptance-summary-1.0",
+  "task_status": "COMPLETE_WITH_ALIAS_REJECTED",
+  "release_admission": "HOLD",
+  "current_identity": {
+    "model_version": "m4",
+    "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+    "release_lock_status": "MATCH"
+  },
+  "target_group": {
+    "old_model_version": "m4",
+    "old_probability_signature": "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+    "registered_route": null,
+    "record_count": 14,
+    "status": "UNREPLAYABLE",
+    "result_status_counts": {"UNREPLAYABLE": 14},
+    "blocking_reasons": {
+      "registered_route_missing_or_inconsistent": 14,
+      "registered_vs_input_match_id_mismatch": 14
+    },
+    "time_and_hash_evidence": {
+      "prediction_before_kickoff_count": 14,
+      "evidence_after_prediction_as_of_count": 0,
+      "input_sha256_present_count": 14,
+      "registered_identity_present_count": 14,
+      "input_identity_present_count": 14
+    },
+    "compare_fields_contract": [
+      "final_1x2_pct",
+      "model_1x2_pct",
+      "score_matrix",
+      "top_scores",
+      "ou_2_5",
+      "ou_3_5",
+      "btts",
+      "hafu_model",
+      "ttg_score_consistency"
+    ],
+    "numerical_comparison_reached": false,
+    "attestation_report_sha256": "334d1d24a6f8773fe6f8dade544be04c1097775ac6aa2bc9f9ab751f6874e19e",
+    "attestation_file_sha256": "546ae6b0eb4202a352d4117773e2d18ca75845b055c8498ed4c921a8cbbd48b8"
+  },
+  "approval": {
+    "attempted": true,
+    "exit_code": 1,
+    "result": "REJECTED",
+    "reason": "证明状态必须为 PENDING_REVIEW",
+    "probability_aliases_changed": false,
+    "probability_aliases_sha256": "26642be7d8a4463fb372ae13d849f4619a3989f567958014feae49e748a33271"
+  },
+  "sample_identity": {
+    "before": {"raw_current_n": 11, "approved_alias_n": 0, "current_settled_n": 11},
+    "after": {"raw_current_n": 11, "approved_alias_n": 0, "current_settled_n": 11},
+    "net_current_change": 0
+  },
+  "current_paired_market": {
+    "n": 11,
+    "brier_delta_model_minus_market": 0.01393036,
+    "brier_delta_95ci": [0.00405373, 0.02393031],
+    "log_loss_delta_model_minus_market": 0.02003962,
+    "log_loss_delta_95ci": [0.00746678, 0.03348974],
+    "interpretation": "Positive deltas are worse than the paired market; sample size remains below review gates."
+  },
+  "version_gates": {
+    "min_recalibration": 100,
+    "threshold_review": 200,
+    "ready_for_recalibration": false,
+    "ready_for_threshold_review": false,
+    "production_recommendations_enabled": false
+  },
+  "remaining_drift_groups": [
+    {
+      "model_version": "m4",
+      "probability_signature": "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+      "route": null,
+      "record_count": 14,
+      "status": "UNREPLAYABLE"
+    },
+    {
+      "model_version": "m4",
+      "probability_signature": "5c34721daa91a0232805bbcaa7b1cfebcbfb57dc32c0a2b1e63c4662ceb17197",
+      "route": null,
+      "record_count": 37,
+      "status": "UNREPLAYED"
+    }
+  ],
+  "immutability": {
+    "checked_file_count": 27,
+    "all_immutable_hashes_unchanged": true,
+    "probability_git_blobs_unchanged_from_merge_base": true,
+    "release_lock_updated": false,
+    "canonical_store_written": false
+  },
+  "verification": {
+    "football_quant_fusion_suite": "485 passed, 6 subtests passed",
+    "independent_p0_process": "26 passed, 6 subtests passed",
+    "release_lock_check": "MATCH",
+    "version_progress_exit_code": 0,
+    "direction_governance_exit_code": 0,
+    "json_evidence_files_valid": 7
+  }
+}

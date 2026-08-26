@@ -6,6 +6,7 @@ alias, manifest, registry, release-lock, or probability-file write path.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from datetime import datetime, timezone
@@ -13,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from fusion_backtest import load_jsonl, resolve_path
+from fusion_predict_core import build_identity
 from probability_replay_check import (COMPARE_FIELDS, FLOAT_TOLERANCE,
                                       canonical_json, is_complete_signature,
                                       registered_route, replay_one)
@@ -172,11 +174,27 @@ def _attestation_filename(group_key: tuple[str, tuple[str, str], str]) -> str:
     return f"signature-drift-{digest}.json"
 
 
-def build_drift_attestations(root: Path, current_identity: dict) -> list[dict]:
-    """Write evidence only beneath the caller-selected root; never alter input data."""
+def build_drift_attestations(
+    root: Path,
+    current_identity: dict,
+    *,
+    output_dir: Path | None = None,
+    model_version: str | None = None,
+    probability_signature: str | None = None,
+    route: str | None = None,
+) -> list[dict]:
+    """Read registered snapshots and write only caller-selected evidence files."""
     reports = []
-    output_dir = _attestation_dir(root)
-    for key, records in sorted(group_records(load_registered_records(root)).items()):
+    evidence_dir = Path(output_dir) if output_dir is not None else _attestation_dir(root)
+    records = load_registered_records(root)
+    if model_version is not None:
+        records = [record for record in records if _identity(record)[0] == model_version]
+    if probability_signature is not None:
+        records = [record for record in records
+                   if _identity(record)[1] == probability_signature]
+    if route is not None:
+        records = [record for record in records if registered_route(record) == route]
+    for key, records in sorted(group_records(records).items()):
         report = evaluate_group(records, current_identity=current_identity)
         report_hash_input = {key: value for key, value in report.items() if key not in {
             "generated_at", "report_sha256", "report_hash_input", "attestation_path",
@@ -186,10 +204,57 @@ def build_drift_attestations(root: Path, current_identity: dict) -> list[dict]:
             canonical_json(report_hash_input).encode("utf-8")
         ).hexdigest()
         report["generated_at"] = datetime.now(timezone.utc).isoformat()
-        path = output_dir / _attestation_filename(key)
+        path = evidence_dir / _attestation_filename(key)
         path.parent.mkdir(parents=True, exist_ok=True)
         report["attestation_path"] = str(path)
         path.write_text(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
                         encoding="utf-8")
         reports.append(report)
     return reports
+
+
+def _is_within(path: Path, parent: Path) -> bool:
+    try:
+        path.relative_to(parent)
+    except ValueError:
+        return False
+    return True
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="按注册身份生成只读签名漂移重放证明")
+    parser.add_argument("--store", required=True, help="只读正式 backtest 目录")
+    parser.add_argument("--output-dir", required=True, help="正式库之外的治理证据目录")
+    parser.add_argument("--model-version")
+    parser.add_argument("--probability-signature")
+    parser.add_argument("--route")
+    args = parser.parse_args(argv)
+    store = Path(args.store).resolve()
+    output_dir = Path(args.output_dir).resolve()
+    if output_dir == store or _is_within(output_dir, store):
+        raise SystemExit("output-dir must be outside the read-only store")
+    reports = build_drift_attestations(
+        store,
+        build_identity(),
+        output_dir=output_dir,
+        model_version=args.model_version,
+        probability_signature=args.probability_signature,
+        route=args.route,
+    )
+    print(json.dumps({
+        "store": str(store),
+        "output_dir": str(output_dir),
+        "report_count": len(reports),
+        "reports": [{
+            "attestation_path": report["attestation_path"],
+            "old_identity": report["old_identity"],
+            "route": report["route"],
+            "record_count": report["record_count"],
+            "status": report["status"],
+        } for report in reports],
+    }, ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

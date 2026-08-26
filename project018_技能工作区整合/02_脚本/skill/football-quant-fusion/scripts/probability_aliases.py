@@ -7,8 +7,10 @@ checks its target against the current release lock.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -186,3 +188,27 @@ def matches(row: dict[str, Any], approved_alias: dict[str, Any]) -> bool:
         and signature == approved_alias.get("probability_signature")
         and _registered_route(row) == approved_alias.get("route")
     )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="从完整重放证明审批精确概率别名")
+    parser.add_argument("--attestation", required=True)
+    parser.add_argument("--aliases", default=str(Path(__file__).resolve().parents[1] /
+                                                  "config" / "probability_aliases.json"))
+    parser.add_argument("--release-lock", default=str(Path(__file__).resolve().parents[1] /
+                                                       "config" / "release_lock.json"))
+    args = parser.parse_args(argv)
+    try:
+        approved = approve_attestation(
+            Path(args.attestation), Path(args.aliases), Path(args.release_lock),
+        )
+    except ProbabilityAliasError as exc:
+        print(json.dumps({"status": "REJECTED", "reason": str(exc)},
+                         ensure_ascii=False, indent=2), file=sys.stderr)
+        return 1
+    print(json.dumps(approved, ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

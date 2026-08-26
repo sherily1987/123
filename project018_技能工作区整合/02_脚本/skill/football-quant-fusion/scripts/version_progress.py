@@ -53,10 +53,16 @@ def _canonical_json(value) -> str:
                       separators=(",", ":"), allow_nan=False)
 
 
-def load_drift_group_statuses(root: Path, current_identity: dict) -> dict[tuple[str, str, str], str]:
+def load_drift_group_statuses(
+    root: Path,
+    current_identity: dict,
+    *,
+    attestation_root: Path | None = None,
+) -> dict[tuple[str, str, str], str]:
     """Load self-consistent Task 2 group states for read-only decomposition."""
     statuses: dict[tuple[str, str, str], tuple[str, str]] = {}
-    proof_root = Path(root) / "signature-drift-attestations"
+    proof_root = (Path(attestation_root) if attestation_root is not None
+                  else Path(root) / "signature-drift-attestations")
     if not proof_root.exists():
         return {}
     target = (str(current_identity.get("model_version") or ""),
@@ -81,8 +87,11 @@ def load_drift_group_statuses(root: Path, current_identity: dict) -> dict[tuple[
             status = report.get("status")
             if ((str(current.get("model_version") or ""),
                  str(current.get("probability_signature") or "")) != target
-                    or not isinstance(route, str) or not route
                     or status not in _DRIFT_STATUSES):
+                continue
+            if route is None and status == "UNREPLAYABLE":
+                route = ""
+            elif not isinstance(route, str) or not route:
                 continue
             key = (str(old.get("model_version") or ""),
                    str(old.get("probability_signature") or ""), route)
@@ -163,7 +172,12 @@ def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
     return rows, unreadable
 
 
-def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> dict:
+def build_report(
+    root: Path,
+    snapshot_policy: str = "latest_before_kickoff",
+    *,
+    attestation_root: Path | None = None,
+) -> dict:
     identity = build_identity()
     cur_mv = str(identity.get("model_version") or "unknown")
     cur_sig = str(identity.get("probability_signature") or "")
@@ -185,7 +199,11 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
                    str(a.get("probability_signature") or ""),
                    str(a.get("route") or "")) for a in aliases}
     alias_versions = sorted({mv for mv, _, _ in alias_keys})
-    drift_statuses = load_drift_group_statuses(root, identity)
+    drift_statuses = (load_drift_group_statuses(root, identity)
+                      if attestation_root is None else
+                      load_drift_group_statuses(
+                          root, identity, attestation_root=attestation_root,
+                      ))
     # 按当前 model_version 审计主库全量记录；签名另行分布，避免把漂移样本隐藏。
     main_current = [row for row in main_rows if row["model_version"] == cur_mv]
     main_signature_counts = {}
@@ -392,10 +410,13 @@ def build_direction_governance_report(
     *,
     release_lock_path: Path = DEFAULT_RELEASE_LOCK_PATH,
     recommendation_policy_path: Path = DEFAULT_RECOMMENDATION_POLICY_PATH,
+    attestation_root: Path | None = None,
 ) -> dict:
     """Build the combined read-only identity and direction-governance view."""
     root = Path(root)
-    progress = build_report(root, snapshot_policy)
+    progress = build_report(
+        root, snapshot_policy, attestation_root=attestation_root,
+    )
     identity = build_identity()
     rows, _ = load_prediction_rows(root)
     primary = select_primary_rows(rows, snapshot_policy)
@@ -500,8 +521,13 @@ def direction_governance_main(argv: list[str] | None = None) -> int:
     parser.add_argument("--snapshot-policy",
                         choices=("latest_before_kickoff", "prematch", "closing"),
                         default="latest_before_kickoff")
+    parser.add_argument("--attestation-root",
+                        help="正式库之外的只读签名漂移证明目录")
     args = parser.parse_args(argv)
-    report = build_direction_governance_report(Path(args.store), args.snapshot_policy)
+    report = build_direction_governance_report(
+        Path(args.store), args.snapshot_policy,
+        attestation_root=(Path(args.attestation_root) if args.attestation_root else None),
+    )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
@@ -555,11 +581,17 @@ def main() -> int:
     ap.add_argument("--store", default=str(backtest_store()))
     ap.add_argument("--snapshot-policy", choices=("latest_before_kickoff", "prematch", "closing"),
                     default="latest_before_kickoff")
+    ap.add_argument("--attestation-root",
+                    help="正式库之外的只读签名漂移证明目录")
     ap.add_argument("--json", action="store_true", help="输出 JSON 而非人读文本")
     ap.add_argument("--output", help="同时写入指定文件")
     a = ap.parse_args()
 
-    report = build_report(assert_writable_target(Path(a.store)), a.snapshot_policy)
+    report = build_report(
+        assert_writable_target(Path(a.store)),
+        a.snapshot_policy,
+        attestation_root=(Path(a.attestation_root) if a.attestation_root else None),
+    )
     text = json.dumps(report, ensure_ascii=False, indent=2) if a.json else render(report)
     print(text)
     if a.output:
