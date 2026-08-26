@@ -203,7 +203,8 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         bucket["signatures"][sig[:12]] = bucket["signatures"].get(sig[:12], 0) + 1
         is_raw_current = (row["model_version"] == cur_mv
                           and row["probability_signature"] == cur_sig)
-        matching_alias = next((alias for alias in aliases if alias_matches(row, alias)), None)
+        matching_alias = (None if is_raw_current else
+                          next((alias for alias in aliases if alias_matches(row, alias)), None))
         is_approved_alias = matching_alias is not None
         counts_as_current = is_raw_current or is_approved_alias
         state = status.get(row["match_id"])

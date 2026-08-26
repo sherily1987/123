@@ -89,6 +89,7 @@ def _identity_value(container: dict[str, Any], field: str) -> Any:
 
 def _record_identity(record: dict[str, Any]) -> dict[str, Any]:
     match = record.get("match") if isinstance(record.get("match"), dict) else {}
+    model = record.get("model") if isinstance(record.get("model"), dict) else {}
     return {
         "match_id": record.get("match_id"),
         "home": _identity_value(record, "home"),
@@ -96,6 +97,9 @@ def _record_identity(record: dict[str, Any]) -> dict[str, Any]:
         "competition": _identity_value(record, "competition"),
         "kickoff": record.get("kickoff") or match.get("kickoff"),
         "prediction_as_of": record.get("prediction_as_of"),
+        "model_version": model.get("model_version"),
+        "probability_signature": model.get("probability_signature"),
+        "route": registered_route(record),
     }
 
 
@@ -108,6 +112,7 @@ def _input_identity(payload: dict[str, Any]) -> dict[str, Any]:
         "competition": _identity_value(payload, "competition"),
         "kickoff": payload.get("kickoff") or payload.get("kickoff_at") or match.get("kickoff"),
         "prediction_as_of": payload.get("prediction_as_of"),
+        "route": registered_route(payload),
     }
 
 
@@ -135,33 +140,55 @@ def _late_evidence_time(value: Any, prediction_as_of: datetime | None) -> bool:
 
 
 def _time_audit(record: dict[str, Any], payload: dict[str, Any], route: str | None) -> dict:
-    if not route:
-        return {"usable": False, "reason": "registered_route_missing_or_inconsistent"}
     registered, stored = _record_identity(record), _input_identity(payload)
-    for field in ("match_id", "home", "away", "competition"):
-        if registered[field] in (None, "") or stored[field] in (None, ""):
-            return {"usable": False, "reason": f"{field}_missing"}
-        if str(registered[field]) != str(stored[field]):
-            reason = {"home": "home_team_mismatch", "away": "away_team_mismatch"}.get(
-                field, f"{field}_mismatch")
-            return {"usable": False, "reason": reason}
     registered_kickoff, stored_kickoff = (_parse_time(registered["kickoff"]),
                                           _parse_time(stored["kickoff"]))
-    if registered_kickoff is None or stored_kickoff is None:
-        return {"usable": False, "reason": "kickoff_missing_or_not_timezone_aware"}
-    if registered_kickoff != stored_kickoff:
-        return {"usable": False, "reason": "kickoff_mismatch"}
     registered_as_of, stored_as_of = (_parse_time(registered["prediction_as_of"]),
                                       _parse_time(stored["prediction_as_of"]))
+    evidence_after = (_late_evidence_time(payload, registered_as_of)
+                      if registered_as_of is not None else None)
+
+    def outcome(usable: bool, reason: str | None) -> dict:
+        return {
+            "usable": usable, "reason": reason,
+            "registered_prediction_as_of": registered["prediction_as_of"],
+            "input_prediction_as_of": stored["prediction_as_of"],
+            "registered_kickoff": registered["kickoff"],
+            "input_kickoff": stored["kickoff"],
+            "prediction_before_kickoff": (
+                registered_as_of < registered_kickoff
+                if registered_as_of is not None and registered_kickoff is not None else False
+            ),
+            "evidence_after_prediction_as_of": evidence_after,
+        }
+
+    if not route:
+        return outcome(False, "registered_route_missing_or_inconsistent")
+    if registered.get("route") != route:
+        return outcome(False, "registered_route_missing_or_inconsistent")
+    if stored.get("route") != route:
+        return outcome(False, "input_route_missing_or_inconsistent")
+    for field in ("match_id", "home", "away", "competition"):
+        if (not isinstance(registered[field], str) or not registered[field].strip()
+                or not isinstance(stored[field], str) or not stored[field].strip()):
+            return outcome(False, f"{field}_missing_or_not_string")
+        if registered[field] != stored[field]:
+            reason = {"home": "home_team_mismatch", "away": "away_team_mismatch"}.get(
+                field, f"{field}_mismatch")
+            return outcome(False, reason)
+    if registered_kickoff is None or stored_kickoff is None:
+        return outcome(False, "kickoff_missing_or_not_timezone_aware")
+    if registered_kickoff != stored_kickoff:
+        return outcome(False, "kickoff_mismatch")
     if registered_as_of is None or stored_as_of is None:
-        return {"usable": False, "reason": "prediction_as_of_missing_or_not_timezone_aware"}
+        return outcome(False, "prediction_as_of_missing_or_not_timezone_aware")
     if registered_as_of != stored_as_of:
-        return {"usable": False, "reason": "prediction_as_of_mismatch"}
+        return outcome(False, "prediction_as_of_mismatch")
     if registered_as_of >= registered_kickoff:
-        return {"usable": False, "reason": "prediction_as_of_not_before_kickoff"}
-    if _late_evidence_time(payload, registered_as_of):
-        return {"usable": False, "reason": "evidence_after_prediction_as_of"}
-    return {"usable": True, "reason": None}
+        return outcome(False, "prediction_as_of_not_before_kickoff")
+    if evidence_after:
+        return outcome(False, "evidence_after_prediction_as_of")
+    return outcome(True, None)
 
 
 def _formal_output(value: dict[str, Any]) -> dict[str, Any]:
@@ -219,28 +246,35 @@ def replay_one(record: dict[str, Any]) -> dict:
     route = registered_route(record)
     prediction_as_of = record.get("prediction_as_of")
     signature = (record.get("model") or {}).get("probability_signature")
+    registered_identity = _record_identity(record)
+    input_identity = _input_identity(payload) if isinstance(payload, dict) else None
+
+    def evidence(status: str, input_sha256: str | None, diffs: dict,
+                 time_audit: dict) -> dict:
+        return {
+            "match_id": match_id, "status": status, "route": route,
+            "prediction_as_of": prediction_as_of, "input_sha256": input_sha256,
+            "diffs": diffs, "registered_identity": registered_identity,
+            "input_identity": input_identity, "time_audit": time_audit,
+        }
+
     if not is_complete_signature(signature):
         input_sha256 = (hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
                         if isinstance(payload, dict) else None)
-        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
-                "prediction_as_of": prediction_as_of, "input_sha256": input_sha256, "diffs": {},
-                "time_audit": {"usable": False, "reason": "probability_signature_invalid"}}
+        return evidence("UNREPLAYABLE", input_sha256, {},
+                        {"usable": False, "reason": "probability_signature_invalid"})
     if not isinstance(payload, dict):
-        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
-                "prediction_as_of": prediction_as_of, "input_sha256": None, "diffs": {},
-                "time_audit": {"usable": False, "reason": "registered_input_missing"}}
+        return evidence("UNREPLAYABLE", None, {},
+                        {"usable": False, "reason": "registered_input_missing"})
     input_sha256 = hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
     time_audit = _time_audit(record, payload, route)
     if not time_audit["usable"]:
-        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
-                "prediction_as_of": prediction_as_of, "input_sha256": input_sha256, "diffs": {},
-                "time_audit": time_audit}
+        return evidence("UNREPLAYABLE", input_sha256, {}, time_audit)
     try:
         fresh = _formal_output(_run_replay(payload))
     except Exception as exc:
-        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
-                "prediction_as_of": prediction_as_of, "input_sha256": input_sha256, "diffs": {},
-                "time_audit": {"usable": False, "reason": f"replay_failed:{exc}"}}
+        failed_audit = dict(time_audit, usable=False, reason=f"replay_failed:{exc}")
+        return evidence("UNREPLAYABLE", input_sha256, {}, failed_audit)
     recorded = _formal_output(record.get("output") or {})
     diffs = {}
     for field in COMPARE_FIELDS:
@@ -252,9 +286,7 @@ def replay_one(record: dict[str, Any]) -> dict:
         if differences:
             diffs[field] = {"recorded": recorded[field], "replayed": fresh[field],
                             "differences": differences}
-    return {"match_id": match_id, "status": "differs" if diffs else "identical",
-            "route": route, "prediction_as_of": prediction_as_of,
-            "input_sha256": input_sha256, "diffs": diffs, "time_audit": time_audit}
+    return evidence("differs" if diffs else "identical", input_sha256, diffs, time_audit)
 
 
 def build_report(root: Path, model_version: str, limit: int = 0) -> dict:

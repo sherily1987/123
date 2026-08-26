@@ -47,6 +47,18 @@ def _canonical_json(value: Any) -> str:
                       separators=(",", ":"), allow_nan=False)
 
 
+def _parse_aware_time(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
 def validate_grouped_alias_attestation(
     report: dict[str, Any], *, current_identity: dict[str, Any]
 ) -> dict[str, Any]:
@@ -79,6 +91,8 @@ def validate_grouped_alias_attestation(
         raise ReleaseGovernanceError("目标概率签名不是完整 SHA256")
     if _identity_pair(target_identity) != _identity_pair(current_identity):
         raise ReleaseGovernanceError("证明目标身份与当前发布锁不一致")
+    if _identity_pair(old_identity) == _identity_pair(target_identity):
+        raise ReleaseGovernanceError("旧身份与当前目标为相同身份，不得建立别名")
 
     route = report.get("route")
     if not isinstance(route, str) or not route.strip() or route != route.strip():
@@ -87,6 +101,9 @@ def validate_grouped_alias_attestation(
     if (not isinstance(fields, list) or len(fields) != len(REQUIRED_REPLAY_FIELDS)
             or set(fields) != set(REQUIRED_REPLAY_FIELDS)):
         raise ReleaseGovernanceError("证明比较字段不是完整必需九字段")
+    tolerance = report.get("float_tolerance")
+    if type(tolerance) is not float or tolerance != 1e-10:
+        raise ReleaseGovernanceError("证明浮点容差必须精确为 1e-10")
 
     record_count = report.get("record_count")
     results = report.get("results")
@@ -106,6 +123,54 @@ def validate_grouped_alias_attestation(
             raise ReleaseGovernanceError("逐场时间审计未通过")
         if result.get("diffs") not in ({}, None):
             raise ReleaseGovernanceError("完全一致记录仍包含差异")
+
+        registered = result.get("registered_identity")
+        stored_input = result.get("input_identity")
+        if not isinstance(registered, dict) or not isinstance(stored_input, dict):
+            raise ReleaseGovernanceError("逐场证明缺少完整记录身份或输入身份")
+        for field in ("match_id", "home", "away", "competition"):
+            registered_value = registered.get(field)
+            input_value = stored_input.get(field)
+            if (not isinstance(registered_value, str) or not registered_value.strip()
+                    or not isinstance(input_value, str) or not input_value.strip()):
+                raise ReleaseGovernanceError(f"逐场身份字段不完整：{field}")
+            if registered_value != input_value:
+                raise ReleaseGovernanceError(f"逐场记录身份与输入身份不一致：{field}")
+        if (registered.get("model_version") != old_model_version
+                or registered.get("probability_signature")
+                != old_identity.get("probability_signature")):
+            raise ReleaseGovernanceError("逐场模型版本或概率签名与证明组身份不一致")
+        if registered.get("route") != route or stored_input.get("route") != route:
+            raise ReleaseGovernanceError("逐场记录/输入路由与证明组路由不一致")
+        if (result.get("match_id") != registered.get("match_id")
+                or result.get("prediction_as_of") != registered.get("prediction_as_of")):
+            raise ReleaseGovernanceError("逐场结果顶层身份与不可变记录身份不一致")
+
+        registered_as_of = _parse_aware_time(registered.get("prediction_as_of"))
+        input_as_of = _parse_aware_time(stored_input.get("prediction_as_of"))
+        registered_kickoff = _parse_aware_time(registered.get("kickoff"))
+        input_kickoff = _parse_aware_time(stored_input.get("kickoff"))
+        if None in (registered_as_of, input_as_of, registered_kickoff, input_kickoff):
+            raise ReleaseGovernanceError("逐场时间身份缺失、不可解析或不含时区")
+        if registered_as_of != input_as_of or registered_kickoff != input_kickoff:
+            raise ReleaseGovernanceError("逐场记录时间与输入时间不一致")
+        if registered_as_of >= registered_kickoff:
+            raise ReleaseGovernanceError("逐场 prediction_as_of 不严格早于 kickoff，非赛前证明")
+
+        audit = result.get("time_audit")
+        if not isinstance(audit, dict):
+            raise ReleaseGovernanceError("逐场时间审计缺失")
+        expected_audit_times = {
+            "registered_prediction_as_of": registered.get("prediction_as_of"),
+            "input_prediction_as_of": stored_input.get("prediction_as_of"),
+            "registered_kickoff": registered.get("kickoff"),
+            "input_kickoff": stored_input.get("kickoff"),
+        }
+        if (audit.get("usable") is not True or audit.get("reason") is not None
+                or any(audit.get(key) != value for key, value in expected_audit_times.items())
+                or audit.get("prediction_before_kickoff") is not True
+                or audit.get("evidence_after_prediction_as_of") is not False):
+            raise ReleaseGovernanceError("逐场时间审计字段与实际时间关系不一致")
 
     hash_input = report.get("report_hash_input")
     expected_hash_input = {key: value for key, value in report.items() if key not in {

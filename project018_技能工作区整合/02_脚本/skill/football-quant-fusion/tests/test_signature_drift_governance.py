@@ -48,6 +48,8 @@ def record(match_id: str, *, route: str = "market_only", input_ok: bool = True) 
 
 
 def identical_result(row: dict) -> dict:
+    registered_identity = replay_check._record_identity(row)
+    input_identity = replay_check._input_identity(row["input"])
     return {
         "match_id": row["match_id"],
         "status": "identical",
@@ -55,7 +57,17 @@ def identical_result(row: dict) -> dict:
         "prediction_as_of": row["prediction_as_of"],
         "input_sha256": "1" * 64,
         "diffs": {},
-        "time_audit": {"usable": True, "reason": None},
+        "registered_identity": registered_identity,
+        "input_identity": input_identity,
+        "time_audit": {
+            "usable": True, "reason": None,
+            "registered_prediction_as_of": registered_identity["prediction_as_of"],
+            "input_prediction_as_of": input_identity["prediction_as_of"],
+            "registered_kickoff": registered_identity["kickoff"],
+            "input_kickoff": input_identity["kickoff"],
+            "prediction_before_kickoff": True,
+            "evidence_after_prediction_as_of": False,
+        },
     }
 
 
@@ -180,6 +192,29 @@ def test_replay_accepts_floats_only_within_fixed_tolerance(monkeypatch):
     assert result["diffs"] == {}
 
 
+def test_replay_proof_carries_immutable_record_input_identity_and_auditable_times(monkeypatch):
+    row = record("m-1")
+    row["output"] = {name: 1.0 for name in FIELDS}
+    monkeypatch.setattr(replay_check, "_run_replay", lambda _payload: dict(row["output"]))
+
+    result = replay_check.replay_one(row)
+
+    assert result["registered_identity"] == {
+        "match_id": "m-1", "home": "Home", "away": "Away",
+        "competition": "League", "kickoff": "2026-09-01T12:00:00Z",
+        "prediction_as_of": "2026-09-01T10:00:00Z",
+        "model_version": "m4", "probability_signature": OLD_SIG,
+        "route": "market_only",
+    }
+    assert result["input_identity"] == {
+        "match_id": "m-1", "home": "Home", "away": "Away",
+        "competition": "League", "kickoff": "2026-09-01T12:00:00Z",
+        "prediction_as_of": "2026-09-01T10:00:00Z", "route": "market_only",
+    }
+    assert result["time_audit"]["prediction_before_kickoff"] is True
+    assert result["time_audit"]["evidence_after_prediction_as_of"] is False
+
+
 def test_replay_rejects_evidence_collected_after_prediction_as_of(monkeypatch):
     row = record("m-1")
     row["input"]["field_meta"] = {
@@ -204,6 +239,28 @@ def test_replay_rejects_registered_team_identity_that_disagrees_with_input(monke
 
     assert result["status"] == "UNREPLAYABLE"
     assert result["time_audit"]["reason"] == "home_team_mismatch"
+
+
+def test_replay_requires_input_identity_to_carry_the_exact_registered_route(monkeypatch):
+    row = record("m-1")
+    row["input"].pop("mode")
+    monkeypatch.setattr(replay_check, "_run_replay", lambda _payload: pytest.fail("must not replay"))
+
+    result = replay_check.replay_one(row)
+
+    assert result["status"] == "UNREPLAYABLE"
+    assert result["time_audit"]["reason"] == "input_route_missing_or_inconsistent"
+
+
+def test_group_without_string_model_version_is_unreplayable_without_replay(monkeypatch):
+    row = record("m-1")
+    row["model"]["model_version"] = None
+    monkeypatch.setattr(governance, "replay_one", lambda _row: pytest.fail("must not replay"))
+
+    report = governance.evaluate_group([row], current_identity=CURRENT)
+
+    assert report["status"] == "UNREPLAYABLE"
+    assert report["results"][0]["time_audit"]["reason"] == "model_version_invalid"
 
 
 @pytest.mark.parametrize(

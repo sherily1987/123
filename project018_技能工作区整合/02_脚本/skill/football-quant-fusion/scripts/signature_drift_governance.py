@@ -83,7 +83,18 @@ def evaluate_group(records: list[dict], *, current_identity: dict) -> dict:
         actual_key = (actual_identity[0], _signature_group_key(actual_identity[1]),
                       registered_route(record) or "")
         record_signature_valid = is_complete_signature(actual_identity[1])
-        if not record_signature_valid:
+        raw_model_version = ((record.get("model") or {}).get("model_version")
+                             if isinstance(record.get("model") or {}, dict) else None)
+        if (not isinstance(raw_model_version, str) or not raw_model_version.strip()
+                or raw_model_version != raw_model_version.strip()):
+            result = {
+                "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
+                "route": actual_key[2] or None,
+                "prediction_as_of": record.get("prediction_as_of"), "input_sha256": None,
+                "diffs": {},
+                "time_audit": {"usable": False, "reason": "model_version_invalid"},
+            }
+        elif not record_signature_valid:
             result = {
                 "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
                 "route": actual_key[2] or None,

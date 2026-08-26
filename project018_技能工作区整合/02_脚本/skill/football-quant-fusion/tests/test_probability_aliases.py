@@ -54,6 +54,7 @@ def _write_attestation(
     target_signature: str = CURRENT_SIG,
     old_model_version: object = "m4",
     target_model_version: object = "m4",
+    tolerance: object = 1e-10,
 ) -> None:
     results = [
         {
@@ -63,7 +64,27 @@ def _write_attestation(
             "prediction_as_of": "2026-08-25T01:00:00+00:00",
             "input_sha256": hashlib.sha256(f"input-{index}".encode()).hexdigest(),
             "diffs": {},
-            "time_audit": {"usable": True},
+            "registered_identity": {
+                "match_id": f"match-{index}", "home": "Home", "away": "Away",
+                "competition": "League", "kickoff": "2026-08-25T03:00:00+00:00",
+                "prediction_as_of": "2026-08-25T01:00:00+00:00",
+                "model_version": old_model_version,
+                "probability_signature": old_signature, "route": route,
+            },
+            "input_identity": {
+                "match_id": f"match-{index}", "home": "Home", "away": "Away",
+                "competition": "League", "kickoff": "2026-08-25T03:00:00+00:00",
+                "prediction_as_of": "2026-08-25T01:00:00+00:00", "route": route,
+            },
+            "time_audit": {
+                "usable": True, "reason": None,
+                "registered_prediction_as_of": "2026-08-25T01:00:00+00:00",
+                "input_prediction_as_of": "2026-08-25T01:00:00+00:00",
+                "registered_kickoff": "2026-08-25T03:00:00+00:00",
+                "input_kickoff": "2026-08-25T03:00:00+00:00",
+                "prediction_before_kickoff": True,
+                "evidence_after_prediction_as_of": False,
+            },
         }
         for index, result_status in enumerate(result_statuses, start=1)
     ]
@@ -79,7 +100,7 @@ def _write_attestation(
             "probability_signature": target_signature,
         },
         "compare_fields": fields if fields is not None else REQUIRED_FIELDS,
-        "float_tolerance": 1e-10,
+        "float_tolerance": tolerance,
         "record_count": len(results),
         "results": results,
         "status": status,
@@ -136,6 +157,34 @@ def test_alias_rejected_after_current_release_lock_changes(tmp_path):
     _, _, alias_file, lock_file = _approve(tmp_path)
 
     _write_lock(lock_file, signature="c" * 64)
+
+    assert aliases.load_approved_aliases(alias_file, lock_file) == []
+
+
+def test_load_revalidates_tolerance_even_if_proof_and_outer_hash_are_recomputed(tmp_path):
+    _, report, alias_file, lock_file = _approve(tmp_path)
+    payload = json.loads(report.read_text(encoding="utf-8"))
+    payload["float_tolerance"] = True
+    hash_input = {key: value for key, value in payload.items() if key not in {
+        "generated_at", "report_sha256", "report_hash_input", "attestation_path",
+    }}
+    payload["report_hash_input"] = hash_input
+    payload["report_sha256"] = hashlib.sha256(
+        json.dumps(hash_input, ensure_ascii=False, sort_keys=True,
+                   separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    report.write_text(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    alias_document = json.loads(alias_file.read_text(encoding="utf-8"))
+    alias_document["aliases"][0]["attestation_sha256"] = hashlib.sha256(
+        report.read_bytes()
+    ).hexdigest()
+    alias_file.write_text(
+        json.dumps(alias_document, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     assert aliases.load_approved_aliases(alias_file, lock_file) == []
 

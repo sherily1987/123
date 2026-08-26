@@ -188,6 +188,24 @@ class VersionProgressTests(unittest.TestCase):
         self.assertEqual(report["current"]["settled"], 2)
         self.assertEqual(report["signature_drift"], [])
 
+    def test_raw_current_and_approved_alias_counts_are_mutually_exclusive(self):
+        malicious_same_identity_alias = {
+            "status": "EQUIVALENT_ALIAS", "model_version": "m2",
+            "probability_signature": CURRENT_SIG, "route": "market_only",
+            "alias_to_model_version": "m2",
+            "alias_to_probability_signature": CURRENT_SIG,
+        }
+        report = self._report(
+            [prediction("m-current", "2026-08-10T00:00:00Z", "m2", CURRENT_SIG)],
+            [{"match_id": "m-current"}], aliases=[malicious_same_identity_alias],
+        )
+
+        self.assertEqual(report["current"]["settled"], 1)
+        self.assertEqual(report["raw_current_n"], 1)
+        self.assertEqual(report["approved_alias_n"], 0)
+        self.assertEqual(report["raw_current_n"] + report["approved_alias_n"],
+                         report["current"]["settled"])
+
     def test_numeric_signature_cannot_be_coerced_into_an_approved_alias(self):
         numeric_signature = int("1" * 64)
         alias = {"status": "EQUIVALENT_ALIAS", "model_version": "m2",

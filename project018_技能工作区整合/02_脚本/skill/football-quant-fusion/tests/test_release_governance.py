@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import subprocess
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -54,6 +56,127 @@ def _validate(report):
         previous_lock=_identity(OLD_SIG),
         current_identity=_identity(),
     )
+
+
+def _group_attestation(*, tolerance=1e-10, old_signature=OLD_SIG):
+    registered_identity = {
+        "match_id": "match-1", "home": "Home", "away": "Away",
+        "competition": "League", "kickoff": "2026-09-01T12:00:00Z",
+        "prediction_as_of": "2026-09-01T10:00:00Z",
+        "model_version": "m4", "probability_signature": old_signature,
+        "route": "market_only",
+    }
+    input_identity = {
+        "match_id": "match-1", "home": "Home", "away": "Away",
+        "competition": "League", "kickoff": "2026-09-01T12:00:00Z",
+        "prediction_as_of": "2026-09-01T10:00:00Z", "route": "market_only",
+    }
+    result = {
+        "match_id": "match-1", "status": "identical", "route": "market_only",
+        "prediction_as_of": "2026-09-01T10:00:00Z",
+        "input_sha256": "c" * 64, "diffs": {},
+        "registered_identity": registered_identity, "input_identity": input_identity,
+        "time_audit": {
+            "usable": True, "reason": None,
+            "registered_prediction_as_of": "2026-09-01T10:00:00Z",
+            "input_prediction_as_of": "2026-09-01T10:00:00Z",
+            "registered_kickoff": "2026-09-01T12:00:00Z",
+            "input_kickoff": "2026-09-01T12:00:00Z",
+            "prediction_before_kickoff": True,
+            "evidence_after_prediction_as_of": False,
+        },
+    }
+    core = {
+        "schema_version": "signature-drift-attestation-1.0",
+        "old_identity": {"model_version": "m4", "probability_signature": old_signature},
+        "route": "market_only", "current_identity": _identity(),
+        "compare_fields": list(governance.REQUIRED_REPLAY_FIELDS),
+        "float_tolerance": tolerance, "record_count": 1, "results": [result],
+        "status": "PENDING_REVIEW", "alias_eligible": False,
+    }
+    report = dict(core, report_hash_input=core)
+    report["report_sha256"] = hashlib.sha256(
+        json.dumps(core, ensure_ascii=False, sort_keys=True,
+                   separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return report
+
+
+def _validate_group(report):
+    return governance.validate_grouped_alias_attestation(
+        report, current_identity=_identity())
+
+
+def _rehash_group(report):
+    core = {key: value for key, value in report.items() if key not in {
+        "generated_at", "report_sha256", "report_hash_input", "attestation_path",
+    }}
+    report["report_hash_input"] = core
+    report["report_sha256"] = hashlib.sha256(
+        json.dumps(core, ensure_ascii=False, sort_keys=True,
+                   separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return report
+
+
+def test_grouped_alias_attestation_accepts_complete_identity_and_time_proof():
+    validated = _validate_group(_group_attestation())
+
+    assert validated["route"] == "market_only"
+    assert validated["probability_signature"] == OLD_SIG
+
+
+@pytest.mark.parametrize("tolerance", [True, "1e-10", None, 0, 1e-9])
+def test_grouped_alias_attestation_requires_exact_float_tolerance(tolerance):
+    with pytest.raises(governance.ReleaseGovernanceError, match="容差"):
+        _validate_group(_group_attestation(tolerance=tolerance))
+
+
+@pytest.mark.parametrize(
+    ("section", "field", "value"),
+    [
+        ("registered_identity", "home", None),
+        ("registered_identity", "probability_signature", "d" * 64),
+        ("input_identity", "match_id", "different-match"),
+        ("input_identity", "route", "hybrid"),
+        ("registered_identity", "prediction_as_of", "2026-09-01T10:00:00"),
+        ("input_identity", "kickoff", "2026-09-01T09:00:00Z"),
+    ],
+)
+def test_grouped_alias_attestation_rechecks_immutable_record_and_input_identity(
+    section, field, value
+):
+    report = deepcopy(_group_attestation())
+    report["results"][0][section][field] = value
+    _rehash_group(report)
+
+    with pytest.raises(governance.ReleaseGovernanceError, match="身份|签名|路由|时间|赛前"):
+        _validate_group(report)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("registered_prediction_as_of", "2026-09-01T09:59:00Z"),
+        ("input_kickoff", "2026-09-01T13:00:00Z"),
+        ("prediction_before_kickoff", False),
+        ("evidence_after_prediction_as_of", True),
+    ],
+)
+def test_grouped_alias_attestation_recomputes_time_audit_instead_of_trusting_usable(
+    field, value
+):
+    report = deepcopy(_group_attestation())
+    report["results"][0]["time_audit"][field] = value
+    _rehash_group(report)
+
+    with pytest.raises(governance.ReleaseGovernanceError, match="时间审计"):
+        _validate_group(report)
+
+
+def test_grouped_alias_attestation_rejects_same_identity_alias():
+    with pytest.raises(governance.ReleaseGovernanceError, match="相同身份"):
+        _validate_group(_group_attestation(old_signature=CURRENT_SIG))
 
 
 def test_same_version_signature_transition_requires_complete_equivalent_attestation(tmp_path):
