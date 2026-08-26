@@ -537,28 +537,32 @@ def main() -> None:
     # written to the due manifest / late-info evidence.
     resolve_api_sports_fixture_ids(matches, fetch_api_sports_fixtures)
     due_path = work / "late_info_due.json"
-    due = write_due(due_path, matches, args.snapshot)
+    batch_now = _utc_now()
+    due = write_due(due_path, matches, args.snapshot, now_utc=batch_now)
 
     collected = []
     for rec in matches:
+        kickoff = kickoff_of(rec)
         collected.extend(collect_one(
             rec, args.snapshot, want_injury=True,
-            want_lineup=in_collection_window(kickoff_of(rec)),
-            events_path=events_path))
+            want_lineup=in_collection_window(kickoff, batch_now),
+            events_path=events_path, now_utc=batch_now))
         time.sleep(0.4)
 
     if args.watch and not args.once:
-        pending = [rec for rec in matches if kickoff_of(rec) and kickoff_of(rec) > now_utc()]
+        pending = [rec for rec in matches if kickoff_of(rec) and kickoff_of(rec) > batch_now]
         while pending:
             time.sleep(max(5, args.poll_seconds))
+            poll_now = _utc_now()
             still = []
             for rec in pending:
                 kickoff = kickoff_of(rec)
-                if kickoff is None or now_utc() >= kickoff:
+                if kickoff is None or poll_now >= kickoff:
                     continue
-                if in_collection_window(kickoff):
+                if in_collection_window(kickoff, poll_now):
                     rows = collect_one(
-                        rec, "prematch_poll", want_injury=True, want_lineup=True, events_path=events_path)
+                        rec, "prematch_poll", want_injury=True, want_lineup=True,
+                        events_path=events_path, now_utc=poll_now)
                     collected.extend(rows)
                     if should_retry_lineup(rows):
                         still.append(rec)

@@ -223,6 +223,50 @@ def test_main_resolves_api_sports_identity_before_writing_due(tmp_path: Path, mo
     assert due["matches"][0]["api_sports_fixture_id"] == 1550089
 
 
+def test_main_reuses_one_clock_for_each_batch_and_poll_iteration(tmp_path: Path, monkeypatch):
+    """Near kickoff, due scheduling and collection must agree on the same instant."""
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps({"matches": [{
+        "sporttery_meta": {"match_id": 2041028}, "home": "博洛尼亚", "away": "拉齐奥",
+        "kickoff": "2026-08-25T00:30:00+08:00",
+    }]}), encoding="utf-8")
+    batch_now = datetime(2026, 8, 24, 16, 0, tzinfo=UTC)
+    poll_now = datetime(2026, 8, 24, 16, 15, tzinfo=UTC)
+    clocks = iter((batch_now, poll_now))
+    seen = {"windows": [], "collections": []}
+
+    monkeypatch.setattr(mod, "_utc_now", lambda _value=None: next(clocks))
+    monkeypatch.setattr(mod, "resolve_api_sports_fixture_ids", lambda *_args: {})
+    monkeypatch.setattr(mod, "time", type("Clock", (), {"sleep": staticmethod(lambda _seconds: None)}))
+
+    def write_due(path, matches, snapshot, *, now_utc):
+        seen["due"] = now_utc
+        return [{}]
+
+    def in_window(kickoff, at=None, window=mod.INITIAL_REFRESH_MINUTES):
+        seen["windows"].append(at)
+        return True
+
+    def collect_one(*_args, now_utc, **_kwargs):
+        seen["collections"].append(now_utc)
+        return [{"kind": "lineup", "status": "VALID"}]
+
+    monkeypatch.setattr(mod, "write_due", write_due)
+    monkeypatch.setattr(mod, "in_collection_window", in_window)
+    monkeypatch.setattr(mod, "collect_one", collect_one)
+    monkeypatch.setattr(mod, "should_retry_lineup", lambda _rows: False)
+    monkeypatch.setattr(sys, "argv", [
+        "collect_late_info.py", "--from-collect", str(source), "--work-dir", str(tmp_path),
+        "--events", str(tmp_path / "events.jsonl"), "--watch", "--poll-seconds", "0",
+    ])
+
+    mod.main()
+
+    assert seen["due"] is batch_now
+    assert seen["windows"] == [batch_now, poll_now]
+    assert seen["collections"] == [batch_now, poll_now]
+
+
 def test_t75_lineup_uses_api_sports_fixture_identity(tmp_path: Path, monkeypatch):
     now = datetime(2026, 8, 24, 16, 0, tzinfo=UTC)
     rec = {
