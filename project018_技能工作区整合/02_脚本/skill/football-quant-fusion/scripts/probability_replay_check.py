@@ -1,35 +1,20 @@
 #!/usr/bin/env python3
-"""重放旧版本样本，判定它与当前概率代码是否**数值等价**。
+"""Replay registered predictions and compare every formal probability output.
 
-为什么需要这个脚本
-------------------
-`probability_signature` 是概率文件的**字节哈希**。只要 `production_router.py` 之类的
-文件动了一个字节，签名就变，`audit_version_consistency.py` 就会要求 bump `model_version`，
-于是样本累积清零——这正是 `40_模型/模型版本管理_打破current死锁.md` 声称要打破的死锁，
-只是范围从「全部源文件」缩小到了「概率文件名单」，机制本身没变。
-
-2026-08-15 实测踩到一次：m1→m2 的 bump 由影子路由与签名拆分触发，生产 market_only
-路由的概率**一位没变**，却让 34 场在途样本落进一个不会再增长的队列。
-
-本脚本提供字节哈希给不出的那个答案：**概率到底变没变**。做法是取旧样本登记时保存的
-`input`，用当前代码重跑，与登记的 `output.final_1x2_pct` 逐场比对。
-
-判定与用法
-----------
-- `equivalent`：全部场次概率完全一致 → 该旧版本的样本可以在 manifest 里登记为
-  `model_version_aliases`，并入当前 cohort，不必从零累积；
-- `changed`：存在差异 → 旧样本不得并入，必须重新累积（与 1466 场 legacy 同样处理）。
-
-**等价判定只覆盖被重放的路由与市场**。只跑了 market_only 就只能对 market_only 下结论，
-不能外推到 hybrid 或其他衍生市场；报告里的 `replayed_modes` 就是这个边界。
+This module only produces per-record evidence. Grouping, proof files, and any
+later human approval live in ``signature_drift_governance`` so a replay cannot
+silently alter a cohort or alias configuration.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from fusion_backtest import load_jsonl, resolve_path
 from fusion_predict_core import build_identity
@@ -38,52 +23,214 @@ from runtime_paths import backtest_store
 
 HERE = Path(__file__).resolve().parent
 PY = resolve_python()
-# 生产主概率 + 已有衍生市场概率/排序；只比较实际存在的字段，避免旧样本因
-# 新增纯展示字段被误判为变化。HAFU/TTG/CRS 的状态与概率一并纳入重放边界。
+
+# This is a governance contract, not a best-effort display list. Missing formal
+# output is a difference and must never be silently defaulted.
 COMPARE_FIELDS = (
-    "final_1x2_pct", "model_1x2_pct", "ou_2_5", "ou_3_5", "btts",
-    "hafu_model", "ttg_score_consistency", "top_scores", "score_matrix",
+    "final_1x2_pct", "model_1x2_pct", "score_matrix", "top_scores",
+    "ou_2_5", "ou_3_5", "btts", "hafu_model", "ttg_score_consistency",
 )
+FLOAT_TOLERANCE = 1e-10
 
 
-def replay_one(record: dict) -> dict:
-    """重跑单条记录的 input，返回比对结果。"""
-    match_id = record.get("match_id")
-    recorded = record.get("output") or {}
-    payload = record.get("input")
-    if not payload:
-        return {"match_id": match_id, "status": "no_input"}
+def canonical_json(value: Any) -> str:
+    """Stable JSON used for immutable replay-input hashes."""
+    return json.dumps(value, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":"), allow_nan=False)
 
+
+def _parse_time(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+def registered_route(record: dict[str, Any]) -> str | None:
+    """Read route only from the registered snapshot, never a current replay."""
+    candidates = []
+    for container in (record, record.get("model") or {}, record.get("input") or {}):
+        if isinstance(container, dict):
+            value = container.get("route") or container.get("mode")
+            if value not in (None, ""):
+                candidates.append(str(value).strip())
+    if not candidates or not candidates[0]:
+        return None
+    return candidates[0] if all(value == candidates[0] for value in candidates) else None
+
+
+def _recorded_kickoff(record: dict[str, Any], payload: dict[str, Any]) -> Any:
+    match = record.get("match") if isinstance(record.get("match"), dict) else {}
+    payload_match = payload.get("match") if isinstance(payload.get("match"), dict) else {}
+    return (record.get("kickoff") or match.get("kickoff") or payload.get("kickoff")
+            or payload.get("kickoff_at") or payload_match.get("kickoff"))
+
+
+def _identity_value(container: dict[str, Any], field: str) -> Any:
+    match = container.get("match") if isinstance(container.get("match"), dict) else {}
+    aliases = {
+        "home": ("home", "home_team"),
+        "away": ("away", "away_team"),
+        "competition": ("competition", "league", "stage"),
+    }
+    for key in aliases[field]:
+        if container.get(key) not in (None, ""):
+            return container[key]
+        if match.get(key) not in (None, ""):
+            return match[key]
+    return None
+
+
+_EVIDENCE_TIME_KEYS = frozenset({
+    "as_of", "collected_at", "created_at", "observed_at", "refreshed_at",
+    "timestamp", "updated_at",
+})
+
+
+def _late_evidence_time(value: Any, prediction_as_of: datetime | None) -> bool:
+    """Detect time-stamped input evidence that was not available at prediction time."""
+    if prediction_as_of is None:
+        return False
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key in _EVIDENCE_TIME_KEYS:
+                observed = _parse_time(child)
+                if observed is not None and observed > prediction_as_of:
+                    return True
+            if _late_evidence_time(child, prediction_as_of):
+                return True
+    elif isinstance(value, list):
+        return any(_late_evidence_time(item, prediction_as_of) for item in value)
+    return False
+
+
+def _time_audit(record: dict[str, Any], payload: dict[str, Any], route: str | None) -> dict:
+    prediction_as_of = record.get("prediction_as_of") or payload.get("prediction_as_of")
+    as_of = _parse_time(prediction_as_of)
+    kickoff = _parse_time(_recorded_kickoff(record, payload))
+    if not route:
+        return {"usable": False, "reason": "registered_route_missing_or_inconsistent"}
+    if as_of is None:
+        return {"usable": False, "reason": "prediction_as_of_missing_or_not_timezone_aware"}
+    if kickoff is None:
+        return {"usable": False, "reason": "kickoff_missing_or_not_timezone_aware"}
+    if as_of >= kickoff:
+        return {"usable": False, "reason": "prediction_as_of_not_before_kickoff"}
+    registered_id = record.get("match_id")
+    payload_id = payload.get("match_id")
+    if registered_id and payload_id and str(registered_id) != str(payload_id):
+        return {"usable": False, "reason": "match_id_mismatch"}
+    if not registered_id or not payload_id:
+        return {"usable": False, "reason": "match_id_missing"}
+    for field, reason in (("home", "home_team_mismatch"), ("away", "away_team_mismatch"),
+                          ("competition", "competition_mismatch")):
+        registered_value = _identity_value(record, field)
+        input_value = _identity_value(payload, field)
+        if (registered_value not in (None, "") and input_value not in (None, "")
+                and str(registered_value) != str(input_value)):
+            return {"usable": False, "reason": reason}
+    input_kickoff = _parse_time(_recorded_kickoff({}, payload))
+    if input_kickoff is not None and input_kickoff != kickoff:
+        return {"usable": False, "reason": "kickoff_mismatch"}
+    if _late_evidence_time(payload, as_of):
+        return {"usable": False, "reason": "evidence_after_prediction_as_of"}
+    return {"usable": True, "reason": None}
+
+
+def _formal_output(value: dict[str, Any]) -> dict[str, Any]:
+    nested = value.get("core_output") if isinstance(value, dict) else None
+    return nested if isinstance(nested, dict) else value
+
+
+def _normalised_difference(before: Any, after: Any, path: str = "$") -> list[dict]:
+    """Compare recursively; tolerance never erases type or array-shape drift."""
+    if type(before) is not type(after):
+        return [{"path": path, "reason": "type", "recorded": before, "replayed": after}]
+    if isinstance(before, float):
+        if abs(before - after) <= FLOAT_TOLERANCE:
+            return []
+        return [{"path": path, "reason": "numeric", "recorded": before, "replayed": after}]
+    if isinstance(before, dict):
+        differences = []
+        before_keys, after_keys = set(before), set(after)
+        for key in sorted(before_keys - after_keys):
+            differences.append({"path": f"{path}.{key}", "reason": "missing_replayed",
+                                "recorded": before[key], "replayed": None})
+        for key in sorted(after_keys - before_keys):
+            differences.append({"path": f"{path}.{key}", "reason": "missing_recorded",
+                                "recorded": None, "replayed": after[key]})
+        for key in sorted(before_keys & after_keys):
+            differences.extend(_normalised_difference(before[key], after[key], f"{path}.{key}"))
+        return differences
+    if isinstance(before, list):
+        if len(before) != len(after):
+            return [{"path": path, "reason": "array_length", "recorded": before, "replayed": after}]
+        return [diff for index, (left, right) in enumerate(zip(before, after))
+                for diff in _normalised_difference(left, right, f"{path}[{index}]")]
+    if before != after:
+        return [{"path": path, "reason": "value", "recorded": before, "replayed": after}]
+    return []
+
+
+def _run_replay(payload: dict[str, Any]) -> dict[str, Any]:
+    """Run current prediction code against the registered input."""
     with tempfile.TemporaryDirectory() as tmp:
-        in_path = Path(tmp) / "input.json"
-        out_path = Path(tmp) / "output.json"
-        in_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        in_path, out_path = Path(tmp) / "input.json", Path(tmp) / "output.json"
+        in_path.write_text(canonical_json(payload), encoding="utf-8")
         proc = subprocess.run([PY, str(HERE / "fusion_predict.py"), str(in_path),
-                               "--output", str(out_path)],
-                              text=True, capture_output=True)
+                               "--output", str(out_path)], text=True, capture_output=True)
         if proc.returncode != 0 or not out_path.exists():
-            return {"match_id": match_id, "status": "replay_failed",
-                    "detail": (proc.stderr or proc.stdout or "").strip()[:300]}
-        fresh = json.loads(out_path.read_text(encoding="utf-8"))
+            detail = (proc.stderr or proc.stdout or "").strip()[:300]
+            raise RuntimeError(detail or "prediction replay did not produce output")
+        return json.loads(out_path.read_text(encoding="utf-8"))
 
-    core = fresh.get("core_output") or fresh
+
+def replay_one(record: dict[str, Any]) -> dict:
+    """Replay one immutable record without inferring its route from fresh output."""
+    match_id = record.get("match_id")
+    payload = record.get("input")
+    route = registered_route(record)
+    prediction_as_of = record.get("prediction_as_of") or (
+        payload.get("prediction_as_of") if isinstance(payload, dict) else None)
+    if not isinstance(payload, dict):
+        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
+                "prediction_as_of": prediction_as_of, "input_sha256": None, "diffs": {},
+                "time_audit": {"usable": False, "reason": "registered_input_missing"}}
+    input_sha256 = hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+    time_audit = _time_audit(record, payload, route)
+    if not time_audit["usable"]:
+        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
+                "prediction_as_of": prediction_as_of, "input_sha256": input_sha256, "diffs": {},
+                "time_audit": time_audit}
+    try:
+        fresh = _formal_output(_run_replay(payload))
+    except Exception as exc:
+        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
+                "prediction_as_of": prediction_as_of, "input_sha256": input_sha256, "diffs": {},
+                "time_audit": {"usable": False, "reason": f"replay_failed:{exc}"}}
+    recorded = _formal_output(record.get("output") or {})
     diffs = {}
     for field in COMPARE_FIELDS:
-        before, after = recorded.get(field), core.get(field)
-        if before is None and after is None:
+        if field not in recorded or field not in fresh:
+            diffs[field] = {"recorded": recorded.get(field), "replayed": fresh.get(field),
+                            "reason": "required_field_missing"}
             continue
-        if before != after:
-            diffs[field] = {"recorded": before, "replayed": after}
-    return {
-        "match_id": match_id,
-        "status": "differs" if diffs else "identical",
-        "mode": record.get("mode") or payload.get("mode"),
-        "diffs": diffs,
-    }
+        differences = _normalised_difference(recorded[field], fresh[field], f"$.{field}")
+        if differences:
+            diffs[field] = {"recorded": recorded[field], "replayed": fresh[field],
+                            "differences": differences}
+    return {"match_id": match_id, "status": "differs" if diffs else "identical",
+            "route": route, "prediction_as_of": prediction_as_of,
+            "input_sha256": input_sha256, "diffs": diffs, "time_audit": time_audit}
 
 
 def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
-    current_identity = build_identity()
+    """Legacy per-version evidence report; it cannot approve aliases or write state."""
     records = []
     for entry in load_jsonl(root / "registry.jsonl"):
         path = resolve_path(entry.get("path", ""), root)
@@ -95,69 +242,34 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
             continue
         if str((rec.get("model") or {}).get("model_version") or "") == model_version:
             records.append(rec)
-    if limit:
-        records = records[:limit]
-
-    results = [replay_one(rec) for rec in records]
-    counts = {}
+    results = [replay_one(rec) for rec in (records[:limit] if limit else records)]
+    counts: dict[str, int] = {}
     for item in results:
         counts[item["status"]] = counts.get(item["status"], 0) + 1
-    modes = sorted({str(r.get("mode")) for r in results if r.get("mode")})
-    signatures = sorted({str((rec.get("model") or {}).get("probability_signature") or "")
-                         for rec in records if (rec.get("model") or {}).get("probability_signature")})
-
-    identical = counts.get("identical", 0)
-    verdict = ("equivalent" if identical == len(results) and results
-               else "changed" if counts.get("differs") else "inconclusive")
-    return {
-        "schema_version": "fusion-probability-replay-1.0",
-        "replayed_model_version": model_version,
-        "current_identity": {
-            "model_version": str(current_identity.get("model_version") or ""),
-            "probability_signature": str(current_identity.get("probability_signature") or ""),
-        },
-        "replayed_probability_signatures": signatures,
-        "compare_fields": list(COMPARE_FIELDS),
-        "replayed_n": len(results),
-        "replayed_modes": modes,
-        "counts": counts,
-        "verdict": verdict,
-        "verdict_note": {
-            "equivalent": "全部重放场次概率一致；可在 manifest 登记 model_version_aliases 并入当前 cohort。",
-            "changed": "存在概率差异；旧样本不得并入当前 cohort，必须重新累积。",
-            "inconclusive": "没有可重放的样本或重放失败，无法判定。",
-        }[verdict],
-        "scope_warning": "等价结论仅覆盖 replayed_modes 列出的路由，不可外推到其他路由或衍生市场。",
-        "results": results,
-    }
+    current_identity = build_identity()
+    return {"schema_version": "fusion-probability-replay-2.0",
+            "replayed_model_version": model_version,
+            "current_identity": {key: str(current_identity.get(key) or "")
+                                 for key in ("model_version", "probability_signature")},
+            "compare_fields": list(COMPARE_FIELDS), "float_tolerance": FLOAT_TOLERANCE,
+            "replayed_n": len(results), "counts": counts, "results": results,
+            "note": "Evidence only; this script never creates or loads aliases."}
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="重放旧版本样本判定概率等价性")
+    ap = argparse.ArgumentParser(description="重放已登记预测；不修改版本或别名")
     ap.add_argument("--store", default=str(backtest_store()))
-    ap.add_argument("--model-version", required=True, help="要重放的旧 model_version，如 m1")
-    ap.add_argument("--limit", type=int, default=0, help="只重放前 N 条（0=全部）")
-    ap.add_argument("--output", help="写出 JSON 报告")
-    a = ap.parse_args()
-
-    report = build_report(Path(a.store), a.model_version, a.limit)
-    print(f"重放 {report['replayed_model_version']}：{report['replayed_n']} 场"
-          f"（路由 {','.join(report['replayed_modes']) or '?'}）")
-    for status, n in sorted(report["counts"].items()):
-        print(f"  {status}: {n}")
-    print(f"判定：{report['verdict']} — {report['verdict_note']}")
-    print(report["scope_warning"])
-    for item in report["results"]:
-        if item["status"] == "differs":
-            print(f"  差异 {item['match_id']}: {json.dumps(item['diffs'], ensure_ascii=False)}")
-        elif item["status"] not in ("identical",):
-            print(f"  {item['status']} {item['match_id']}: {item.get('detail', '')}")
-
-    if a.output:
-        out = Path(a.output)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return 0 if report["verdict"] != "inconclusive" else 1
+    ap.add_argument("--model-version", required=True)
+    ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--output")
+    args = ap.parse_args()
+    report = build_report(Path(args.store), args.model_version, args.limit)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if args.output:
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return 0
 
 
 if __name__ == "__main__":
