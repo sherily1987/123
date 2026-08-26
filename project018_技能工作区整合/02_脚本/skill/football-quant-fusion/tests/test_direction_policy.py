@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -105,6 +106,24 @@ def test_direction_implementation_is_governed_as_decision_policy_not_probability
 
     assert "scripts/direction_policy.py" in manifest["decision_policy_files"]
     assert "scripts/direction_policy.py" not in manifest["probability_files"]
+
+
+def test_direction_governance_does_not_change_task4_base_probability_module():
+    relative_path = (
+        "project018_技能工作区整合/02_脚本/skill/football-quant-fusion/"
+        "scripts/fusion_predict_core.py"
+    )
+    repository = SKILL_ROOT.parents[3]
+    baseline = subprocess.check_output(
+        ["git", "rev-parse", f"84eb9aa:{relative_path}"], cwd=repository, text=True
+    ).strip()
+    current = subprocess.check_output(
+        ["git", "hash-object", "--path", relative_path, "--filters", relative_path],
+        cwd=repository,
+        text=True,
+    ).strip()
+
+    assert current == baseline
 
 
 def test_policy_signature_changes_when_governed_implementation_bytes_change(
