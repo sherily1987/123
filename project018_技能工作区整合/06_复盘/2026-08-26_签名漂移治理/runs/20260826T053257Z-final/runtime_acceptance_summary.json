@@ -1,0 +1,88 @@
+{
+  "schema_version": "task7-runtime-acceptance-summary-3.0",
+  "run_id": "20260826T053257Z-final",
+  "generated_at": "2026-08-26T05:34:15+00:00",
+  "task_status": "COMPLETE_WITH_ALIAS_REJECTED",
+  "release_admission": "HOLD",
+  "strict_selection": {
+    "model_version": "m4",
+    "probability_signature": "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+    "registered_route": null,
+    "expected_record_count": 14,
+    "selected_group_count": 1,
+    "selected_record_count": 14
+  },
+  "target_group": {
+    "status": "UNREPLAYABLE",
+    "result_status_counts": {"UNREPLAYABLE": 14},
+    "blocking_reasons": {"registered_route_missing_or_inconsistent": 14},
+    "numerical_comparison_reached": false,
+    "attestation_path": "project018_技能工作区整合/06_复盘/2026-08-26_签名漂移治理/runs/20260826T053257Z-final/proofs/signature-drift-334d1d24a6f8773fe6f8dade544be04c1097775ac6aa2bc9f9ab751f6874e19e.json",
+    "attestation_report_sha256": "334d1d24a6f8773fe6f8dade544be04c1097775ac6aa2bc9f9ab751f6874e19e",
+    "attestation_file_sha256": "ca4d3744070ad88b63fddf357591e531f437de0ac5e74d665200c7a75ddaa61b"
+  },
+  "approval": {
+    "attempted": true,
+    "exit_code": 1,
+    "exit_code_expected": true,
+    "result": "REJECTED",
+    "reason": "证明状态必须为 PENDING_REVIEW",
+    "probability_aliases_changed": false,
+    "probability_aliases_before_sha256": "26642be7d8a4463fb372ae13d849f4619a3989f567958014feae49e748a33271",
+    "probability_aliases_after_sha256": "26642be7d8a4463fb372ae13d849f4619a3989f567958014feae49e748a33271"
+  },
+  "sample_identity": {
+    "raw_current_n": 11,
+    "approved_alias_n": 0,
+    "current_settled_n": 11,
+    "current_pending_n": 0,
+    "net_current_change": 0
+  },
+  "current_paired_market": {
+    "n": 11,
+    "brier_delta_model_minus_market": 0.01393036,
+    "brier_delta_95ci": [0.00405373, 0.02393031],
+    "log_loss_delta_model_minus_market": 0.02003962,
+    "log_loss_delta_95ci": [0.00746678, 0.03348974]
+  },
+  "gates": {
+    "min_recalibration": 100,
+    "threshold_review": 200,
+    "ready_for_recalibration": false,
+    "ready_for_threshold_review": false,
+    "production_recommendations_enabled": false
+  },
+  "immutability": {
+    "baseline_generated_before_commands": true,
+    "baseline_file_count": 28,
+    "post_file_count": 28,
+    "all_unchanged": true,
+    "canonical_store_written": false,
+    "release_lock_updated": false,
+    "baseline_file_sha256": "353e51c630c23100171670d8313a188466b04fee716b67dcf728bf2c7c3e936d",
+    "post_hashes_file_sha256": "b0fb5341c775ddf7cb64a5fc0d6de229fba415b993289224915e3db2c27a6fe2",
+    "registry_sha256": "0f6b343b69ac493da2544f3a619e491bccffea643ac605ac82ee425eac2b99a3",
+    "results_registry_sha256": "d3038cd1fb32c065e7387642faed030427224a449cdccf4f635a2d69ce4e7d2a",
+    "release_lock_sha256": "9360507871a3ef9f48e21d2d79318de5baa6c9be1ab4cebbacad3cda743ead"
+  },
+  "commands": {
+    "count": 9,
+    "all_exit_codes_expected": true,
+    "command_manifest_file_sha256": "dadeb605fa4ba0f928332aa771275bae330edee6cc30471aab061c29fa259272",
+    "raw_streams_preserved": true,
+    "junit_preserved": true
+  },
+  "verification": {
+    "full_suite_raw": "522 passed, 6 subtests passed in 27.67s",
+    "full_suite_junit": {"tests": 528, "failures": 0, "errors": 0},
+    "independent_p0_raw": "27 passed, 6 subtests passed in 3.26s",
+    "independent_p0_junit": {"tests": 33, "failures": 0, "errors": 0},
+    "release_lock_precheck": "MATCH",
+    "release_lock_postcheck": "MATCH"
+  },
+  "concerns": [
+    "The selected 14-row group has no uniquely registered route, so the numerical fields were not replayed and no equivalence may be claimed.",
+    "A separate 37-row m4 drift group remains UNREPLAYED and isolated.",
+    "The current paired-market sample is only 11 and production recommendation admission remains HOLD."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "signature-direction-governance-authoritative-run-index-1.0",
+  "updated_at": "2026-08-26T05:34:15+00:00",
+  "authoritative_run": {
+    "run_id": "20260826T053257Z-final",
+    "path": "runs/20260826T053257Z-final",
+    "runtime_acceptance_summary": "runs/20260826T053257Z-final/runtime_acceptance_summary.json",
+    "runtime_acceptance_summary_sha256": "65dd7d195c8f7bccf74e6a806e4fa0968c3e53a1ec4ae7bb381659d104c5a868",
+    "run_config_sha256": "1c89344009f736a6dc2a6e01ee176d0383b7b6b0f8b28127f4db3bccecd290fd",
+    "release_admission": "HOLD",
+    "strict_selection": {
+      "model_version": "m4",
+      "probability_signature": "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+      "registered_route": null,
+      "record_count": 14,
+      "group_count": 1
+    }
+  },
+  "superseded_runs": [
+    {
+      "run_id": "legacy-initial",
+      "path": "runs/legacy-initial",
+      "reason": "preserved first-run top-level evidence; not authoritative"
+    },
+    {
+      "run_id": "20260826T045241Z-fix1",
+      "path": "runs/20260826T045241Z-fix1",
+      "reason": "superseded by final-fix runtime acceptance"
+    }
+  ]
+}

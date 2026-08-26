@@ -1,0 +1,230 @@
+{
+  "status": "ok",
+  "record_sample_size": 1758,
+  "sample_size": 616,
+  "unique_match_n": 616,
+  "deduped_duplicates": 6,
+  "overall": {
+    "n": 616,
+    "accuracy_pct": 51.948,
+    "brier_mean": 0.60791198,
+    "brier_sum": 374.473781,
+    "log_loss": 1.0176025,
+    "ece": 0.022931,
+    "score": {
+      "top1_accuracy_pct": 13.8,
+      "top3_accuracy_pct": 33.77,
+      "top5_accuracy_pct": 50.49,
+      "full_matrix_n": 616,
+      "score_log_loss": 2.925
+    },
+    "ou_2_5_brier": 0.2553,
+    "ou_2_5": {
+      "n": 616,
+      "brier": 0.2553,
+      "accuracy_pct": 53.25
+    },
+    "ou_3_5": {
+      "n": 616,
+      "brier": 0.198726,
+      "accuracy_pct": 72.89
+    },
+    "btts_brier": 0.255741,
+    "clv_mean_pp": -0.029,
+    "clv_n": 369
+  },
+  "by_version": {
+    "fusion-1.2.0+core-3.4.1": {
+      "n": 12,
+      "accuracy_pct": 50.0,
+      "brier_mean": 0.64357567,
+      "brier_sum": 7.722908,
+      "log_loss": 1.07079255,
+      "ece": 0.192111,
+      "score": {
+        "top1_accuracy_pct": 25.0,
+        "top3_accuracy_pct": 66.67,
+        "top5_accuracy_pct": 66.67,
+        "full_matrix_n": 12,
+        "score_log_loss": 2.52963
+      },
+      "ou_2_5_brier": 0.259101,
+      "ou_2_5": {
+        "n": 12,
+        "brier": 0.259101,
+        "accuracy_pct": 33.33
+      },
+      "ou_3_5": {
+        "n": 12,
+        "brier": 0.15793,
+        "accuracy_pct": 91.67
+      },
+      "btts_brier": 0.231997
+    },
+    "fusion-1.3.0+core-3.4.4": {
+      "n": 10,
+      "accuracy_pct": 70.0,
+      "brier_mean": 0.5855139,
+      "brier_sum": 5.855139,
+      "log_loss": 0.99120687,
+      "ece": 0.213167,
+      "score": {
+        "top1_accuracy_pct": 20.0,
+        "top3_accuracy_pct": 50.0,
+        "top5_accuracy_pct": 60.0,
+        "full_matrix_n": 10,
+        "score_log_loss": 3.10295
+      },
+      "ou_2_5_brier": 0.215662,
+      "ou_2_5": {
+        "n": 10,
+        "brier": 0.215662,
+        "accuracy_pct": 80.0
+      },
+      "ou_3_5": {
+        "n": 10,
+        "brier": 0.214462,
+        "accuracy_pct": 70.0
+      },
+      "btts_brier": 0.220285
+    },
+    "unknown": {
+      "n": 372,
+      "accuracy_pct": 51.882,
+      "brier_mean": 0.61145163,
+      "brier_sum": 227.460007,
+      "log_loss": 1.01986852,
+      "ece": 0.033411,
+      "score": {
+        "top1_accuracy_pct": 11.83,
+        "top3_accuracy_pct": 31.18,
+        "top5_accuracy_pct": 48.92,
+        "full_matrix_n": 372,
+        "score_log_loss": 2.933
+      },
+      "ou_2_5_brier": 0.260912,
+      "ou_2_5": {
+        "n": 372,
+        "brier": 0.260912,
+        "accuracy_pct": 52.42
+      },
+      "ou_3_5": {
+        "n": 372,
+        "brier": 0.216595,
+        "accuracy_pct": 69.62
+      },
+      "btts_brier": 0.254829,
+      "clv_mean_pp": -0.029,
+      "clv_n": 369
+    },
+    "fusion-1.4.0+core-3.4.4": {
+      "n": 2,
+      "accuracy_pct": 0.0,
+      "brier_mean": 0.965633,
+      "brier_sum": 1.931266,
+      "log_loss": 1.4538607,
+      "ece": 0.469333,
+      "score": {
+        "top1_accuracy_pct": 0.0,
+        "top3_accuracy_pct": 0.0,
+        "top5_accuracy_pct": 0.0,
+        "full_matrix_n": 2,
+        "score_log_loss": 3.52625
+      },
+      "ou_2_5_brier": 0.227299,
+      "ou_2_5": {
+        "n": 2,
+        "brier": 0.227299,
+        "accuracy_pct": 50.0
+      },
+      "ou_3_5": {
+        "n": 2,
+        "brier": 0.127825,
+        "accuracy_pct": 100.0
+      },
+      "btts_brier": 0.306952
+    },
+    "fusion-1.4.0-core-3.4.4": {
+      "n": 111,
+      "accuracy_pct": 43.243,
+      "brier_mean": 0.65867655,
+      "brier_sum": 73.113097,
+      "log_loss": 1.10015283,
+      "ece": 0.080111,
+      "score": {
+        "top1_accuracy_pct": 14.41,
+        "top3_accuracy_pct": 32.43,
+        "top5_accuracy_pct": 51.35,
+        "full_matrix_n": 111,
+        "score_log_loss": 2.94375
+      },
+      "ou_2_5_brier": 0.249154,
+      "ou_2_5": {
+        "n": 111,
+        "brier": 0.249154,
+        "accuracy_pct": 54.95
+      },
+      "ou_3_5": {
+        "n": 111,
+        "brier": 0.171373,
+        "accuracy_pct": 77.48
+      },
+      "btts_brier": 0.252153
+    },
+    "fusion-1.5.0-core-3.4.4": {
+      "n": 54,
+      "accuracy_pct": 57.407,
+      "brier_mean": 0.5950337,
+      "brier_sum": 32.13182,
+      "log_loss": 1.00129333,
+      "ece": 0.07516,
+      "score": {
+        "top1_accuracy_pct": 12.96,
+        "top3_accuracy_pct": 35.19,
+        "top5_accuracy_pct": 48.15,
+        "full_matrix_n": 54,
+        "score_log_loss": 3.02371
+      },
+      "ou_2_5_brier": 0.258337,
+      "ou_2_5": {
+        "n": 54,
+        "brier": 0.258337,
+        "accuracy_pct": 48.15
+      },
+      "ou_3_5": {
+        "n": 54,
+        "brier": 0.16892,
+        "accuracy_pct": 77.78
+      },
+      "btts_brier": 0.264556
+    },
+    "fusion-1.5.0-core-3.4.5": {
+      "n": 55,
+      "accuracy_pct": 63.636,
+      "brier_mean": 0.47744625,
+      "brier_sum": 26.259544,
+      "log_loss": 0.82901723,
+      "ece": 0.090921,
+      "score": {
+        "top1_accuracy_pct": 23.64,
+        "top3_accuracy_pct": 43.64,
+        "top5_accuracy_pct": 58.18,
+        "full_matrix_n": 55,
+        "score_log_loss": 2.76812
+      },
+      "ou_2_5_brier": 0.234158,
+      "ou_2_5": {
+        "n": 55,
+        "brier": 0.234158,
+        "accuracy_pct": 60.0
+      },
+      "ou_3_5": {
+        "n": 55,
+        "brier": 0.17095,
+        "accuracy_pct": 76.36
+      },
+      "btts_brier": 0.270263
+    }
+  },
+  "output": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T053257Z-final\\backtest_after.json"
+}

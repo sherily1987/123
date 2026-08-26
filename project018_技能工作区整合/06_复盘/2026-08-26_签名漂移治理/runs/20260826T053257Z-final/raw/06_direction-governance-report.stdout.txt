@@ -1,0 +1,103 @@
+{
+  "schema_version": "direction-governance-report-1.0",
+  "generated_at": "2026-08-26T05:33:43.049488+00:00",
+  "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+  "snapshot_policy": "latest_before_kickoff",
+  "current_identity": {
+    "skill_version": "1.5.0",
+    "fusion_version": "1.5.0",
+    "core_version": "3.4.5",
+    "fusion_schema_version": "1.4.0",
+    "model_version": "m4",
+    "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+    "decision_policy_signature": "c86c608f49c2d7e6e50b90cc9b04f1947c5a3f489067172abd301e2321219697",
+    "evidence_pipeline_signature": "8e1f4b6845ce9d418b36ee653a9d59aa6b3432d76308bce8d0aec072426a69e5",
+    "prediction_code_sha256": "6abc982e5a10219ce4a092a5dc119c38a853f718b6ec837648dbc9496f19b1a9",
+    "config_sha256": "c6420ccc68f74eb0a44a74aa2719dcf2681126581d00abdfdb0e4fa8790582ae",
+    "engine_bundle_sha256": "cf3c867240d6e439a405050278c8228a0f5170b5d5f90774cf20fa25bfb60514"
+  },
+  "release_lock": {
+    "status": "MATCH",
+    "path": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\config\\release_lock.json",
+    "locked_model_version": "m4",
+    "locked_probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+    "locked_at": "2026-08-24T15:25:31.828306+00:00"
+  },
+  "sample_identity": {
+    "raw_current_registry_settled_upper_bound_n": 11,
+    "approved_alias_registry_settled_upper_bound_n": 0,
+    "registry_settled_upper_bound_n": 11,
+    "raw_current_verified_official_settled_n": 11,
+    "approved_alias_verified_official_settled_n": 0,
+    "verified_official_settled_n": 11,
+    "current_pending_n": 0
+  },
+  "approved_aliases": [],
+  "signature_drift_groups": [
+    {
+      "model_version": "m4",
+      "probability_signature": "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+      "route": null,
+      "record_count": 14,
+      "status": "UNREPLAYABLE"
+    },
+    {
+      "model_version": "m4",
+      "probability_signature": "5c34721daa91a0232805bbcaa7b1cfebcbfb57dc32c0a2b1e63c4662ceb17197",
+      "route": null,
+      "record_count": 37,
+      "status": "UNREPLAYED"
+    }
+  ],
+  "drift_group_status_counts": {
+    "UNREPLAYABLE": 1,
+    "UNREPLAYED": 1
+  },
+  "direction_policy_metrics": {
+    "registration_status_counts": {
+      "NOT_REGISTERED": 255
+    },
+    "classification_counts": {
+      "NOT_REGISTERED": 255
+    },
+    "primary_hit": {
+      "hits": 0,
+      "n": 0,
+      "rate": null
+    },
+    "alternative_hit": {
+      "hits": 0,
+      "n": 0,
+      "rate": null
+    },
+    "direction_policy_hit": {
+      "hits": 0,
+      "n": 0,
+      "rate": null
+    },
+    "denominator_isolation": {
+      "top1_1x2_unchanged": true,
+      "brier_ece_unchanged": true,
+      "ev_kelly_unchanged": true,
+      "coverage_is_not_primary_correctness": true
+    }
+  },
+  "version_admission": {
+    "status": "HOLD",
+    "reasons": [
+      "paired_market_evidence_not_evaluated_by_direction_report",
+      "current_sample_below_minimum",
+      "signature_drift_groups_remain_isolated",
+      "production_recommendations_disabled"
+    ],
+    "uses_direction_coverage": false,
+    "production_recommendations_enabled": false,
+    "note": "方向覆盖命中只做独立审计，不构成模型方向正确或版本准入证据。"
+  },
+  "read_only": {
+    "aliases_written": false,
+    "release_lock_written": false,
+    "weights_changed": false,
+    "gates_changed": false
+  }
+}
