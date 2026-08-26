@@ -132,6 +132,17 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
 
     settled = current_settled
     pending = current_pending
+    # 只统计本次精确签名产生、且确实替代过同场旧快照的记录；不要把全库历史
+    # 多快照数量（superseded_snapshot_count）误显示为本次发布重建数量。
+    exact_current_primary = [
+        row for row in primary
+        if row["model_version"] == cur_mv and row["probability_signature"] == cur_sig
+    ]
+    reissued_current_snapshot_count = sum(
+        any(str(candidate.get("prediction_id") or "") != str(row.get("prediction_id") or "")
+            for candidate in rows if candidate.get("match_id") == row.get("match_id"))
+        for row in exact_current_primary
+    )
     return {
         "schema_version": "fusion-version-progress-1.0",
         "store": str(root),
@@ -150,6 +161,8 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         },
         "by_model_version": {k: v for k, v in sorted(by_version.items())},
         "signature_drift": signature_drift,
+        "superseded_snapshot_count": max(0, len(rows) - len(primary)),
+        "reissued_current_snapshot_count": reissued_current_snapshot_count,
         "unreadable_records": unreadable,
         "main_registry_audit": {
             "store": str(main_root),

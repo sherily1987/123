@@ -32,6 +32,7 @@ import tempfile
 from pathlib import Path
 
 from fusion_backtest import load_jsonl, resolve_path
+from fusion_predict_core import build_identity
 from runtime import resolve_python
 from runtime_paths import backtest_store
 
@@ -82,6 +83,7 @@ def replay_one(record: dict) -> dict:
 
 
 def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
+    current_identity = build_identity()
     records = []
     for entry in load_jsonl(root / "registry.jsonl"):
         path = resolve_path(entry.get("path", ""), root)
@@ -101,6 +103,8 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
     for item in results:
         counts[item["status"]] = counts.get(item["status"], 0) + 1
     modes = sorted({str(r.get("mode")) for r in results if r.get("mode")})
+    signatures = sorted({str((rec.get("model") or {}).get("probability_signature") or "")
+                         for rec in records if (rec.get("model") or {}).get("probability_signature")})
 
     identical = counts.get("identical", 0)
     verdict = ("equivalent" if identical == len(results) and results
@@ -108,6 +112,12 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
     return {
         "schema_version": "fusion-probability-replay-1.0",
         "replayed_model_version": model_version,
+        "current_identity": {
+            "model_version": str(current_identity.get("model_version") or ""),
+            "probability_signature": str(current_identity.get("probability_signature") or ""),
+        },
+        "replayed_probability_signatures": signatures,
+        "compare_fields": list(COMPARE_FIELDS),
         "replayed_n": len(results),
         "replayed_modes": modes,
         "counts": counts,

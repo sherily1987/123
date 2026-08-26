@@ -112,6 +112,8 @@ class VersionProgressTests(unittest.TestCase):
              prediction("m-1", "2026-08-10T06:00:00Z", "m2", CURRENT_SIG, snapshot="closing")],
             [{"match_id": "m-1"}])
         self.assertEqual(report["current"]["settled"], 1)
+        self.assertEqual(report["superseded_snapshot_count"], 1)
+        self.assertEqual(report["reissued_current_snapshot_count"], 1)
 
     def test_current_version_uses_prediction_as_of_not_delayed_registry_write(self):
         """Delayed persistence must not hide the later deployed version."""

@@ -1,6 +1,30 @@
 {
   "model_version": "m4",
-  "probability_signature": "f80d948d50b673e05599f0f3a819bc8272709f10818b170c9a3b8eda9d715825",
-  "locked_at": "2026-08-23T21:00:35.969306+00:00",
-  "note": "发布快照；发布窗口内禁止改概率文件。改概率文件前先 bump config/version_manifest.json 的 model_version，再重新 lock。"
+  "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+  "locked_at": "2026-08-24T15:25:31.828306+00:00",
+  "note": "发布快照；发布窗口内禁止改概率文件。同版本签名变化必须由完整数值重放证明。",
+  "replay_attestation": {
+    "previous_model_version": "m4",
+    "previous_probability_signature": "f80d948d50b673e05599f0f3a819bc8272709f10818b170c9a3b8eda9d715825",
+    "replayed_probability_signatures": [
+      "5c34721daa91a0232805bbcaa7b1cfebcbfb57dc32c0a2b1e63c4662ceb17197",
+      "f80d948d50b673e05599f0f3a819bc8272709f10818b170c9a3b8eda9d715825"
+    ],
+    "replayed_modes": [
+      "market_only"
+    ],
+    "compare_fields": [
+      "final_1x2_pct",
+      "model_1x2_pct",
+      "ou_2_5",
+      "ou_3_5",
+      "btts",
+      "hafu_model",
+      "ttg_score_consistency",
+      "top_scores",
+      "score_matrix"
+    ],
+    "replay_verdict": "equivalent",
+    "replay_report": "F:\\HM足球比赛预测\\project018_技能工作区整合\\06_复盘\\2026-08-24_M4重放\\m4_48d50_replay_attestation.json"
+  }
 }

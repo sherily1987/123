@@ -199,8 +199,8 @@ class BuildIdentityTests(unittest.TestCase):
             experiment = json.loads(Path(entries[1]["path"]).read_text(encoding="utf-8"))
             self.assertEqual(experiment["prediction_as_of"], "2099-08-09T20:00:00+08:00")
 
-    def test_same_prematch_allows_distinct_probability_version_after_release(self):
-        """A new released probability cohort must be registrable for the same match."""
+    def test_same_prematch_rejects_unlocked_probability_version(self):
+        """A direct registration cannot create a new cohort outside the release lock."""
         m4_identity = fusion.build_identity()
         m3_identity = dict(m4_identity, model_version="m3", probability_signature="a" * 64)
         with tempfile.TemporaryDirectory(prefix="fusion-cross-version-record-") as td:
@@ -217,14 +217,15 @@ class BuildIdentityTests(unittest.TestCase):
 
             output_path.write_text(json.dumps({"fusion_status": "ok", "build_identity": m3_identity}), encoding="utf-8")
             first = subprocess.run(command, text=True, capture_output=True)
-            self.assertEqual(json.loads(first.stdout)["status"], "recorded")
+            self.assertNotEqual(first.returncode, 0)
+            self.assertIn("发布锁", first.stderr)
 
             output_path.write_text(json.dumps({"fusion_status": "ok", "build_identity": m4_identity}), encoding="utf-8")
             second = subprocess.run(command, text=True, capture_output=True)
             self.assertEqual(second.returncode, 0, second.stderr or second.stdout)
             self.assertEqual(json.loads(second.stdout)["status"], "recorded")
             entries = [json.loads(line) for line in (store / "registry.jsonl").read_text(encoding="utf-8").splitlines()]
-            self.assertEqual(len(entries), 2)
+            self.assertEqual(len(entries), 1)
 
     def test_prematch_requires_explicit_timezone_aware_as_of_strictly_before_kickoff(self):
         identity = fusion.build_identity()
@@ -543,6 +544,7 @@ class BacktestSamplingTests(unittest.TestCase):
             self.assertEqual(report["by_version_cohort"]["current"]["n"], 2)
             self.assertEqual(report["snapshot_research"]["by_snapshot"]["prematch"]["n"], 2)
             self.assertEqual(report["paired_market"]["n"], 2)
+            self.assertEqual(report["current_paired_market"]["n"], 2)
             self.assertEqual(report["walk_forward"]["fold_count"], 1)
 
             audit_path = root / "audit.json"

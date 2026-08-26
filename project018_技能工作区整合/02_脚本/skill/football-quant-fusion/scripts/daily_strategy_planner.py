@@ -307,10 +307,10 @@ def _recreational_candidates(
             if gap_reasons & blocked:
                 continue
             entries = row.get("evidence_entries") or {}
-            # An empty provider field is not proof of a cleared injury report.
-            # Keep this ambiguity out of even the relaxed entertainment plan.
-            if any(str((entries.get(field) or {}).get("status") or "").upper() == "EMPTY_UNCONFIRMED"
-                   for field in ("injury", "suspensions")):
+            # Missing injury data can hide material absences and remains a
+            # hard block.  Empty-unconfirmed suspensions are allowed only in
+            # this entertainment branch and stay visible as a risk reason.
+            if str((entries.get("injury") or {}).get("status") or "").upper() == "EMPTY_UNCONFIRMED":
                 continue
             for field, allowed_statuses in required.items():
                 status = str((entries.get(field) or {}).get("status") or "").upper()

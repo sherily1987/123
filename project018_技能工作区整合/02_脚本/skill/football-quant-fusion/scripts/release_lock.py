@@ -21,6 +21,7 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
 from fusion_predict_core import build_identity  # noqa: E402
+from release_governance import ReleaseGovernanceError, transition_release_lock  # noqa: E402
 
 LOCK_FILE = HERE.parent / "config" / "release_lock.json"
 
@@ -28,6 +29,7 @@ LOCK_FILE = HERE.parent / "config" / "release_lock.json"
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="只校验不写")
+    ap.add_argument("--replay-report", help="同版本签名迁移所需的完整重放报告")
     a = ap.parse_args()
 
     ident = build_identity()
@@ -60,14 +62,12 @@ def main() -> None:
         }, ensure_ascii=False, indent=2))
         sys.exit(0 if verdict == "ok" else 1)
 
-    payload = {
-        "model_version": model_version,
-        "probability_signature": prob_sig,
-        "locked_at": datetime.now(timezone.utc).isoformat(),
-        "note": ("发布快照；发布窗口内禁止改概率文件。"
-                 "改概率文件前先 bump config/version_manifest.json 的 model_version，再重新 lock。"),
-    }
-    LOCK_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    try:
+        payload = transition_release_lock(
+            LOCK_FILE, ident, Path(a.replay_report) if a.replay_report else None)
+    except ReleaseGovernanceError as exc:
+        print(json.dumps({"status": "refused", "note": str(exc)}, ensure_ascii=False))
+        sys.exit(1)
     print(json.dumps({"status": "locked", "lock_file": str(LOCK_FILE), **payload},
                      ensure_ascii=False, indent=2))
 

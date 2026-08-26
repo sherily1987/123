@@ -1,0 +1,79 @@
+{
+  "schema_version": "fusion-version-progress-1.0",
+  "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+  "snapshot_policy": "latest_before_kickoff",
+  "current_model_version": "m4",
+  "current_probability_signature": "48d50abee08c",
+  "counted_as_current_aliases": [
+    "m4"
+  ],
+  "current": {
+    "settled": 37,
+    "pending": 11,
+    "projected_after_pending": 48,
+    "to_recalibration": 63,
+    "to_threshold_review": 163,
+    "ready_for_recalibration": false,
+    "ready_for_threshold_review": false
+  },
+  "by_model_version": {
+    "m1": {
+      "settled": 33,
+      "pending": 0,
+      "cancelled": 0,
+      "signatures": {
+        "5b608c3debf8": 33
+      }
+    },
+    "m2": {
+      "settled": 1,
+      "pending": 0,
+      "cancelled": 0,
+      "signatures": {
+        "2dd27a97493c": 1
+      }
+    },
+    "m3": {
+      "settled": 53,
+      "pending": 1,
+      "cancelled": 0,
+      "signatures": {
+        "18c92711c9b1": 40,
+        "1f08d89e28e3": 14
+      }
+    },
+    "m4": {
+      "settled": 37,
+      "pending": 11,
+      "cancelled": 0,
+      "signatures": {
+        "5c34721daa91": 37,
+        "48d50abee08c": 11
+      }
+    },
+    "unattributable": {
+      "settled": 474,
+      "pending": 0,
+      "cancelled": 1,
+      "signatures": {
+        "(none)": 475
+      }
+    }
+  },
+  "signature_drift": [],
+  "superseded_snapshot_count": 1150,
+  "reissued_current_snapshot_count": 11,
+  "unreadable_records": 0,
+  "main_registry_audit": {
+    "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+    "current_rows": 27,
+    "current_signature": "48d50abee08c",
+    "signature_counts": {
+      "5c34721daa91": 27
+    },
+    "current_not_in_backtest": 0,
+    "unreadable_records": 0,
+    "note": "仅审计主库与回测库接续差异，不自动并入 current cohort"
+  },
+  "note": "样本量只是复审触发点，不是统计证明；达标不等于可以解禁生产推荐。"
+}

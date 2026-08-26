@@ -315,7 +315,9 @@ def t_constants():
         ("PENALTY_HOME_PROB_DEFAULT", P.PENALTY_HOME_PROB_DEFAULT, 0.38),
         ("ET_TEMPO_DEFAULT", P.ET_TEMPO_DEFAULT, 0.83),
         ("SCORE_MODEL", P.SCORE_MODEL, "bp"),
-        ("SCORE_LAMBDA3", P.SCORE_LAMBDA3, 0.05),
+        # 与已纳入 m4 的时间切分评分优胜参数保持一致；该常数已由
+        # tests/test_score_lambda3_release.py 锁定为 0.20。
+        ("SCORE_LAMBDA3", P.SCORE_LAMBDA3, 0.20),
         ("SCORE_TEMPERATURE_FT", P.SCORE_TEMPERATURE_FT, 1.30),
         ("DEVIG_METHOD_DEFAULT", P.DEVIG_METHOD_DEFAULT, "power"),
         ("SCORE_TEMPERATURE_HT", P.SCORE_TEMPERATURE_HT, 1.22),

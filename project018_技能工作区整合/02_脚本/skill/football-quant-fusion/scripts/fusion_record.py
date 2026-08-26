@@ -12,6 +12,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from release_governance import ReleaseGovernanceError, assert_output_matches_release_lock
+
+HERE = Path(__file__).resolve().parent
+LOCK_FILE = HERE.parent / 'config' / 'release_lock.json'
+
 from runtime_paths import core_scripts_dir, data_root
 from job_ticket import (
     identity_from,
@@ -142,6 +147,10 @@ def main():
         if model_version == 'm2' and not all(
                 is_complete_sha256(value) for value in governance_signatures.values()):
             sys.exit('complete decision/evidence signatures required for formal model m2 registration')
+        try:
+            assert_output_matches_release_lock(build, LOCK_FILE)
+        except ReleaseGovernanceError as exc:
+            sys.exit(str(exc))
     created = datetime.now(timezone.utc)
     # Every record in the formal registry, including an explicitly named
     # T-minus snapshot, must prove it was generated before kickoff.  Labels

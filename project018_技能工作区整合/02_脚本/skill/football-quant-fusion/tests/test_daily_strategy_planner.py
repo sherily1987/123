@@ -317,3 +317,31 @@ def test_recreational_gate_rejects_unconfirmed_empty_injury_field():
     )
     assert plan["budget"]["allocated_amount"] == 0.0
     assert plan["single_purchase_recommendations"] == []
+
+
+def test_recreational_gate_allows_unconfirmed_empty_suspensions_without_production_authorization():
+    job = _job("sporttery-empty-suspensions")
+    job["outputs"][0]["evidence_audit"] = {
+        "evidence_gap": True,
+        "evidence_status": "GAP",
+        "evidence_gap_reasons": ["SUSPENSIONS_EMPTY_UNCONFIRMED"],
+        "entries": {
+            "team_stats": {"status": "VALID"},
+            "recent_form": {"status": "VALID"},
+            "injury": {"status": "VALID"},
+            "suspensions": {"status": "EMPTY_UNCONFIRMED"},
+            "starting_xi": {"status": "PREDICTED"},
+        },
+    }
+    policy = {**_disabled_policy(), "recreational_strategy_enabled": True}
+
+    plan = dsp.build_daily_strategy(
+        [job], policy, bankroll=100, execution_mode="budgeted_action",
+        as_of=datetime.fromisoformat("2026-08-23T08:00:00+08:00"),
+    )
+
+    rows = plan["single_purchase_recommendations"]
+    assert plan["budget"]["allocated_amount"] > 0
+    assert rows
+    assert all(row["production_authorized"] is False for row in rows)
+    assert all("SUSPENSIONS_EMPTY_UNCONFIRMED" in row["recreational_gate_reasons"] for row in rows)

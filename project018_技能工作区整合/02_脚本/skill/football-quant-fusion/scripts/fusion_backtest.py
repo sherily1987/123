@@ -722,6 +722,9 @@ def main():
     for r in snapshot_rows:
         by_snapshot.setdefault(r["snapshot_type"], []).append(r)
     current_n = len(by_cohort["current"])
+    current_by_league = {}
+    for row in by_cohort["current"]:
+        current_by_league.setdefault(row["league"], []).append(row)
     report = {
         "schema_version": "fusion-backtest-2.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -745,6 +748,13 @@ def main():
         },
         "paired_market": paired_market_comparison(
             rows, iterations=a.bootstrap_iterations, seed=20260808),
+        # 权重/上线的统计证据必须只来自当前精确版本（或已审计等价别名）。
+        # 全历史 paired_market 仍保留作诊断，绝不可替代当前 cohort 的准入分母。
+        "current_paired_market": paired_market_comparison(
+            by_cohort["current"], iterations=a.bootstrap_iterations, seed=20260808),
+        "current_by_league": {
+            key: summarize(value) for key, value in sorted(current_by_league.items())
+        },
         "evidence_stratification": evidence_stratification(rows),
         "route_stratification": route_stratification(rows),
         "walk_forward": walk_forward_report(
