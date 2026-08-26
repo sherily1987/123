@@ -39,7 +39,8 @@ Supported commands:
   record | daily-pipeline | preview | merge-preview | settle | backtest
   odds-add | odds-drift | odds-intl | odds-intl-capture | tournament
   football-data-enrich | market-ablation | collect-date | llm-evidence
-  version-progress | version-admission | derivative-diagnostics | half-time-enrichment | score-shadow-compare
+  version-progress | version-admission | direction-governance-report
+  derivative-diagnostics | half-time-enrichment | score-shadow-compare
   league-capability-matrix
   draw-watch-evaluate | draw-ttg-shadow-research
   half-time-collect | four-market-admission
@@ -314,6 +315,10 @@ def main():
         # 发布窗口期盯样本累积：当前 model_version 已结算/在途场次与门槛距离。
         # 用法：fusion_cli.py version-progress [--store DIR] [--json] [--output FILE]
         run_script("version_progress.py", rest)
+        return
+    if cmd == "direction-governance-report":
+        # 只读汇总：不提供 alias/锁/权重/门禁写入参数。
+        run_script("version_progress.py", ["--direction-governance-report", *rest])
         return
     if cmd == "version-admission":
         # 只读版本复审门禁；绝不自动改权重或生产推荐开关。

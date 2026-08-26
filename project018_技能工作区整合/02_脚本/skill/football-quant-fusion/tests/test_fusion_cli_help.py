@@ -24,6 +24,23 @@ def test_top_level_help_lists_supported_commands():
     assert "strategy-plan" in completed.stdout
     assert "independent-market-shadow" in completed.stdout
     assert "version-admission" in completed.stdout
+    assert "direction-governance-report" in completed.stdout
+
+
+def test_direction_governance_report_routes_to_read_only_version_progress(monkeypatch):
+    calls = []
+    monkeypatch.setattr(sys, "argv", [
+        "fusion_cli.py", "direction-governance-report", "--store", "audit-store",
+    ])
+    monkeypatch.setattr(fusion_cli, "validate_cli_paths", lambda _rest: [])
+    monkeypatch.setattr(fusion_cli, "core_copy_status", lambda: {"status": "MATCH"})
+    monkeypatch.setattr(fusion_cli, "run_script", lambda script, rest: calls.append((script, rest)))
+
+    fusion_cli.main()
+
+    assert calls == [("version_progress.py", [
+        "--direction-governance-report", "--store", "audit-store",
+    ])]
 
 
 def test_production_record_release_lock_gate_fails_closed(monkeypatch):

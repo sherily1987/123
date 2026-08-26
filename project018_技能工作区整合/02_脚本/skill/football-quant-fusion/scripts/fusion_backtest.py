@@ -24,7 +24,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from runtime_paths import assert_writable_target, backtest_store
-from probability_aliases import load_approved_aliases, matches as alias_matches
+from probability_aliases import (load_approved_aliases, matches as alias_matches,
+                                 _registered_route as registered_route)
+from direction_settlement import (settle_direction_policy,
+                                  summarize_direction_policy_metrics)
 
 # 2026-08-16 修正：原默认值硬编码指向外部 football-quant-fusion-suite。
 # 那是一份物理拷贝、且比仓库内唯一事实源旧，忘了传 --store 就会**静默评测错的库**
@@ -216,6 +219,7 @@ def version_cohort(row, current_identity):
         for alias in load_version_aliases(cur_mv):
             if (str(alias.get("alias_to_model_version")) == cur_mv
                     and str(alias.get("alias_to_probability_signature")) == cur_ps
+                    and row.get("route_identity_valid") is not False
                     and alias_matches(row, alias)):
                 return "current"
     version = str(row.get("version") or "").strip().lower()
@@ -504,6 +508,16 @@ def score_record(rec, root):
         except Exception:
             market_probs = None
     idx = actual_1x2(h, a)
+    exact_route = registered_route(rec)
+    direction_policy = rec.get("direction_policy")
+    direction_policy_status = str(
+        rec.get("direction_policy_status") or "NOT_REGISTERED")
+    direction_settlement = settle_direction_policy(
+        direction_policy,
+        rs,
+        registration_status=direction_policy_status,
+        kickoff=rec.get("kickoff") or (rec.get("match") or {}).get("kickoff"),
+    )
     top_list = fc.get("top_scores") or core.get("top_scores") or []
     score_view = None
     score_matrix = None
@@ -549,9 +563,9 @@ def score_record(rec, root):
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
         "model": _m if isinstance(_m, dict) else {},
-        "mode": str((rec.get("input") or {}).get("mode") or
-                     ((rec.get("output") or {}).get("mode")) or
-                     (_m.get("mode") if isinstance(_m, dict) else "unknown")),
+        "mode": exact_route or "unknown",
+        "route": exact_route,
+        "route_identity_valid": exact_route is not None,
         "core_engine_version": (rec.get("output") or {}).get("core_engine_version"),
         "league": ((rec.get("match") or {}).get("competition")) or ((rec.get("match") or {}).get("stage")) or "?",
         "probs": probs,
@@ -569,6 +583,9 @@ def score_record(rec, root):
         "kickoff": ((rec.get("match") or {}).get("kickoff")),
         "evidence_gap": bool((((rec.get("output") or {}).get("evidence_audit") or {}).get("evidence_gap"))),
         "evidence_age_hours": (((rec.get("output") or {}).get("evidence_audit") or {}).get("evidence_freshness_hours")),
+        "direction_policy_status": direction_policy_status,
+        "direction_policy": direction_policy,
+        "direction_settlement": direction_settlement,
     }, None
 
 
@@ -671,6 +688,16 @@ def main():
                 "kickoff": it.get("kickoff") or "",
                 "evidence_gap": bool(it.get("evidence_gap", False)),
                 "evidence_age_hours": it.get("evidence_age_hours"),
+                "direction_policy_status": str(
+                    it.get("direction_policy_status") or "NOT_REGISTERED"),
+                "direction_policy": it.get("direction_policy"),
+                "direction_settlement": settle_direction_policy(
+                    it.get("direction_policy"),
+                    {"score_90_status": "verified", "score_90": s90},
+                    registration_status=str(
+                        it.get("direction_policy_status") or "NOT_REGISTERED"),
+                    kickoff=it.get("kickoff"),
+                ),
             })
         snapshot_rows, dropped = dedupe_snapshot_rows(raw_rows)
     else:
@@ -751,6 +778,7 @@ def main():
         },
         "evidence_stratification": evidence_stratification(rows),
         "route_stratification": route_stratification(rows),
+        "direction_policy_metrics": summarize_direction_policy_metrics(rows),
         "walk_forward": walk_forward_report(
             rows, folds=a.walk_forward_folds, bootstrap_iterations=a.bootstrap_iterations),
         "current_identity": current_identity,

@@ -22,6 +22,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
+from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fusion_backtest import (load_jsonl, load_version_aliases, resolve_path,
@@ -29,9 +32,14 @@ from fusion_backtest import (load_jsonl, load_version_aliases, resolve_path,
 from fusion_predict_core import build_identity
 from probability_aliases import matches as alias_matches
 from runtime_paths import assert_writable_target, backtest_store, data_root
+from direction_settlement import (settle_direction_policy,
+                                  summarize_direction_policy_metrics)
 
 MIN_RECALIBRATION = 100
 THRESHOLD_REVIEW = 200
+CONFIG_ROOT = Path(__file__).resolve().parent.parent / "config"
+DEFAULT_RELEASE_LOCK_PATH = CONFIG_ROOT / "release_lock.json"
+DEFAULT_RECOMMENDATION_POLICY_PATH = CONFIG_ROOT / "recommendation_policy.json"
 _DRIFT_STATUSES = {
     "PENDING_REVIEW",
     "UNREPLAYABLE",
@@ -144,10 +152,12 @@ def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
             "snapshot_type": rec.get("snapshot_type") or "unspecified",
             "created_at": rec.get("created_at") or entry.get("created_at") or "",
             "prediction_as_of": rec.get("prediction_as_of") or "",
-            "kickoff": rec.get("kickoff") or "",
+            "kickoff": rec.get("kickoff") or (rec.get("match") or {}).get("kickoff") or "",
             "model_version": str(model.get("model_version") or "unattributable"),
             "probability_signature": model.get("probability_signature"),
             "route": registered_route(rec),
+            "direction_policy_status": rec.get("direction_policy_status") or "NOT_REGISTERED",
+            "direction_policy": rec.get("direction_policy"),
         })
     return rows, unreadable
 
@@ -296,6 +306,177 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
     }
 
 
+def _read_json_object(path: Path) -> dict:
+    try:
+        value = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError, TypeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _release_lock_report(identity: dict, path: Path) -> dict:
+    lock = _read_json_object(path)
+    if not Path(path).is_file():
+        status = "MISSING"
+    elif not lock:
+        status = "INVALID"
+    elif (lock.get("model_version") == identity.get("model_version")
+          and lock.get("probability_signature") == identity.get("probability_signature")):
+        status = "MATCH"
+    else:
+        status = "DRIFT"
+    return {
+        "status": status,
+        "path": str(path),
+        "locked_model_version": lock.get("model_version"),
+        "locked_probability_signature": lock.get("probability_signature"),
+        "locked_at": lock.get("locked_at"),
+    }
+
+
+def _load_result(root: Path, match_id: str) -> dict | None:
+    path = Path(root) / "results" / f"{match_id}.json"
+    value = _read_json_object(path)
+    return value or None
+
+
+def _attested_compare_fields(alias: dict) -> list[str]:
+    direct = alias.get("compare_fields")
+    if isinstance(direct, list) and all(isinstance(field, str) and field for field in direct):
+        return list(direct)
+    path_value = alias.get("attestation_path")
+    expected_hash = alias.get("attestation_sha256")
+    if not isinstance(path_value, str) or not isinstance(expected_hash, str):
+        return []
+    path = Path(path_value)
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return []
+    if hashlib.sha256(raw).hexdigest() != expected_hash:
+        return []
+    proof = _read_json_object(path)
+    fields = proof.get("compare_fields")
+    if not isinstance(fields, list) or not all(
+            isinstance(field, str) and field for field in fields):
+        return []
+    return list(fields)
+
+
+def _alias_summaries(rows: list[dict], aliases: list[dict], settled_ids: set[str]) -> list[dict]:
+    summaries = []
+    for alias in aliases:
+        matching = [row for row in rows if alias_matches(row, alias)]
+        summaries.append({
+            "model_version": alias.get("model_version"),
+            "probability_signature": alias.get("probability_signature"),
+            "route": alias.get("route"),
+            "alias_to_model_version": alias.get("alias_to_model_version"),
+            "alias_to_probability_signature": alias.get("alias_to_probability_signature"),
+            "attestation_path": alias.get("attestation_path"),
+            "attestation_sha256": alias.get("attestation_sha256"),
+            "compare_fields": _attested_compare_fields(alias),
+            "record_count": len(matching),
+            "settled_count": sum(str(row.get("match_id")) in settled_ids for row in matching),
+        })
+    return summaries
+
+
+def build_direction_governance_report(
+    root: Path,
+    snapshot_policy: str = "latest_before_kickoff",
+    *,
+    release_lock_path: Path = DEFAULT_RELEASE_LOCK_PATH,
+    recommendation_policy_path: Path = DEFAULT_RECOMMENDATION_POLICY_PATH,
+) -> dict:
+    """Build the combined read-only identity and direction-governance view."""
+    root = Path(root)
+    progress = build_report(root, snapshot_policy)
+    identity = build_identity()
+    rows, _ = load_prediction_rows(root)
+    primary = select_primary_rows(rows, snapshot_policy)
+    settled_ids = {
+        str(row.get("match_id")) for row in load_jsonl(root / "results_registry.jsonl")
+        if row.get("match_id") and str(row.get("status") or "settled") != "cancelled"
+    }
+    direction_rows = []
+    for row in primary:
+        item = dict(row)
+        result = _load_result(root, str(row.get("match_id") or ""))
+        item["direction_settlement"] = settle_direction_policy(
+            row.get("direction_policy"),
+            result,
+            registration_status=str(row.get("direction_policy_status") or "NOT_REGISTERED"),
+            kickoff=row.get("kickoff"),
+        )
+        direction_rows.append(item)
+    metrics = summarize_direction_policy_metrics(direction_rows)
+    aliases = [alias for alias in load_version_aliases(identity.get("model_version"))
+               if alias.get("alias_to_model_version") == identity.get("model_version")
+               and alias.get("alias_to_probability_signature") == identity.get(
+                   "probability_signature")]
+    lock_report = _release_lock_report(identity, Path(release_lock_path))
+    recommendation = _read_json_object(Path(recommendation_policy_path))
+    drift_counts = Counter(
+        str(group.get("status") or "UNKNOWN")
+        for group in progress.get("signature_drift_groups") or []
+    )
+    admission_reasons = ["paired_market_evidence_not_evaluated_by_direction_report"]
+    if progress["current"]["settled"] < MIN_RECALIBRATION:
+        admission_reasons.append("current_sample_below_minimum")
+    if lock_report["status"] != "MATCH":
+        admission_reasons.append("release_lock_not_current")
+    if drift_counts:
+        admission_reasons.append("signature_drift_groups_remain_isolated")
+    if not recommendation.get("production_recommendations_enabled", False):
+        admission_reasons.append("production_recommendations_disabled")
+    return {
+        "schema_version": "direction-governance-report-1.0",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "store": str(root),
+        "snapshot_policy": snapshot_policy,
+        "current_identity": identity,
+        "release_lock": lock_report,
+        "sample_identity": {
+            "raw_current_n": progress["raw_current_n"],
+            "approved_alias_n": progress["approved_alias_n"],
+            "current_settled_n": progress["current"]["settled"],
+            "current_pending_n": progress["current"]["pending"],
+        },
+        "approved_aliases": _alias_summaries(primary, aliases, settled_ids),
+        "signature_drift_groups": progress.get("signature_drift_groups") or [],
+        "drift_group_status_counts": dict(sorted(drift_counts.items())),
+        "direction_policy_metrics": metrics,
+        "version_admission": {
+            "status": "HOLD",
+            "reasons": admission_reasons,
+            "uses_direction_coverage": False,
+            "production_recommendations_enabled": bool(
+                recommendation.get("production_recommendations_enabled", False)),
+            "note": "方向覆盖命中只做独立审计，不构成模型方向正确或版本准入证据。",
+        },
+        "read_only": {
+            "aliases_written": False,
+            "release_lock_written": False,
+            "weights_changed": False,
+            "gates_changed": False,
+        },
+    }
+
+
+def direction_governance_main(argv: list[str] | None = None) -> int:
+    """Read-only CLI: intentionally offers no output or mutation option."""
+    parser = argparse.ArgumentParser(description="只读方向与签名治理报告")
+    parser.add_argument("--store", default=str(backtest_store()))
+    parser.add_argument("--snapshot-policy",
+                        choices=("latest_before_kickoff", "prematch", "closing"),
+                        default="latest_before_kickoff")
+    args = parser.parse_args(argv)
+    report = build_direction_governance_report(Path(args.store), args.snapshot_policy)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    return 0
+
+
 def render(report: dict) -> str:
     cur = report["current"]
     alias_text = ("，含经重放验证等价的 " + "/".join(report["counted_as_current_aliases"])
@@ -339,6 +520,8 @@ def render(report: dict) -> str:
 
 
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--direction-governance-report":
+        return direction_governance_main(sys.argv[2:])
     ap = argparse.ArgumentParser(description="按 model_version 统计样本累积进度")
     ap.add_argument("--store", default=str(backtest_store()))
     ap.add_argument("--snapshot-policy", choices=("latest_before_kickoff", "prematch", "closing"),
