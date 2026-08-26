@@ -24,18 +24,30 @@ def _identity(record: dict[str, Any]) -> tuple[str, Any]:
             model.get("probability_signature"))
 
 
-def _signature_group_key(signature: Any) -> Any:
-    """Keep scalar types intact and make malformed containers groupable."""
+def _signature_group_key(signature: Any) -> tuple[str, str]:
+    """Return a deterministic sortable key without erasing raw JSON types."""
+    json_type = {
+        type(None): "null",
+        bool: "boolean",
+        int: "integer",
+        float: "number",
+        str: "string",
+        list: "array",
+        dict: "object",
+    }.get(type(signature), f"invalid-{type(signature).__name__}")
     try:
-        hash(signature)
-    except TypeError:
-        return ("invalid-non-string-signature", type(signature).__name__, canonical_json(signature))
-    return signature
+        encoded = canonical_json(signature)
+    except (TypeError, ValueError):
+        # Registry snapshots are JSON, so this is only a defense for a
+        # corrupted in-memory value.  The type tag prevents it from colliding
+        # with a genuine JSON string that happens to share the same text.
+        encoded = canonical_json(str(signature))
+    return json_type, encoded
 
 
-def group_records(records: list[dict]) -> dict[tuple[str, Any, str], list[dict]]:
+def group_records(records: list[dict]) -> dict[tuple[str, tuple[str, str], str], list[dict]]:
     """Group strictly by stored model version, complete signature, and route."""
-    groups: dict[tuple[str, Any, str], list[dict]] = {}
+    groups: dict[tuple[str, tuple[str, str], str], list[dict]] = {}
     for record in records:
         model_version, signature = _identity(record)
         # A missing route stays isolated and unreplayable.  It is never filled
@@ -61,7 +73,7 @@ def evaluate_group(records: list[dict], *, current_identity: dict) -> dict:
         raise ValueError("cannot evaluate an empty signature-drift group")
     model_version, signature = _identity(records[0])
     route = registered_route(records[0]) or ""
-    expected_key = (model_version, signature, route)
+    expected_key = (model_version, _signature_group_key(signature), route)
     current_signature = current_identity.get("probability_signature")
     current_identity_valid = bool(str(current_identity.get("model_version") or "")) and \
         is_complete_signature(current_signature)
@@ -143,6 +155,12 @@ def _attestation_dir(root: Path) -> Path:
     return root / "signature-drift-attestations" / datetime.now(timezone.utc).date().isoformat()
 
 
+def _attestation_filename(group_key: tuple[str, tuple[str, str], str]) -> str:
+    """Map every raw group identity to one fixed Windows-safe filename."""
+    digest = hashlib.sha256(canonical_json(group_key).encode("utf-8")).hexdigest()
+    return f"signature-drift-{digest}.json"
+
+
 def build_drift_attestations(root: Path, current_identity: dict) -> list[dict]:
     """Write evidence only beneath the caller-selected root; never alter input data."""
     reports = []
@@ -157,9 +175,7 @@ def build_drift_attestations(root: Path, current_identity: dict) -> list[dict]:
             canonical_json(report_hash_input).encode("utf-8")
         ).hexdigest()
         report["generated_at"] = datetime.now(timezone.utc).isoformat()
-        model_version, signature, route = key
-        filename = f"{model_version or 'missing'}_{signature or 'missing'}_{route or 'missing'}.json"
-        path = output_dir / filename
+        path = output_dir / _attestation_filename(key)
         path.parent.mkdir(parents=True, exist_ok=True)
         report["attestation_path"] = str(path)
         path.write_text(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n",

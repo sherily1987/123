@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -75,8 +76,8 @@ def test_route_is_part_of_group_identity():
     ])
 
     assert set(groups) == {
-        ("m4", OLD_SIG, "market_only"),
-        ("m4", OLD_SIG, "hybrid"),
+        ("m4", ("string", f'"{OLD_SIG}"'), "market_only"),
+        ("m4", ("string", f'"{OLD_SIG}"'), "hybrid"),
     }
 
 
@@ -104,7 +105,9 @@ def test_grouped_numeric_signature_makes_every_member_unreplayable_without_repla
     groups = governance.group_records(rows)
     report = governance.evaluate_group(next(iter(groups.values())), current_identity=CURRENT)
 
-    assert set(groups) == {("m4", numeric_signature, "market_only")}
+    assert set(groups) == {
+        ("m4", ("integer", str(numeric_signature)), "market_only"),
+    }
     assert report["status"] == "UNREPLAYABLE"
     assert [item["status"] for item in report["results"]] == ["UNREPLAYABLE", "UNREPLAYABLE"]
     assert {item["time_audit"]["reason"] for item in report["results"]} == {
@@ -388,3 +391,81 @@ def test_attestation_write_is_read_only_and_hashes_its_canonical_content(monkeyp
     assert report["report_sha256"] == expected
     assert persisted["report_sha256"] == expected
     assert not (tmp_path / "registry.jsonl").exists()
+
+
+def test_mixed_raw_signature_types_write_distinct_safe_attestations_without_invalid_replay(
+        monkeypatch, tmp_path):
+    valid_signature = "1" * 64
+    raw_signatures = [
+        valid_signature,
+        int(valid_signature),
+        {"raw": "bad/signature:object"},
+        ["bad/signature:list"],
+        "bad/signature:stream",
+    ]
+    rows = []
+    for index, signature in enumerate(raw_signatures):
+        for member in range(2):
+            row = record(f"m-{index}-{member}")
+            row["model"]["probability_signature"] = signature
+            rows.append(row)
+    replayed = []
+
+    def replay_valid_signature_only(item):
+        signature = item["model"]["probability_signature"]
+        if type(signature) is not str or signature != valid_signature:
+            pytest.fail("invalid signature groups must not call replay")
+        replayed.append(item["match_id"])
+        return identical_result(item)
+
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: rows)
+    monkeypatch.setattr(governance, "replay_one", replay_valid_signature_only)
+
+    reports = governance.build_drift_attestations(tmp_path, CURRENT)
+
+    assert len(reports) == len(raw_signatures)
+    assert replayed == ["m-0-0", "m-0-1"]
+    assert sum(report["status"] == "PENDING_REVIEW" for report in reports) == 1
+    assert sum(report["status"] == "UNREPLAYABLE" for report in reports) == 4
+    assert all(report["record_count"] == 2 for report in reports)
+    assert all(
+        [result["status"] for result in report["results"]] ==
+        (["identical"] * 2 if report["status"] == "PENDING_REVIEW"
+         else ["UNREPLAYABLE"] * 2)
+        for report in reports
+    )
+
+    paths = [Path(report["attestation_path"]) for report in reports]
+    assert len({path.name for path in paths}) == len(raw_signatures)
+    assert len({path.parent for path in paths}) == 1
+    assert all(re.fullmatch(r"signature-drift-[0-9a-f]{64}\.json", path.name)
+               for path in paths)
+    assert all(path.is_file() for path in paths)
+
+    persisted_raw_signatures = [
+        json.loads(path.read_text(encoding="utf-8"))["old_identity"]["probability_signature"]
+        for path in paths
+    ]
+    for original in raw_signatures:
+        assert any(type(persisted) is type(original) and persisted == original
+                   for persisted in persisted_raw_signatures)
+
+
+def test_corrupt_signature_path_characters_cannot_escape_attestation_directory(
+        monkeypatch, tmp_path):
+    row = record("m-unsafe")
+    row["model"]["probability_signature"] = "bad/signature:stream"
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: [row])
+    monkeypatch.setattr(governance, "replay_one", lambda _row: pytest.fail("must not replay"))
+
+    report = governance.build_drift_attestations(tmp_path, CURRENT)[0]
+
+    path = Path(report["attestation_path"])
+    expected_dir = tmp_path / "signature-drift-attestations" / path.parent.name
+    assert path.parent == expected_dir
+    assert re.fullmatch(r"signature-drift-[0-9a-f]{64}\.json", path.name)
+    assert path.is_file()
+    assert json.loads(path.read_text(encoding="utf-8"))["old_identity"] == {
+        "model_version": "m4",
+        "probability_signature": "bad/signature:stream",
+    }
