@@ -52,7 +52,8 @@ def test_empty_injury_response_is_traced_but_not_treated_as_clear(tmp_path: Path
     monkeypatch.setattr(mod, "fetch_injury", lambda _: {"home": {}, "away": {}})
 
     rows = mod.collect_one(rec, "initial_prematch", want_injury=True,
-                           want_lineup=False, events_path=tmp_path / "events.jsonl")
+                           want_lineup=False, events_path=tmp_path / "events.jsonl",
+                           now_utc=datetime(2026, 8, 24, 12, 0, tzinfo=UTC))
 
     assert rows[0]["status"] == "EMPTY_UNCONFIRMED"
     assert rows[0]["absence"]["home"]["status"] == "EMPTY_UNCONFIRMED"
@@ -64,11 +65,11 @@ def test_post_kickoff_injury_is_not_fetched_or_admitted(tmp_path: Path, monkeypa
         "home": "博洛尼亚", "away": "拉齐奥",
         "kickoff": "2026-08-25T00:30:00+08:00",
     }
-    monkeypatch.setattr(mod, "now_utc", lambda: datetime(2026, 8, 25, 1, 0, tzinfo=mod.CST))
     monkeypatch.setattr(mod, "fetch_injury", lambda _: (_ for _ in ()).throw(AssertionError("post-match fetch")))
 
     rows = mod.collect_one(rec, "prematch_poll", want_injury=True,
-                           want_lineup=False, events_path=tmp_path / "events.jsonl")
+                           want_lineup=False, events_path=tmp_path / "events.jsonl",
+                           now_utc=datetime(2026, 8, 25, 1, 0, tzinfo=mod.CST))
 
     assert rows[0]["kind"] == "injury"
     assert rows[0]["status"] == "POST_KICKOFF"
@@ -189,7 +190,8 @@ def test_due_manifest_carries_api_sports_fixture_identity(tmp_path: Path):
         "api_sports_fixture_id": 1550089,
     }]
 
-    due = mod.write_due(tmp_path / "late_info_due.json", matches, "prematch")
+    due = mod.write_due(tmp_path / "late_info_due.json", matches, "prematch",
+                        now_utc=datetime(2026, 8, 24, 12, 0, tzinfo=UTC))
 
     assert due[0]["api_sports_fixture_id"] == 1550089
     assert due[0]["lineup_provider"] == "api-sports.io"
@@ -238,11 +240,10 @@ def test_t75_lineup_uses_api_sports_fixture_identity(tmp_path: Path, monkeypatch
         "startXI": [{"player": {"name": "Away Starter"}}],
         "substitutes": [],
     }]
-    monkeypatch.setattr(mod, "now_utc", lambda: now)
     monkeypatch.setattr(mod, "fetch_api_sports_lineup", lambda fixture_id: payload)
 
     rows = mod.collect_one(rec, "T-75", want_injury=False, want_lineup=True,
-                           events_path=tmp_path / "events.jsonl")
+                           events_path=tmp_path / "events.jsonl", now_utc=now)
 
     assert rows[0]["status"] == "VALID"
     assert rows[0]["api_sports_fixture_id"] == 1550089
@@ -258,11 +259,10 @@ def test_lineup_collection_uses_dynamic_prematch_window_not_t75(tmp_path: Path, 
         "kickoff": "2026-08-25T00:30:00+08:00",
         "api_sports_fixture_id": 1550089,
     }
-    monkeypatch.setattr(mod, "now_utc", lambda: now)
     monkeypatch.setattr(mod, "fetch_api_sports_lineup", lambda fixture_id: [])
 
     rows = mod.collect_one(rec, "initial_prematch", want_injury=False,
-                           want_lineup=True, events_path=tmp_path / "events.jsonl")
+                           want_lineup=True, events_path=tmp_path / "events.jsonl", now_utc=now)
 
     # 8 hours before kickoff is collected even though it is outside the old
     # The dynamic window is active; a missing provider response remains UNAVAILABLE and is retryable.

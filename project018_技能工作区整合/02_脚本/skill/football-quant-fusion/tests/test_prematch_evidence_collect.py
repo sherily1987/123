@@ -1,4 +1,5 @@
 import importlib.util
+from datetime import datetime
 from pathlib import Path
 
 
@@ -7,6 +8,8 @@ spec = importlib.util.spec_from_file_location("prematch_evidence_collect", MODUL
 pec = importlib.util.module_from_spec(spec)
 assert spec.loader
 spec.loader.exec_module(pec)
+
+NOW = datetime.fromisoformat("2026-08-24T12:00:00+00:00")
 
 
 def test_audit_has_recent_form_injuries_and_dynamic_lineup_schedule(monkeypatch):
@@ -19,7 +22,7 @@ def test_audit_has_recent_form_injuries_and_dynamic_lineup_schedule(monkeypatch)
         "tables": [],
     })
     row = pec.collect_one({"match_id": "sporttery-1", "home": "A", "away": "B",
-                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"}, now_utc=NOW)
     audit = row["evidence_audit"]
     assert audit["entries"]["team_stats"]["status"] == "VALID"
     assert audit["entries"]["recent_form"]["status"] == "VALID"
@@ -34,7 +37,7 @@ def test_collect_file_writes_sidecar_without_mutating_input(tmp_path, monkeypatc
     source.write_text('{"matches":[{"match_id":"sporttery-1","home":"A","away":"B","kickoff":"2026-08-25T20:00:00+08:00"}]}', encoding="utf-8")
     monkeypatch.setattr(pec.preview, "collect", lambda mid, terms, hist: {"feature": {}, "strength": None,
         "recent_home": [], "recent_away": [], "injuries": {}, "tables": []})
-    out = pec.collect_file(source, tmp_path / "out")
+    out = pec.collect_file(source, tmp_path / "out", now_utc=NOW)
     assert out["count"] == 1
     assert (tmp_path / "out" / "sporttery-1.json").exists()
     assert "evidence_audit" not in source.read_text(encoding="utf-8")
@@ -58,7 +61,7 @@ def test_audit_exposes_mobile_feature_analysis_without_guessing_labels(monkeypat
         "injuries": {"home": {}, "away": {}}, "tables": [],
     })
     row = pec.collect_one({"match_id": "sporttery-1", "home": "A", "away": "B",
-                           "competition": "日职", "kickoff": "2026-08-25T20:00:00+08:00"})
+                           "competition": "日职", "kickoff": "2026-08-25T20:00:00+08:00"}, now_utc=NOW)
     analysis = row["facts"]["feature_analysis"]
     assert analysis["source_field_map"]["h2h_last7"] == "feature.last"
     assert analysis["h2h_last7"]["totalLegCnt"] == 7
@@ -74,7 +77,7 @@ def test_missing_injury_payload_remains_unavailable(monkeypatch):
         "injuries": {}, "tables": [],
     })
     row = pec.collect_one({"match_id": "sporttery-2", "home": "A", "away": "B",
-                           "kickoff": "2026-08-25T20:00:00+08:00"})
+                           "kickoff": "2026-08-25T20:00:00+08:00"}, now_utc=NOW)
     assert row["evidence_audit"]["entries"]["injury"]["status"] == "UNAVAILABLE"
     assert row["evidence_audit"]["entries"]["suspensions"]["status"] == "UNAVAILABLE"
     assert row["evidence_audit"]["api_sports_attempt"]["status"] == "NOT_REQUESTED"
@@ -107,7 +110,7 @@ def test_api_sports_enrichment_fills_form_injury_and_confirmed_lineups(monkeypat
 
     monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
     row = pec.collect_one({"match_id": "sporttery-3", "home": "A", "away": "B",
-                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"}, now_utc=NOW)
     entries = row["evidence_audit"]["entries"]
     assert entries["recent_form"]["status"] == "VALID"
     assert entries["recent_form"]["source_id"] == "api-sports.io"
@@ -133,7 +136,7 @@ def test_api_fixture_id_can_be_supplied_inside_evidence_sources(monkeypatch):
     monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
     pec.collect_one({"match_id": "sporttery-7", "home": "A", "away": "B",
                      "kickoff": "2026-08-25T20:00:00+08:00",
-                     "evidence_sources": {"api_sports_fixture_id": 7788}})
+                     "evidence_sources": {"api_sports_fixture_id": 7788}}, now_utc=NOW)
     assert seen == [7788]
 
 
@@ -156,7 +159,7 @@ def test_audit_does_not_upgrade_one_sided_api_lineup_to_valid(monkeypatch):
 
     monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
     row = pec.collect_one({"match_id": "sporttery-4", "home": "A", "away": "B",
-                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"}, now_utc=NOW)
     entry = row["evidence_audit"]["entries"]["starting_xi"]
     assert entry["status"] == "PARTIAL"
     assert "starting_xi" in row["evidence_audit"]["missing_fields"]
@@ -182,7 +185,7 @@ def test_api_gap_routes_to_scrapling_and_projects_only_missing_fields(monkeypatc
     monkeypatch.setattr(pec, "_scrapling_fallback", fake_scrapling)
     row = pec.collect_one({"match_id": "sporttery-5", "home": "A", "away": "B",
                            "kickoff": "2026-08-25T20:00:00+08:00",
-                           "evidence_sources": {"scrapling_url": "https://example.test"}})
+                           "evidence_sources": {"scrapling_url": "https://example.test"}}, now_utc=NOW)
     assert calls and calls[0][0] == "sporttery-5"
     assert row["facts"]["scrapling"]["research_only"] is True
     # PREDICTED is intentionally not promoted to VALID; API/official evidence
@@ -223,7 +226,7 @@ def test_scrapling_is_attempted_before_api_and_api_only_fills_gaps(monkeypatch):
     monkeypatch.setattr(pec, "_scrapling_fallback", fake_scrapling)
     monkeypatch.setattr(pec.enrichment, "ApiSportsClient", FakeClient)
     row = pec.collect_one({"match_id": "sporttery-8", "home": "A", "away": "B",
-                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"})
+                           "competition": "英超", "kickoff": "2026-08-25T20:00:00+08:00"}, now_utc=NOW)
     assert calls == ["scrapling", "api"]
     entries = row["evidence_audit"]["entries"]
     assert entries["recent_form"]["source_id"] == "dynamic.source"

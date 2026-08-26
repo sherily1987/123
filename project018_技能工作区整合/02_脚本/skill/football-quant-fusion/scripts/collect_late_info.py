@@ -58,8 +58,15 @@ COMPETITION_ALIASES = {
 }
 
 
+def _utc_now(now_utc=None) -> datetime:
+    value = now_utc or datetime.now(timezone.utc)
+    if value.tzinfo is None:
+        raise ValueError("now_utc must be timezone-aware")
+    return value.astimezone(timezone.utc)
+
+
 def now_utc():
-    return datetime.now(timezone.utc)
+    return _utc_now()
 
 
 def parse_dt(value):
@@ -423,8 +430,8 @@ def base_row(rec, kind, snapshot, collected_at, odds_at, kickoff):
     }
 
 
-def collect_one(rec, snapshot, want_injury, want_lineup, events_path):
-    collected_at = now_utc()
+def collect_one(rec, snapshot, want_injury, want_lineup, events_path, *, now_utc: datetime | None = None):
+    collected_at = _utc_now(now_utc)
     kickoff = kickoff_of(rec)
     odds_at = odds_at_of(rec)
     mid = match_id_of(rec)
@@ -474,7 +481,8 @@ def should_retry_lineup(rows: list[dict]) -> bool:
     return not any(row.get("kind") == "lineup" and row.get("status") == "VALID" for row in rows)
 
 
-def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
+def write_due(path: Path, matches: list[dict], snapshot: str, *, now_utc: datetime | None = None) -> list[dict]:
+    observed = _utc_now(now_utc)
     due = []
     for rec in matches:
         kickoff = kickoff_of(rec)
@@ -488,7 +496,7 @@ def write_due(path: Path, matches: list[dict], snapshot: str) -> list[dict]:
             "kickoff": kickoff.isoformat(),
             "initial_refresh_at_or_after": (kickoff - timedelta(minutes=INITIAL_REFRESH_MINUTES)).isoformat(),
             "refresh_schedule": [point.isoformat() for point in refresh_points],
-            "next_refresh_at": next_refresh_at(kickoff),
+            "next_refresh_at": next_refresh_at(kickoff, observed),
             "refresh_policy": "scheduled_repoll_until_kickoff",
             "odds_at": odds_at_of(rec).isoformat() if odds_at_of(rec) else None,
             "apifootball_match_id": api_match_id_of(rec),

@@ -31,6 +31,13 @@ WEIGHT_SWEEP = (0.40, 0.50, 0.60, 0.70, 0.80)
 LOCAL_MATCH_TZ = timezone(timedelta(hours=8))
 
 
+def _utc_now(now_utc=None) -> datetime:
+    value = now_utc or datetime.now(timezone.utc)
+    if value.tzinfo is None:
+        raise ValueError("now_utc must be timezone-aware")
+    return value.astimezone(timezone.utc)
+
+
 def _parse_kickoff(value) -> datetime | None:
     """Parse Sporttery local timestamps and ISO timestamps into aware UTC time."""
     if not value:
@@ -206,11 +213,13 @@ def weight_sweep(core, version, routed: dict, prior: dict, *, weights=WEIGHT_SWE
     return variants
 
 
-def run_one(core, version, match: dict, understat, events, min_history: int, sales_day: str | None) -> dict:
+def run_one(core, version, match: dict, understat, events, min_history: int, sales_day: str | None,
+            *, now_utc: datetime | None = None) -> dict:
     ident = identity_from(match)
     if sales_day:
         ident["sales_day"] = sales_day
-    gate_reason = post_kickoff_reason(match)
+    observed = _utc_now(now_utc)
+    gate_reason = post_kickoff_reason(match, now=observed)
     if gate_reason:
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": gate_reason}
     skip = in_scope(match)
@@ -219,7 +228,7 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
                    research=_research_blob(match, hybrid_from_fusion_output({}, skip_reason=skip)))
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": skip}
 
-    research_run_at = datetime.now(timezone.utc).isoformat()
+    research_run_at = observed.isoformat()
     routed = route_match(match, understat, events, min_history, enable_experimental=True)
     prior = routed.get("lambda_prior")
     if not prior or routed.get("research_only") is not True:

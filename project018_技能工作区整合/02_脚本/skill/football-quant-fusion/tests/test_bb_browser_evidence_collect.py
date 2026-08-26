@@ -1,5 +1,6 @@
 import importlib.util
 import json
+from datetime import datetime
 from pathlib import Path
 
 
@@ -8,6 +9,8 @@ spec = importlib.util.spec_from_file_location("bb_browser_evidence_collect", MOD
 bec = importlib.util.module_from_spec(spec)
 assert spec.loader
 spec.loader.exec_module(bec)
+
+NOW = datetime.fromisoformat("2026-08-24T12:00:00+00:00")
 
 
 def _payload():
@@ -233,7 +236,7 @@ def test_collect_file_normalizes_nested_sporttery_identity_for_pending_tasks(tmp
         "sporttery_meta": {"match_id": 2040999},
     }]}), encoding="utf-8")
     output = tmp_path / "out"
-    report = bec.collect_file(source, output, None, discover=False)
+    report = bec.collect_file(source, output, None, discover=False, now_utc=NOW)
     assert report["rows"][0]["match_id"] == "sporttery-2040999"
     assert report["rows"][0]["status"] == "pending_browser_task"
     task = json.loads((output / "browser_tasks.json").read_text(encoding="utf-8"))[0]
@@ -256,7 +259,7 @@ def test_collect_file_uses_match_embedded_scrapling_source_without_url_map(monke
                               "source_id": "league.preview"},
     }]}), encoding="utf-8")
 
-    report = bec.collect_file(source, tmp_path / "out", None, discover=False)
+    report = bec.collect_file(source, tmp_path / "out", None, discover=False, now_utc=NOW)
     assert report["ok"] == 1
     saved = json.loads((tmp_path / "out" / "sporttery-2041001.json").read_text(encoding="utf-8"))
     assert saved["provider"] == "league_preview"
@@ -327,7 +330,7 @@ def test_collect_file_scrapes_discovered_allowlisted_candidates(monkeypatch, tmp
                                                 "evidence_gap": False},
                         })
     report = bec.collect_file(source, tmp_path / "out", None, discover=True,
-                              scrape_discovered=True)
+                              scrape_discovered=True, now_utc=NOW)
     assert report["ok"] == 1
     saved = json.loads((tmp_path / "out" / "sporttery-2050002.json").read_text(encoding="utf-8"))
     assert saved["source_discovery"]["official_candidates"]
@@ -358,7 +361,7 @@ def test_collect_file_discovers_additional_sources_after_partial_mapped_fetch(mo
 
     monkeypatch.setattr(bec, "_scrapling_generic_snapshot", fake_generic)
     report = bec.collect_file(source, tmp_path / "out", None,
-                              discover=True, scrape_discovered=True)
+                              discover=True, scrape_discovered=True, now_utc=NOW)
     assert report["ok"] == 1
     assert calls == ["https://mapped.example/preview", "https://official.example/match/2050003"]
     saved = json.loads((tmp_path / "out" / "sporttery-2050003.json").read_text(encoding="utf-8"))

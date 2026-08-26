@@ -37,6 +37,13 @@ UTC = timezone.utc
 REQUIRED = ("team_stats", "recent_form", "injury", "suspensions", "starting_xi")
 
 
+def _utc_now(now_utc=None) -> datetime:
+    value = now_utc or datetime.now(timezone.utc)
+    if value.tzinfo is None:
+        raise ValueError("now_utc must be timezone-aware")
+    return value.astimezone(timezone.utc)
+
+
 def _load_team_aliases() -> dict[str, list[str]]:
     path = HERE.parent / "config" / "intl_odds_sources.json"
     try:
@@ -321,13 +328,14 @@ def _audit(match: dict[str, Any], facts: dict[str, Any], collected_at: str) -> d
                 "international": "research_only"}}
 
 
-def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5) -> dict[str, Any]:
+def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5,
+                now_utc: datetime | None = None) -> dict[str, Any]:
     mid = match.get("match_id")
     if mid is None:
         raise ValueError("match_id required")
-    collected_at = datetime.now(UTC).isoformat(timespec="seconds")
+    now = _utc_now(now_utc)
+    collected_at = now.isoformat(timespec="seconds")
     kickoff = _parse(match.get("kickoff"))
-    now = datetime.now(UTC)
     if kickoff and now >= kickoff:
         audit = {"schema_version": "evidence-audit-1.1", "critical_fields": list(REQUIRED),
                  "entries": {}, "missing_fields": list(REQUIRED), "evidence_gap": True,
@@ -361,8 +369,9 @@ def collect_one(match: dict[str, Any], *, terms: int = 10, hist: int = 5) -> dic
 
 
 def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | None = None,
-                 terms: int = 10, hist: int = 5,
-                 scrapling_url_map: Path | None = None) -> dict[str, Any]:
+                  terms: int = 10, hist: int = 5,
+                  scrapling_url_map: Path | None = None,
+                  now_utc: datetime | None = None) -> dict[str, Any]:
     payload = json.loads(input_path.read_text(encoding="utf-8-sig"))
     if isinstance(payload, dict) and isinstance(payload.get("matches"), list):
         matches = payload["matches"]
@@ -400,7 +409,7 @@ def collect_file(input_path: Path, output_dir: Path, *, match_ids: set[str] | No
         if match_ids and key not in match_ids and key.removeprefix("sporttery-") not in match_ids:
             continue
         try:
-            row = collect_one(match, terms=terms, hist=hist)
+            row = collect_one(match, terms=terms, hist=hist, now_utc=now_utc)
             path = output_dir / f"{key}.json"
             path.write_text(json.dumps(row, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             audit = row.get("evidence_audit") or {}

@@ -1,5 +1,6 @@
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -125,7 +126,7 @@ def test_run_one_persists_router_time_audit_with_research_sidecar(monkeypatch, t
     hs.run_one(None, {}, {
         "match_id": "sporttery-1", "home": "主队", "away": "客队", "competition": "英超",
         "kickoff": "2026-08-25T00:00:00+00:00", "prediction_as_of": "2026-08-21T20:00:00+00:00",
-    }, [], [], 5, "2026-08-22")
+    }, [], [], 5, "2026-08-22", now_utc=datetime(2026, 8, 24, 12, 0, tzinfo=timezone.utc))
 
     hybrid = captured["research"]
     assert hybrid["routing_audit"] == router_audit

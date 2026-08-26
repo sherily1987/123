@@ -32,6 +32,13 @@ from typing import Any
 
 UTC = timezone.utc
 
+
+def _utc_now(now_utc=None) -> datetime:
+    value = now_utc or datetime.now(timezone.utc)
+    if value.tzinfo is None:
+        raise ValueError("now_utc must be timezone-aware")
+    return value.astimezone(timezone.utc)
+
 # Defaults are only hints for candidate classification.  A league-specific
 # input may add its own official domains; no URL is promoted to production by
 # this list.
@@ -672,8 +679,8 @@ def _snapshot(match: dict[str, Any], payload: dict[str, Any], source_url: str,
 
 
 def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
-                *, now: datetime | None = None) -> dict[str, Any]:
-    now = now or datetime.now(UTC)
+                *, now: datetime | None = None, now_utc: datetime | None = None) -> dict[str, Any]:
+    now = _utc_now(now_utc if now_utc is not None else now)
     kickoff = _parse(match.get("kickoff"))
     if kickoff and now >= kickoff:
         return {"status": "post_kickoff", "match_id": match.get("match_id"),
@@ -696,7 +703,7 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
         return {"status": "pending_browser_task", "match_id": match.get("match_id"),
                 "browser_task": {"reason": "SCRAPLING_URL_REQUIRED_FOR_GENERIC_SOURCE"}}
     if not fotmob_id:
-        collected_at = datetime.now(UTC).isoformat(timespec="seconds")
+        collected_at = now.isoformat(timespec="seconds")
         snapshot, attempts = _scrapling_attempts(match, mapping, collected_at)
         if snapshot is not None:
             row = {"status": "ok", **snapshot}
@@ -709,7 +716,7 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
                 "reason": "ALL_SCRAPLING_SOURCES_FAILED", "evidence_gap": True,
                 "scrapling_attempts": attempts, "scrapling_fallback_used": False}
     tab = None
-    collected_at = datetime.now(UTC).isoformat(timespec="seconds")
+    collected_at = now.isoformat(timespec="seconds")
     try:
         tab = _tab_id(_run_browser(["open", str(url)]))
         # Function syntax survives the Windows bb-browser.cmd argument parser;
@@ -780,7 +787,8 @@ def collect_one(match: dict[str, Any], mapping: dict[str, Any] | None,
 
 
 def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
-                 *, discover: bool = False, scrape_discovered: bool = False) -> dict[str, Any]:
+                 *, discover: bool = False, scrape_discovered: bool = False,
+                 now_utc: datetime | None = None) -> dict[str, Any]:
     payload = json.loads(input_path.read_text(encoding="utf-8-sig"))
     if isinstance(payload, dict) and isinstance(payload.get("matches"), list):
         matches = payload["matches"]
@@ -830,7 +838,7 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
             if scrape_discovered and discovered.get("status") == "source_candidates_found":
                 mapping = _discovered_mapping(discovered)
                 if mapping:
-                    row = collect_one(match, mapping)
+                    row = collect_one(match, mapping, now_utc=now_utc)
                     if row.get("status") == "ok":
                         row["source_discovery"] = discovered
                         path = output_dir / f"{mid}.json"
@@ -849,7 +857,7 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
             rows.append({k: row.get(k) for k in ("match_id", "status", "reason", "path", "browser_task") if k in row})
             continue
         try:
-            row = collect_one(match, mapping)
+            row = collect_one(match, mapping, now_utc=now_utc)
         except Exception as exc:
             row = {"status": "error", "match_id": mid, "reason": str(exc)[:300]}
         # A mapped API/FotMob source may be reachable yet omit injuries, form,
@@ -864,7 +872,7 @@ def collect_file(input_path: Path, output_dir: Path, url_map_path: Path | None,
                 if discovered.get("status") == "source_candidates_found" else None
             )
             if discovered_mapping:
-                discovered_row = collect_one(match, discovered_mapping)
+                discovered_row = collect_one(match, discovered_mapping, now_utc=now_utc)
                 if row.get("status") == "ok" and discovered_row.get("status") == "ok":
                     attempts = discovered_row.get("scrapling_attempts") or []
                     row["scrapling_attempts"] = (row.get("scrapling_attempts") or []) + attempts
