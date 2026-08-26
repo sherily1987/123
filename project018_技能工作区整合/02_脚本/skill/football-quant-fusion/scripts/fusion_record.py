@@ -88,6 +88,43 @@ def _aware_datetime(value):
     return parsed.astimezone(timezone.utc)
 
 
+def _direction_policy_claims(value, path='$'):
+    """Collect every persisted direction-policy copy with its JSON path."""
+    claims = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f'{path}.{key}'
+            if key == 'direction_policy':
+                claims.append({'path': child_path, 'value': child})
+            claims.extend(_direction_policy_claims(child, child_path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            claims.extend(_direction_policy_claims(child, f'{path}[{index}]'))
+    return claims
+
+
+def _direction_claims_sha256(claims):
+    hash_input = claims or [{'path': '$.direction_policy', 'value': '<missing>'}]
+    canonical = json.dumps(
+        hash_input, ensure_ascii=False, sort_keys=True,
+        separators=(',', ':'), allow_nan=True,
+    ).encode('utf-8')
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def _replace_direction_policies(value, replacement):
+    """Replace all nested policy claims in a JSON-compatible object in place."""
+    if isinstance(value, dict):
+        for key, child in list(value.items()):
+            if key == 'direction_policy':
+                value[key] = copy.deepcopy(replacement)
+            else:
+                _replace_direction_policies(child, replacement)
+    elif isinstance(value, list):
+        for child in value:
+            _replace_direction_policies(child, replacement)
+
+
 def _direction_validation_error(candidate, expected, *, probabilities,
                                 build, prediction_as_of, kickoff):
     """Return a stable error code, or None when a policy is safe to persist."""
@@ -135,7 +172,7 @@ def _direction_validation_error(candidate, expected, *, probabilities,
     return None
 
 
-def _unavailable_direction_policy(expected, *, error):
+def _unavailable_direction_policy(expected, *, error, rejected_sha256):
     """Remove every direction claim while retaining auditable policy identity."""
     unavailable = copy.deepcopy(expected) if isinstance(expected, dict) else {}
     unavailable.update({
@@ -147,38 +184,62 @@ def _unavailable_direction_policy(expected, *, error):
         'gap_pp': None,
         'reason': 'validation_error',
         'validation_error': error,
+        'rejected_direction_policy_sha256': rejected_sha256,
     })
     return unavailable
 
 
 def validate_direction_registration(out, *, build, prediction_as_of, kickoff):
     """Validate a supplied policy; never synthesize a missing historical one."""
-    candidate = out.get('direction_policy')
-    if candidate is None:
-        return 'NOT_REGISTERED', None
     probabilities = _final_probabilities(out)
+    claims = _direction_policy_claims(out)
+    rejected_sha256 = _direction_claims_sha256(claims)
     try:
-        expected = build_direction_policy(
-            probabilities,
-            prediction_as_of=prediction_as_of,
-            model_identity=build,
-            policy=load_policy(),
-        )
+        policy_config = load_policy()
     except Exception as exc:
         return 'UNAVAILABLE', _unavailable_direction_policy(
-            {}, error=f'policy_validation_failed:{type(exc).__name__}'
+            {}, error=f'policy_validation_failed:{type(exc).__name__}',
+            rejected_sha256=rejected_sha256,
+        )
+    activation = _aware_datetime(policy_config.get('activation_timestamp'))
+    prediction_time = _aware_datetime(prediction_as_of)
+    if activation is None or prediction_time is None:
+        return 'UNAVAILABLE', _unavailable_direction_policy(
+            {}, error='policy_activation_timestamp_invalid',
+            rejected_sha256=rejected_sha256,
+        )
+
+    top_level_present = isinstance(out, dict) and 'direction_policy' in out
+    if not top_level_present and not claims and prediction_time < activation:
+        return 'NOT_REGISTERED', None
+
+    expected = build_direction_policy(
+        probabilities,
+        prediction_as_of=prediction_as_of,
+        model_identity=build,
+        policy=policy_config,
+    )
+    if not top_level_present:
+        error = ('direction_policy_top_level_missing' if claims
+                 else 'direction_policy_missing_after_activation')
+        return 'UNAVAILABLE', _unavailable_direction_policy(
+            expected, error=error, rejected_sha256=rejected_sha256,
         )
     if expected.get('status') != 'AVAILABLE':
         return 'UNAVAILABLE', _unavailable_direction_policy(
-            expected, error='expected_policy_unavailable'
+            expected, error='expected_policy_unavailable',
+            rejected_sha256=rejected_sha256,
         )
-    error = _direction_validation_error(
-        candidate, expected, probabilities=probabilities, build=build,
-        prediction_as_of=prediction_as_of, kickoff=kickoff,
-    )
-    if error is not None:
-        return 'UNAVAILABLE', _unavailable_direction_policy(expected, error=error)
-    return 'REGISTERED', copy.deepcopy(candidate)
+    for claim in claims:
+        error = _direction_validation_error(
+            claim['value'], expected, probabilities=probabilities, build=build,
+            prediction_as_of=prediction_as_of, kickoff=kickoff,
+        )
+        if error is not None:
+            return 'UNAVAILABLE', _unavailable_direction_policy(
+                expected, error=error, rejected_sha256=rejected_sha256,
+            )
+    return 'REGISTERED', copy.deepcopy(expected)
 
 
 def cohort_key(model_version, probability_signature, route, mode, llm_model_pool_sha256=None):
@@ -278,6 +339,10 @@ def main():
     direction_policy_status, registered_direction_policy = validate_direction_registration(
         out, build=build, prediction_as_of=prediction_as_of, kickoff=kd,
     )
+    persisted_out = copy.deepcopy(out)
+    if registered_direction_policy is not None:
+        _replace_direction_policies(persisted_out, registered_direction_policy)
+        persisted_out['direction_policy'] = copy.deepcopy(registered_direction_policy)
 
     route = inp.get('route') or out.get('route') or 'unknown'
     mode = inp.get('mode') or out.get('mode') or 'unknown'
@@ -354,10 +419,11 @@ def main():
                   'home': inp['home'], 'away': inp['away'],
                   'sporttery_meta': sm},
         'input': inp,
-        'output': out,
+        'output': persisted_out,
         'direction_policy_status': direction_policy_status,
         'hashes': {
             'input_sha256': sha(inp), 'output_sha256': sha(out),
+            'persisted_output_sha256': sha(persisted_out),
             'input_raw_sha256': raw_sha256(input_raw), 'output_raw_sha256': raw_sha256(output_raw),
         },
     }
@@ -383,13 +449,13 @@ def main():
     append_jsonl(reg, entry)
     job_file = None
     try:
-        ident = identity_from(inp, out)
+        ident = identity_from(inp, persisted_out)
         ident['match_id'] = mid
         job_file = str(upsert_job(
             jobs_root(Path(a.store)),
             ident,
             input_obj=inp,
-            quant=quant_from_fusion_output(out, prediction_id=pid),
+            quant=quant_from_fusion_output(persisted_out, prediction_id=pid),
         ))
     except Exception as exc:
         job_file = f"job_upsert_failed:{exc}"

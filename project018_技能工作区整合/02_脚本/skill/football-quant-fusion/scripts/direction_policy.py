@@ -23,6 +23,7 @@ SUM_TOLERANCE_PP = 0.5
 REQUIRED_POLICY_FIELDS = (
     "schema_version",
     "rule_version",
+    "activation_timestamp",
     "primary_only_min_gap_pp",
     "cover_min_gap_pp",
     "cover_max_gap_pp",
@@ -77,11 +78,16 @@ def validate_policy(policy: dict[str, Any]) -> None:
     for field in REQUIRED_POLICY_FIELDS:
         if field not in policy:
             raise ValueError(f"policy missing {field}")
-    for field in ("schema_version", "rule_version"):
+    for field in ("schema_version", "rule_version", "activation_timestamp"):
         value = policy[field]
         if not isinstance(value, str) or not value.strip() or value != value.strip():
             raise ValueError(f"policy {field} must be a non-empty string")
-    numeric_fields = REQUIRED_POLICY_FIELDS[2:]
+    if _aware_time(policy["activation_timestamp"]) is None:
+        raise ValueError("policy activation_timestamp must be timezone-aware")
+    numeric_fields = (
+        "primary_only_min_gap_pp", "cover_min_gap_pp", "cover_max_gap_pp",
+        "alternative_min_probability", "draw_tie_band_pp", "unclear_max_gap_pp",
+    )
     for field in numeric_fields:
         value = policy[field]
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
@@ -171,6 +177,9 @@ def _unavailable(*, policy: Any, probabilities: Any, prediction_as_of: Any,
         "schema_version": schema_version,
         "rule_version": rule_version,
         "policy_version": rule_version,
+        "activation_timestamp": (
+            policy.get("activation_timestamp") if isinstance(policy, dict) else None
+        ),
         "status": "UNAVAILABLE",
         "classification": "UNAVAILABLE",
         "primary_direction": None,
@@ -261,6 +270,7 @@ def build_direction_policy(probabilities: Any, *, prediction_as_of: Any,
         "schema_version": policy["schema_version"],
         "rule_version": policy["rule_version"],
         "policy_version": policy["rule_version"],
+        "activation_timestamp": policy["activation_timestamp"],
         "status": "AVAILABLE",
         "classification": classification,
         "primary_direction": primary_direction,

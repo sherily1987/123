@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib
 import json
 import subprocess
@@ -74,7 +75,8 @@ def _write_payloads(root: Path, inp: dict, out: dict) -> tuple[Path, Path]:
 
 
 def _run_record(root: Path, inp: dict, out: dict, *, snapshot: str = "prematch",
-                replace_snapshot: bool = False) -> subprocess.CompletedProcess[str]:
+                replace_snapshot: bool = False,
+                allow_past: bool = False) -> subprocess.CompletedProcess[str]:
     input_path, output_path = _write_payloads(root, inp, out)
     command = [
         sys.executable,
@@ -86,6 +88,8 @@ def _run_record(root: Path, inp: dict, out: dict, *, snapshot: str = "prematch",
     ]
     if replace_snapshot:
         command.append("--replace-snapshot")
+    if allow_past:
+        command.append("--allow-past")
     return subprocess.run(command, text=True, capture_output=True)
 
 
@@ -95,6 +99,19 @@ def _records(root: Path) -> list[dict]:
         for line in (root / "store" / "registry.jsonl").read_text(encoding="utf-8").splitlines()
     ]
     return [json.loads(Path(entry["path"]).read_text(encoding="utf-8")) for entry in entries]
+
+
+def _direction_policies(value) -> list[dict]:
+    found = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "direction_policy" and isinstance(child, dict):
+                found.append(child)
+            found.extend(_direction_policies(child))
+    elif isinstance(value, list):
+        for child in value:
+            found.extend(_direction_policies(child))
+    return found
 
 
 def test_new_formal_prediction_attaches_policy_without_changing_probabilities(monkeypatch):
@@ -116,6 +133,7 @@ def test_new_formal_prediction_attaches_policy_without_changing_probabilities(mo
     assert result["forecast"]["final_1x2_pct"] == probabilities
     assert result["core_output"]["final_1x2_pct"] == probabilities
     assert result["direction_policy"]["rule_version"] == "direction-policy-v1"
+    assert result["direction_policy"]["activation_timestamp"] == "2026-08-26T11:16:27+08:00"
     assert result["direction_policy"]["probabilities"] == {
         "H": 39.4, "D": 29.8, "A": 30.8,
     }
@@ -152,7 +170,7 @@ def test_policy_generation_failure_keeps_probability_output_and_clears_direction
     }
     monkeypatch.setattr(fusion_predict, "_core_predict_one", lambda *_args: copy.deepcopy(bare))
     monkeypatch.setattr(
-        fusion_predict, "load_policy",
+        fusion_predict, "_load_direction_policy_module",
         lambda: (_ for _ in ()).throw(ValueError("policy missing")),
     )
 
@@ -165,7 +183,31 @@ def test_policy_generation_failure_keeps_probability_output_and_clears_direction
     assert unavailable["primary_direction"] is None
     assert unavailable["alternative_direction"] is None
     assert unavailable["reason"] == "validation_error"
-    assert unavailable["validation_error"] == "policy_generation_failed:ValueError"
+    assert unavailable["validation_error"] == "direction_policy_import_failed:ValueError"
+
+
+def test_direction_module_import_failure_never_blocks_base_probability(monkeypatch, tmp_path):
+    _, prediction_as_of = _times()
+    probabilities = [55.0, 25.0, 20.0]
+    bare = {
+        "fusion_status": "ok",
+        "research_only": False,
+        "build_identity": fusion_predict._core.build_identity(),
+        "forecast": {"final_1x2_pct": list(probabilities)},
+        "core_output": {"final_1x2_pct": list(probabilities)},
+    }
+    monkeypatch.setattr(fusion_predict, "_core_predict_one", lambda *_args: copy.deepcopy(bare))
+    monkeypatch.setattr(fusion_predict, "_DIRECTION_POLICY_FILE", tmp_path / "missing.py")
+
+    result = fusion_predict.predict_one(object(), "test", {"prediction_as_of": prediction_as_of})
+
+    assert result["forecast"]["final_1x2_pct"] == probabilities
+    assert result["direction_policy"]["status"] == "UNAVAILABLE"
+    assert result["direction_policy"]["primary_direction"] is None
+    assert result["direction_policy"]["alternative_direction"] is None
+    assert result["direction_policy"]["validation_error"].startswith(
+        "direction_policy_import_failed:"
+    )
 
 
 def test_prematch_record_contains_validated_direction_policy(tmp_path):
@@ -182,18 +224,54 @@ def test_prematch_record_contains_validated_direction_policy(tmp_path):
     assert recorded["direction_policy"]["rule_version"] == "direction-policy-v1"
 
 
-def test_legacy_output_without_policy_is_not_backfilled(tmp_path):
-    kickoff, prediction_as_of = _times()
+def test_policy_config_has_aware_task4_activation_timestamp():
+    policy = json.loads(
+        (SKILL_ROOT / "config" / "direction_policy.json").read_text(encoding="utf-8-sig")
+    )
+
+    activation = datetime.fromisoformat(policy["activation_timestamp"])
+
+    assert policy["activation_timestamp"] == "2026-08-26T11:16:27+08:00"
+    assert activation.tzinfo is not None
+    assert activation.utcoffset() is not None
+
+
+def test_legacy_output_before_policy_activation_is_not_backfilled(tmp_path):
+    kickoff = "2026-08-27T20:00:00+08:00"
+    prediction_as_of = "2026-08-26T11:16:26+08:00"
     inp = _input(kickoff, prediction_as_of)
     out = _valid_output(prediction_as_of)
     del out["direction_policy"]
 
-    result = _run_record(tmp_path, inp, out)
+    result = _run_record(tmp_path, inp, out, allow_past=True)
 
     assert result.returncode == 0, result.stderr or result.stdout
     recorded = _records(tmp_path)[0]
     assert recorded["direction_policy_status"] == "NOT_REGISTERED"
     assert "direction_policy" not in recorded
+
+
+@pytest.mark.parametrize("prediction_as_of", [
+    "2026-08-26T11:16:27+08:00",
+    "2026-08-26T11:16:28+08:00",
+])
+def test_current_output_missing_policy_is_unavailable_not_legacy(tmp_path, prediction_as_of):
+    kickoff = "2026-08-27T20:00:00+08:00"
+    inp = _input(kickoff, prediction_as_of, match_id=f"missing-{prediction_as_of[-8:]}")
+    out = _valid_output(prediction_as_of)
+    del out["direction_policy"]
+
+    result = _run_record(tmp_path, inp, out, allow_past=True)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    recorded = _records(tmp_path)[0]
+    assert recorded["direction_policy_status"] == "UNAVAILABLE"
+    assert recorded["direction_policy"]["status"] == "UNAVAILABLE"
+    assert recorded["direction_policy"]["reason"] == "validation_error"
+    assert recorded["direction_policy"]["validation_error"] == "direction_policy_missing_after_activation"
+    assert recorded["direction_policy"]["primary_direction"] is None
+    assert recorded["direction_policy"]["alternative_direction"] is None
+    assert recorded["output"]["direction_policy"] == recorded["direction_policy"]
 
 
 @pytest.mark.parametrize(
@@ -206,6 +284,7 @@ def test_legacy_output_without_policy_is_not_backfilled(tmp_path):
         ).isoformat()), "prediction_as_of_mismatch"),
         (lambda policy, out, inp: policy.update(schema_version="direction-policy-0.0"), "schema_version_mismatch"),
         (lambda policy, out, inp: policy.update(unregistered_extension=True), "schema_fields_mismatch"),
+        (lambda policy, out, inp: policy.update(non_finite_extension=float("nan")), "schema_fields_mismatch"),
         (lambda policy, out, inp: policy.update(rule_version="direction-policy-v0"), "rule_version_mismatch"),
         (lambda policy, out, inp: policy.update(decision_policy_signature="0" * 64), "decision_policy_signature_mismatch"),
         (lambda policy, out, inp: policy["decision_policy_signature_components"].update(
@@ -235,6 +314,44 @@ def test_invalid_policy_records_probability_snapshot_as_unavailable(
     assert unavailable["alternative_direction"] is None
     assert unavailable["reason"] == "validation_error"
     assert unavailable["validation_error"] == expected_error
+
+
+def test_invalid_policy_is_sanitized_from_every_persisted_nested_copy(tmp_path):
+    kickoff, prediction_as_of = _times()
+    inp = _input(kickoff, prediction_as_of, match_id="nested-policy-sanitize")
+    out = _valid_output(prediction_as_of)
+    valid = copy.deepcopy(out["direction_policy"])
+    tampered = copy.deepcopy(valid)
+    tampered["primary_direction"] = "A"
+    out["direction_policy"] = tampered
+    out["core_output"] = {"final_1x2_pct": [55.0, 25.0, 20.0],
+                          "direction_policy": copy.deepcopy(tampered)}
+    out["fusion_full_output"] = {
+        "direction_policy": copy.deepcopy(valid),
+        "core_output": {"direction_policy": copy.deepcopy(tampered)},
+        "results": [{"direction_policy": copy.deepcopy(tampered)}],
+    }
+
+    result = _run_record(tmp_path, inp, out)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    recorded = _records(tmp_path)[0]
+    policies = _direction_policies(recorded)
+    assert len(policies) >= 6
+    assert {policy["validation_error"] for policy in policies} == {"primary_direction_mismatch"}
+    assert len({policy["rejected_direction_policy_sha256"] for policy in policies}) == 1
+    for policy in policies:
+        assert policy["status"] == "UNAVAILABLE"
+        assert policy["classification"] == "UNAVAILABLE"
+        assert policy["primary_direction"] is None
+        assert policy["alternative_direction"] is None
+    rejection_hash = recorded["direction_policy"]["rejected_direction_policy_sha256"]
+    assert len(rejection_hash) == 64
+    int(rejection_hash, 16)
+    assert recorded["hashes"]["output_raw_sha256"] == hashlib.sha256(
+        (tmp_path / "output.json").read_bytes()
+    ).hexdigest()
+    assert recorded["hashes"]["persisted_output_sha256"] != recorded["hashes"]["output_sha256"]
 
 
 def test_policy_time_must_be_aware_and_strictly_prematch_without_blocking_probability(tmp_path):
