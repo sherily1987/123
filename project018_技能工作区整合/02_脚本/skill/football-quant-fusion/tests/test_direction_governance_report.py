@@ -18,6 +18,7 @@ import version_progress  # noqa: E402
 CURRENT_SIG = "a" * 64
 ALIAS_SIG = "b" * 64
 DRIFT_SIG = "c" * 64
+OFFICIAL_90MIN_SOURCE = "中国体彩网移动端官方赛果"
 
 
 def _policy(classification, primary, alternative=None):
@@ -61,7 +62,7 @@ def _store(root: Path, records):
             result = {
                 "status": "finished", "settlement_scope": "90min",
                 "score_90": {"home": score[0], "away": score[1]},
-                "source": {"name": "official"},
+                "source": {"name": OFFICIAL_90MIN_SOURCE},
             }
             (root / "results" / f"{record['match_id']}.json").write_text(
                 json.dumps(result), encoding="utf-8")
@@ -82,8 +83,16 @@ def test_read_only_governance_report_combines_lock_alias_drift_and_direction_met
                       _policy("PRIMARY_ONLY", "H"))
     aliased = _record("alias", "m3", ALIAS_SIG, "market_only", "REGISTERED",
                       _policy("PRIMARY_WITH_COVER", "H", "D"))
+    alias_unverified = _record(
+        "alias-unverified", "m3", ALIAS_SIG, "market_only", "REGISTERED",
+        _policy("PRIMARY_ONLY", "A"))
     drift = _record("drift", "m4", DRIFT_SIG, "hybrid", "NOT_REGISTERED", None)
-    _store(tmp_path, [(current, "H"), (aliased, "D"), (drift, "A")])
+    _store(tmp_path, [
+        (current, "H"), (aliased, "D"), (alias_unverified, "A"), (drift, "A")])
+    unverified_path = tmp_path / "results" / "alias-unverified.json"
+    unverified = json.loads(unverified_path.read_text(encoding="utf-8"))
+    unverified["source"] = {"name": "unknown-provider"}
+    unverified_path.write_text(json.dumps(unverified), encoding="utf-8")
     lock_path = tmp_path / "release_lock.json"
     lock_path.write_text(json.dumps({
         "model_version": "m4", "probability_signature": CURRENT_SIG,
@@ -126,7 +135,12 @@ def test_read_only_governance_report_combines_lock_alias_drift_and_direction_met
     }
     assert report["release_lock"]["status"] == "MATCH"
     assert report["sample_identity"] == {
-        "raw_current_n": 1, "approved_alias_n": 1, "current_settled_n": 2,
+        "raw_current_registry_settled_upper_bound_n": 1,
+        "approved_alias_registry_settled_upper_bound_n": 2,
+        "registry_settled_upper_bound_n": 3,
+        "raw_current_verified_official_settled_n": 1,
+        "approved_alias_verified_official_settled_n": 1,
+        "verified_official_settled_n": 2,
         "current_pending_n": 0,
     }
     assert report["drift_group_status_counts"] == {"UNREPLAYED": 1}
@@ -139,12 +153,12 @@ def test_read_only_governance_report_combines_lock_alias_drift_and_direction_met
         "attestation_path": str(attestation_path),
         "attestation_sha256": _digest(attestation_path),
         "compare_fields": ["final_1x2_pct", "score_matrix"],
-        "record_count": 1,
-        "settled_count": 1,
+        "record_count": 2,
+        "verified_official_settled_count": 1,
     }]
     metrics = report["direction_policy_metrics"]
     assert metrics["registration_status_counts"] == {
-        "NOT_REGISTERED": 1, "REGISTERED": 2,
+        "NOT_REGISTERED": 1, "REGISTERED": 3,
     }
     assert metrics["primary_hit"] == {"hits": 1, "n": 2, "rate": 0.5}
     assert metrics["alternative_hit"] == {"hits": 1, "n": 1, "rate": 1.0}

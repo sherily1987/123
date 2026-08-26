@@ -6,6 +6,8 @@ from collections import Counter
 from datetime import datetime
 from typing import Any
 
+from backtest_dual_track import validate_90min_settlement
+
 
 DIRECTIONS = frozenset({"H", "D", "A"})
 SCOREABLE_CLASSIFICATIONS = frozenset({"PRIMARY_ONLY", "PRIMARY_WITH_COVER"})
@@ -38,27 +40,22 @@ def _score_direction(score: Any) -> str | None:
     return "H" if home > away else ("D" if home == away else "A")
 
 
-def _official_direction(value: Any) -> str | None:
-    """Return a verified 90-minute H/D/A result, never a full-match outcome."""
-    if isinstance(value, str):
-        normalized = value.strip().upper()
-        return normalized if normalized in DIRECTIONS else None
+def is_verified_official_90min_result(value: Any) -> bool:
+    """Return whether a payload satisfies the shared formal result boundary."""
     if not isinstance(value, dict):
-        return None
+        return False
     if any(value.get(field) not in (None, "", False) for field in (
             "score_et", "score_extra_time", "penalty_winner", "score_penalties")):
-        return None
-    score_status = value.get("score_90_status")
-    if score_status is not None:
-        if not isinstance(score_status, str) or score_status.strip().lower() != "verified":
-            return None
-        explicit = value.get("official_result") or value.get("direction")
-        if explicit is not None:
-            return _official_direction(explicit)
-        return _score_direction(value.get("score_90"))
-    if (str(value.get("status") or "").strip().lower() != "finished"
-            or str(value.get("settlement_scope") or "").strip().lower() != "90min"
-            or not value.get("source")):
+        return False
+    if ("score_90_status" in value
+            and value.get("score_90_status") != "verified"):
+        return False
+    return bool(validate_90min_settlement(value).get("eligible"))
+
+
+def _official_direction(value: Any) -> str | None:
+    """Return a verified 90-minute H/D/A result, never a full-match outcome."""
+    if not is_verified_official_90min_result(value):
         return None
     return _score_direction(value.get("score_90"))
 
@@ -82,9 +79,9 @@ def settle_direction_policy(
 ) -> dict[str, Any]:
     """Settle only a registered, valid prematch policy against official 90 minutes.
 
-    A normalized ``H/D/A`` string is accepted at this internal boundary.  Raw
-    result objects must either carry ``score_90_status=verified`` or match the
-    immutable formal result contract (finished, 90min, source, score_90).
+    Result objects must satisfy the repository's formal official 90-minute
+    settlement contract.  Bare directions and offline scores are never formal
+    evidence and therefore never enter direction denominators.
     """
     official = _official_direction(official_result)
     if registration_status is None:
@@ -104,9 +101,9 @@ def settle_direction_policy(
         return _empty_settlement("UNAVAILABLE", official)
 
     prediction_as_of = _aware_time(policy.get("prediction_as_of"))
-    kickoff_at = _aware_time(kickoff) if kickoff is not None else None
-    if prediction_as_of is None or (kickoff is not None and (
-            kickoff_at is None or prediction_as_of >= kickoff_at)):
+    kickoff_at = _aware_time(kickoff)
+    if (prediction_as_of is None or kickoff_at is None
+            or prediction_as_of >= kickoff_at):
         return _empty_settlement("UNAVAILABLE", official)
 
     classification = policy.get("classification")

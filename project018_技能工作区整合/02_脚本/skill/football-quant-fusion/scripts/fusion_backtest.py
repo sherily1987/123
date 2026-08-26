@@ -563,7 +563,9 @@ def score_record(rec, root):
         "snapshot_type": rec.get("snapshot_type"),
         "version": _version,
         "model": _m if isinstance(_m, dict) else {},
-        "mode": exact_route or "unknown",
+        "mode": str((rec.get("input") or {}).get("mode") or
+                    ((rec.get("output") or {}).get("mode")) or
+                    (_m.get("mode") if isinstance(_m, dict) else "unknown")),
         "route": exact_route,
         "route_identity_valid": exact_route is not None,
         "core_engine_version": (rec.get("output") or {}).get("core_engine_version"),
@@ -693,7 +695,7 @@ def main():
                 "direction_policy": it.get("direction_policy"),
                 "direction_settlement": settle_direction_policy(
                     it.get("direction_policy"),
-                    {"score_90_status": "verified", "score_90": s90},
+                    it.get("official_result"),
                     registration_status=str(
                         it.get("direction_policy_status") or "NOT_REGISTERED"),
                     kickoff=it.get("kickoff"),

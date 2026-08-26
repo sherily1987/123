@@ -15,6 +15,7 @@ from direction_settlement import (  # noqa: E402
     summarize_direction_policy_metrics,
 )
 backtest = importlib.import_module("fusion_backtest")
+OFFICIAL_90MIN_SOURCE = "中国体彩网移动端官方赛果"
 
 
 def policy(classification="PRIMARY_WITH_COVER", primary="H", alternative="D"):
@@ -34,21 +35,23 @@ def official(direction):
         "status": "finished",
         "settlement_scope": "90min",
         "score_90": {"home": home, "away": away},
-        "source": {"name": "official"},
+        "source": {"name": OFFICIAL_90MIN_SOURCE},
     }
 
 
-def settle(value, result="D", registration_status="REGISTERED"):
+def settle(value, result=None, registration_status="REGISTERED", **kwargs):
+    if result is None:
+        result = official("D")
     return settle_direction_policy(
         value,
         result,
         registration_status=registration_status,
-        kickoff="2026-09-01T12:00:00+00:00",
+        kickoff=kwargs.get("kickoff", "2026-09-01T12:00:00+00:00"),
     )
 
 
 def test_cover_hit_does_not_turn_primary_into_hit():
-    assert settle(policy(primary="H", alternative="D"), "D") == {
+    assert settle(policy(primary="H", alternative="D"), official("D")) == {
         "primary_hit": False,
         "alternative_hit": True,
         "direction_policy_hit": True,
@@ -58,7 +61,7 @@ def test_cover_hit_does_not_turn_primary_into_hit():
 
 
 def test_missing_historical_policy_is_not_registered_and_never_reinferred():
-    assert settle(None, "H", registration_status="NOT_REGISTERED") == {
+    assert settle(None, official("H"), registration_status="NOT_REGISTERED") == {
         "primary_hit": None,
         "alternative_hit": None,
         "direction_policy_hit": None,
@@ -71,9 +74,9 @@ def test_unavailable_and_unclear_policies_are_not_scoreable():
     unavailable = settle(
         {"status": "UNAVAILABLE", "classification": "UNAVAILABLE",
          "primary_direction": None, "alternative_direction": None},
-        "H", registration_status="UNAVAILABLE",
+        official("H"), registration_status="UNAVAILABLE",
     )
-    unclear = settle(policy("UNCLEAR", None, None), "D")
+    unclear = settle(policy("UNCLEAR", None, None), official("D"))
 
     assert unavailable["settlement_status"] == "UNAVAILABLE"
     assert unclear["settlement_status"] == "UNCLEAR"
@@ -83,15 +86,30 @@ def test_unavailable_and_unclear_policies_are_not_scoreable():
 
 def test_only_verified_official_90_minute_results_are_settled():
     invalid_results = [
+        "H",
         {"score_90_status": "pending", "score_90": {"home": 1, "away": 0}},
+        {"score_90_status": "verified", "score_90": {"home": 1, "away": 0}},
         {"status": "pending", "settlement_scope": "90min",
-         "score_90": {"home": 1, "away": 0}},
+         "score_90": {"home": 1, "away": 0},
+         "source": {"name": OFFICIAL_90MIN_SOURCE}},
         {"status": "finished", "settlement_scope": "full_match",
-         "score_90": {"home": 1, "away": 0}},
+         "score_90": {"home": 1, "away": 0},
+         "source": {"name": OFFICIAL_90MIN_SOURCE}},
         {"status": "finished", "settlement_scope": "90min",
-         "score_90": {"home": 1, "away": 0}, "score_et": {"home": 2, "away": 1}},
+         "score_90": {"home": 1, "away": 0}, "score_et": {"home": 2, "away": 1},
+         "source": {"name": OFFICIAL_90MIN_SOURCE}},
         {"status": "finished", "settlement_scope": "90min",
-         "score_90": {"home": 1, "away": 1}, "penalty_winner": "home"},
+         "score_90": {"home": 1, "away": 1}, "penalty_winner": "home",
+         "source": {"name": OFFICIAL_90MIN_SOURCE}},
+        {"status": "finished", "settlement_scope": "90min",
+         "score_90": {"home": 1, "away": 0}, "source": True},
+        {"status": "finished", "settlement_scope": "90min",
+         "score_90": {"home": 1, "away": 0},
+         "source": {"name": "unknown-provider"}},
+        {"status": "finished", "settlement_scope": "90min",
+         "score_90": {"home": 1, "away": 0},
+         "score_90_status": "pending",
+         "source": {"name": OFFICIAL_90MIN_SOURCE}},
     ]
 
     for result in invalid_results:
@@ -108,34 +126,40 @@ def test_registered_policy_must_still_have_a_valid_prematch_time_contract():
     naive = policy("PRIMARY_ONLY", "H", None)
     naive["prediction_as_of"] = "2026-09-01T10:00:00"
 
-    assert settle(late, "H")["settlement_status"] == "UNAVAILABLE"
-    assert settle(naive, "H")["settlement_status"] == "UNAVAILABLE"
+    assert settle(late, official("H"))["settlement_status"] == "UNAVAILABLE"
+    assert settle(naive, official("H"))["settlement_status"] == "UNAVAILABLE"
+    for kickoff in (None, "", "not-a-time", "2026-09-01T12:00:00"):
+        assert settle(policy("PRIMARY_ONLY", "H", None), official("H"),
+                      kickoff=kickoff)["settlement_status"] == "UNAVAILABLE"
 
 
 def test_three_hit_metrics_keep_independent_denominators():
     rows = [
         {"direction_policy_status": "REGISTERED",
          "direction_policy": policy("PRIMARY_ONLY", "H", None),
-         "direction_settlement": settle(policy("PRIMARY_ONLY", "H", None), "H")},
+         "direction_settlement": settle(policy("PRIMARY_ONLY", "H", None), official("H"))},
         {"direction_policy_status": "REGISTERED",
          "direction_policy": policy("PRIMARY_WITH_COVER", "H", "D"),
-         "direction_settlement": settle(policy("PRIMARY_WITH_COVER", "H", "D"), "D")},
+         "direction_settlement": settle(policy("PRIMARY_WITH_COVER", "H", "D"), official("D"))},
         {"direction_policy_status": "REGISTERED",
          "direction_policy": policy("PRIMARY_WITH_COVER", "A", "D"),
-         "direction_settlement": settle(policy("PRIMARY_WITH_COVER", "A", "D"), "H")},
+         "direction_settlement": settle(policy("PRIMARY_WITH_COVER", "A", "D"), official("H"))},
         {"direction_policy_status": "REGISTERED",
          "direction_policy": policy("UNCLEAR", None, None),
-         "direction_settlement": settle(policy("UNCLEAR", None, None), "D")},
+         "direction_settlement": settle(policy("UNCLEAR", None, None), official("D"))},
         {"direction_policy_status": "UNAVAILABLE",
          "direction_policy": {"status": "UNAVAILABLE", "classification": "UNAVAILABLE"},
          "direction_settlement": settle(
              {"status": "UNAVAILABLE", "classification": "UNAVAILABLE"},
-             "H", registration_status="UNAVAILABLE")},
+             official("H"), registration_status="UNAVAILABLE")},
         {"direction_policy_status": "NOT_REGISTERED", "direction_policy": None,
-         "direction_settlement": settle(None, "A", registration_status="NOT_REGISTERED")},
+         "direction_settlement": settle(None, official("A"), registration_status="NOT_REGISTERED")},
         {"direction_policy_status": "REGISTERED",
          "direction_policy": policy("PRIMARY_WITH_COVER", "H", "D"),
-         "direction_settlement": settle(policy("PRIMARY_WITH_COVER", "H", "D"), None)},
+         "direction_settlement": settle_direction_policy(
+             policy("PRIMARY_WITH_COVER", "H", "D"), None,
+             registration_status="REGISTERED",
+             kickoff="2026-09-01T12:00:00+00:00")},
     ]
 
     metrics = summarize_direction_policy_metrics(rows)
@@ -236,3 +260,50 @@ def test_backtest_alias_never_fills_an_inconsistent_registered_route(monkeypatch
     assert backtest.version_cohort(scored_projection_with_conflict, {
         "model_version": "m4", "probability_signature": "a" * 64,
     }) == "legacy"
+
+
+def test_offline_actual_remains_top1_scoreable_but_not_formally_direction_settled(tmp_path):
+    source = tmp_path / "offline.json"
+    source.write_text(json.dumps({"matches": [{
+        "match_id": "offline-1",
+        "output": {"final_1x2_pct": [60.0, 25.0, 15.0]},
+        "actual": [2, 0],
+        "kickoff": "2026-09-01T12:00:00+00:00",
+        "direction_policy_status": "REGISTERED",
+        "direction_policy": policy("PRIMARY_ONLY", "H", None),
+    }]}), encoding="utf-8")
+    output = tmp_path / "report.json"
+
+    completed = subprocess.run([
+        sys.executable, str(SCRIPTS / "fusion_backtest.py"), str(source),
+        "--store", str(tmp_path / "store"), "--output", str(output),
+        "--bootstrap-iterations", "1", "--walk-forward-folds", "1",
+    ], text=True, capture_output=True, check=False)
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["overall"]["n"] == 1
+    assert report["overall"]["accuracy_pct"] == 100.0
+    assert report["direction_policy_metrics"]["primary_hit"]["n"] == 0
+    assert report["direction_policy_metrics"]["direction_policy_hit"]["n"] == 0
+
+
+def test_score_record_preserves_original_mode_projection_separate_from_route_identity(tmp_path):
+    (tmp_path / "results").mkdir()
+    (tmp_path / "results" / "mode-1.json").write_text(json.dumps({
+        "score_90": {"home": 1, "away": 0},
+    }), encoding="utf-8")
+    record = {
+        "prediction_id": "mode-1__2026-09-01T10:00:00Z__prematch",
+        "match_id": "mode-1",
+        "model": {"version": "fusion-test"},
+        "output": {"mode": "hybrid", "final_1x2_pct": [60.0, 25.0, 15.0]},
+    }
+
+    row, error = backtest.score_record(record, tmp_path)
+
+    assert error is None
+    assert row["mode"] == "hybrid"
+    assert row["route"] is None
+    assert row["route_identity_valid"] is False
+    assert "hybrid" in backtest.route_stratification([row])

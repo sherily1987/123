@@ -32,7 +32,8 @@ from fusion_backtest import (load_jsonl, load_version_aliases, resolve_path,
 from fusion_predict_core import build_identity
 from probability_aliases import matches as alias_matches
 from runtime_paths import assert_writable_target, backtest_store, data_root
-from direction_settlement import (settle_direction_policy,
+from direction_settlement import (is_verified_official_90min_result,
+                                  settle_direction_policy,
                                   summarize_direction_policy_metrics)
 
 MIN_RECALIBRATION = 100
@@ -363,7 +364,9 @@ def _attested_compare_fields(alias: dict) -> list[str]:
     return list(fields)
 
 
-def _alias_summaries(rows: list[dict], aliases: list[dict], settled_ids: set[str]) -> list[dict]:
+def _alias_summaries(
+    rows: list[dict], aliases: list[dict], verified_official_ids: set[str],
+) -> list[dict]:
     summaries = []
     for alias in aliases:
         matching = [row for row in rows if alias_matches(row, alias)]
@@ -377,7 +380,8 @@ def _alias_summaries(rows: list[dict], aliases: list[dict], settled_ids: set[str
             "attestation_sha256": alias.get("attestation_sha256"),
             "compare_fields": _attested_compare_fields(alias),
             "record_count": len(matching),
-            "settled_count": sum(str(row.get("match_id")) in settled_ids for row in matching),
+            "verified_official_settled_count": sum(
+                str(row.get("match_id")) in verified_official_ids for row in matching),
         })
     return summaries
 
@@ -395,14 +399,23 @@ def build_direction_governance_report(
     identity = build_identity()
     rows, _ = load_prediction_rows(root)
     primary = select_primary_rows(rows, snapshot_policy)
-    settled_ids = {
+    registry_settled_ids = {
         str(row.get("match_id")) for row in load_jsonl(root / "results_registry.jsonl")
         if row.get("match_id") and str(row.get("status") or "settled") != "cancelled"
+    }
+    results_by_match = {
+        str(row.get("match_id") or ""): _load_result(root, str(row.get("match_id") or ""))
+        for row in primary
+    }
+    verified_official_ids = {
+        match_id for match_id, result in results_by_match.items()
+        if (match_id in registry_settled_ids
+            and is_verified_official_90min_result(result))
     }
     direction_rows = []
     for row in primary:
         item = dict(row)
-        result = _load_result(root, str(row.get("match_id") or ""))
+        result = results_by_match.get(str(row.get("match_id") or ""))
         item["direction_settlement"] = settle_direction_policy(
             row.get("direction_policy"),
             result,
@@ -415,6 +428,19 @@ def build_direction_governance_report(
                if alias.get("alias_to_model_version") == identity.get("model_version")
                and alias.get("alias_to_probability_signature") == identity.get(
                    "probability_signature")]
+    current_model_version = str(identity.get("model_version") or "")
+    current_signature = identity.get("probability_signature")
+    raw_current_verified = 0
+    alias_verified = 0
+    for row in primary:
+        if str(row.get("match_id") or "") not in verified_official_ids:
+            continue
+        is_raw = (row.get("model_version") == current_model_version
+                  and row.get("probability_signature") == current_signature)
+        if is_raw:
+            raw_current_verified += 1
+        elif any(alias_matches(row, alias) for alias in aliases):
+            alias_verified += 1
     lock_report = _release_lock_report(identity, Path(release_lock_path))
     recommendation = _read_json_object(Path(recommendation_policy_path))
     drift_counts = Counter(
@@ -438,12 +464,15 @@ def build_direction_governance_report(
         "current_identity": identity,
         "release_lock": lock_report,
         "sample_identity": {
-            "raw_current_n": progress["raw_current_n"],
-            "approved_alias_n": progress["approved_alias_n"],
-            "current_settled_n": progress["current"]["settled"],
+            "raw_current_registry_settled_upper_bound_n": progress["raw_current_n"],
+            "approved_alias_registry_settled_upper_bound_n": progress["approved_alias_n"],
+            "registry_settled_upper_bound_n": progress["current"]["settled"],
+            "raw_current_verified_official_settled_n": raw_current_verified,
+            "approved_alias_verified_official_settled_n": alias_verified,
+            "verified_official_settled_n": raw_current_verified + alias_verified,
             "current_pending_n": progress["current"]["pending"],
         },
-        "approved_aliases": _alias_summaries(primary, aliases, settled_ids),
+        "approved_aliases": _alias_summaries(primary, aliases, verified_official_ids),
         "signature_drift_groups": progress.get("signature_drift_groups") or [],
         "drift_group_status_counts": dict(sorted(drift_counts.items())),
         "direction_policy_metrics": metrics,
