@@ -70,10 +70,12 @@ python $cli --help
 `config/recommendation_policy.json` 中的 `recreational_strategy_enabled=true` 控制，允许在
 证据不完整时做低风险、可解释的预算内选择：
 
-- 首发仍为 `PENDING_REFRESH` 时，仅允许 HAD、TTG 进入娱乐候选；首发缺口必须显示为风险标签；
+- 娱乐策略不使用首发状态做门禁或风险扣分：`PENDING_REFRESH`、`UNAVAILABLE` 等首发缺口不限制
+  HAD、TTG、HAFU、CRS 候选；首发原始状态仍保留在证据研究库供审计，但不写入娱乐门禁原因；
 - 研究预测门仍要求比赛身份、体彩赔率和基础近期状态可追溯；
 - `POST_KICKOFF_NOT_USABLE`、`EVIDENCE_AUDIT_MISSING`、无赔率、身份冲突或严重过期数据仍然阻断；
-- `evidence_gap=true` 不得被改写为“证据完整”，娱乐策略必须明确显示缺口和固定预算上限；
+- 除首发以外的 `evidence_gap=true` 不得被改写为“证据完整”；此类缺口继续限制为 HAD、TTG，
+  并显示风险标签和固定预算上限；
 - 娱乐候选不得回流生产推荐、EV、Kelly 或模型校准分母。
 
 因此，“可以推荐娱乐策略”不等于“可以解除生产购买门禁”。策略页必须同时展示

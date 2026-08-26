@@ -3,7 +3,8 @@
  "production_recommendations_enabled": false,
  "production_recommendations_disabled_reason": "当前版本及各独立市场尚未分别满足样本量、样本外校准、收益稳定性与发布门禁",
  "recreational_strategy_enabled": true,
- "recreational_allowed_markets_with_pending_lineup": ["HAD", "TTG"],
+ "recreational_allowed_markets_with_other_evidence_gaps": ["HAD", "TTG"],
+ "recreational_ignored_evidence_gap_prefixes": ["STARTING_XI_"],
  "pre_match_media_evidence": {
   "enabled": true,
   "allowed_statuses": ["PREDICTED", "PARTIAL"],

@@ -296,6 +296,46 @@ def test_recreational_gate_allows_low_risk_markets_with_lineup_pending(monkeypat
     assert all(row["edge_claim"] is False for row in plan["single_purchase_recommendations"])
 
 
+def test_recreational_gate_ignores_lineup_only_gap_for_all_entertainment_markets():
+    job = _job("sporttery-lineup-ignored")
+    job["input"]["hafu"]["odds"] = [20.0] * 8 + [4.0]
+    job["outputs"][0]["evidence_audit"] = {
+        "evidence_gap": True,
+        "evidence_status": "GAP",
+        "evidence_gap_reasons": ["STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"],
+        "entries": {
+            "team_stats": {"status": "VALID"},
+            "recent_form": {"status": "VALID"},
+            "injury": {"status": "VALID"},
+            "suspensions": {"status": "VALID"},
+            "starting_xi": {"status": "PENDING_REFRESH"},
+        },
+    }
+    policy = {
+        **_disabled_policy(),
+        "recreational_strategy_enabled": True,
+        "recreational_ignored_evidence_gap_prefixes": ["STARTING_XI_"],
+    }
+
+    plan = dsp.build_daily_strategy(
+        [job], policy, bankroll=100, execution_mode="budgeted_action",
+        as_of=datetime.fromisoformat("2026-08-23T08:00:00+08:00"),
+    )
+
+    rows = plan["recreational_candidates"]
+    assert {row["market"] for row in rows} == {"HAD", "TTG", "HAFU", "CRS"}
+    assert all(
+        row["recreational_ignored_evidence_gap_reasons"]
+        == ["STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"]
+        for row in rows
+    )
+    assert all(
+        "STARTING_XI_OFFICIAL_XI_NOT_PUBLISHED_OR_NOT_ATTACHED"
+        not in row["recreational_gate_reasons"]
+        for row in rows
+    )
+
+
 def test_recreational_gate_rejects_unconfirmed_empty_injury_field():
     job = _job("sporttery-empty-injury")
     job["outputs"][0]["evidence_audit"] = {

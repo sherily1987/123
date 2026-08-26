@@ -286,7 +286,16 @@ def _recreational_candidates(
     # policy still get the explicitly separate entertainment budget planner.
     if policy.get("recreational_strategy_enabled", True) is not True:
         return []
-    allowed_pending = set(policy.get("recreational_allowed_markets_with_pending_lineup") or {"HAD", "TTG"})
+    allowed_incomplete = set(
+        policy.get("recreational_allowed_markets_with_other_evidence_gaps")
+        or policy.get("recreational_allowed_markets_with_pending_lineup")
+        or {"HAD", "TTG"}
+    )
+    ignored_gap_prefixes = tuple(
+        str(prefix).upper()
+        for prefix in (policy.get("recreational_ignored_evidence_gap_prefixes") or ["STARTING_XI_"])
+        if str(prefix)
+    )
     required = policy.get("recreational_required_evidence_statuses") or DEFAULT_RECREATIONAL_REQUIRED_EVIDENCE_STATUSES
     blocked = set(policy.get("recreational_block_reasons") or {"POST_KICKOFF_NOT_USABLE", "EVIDENCE_AUDIT_MISSING"})
     candidates = []
@@ -297,13 +306,21 @@ def _recreational_candidates(
         if limits is None or kickoff is None or kickoff <= as_of:
             continue
         gate_reasons = []
+        ignored_gap_reasons = []
         if row.get("evidence_gap") is True:
-            # A pending official lineup is expected before kickoff.  Keep only
-            # low-risk markets with verified team context and recent form;
-            # HAFU/CRS remain closed until the evidence gap is resolved.
-            if market not in allowed_pending:
+            raw_gap_reasons = {
+                str(reason) for reason in (row.get("evidence_gap_reasons") or ["EVIDENCE_GAP"])
+            }
+            ignored_gap_reasons = sorted(
+                reason for reason in raw_gap_reasons
+                if str(reason).upper().startswith(ignored_gap_prefixes)
+            )
+            gap_reasons = raw_gap_reasons - set(ignored_gap_reasons)
+            # Entertainment ignores lineup-only gaps. Other incomplete
+            # evidence still limits selection to the configured low-risk
+            # markets, while formal production gates remain unchanged.
+            if gap_reasons and market not in allowed_incomplete:
                 continue
-            gap_reasons = set(row.get("evidence_gap_reasons") or [])
             if gap_reasons & blocked:
                 continue
             entries = row.get("evidence_entries") or {}
@@ -317,8 +334,11 @@ def _recreational_candidates(
                 if status not in {str(item).upper() for item in allowed_statuses}:
                     break
             else:
-                gate_reasons.append("EVIDENCE_GAP_RELAXED_FOR_ENTERTAINMENT")
-                gate_reasons.extend(sorted(gap_reasons))
+                if gap_reasons:
+                    gate_reasons.append("EVIDENCE_GAP_RELAXED_FOR_ENTERTAINMENT")
+                    gate_reasons.extend(sorted(gap_reasons))
+                else:
+                    gate_reasons.append("LINEUP_GAP_IGNORED_FOR_ENTERTAINMENT")
             if not gate_reasons:
                 continue
         probability = row.get("market_top_probability_pct")
@@ -357,6 +377,7 @@ def _recreational_candidates(
             "purchase_basis": "market_consensus_plus_model_agreement_recreational_budget",
             "recreational_gate": "OPEN_RELAXED",
             "recreational_gate_reasons": gate_reasons or ["EVIDENCE_COMPLETE"],
+            "recreational_ignored_evidence_gap_reasons": ignored_gap_reasons,
             "production_authorized": False,
         })
     return sorted(
