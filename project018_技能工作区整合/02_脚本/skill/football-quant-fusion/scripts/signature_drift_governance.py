@@ -189,6 +189,33 @@ def _attestation_filename(report_sha256: str) -> str:
     return f"signature-drift-{report_sha256}.json"
 
 
+def _validated_output_policy(
+    store: Path,
+    output_dir: Path,
+    reference_root: Path,
+) -> tuple[Path, Path]:
+    """Enforce the write boundary for both CLI and programmatic callers."""
+    resolved_store = Path(store).resolve()
+    resolved_output = Path(output_dir).resolve()
+    resolved_reference = Path(reference_root).resolve()
+    if resolved_output == resolved_store or _is_within(resolved_output, resolved_store):
+        raise ReplaySelectionError("output-dir must be outside the read-only store")
+    canonical_root = data_root().resolve()
+    if resolved_output == canonical_root or _is_within(resolved_output, canonical_root):
+        raise ReplaySelectionError("output-dir must be outside canonical FUSION_DATA_ROOT")
+    managed_runs = (MANAGED_GOVERNANCE_ROOT / "runs").resolve()
+    if (not _is_within(resolved_output, managed_runs)
+            or len(resolved_output.relative_to(managed_runs).parts) < 2):
+        raise ReplaySelectionError(
+            "output-dir must be an exclusive run subdirectory under managed governance runs"
+        )
+    if _contains_protected_output_directory(resolved_output):
+        raise ReplaySelectionError("output-dir must not use a protected governance directory")
+    if not _is_within(resolved_output, resolved_reference):
+        raise ReplaySelectionError("attestation output is outside the configured reference root")
+    return resolved_output, resolved_reference
+
+
 def build_drift_attestations(
     root: Path,
     current_identity: dict,
@@ -202,10 +229,17 @@ def build_drift_attestations(
     require_exactly_one_group: bool = False,
     reference_root: Path | None = None,
 ) -> list[dict]:
-    """Read registered snapshots and write only caller-selected evidence files."""
+    """Read snapshots and write proofs only inside the managed governance tree."""
     reports = []
-    evidence_dir = Path(output_dir) if output_dir is not None else _attestation_dir(root)
-    records = load_registered_records(root)
+    requested_output = (
+        Path(output_dir) if output_dir is not None
+        else _attestation_dir(MANAGED_GOVERNANCE_ROOT / "runs" / "programmatic")
+    )
+    evidence_dir, resolved_reference = _validated_output_policy(
+        Path(root), requested_output,
+        Path(reference_root) if reference_root is not None else REPOSITORY_ROOT,
+    )
+    records = load_registered_records(Path(root))
     if model_version is not None:
         records = [record for record in records if _identity(record)[0] == model_version]
     if probability_signature is not None:
@@ -238,16 +272,7 @@ def build_drift_attestations(
         path = evidence_dir / _attestation_filename(report["report_sha256"])
         path.parent.mkdir(parents=True, exist_ok=True)
         resolved_path = path.resolve()
-        if reference_root is None:
-            report["attestation_path"] = str(resolved_path)
-        else:
-            resolved_root = Path(reference_root).resolve()
-            try:
-                report["attestation_path"] = resolved_path.relative_to(resolved_root).as_posix()
-            except ValueError as exc:
-                raise ReplaySelectionError(
-                    "attestation output is outside the configured reference root"
-                ) from exc
+        report["attestation_path"] = resolved_path.relative_to(resolved_reference).as_posix()
         # Exclusive creation is the final guard against silently replacing an
         # earlier review artifact, including a same-content rerun.
         with path.open("x", encoding="utf-8") as handle:
@@ -289,19 +314,10 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("expected-record-count must be positive")
     store = Path(args.store).resolve()
     output_dir = Path(args.output_dir).resolve()
-    if output_dir == store or _is_within(output_dir, store):
-        raise SystemExit("output-dir must be outside the read-only store")
-    canonical_root = data_root().resolve()
-    if output_dir == canonical_root or _is_within(output_dir, canonical_root):
-        raise SystemExit("output-dir must be outside canonical FUSION_DATA_ROOT")
-    managed_runs = (MANAGED_GOVERNANCE_ROOT / "runs").resolve()
-    if (not _is_within(output_dir, managed_runs)
-            or len(output_dir.relative_to(managed_runs).parts) < 2):
-        raise SystemExit(
-            "output-dir must be an exclusive run subdirectory under managed governance runs"
-        )
-    if _contains_protected_output_directory(output_dir):
-        raise SystemExit("output-dir must not use a protected governance directory")
+    try:
+        _validated_output_policy(store, output_dir, REPOSITORY_ROOT)
+    except ReplaySelectionError as exc:
+        raise SystemExit(str(exc)) from exc
     try:
         reports = build_drift_attestations(
             store,

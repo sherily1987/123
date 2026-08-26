@@ -430,14 +430,21 @@ def test_complete_schema2_multi_record_report_remains_valid(monkeypatch, tmp_pat
 
 def test_attestation_write_is_read_only_and_hashes_its_canonical_content(monkeypatch, tmp_path):
     row = record("m-1")
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
     monkeypatch.setattr(governance, "load_registered_records", lambda _root: [row])
     monkeypatch.setattr(governance, "replay_one", lambda item: identical_result(item))
 
-    reports = governance.build_drift_attestations(tmp_path, CURRENT)
+    reports = governance.build_drift_attestations(
+        tmp_path / "store", CURRENT, output_dir=evidence, reference_root=tmp_path,
+    )
 
     assert len(reports) == 1
     report = reports[0]
-    attestation = Path(report["attestation_path"])
+    attestation = tmp_path / report["attestation_path"]
     persisted = json.loads(attestation.read_text(encoding="utf-8"))
     expected = hashlib.sha256(
         governance.canonical_json(report["report_hash_input"]).encode("utf-8")
@@ -451,18 +458,22 @@ def test_attestation_write_is_read_only_and_hashes_its_canonical_content(monkeyp
 
 def test_content_addressed_attestation_cannot_be_overwritten(monkeypatch, tmp_path):
     row = record("m-1")
-    evidence = tmp_path / "proofs"
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
     monkeypatch.setattr(governance, "load_registered_records", lambda _root: [row])
     monkeypatch.setattr(governance, "replay_one", lambda item: identical_result(item))
     report = governance.build_drift_attestations(
-        tmp_path / "store", CURRENT, output_dir=evidence,
+        tmp_path / "store", CURRENT, output_dir=evidence, reference_root=tmp_path,
     )[0]
-    path = Path(report["attestation_path"])
+    path = tmp_path / report["attestation_path"]
     before = path.read_bytes()
 
     with pytest.raises(FileExistsError):
         governance.build_drift_attestations(
-            tmp_path / "store", CURRENT, output_dir=evidence,
+            tmp_path / "store", CURRENT, output_dir=evidence, reference_root=tmp_path,
         )
 
     assert path.read_bytes() == before
@@ -495,8 +506,15 @@ def test_mixed_raw_signature_types_write_distinct_safe_attestations_without_inva
 
     monkeypatch.setattr(governance, "load_registered_records", lambda _root: rows)
     monkeypatch.setattr(governance, "replay_one", replay_valid_signature_only)
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
 
-    reports = governance.build_drift_attestations(tmp_path, CURRENT)
+    reports = governance.build_drift_attestations(
+        tmp_path / "store", CURRENT, output_dir=evidence, reference_root=tmp_path,
+    )
 
     assert len(reports) == len(raw_signatures)
     assert replayed == ["m-0-0", "m-0-1"]
@@ -510,7 +528,7 @@ def test_mixed_raw_signature_types_write_distinct_safe_attestations_without_inva
         for report in reports
     )
 
-    paths = [Path(report["attestation_path"]) for report in reports]
+    paths = [tmp_path / report["attestation_path"] for report in reports]
     assert len({path.name for path in paths}) == len(raw_signatures)
     assert len({path.parent for path in paths}) == 1
     assert all(re.fullmatch(r"signature-drift-[0-9a-f]{64}\.json", path.name)
@@ -532,12 +550,18 @@ def test_corrupt_signature_path_characters_cannot_escape_attestation_directory(
     row["model"]["probability_signature"] = "bad/signature:stream"
     monkeypatch.setattr(governance, "load_registered_records", lambda _root: [row])
     monkeypatch.setattr(governance, "replay_one", lambda _row: pytest.fail("must not replay"))
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
 
-    report = governance.build_drift_attestations(tmp_path, CURRENT)[0]
+    report = governance.build_drift_attestations(
+        tmp_path / "store", CURRENT, output_dir=evidence, reference_root=tmp_path,
+    )[0]
 
-    path = Path(report["attestation_path"])
-    expected_dir = tmp_path / "signature-drift-attestations" / path.parent.name
-    assert path.parent == expected_dir
+    path = tmp_path / report["attestation_path"]
+    assert path.parent == evidence
     assert re.fullmatch(r"signature-drift-[0-9a-f]{64}\.json", path.name)
     assert path.is_file()
     assert json.loads(path.read_text(encoding="utf-8"))["old_identity"] == {
@@ -549,7 +573,8 @@ def test_corrupt_signature_path_characters_cannot_escape_attestation_directory(
 def test_runtime_replay_reads_store_but_writes_only_to_explicit_evidence_dir(
         monkeypatch, tmp_path):
     store = tmp_path / "canonical-read-only-store"
-    evidence = tmp_path / "governance-evidence"
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
     target = record("m-target")
     unrelated = record("m-unrelated")
     unrelated["model"]["probability_signature"] = "c" * 64
@@ -557,6 +582,9 @@ def test_runtime_replay_reads_store_but_writes_only_to_explicit_evidence_dir(
         [target, unrelated] if root == store else pytest.fail("wrong store")
     ))
     monkeypatch.setattr(governance, "replay_one", lambda item: identical_result(item))
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
 
     reports = governance.build_drift_attestations(
         store,
@@ -564,11 +592,12 @@ def test_runtime_replay_reads_store_but_writes_only_to_explicit_evidence_dir(
         output_dir=evidence,
         model_version="m4",
         probability_signature=OLD_SIG,
+        reference_root=tmp_path,
     )
 
     assert len(reports) == 1
     assert reports[0]["record_count"] == 1
-    assert Path(reports[0]["attestation_path"]).parent == evidence
+    assert (tmp_path / reports[0]["attestation_path"]).parent == evidence
     assert not store.exists()
 
 
@@ -661,15 +690,20 @@ def test_runtime_cli_zero_match_or_count_mismatch_fails_without_success_report(
 
 
 def test_strict_replay_rejects_multiple_groups_before_writing(monkeypatch, tmp_path):
-    evidence = tmp_path / "review-evidence"
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
     rows = [record("market", route="market_only"), record("hybrid", route="hybrid")]
     monkeypatch.setattr(governance, "load_registered_records", lambda _root: rows)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
 
     with pytest.raises(governance.ReplaySelectionError, match="exactly one group"):
         governance.build_drift_attestations(
             tmp_path / "store", CURRENT, output_dir=evidence,
             model_version="m4", probability_signature=OLD_SIG,
             expected_record_count=2, require_exactly_one_group=True,
+            reference_root=tmp_path,
         )
 
     assert not evidence.exists()
@@ -702,6 +736,61 @@ def test_runtime_cli_rejects_any_output_under_canonical_data_root(monkeypatch, t
             "--model-version", "m4", "--probability-signature", OLD_SIG,
             "--route-null", "--expected-record-count", "1",
         ])
+
+
+def test_public_api_rejects_output_under_canonical_data_root(monkeypatch, tmp_path):
+    canonical_root = tmp_path / "canonical-data"
+    store = canonical_root / "backtest"
+    output = canonical_root / "governance-looking" / "runs" / "run-1" / "proofs"
+    managed_root = tmp_path / "governance"
+    monkeypatch.setattr(governance, "data_root", lambda: canonical_root)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: [record("m-1")])
+
+    with pytest.raises(governance.ReplaySelectionError, match="canonical FUSION_DATA_ROOT"):
+        governance.build_drift_attestations(
+            store, CURRENT, output_dir=output, reference_root=tmp_path,
+        )
+
+    assert not output.exists()
+
+
+def test_public_api_default_output_is_managed_and_repository_relative(monkeypatch, tmp_path):
+    canonical_root = tmp_path / "canonical-data"
+    managed_root = tmp_path / "governance"
+    monkeypatch.setattr(governance, "data_root", lambda: canonical_root)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: [record("m-1")])
+    monkeypatch.setattr(governance, "replay_one", lambda item: identical_result(item))
+
+    report = governance.build_drift_attestations(canonical_root / "backtest", CURRENT)[0]
+
+    stored_path = Path(report["attestation_path"])
+    assert not stored_path.is_absolute()
+    resolved_path = tmp_path / stored_path
+    assert resolved_path.is_file()
+    assert resolved_path.is_relative_to(managed_root / "runs" / "programmatic")
+
+
+def test_public_api_rejects_arbitrary_output_outside_managed_governance_runs(
+        monkeypatch, tmp_path):
+    canonical_root = tmp_path / "canonical-data"
+    store = canonical_root / "backtest"
+    output = tmp_path / "arbitrary-caller-directory"
+    managed_root = tmp_path / "governance"
+    monkeypatch.setattr(governance, "data_root", lambda: canonical_root)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: [record("m-1")])
+
+    with pytest.raises(governance.ReplaySelectionError, match="managed governance runs"):
+        governance.build_drift_attestations(
+            store, CURRENT, output_dir=output, reference_root=tmp_path,
+        )
+
+    assert not output.exists()
 
 
 def test_runtime_cli_rejects_output_outside_managed_governance_runs(monkeypatch, tmp_path):
