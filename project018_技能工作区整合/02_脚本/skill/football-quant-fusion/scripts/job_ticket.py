@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -190,6 +192,9 @@ def validate_job(job: dict) -> list[str]:
         pct = hybrid.get("final_1x2_pct")
         if pct is not None and not _is_pct_triple(pct):
             errors.append("research.hybrid.final_1x2_pct must be [H,D,A]")
+        if hybrid.get("hybrid_sidecar_schema_version") == "hybrid-sidecar-2.0":
+            from hybrid_contract import validate_success_sidecar
+            errors.extend(validate_success_sidecar(hybrid, job.get("input") or {}, None))
     intl = ((job.get("research") or {}).get("intl_kelly")) if job.get("research") else None
     if intl:
         if intl.get("research_only") is not True:
@@ -249,7 +254,13 @@ def upsert_job(
     if errors:
         raise ValueError("invalid job: " + "; ".join(errors))
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        temporary.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        os.replace(temporary, path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
     return path
 
 

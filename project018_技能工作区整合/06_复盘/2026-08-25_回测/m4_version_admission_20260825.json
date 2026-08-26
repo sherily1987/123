@@ -1,0 +1,133 @@
+{
+  "schema_version": "fusion-version-admission-1.0",
+  "current_identity": {
+    "skill_version": "1.5.0",
+    "fusion_version": "1.5.0",
+    "core_version": "3.4.5",
+    "fusion_schema_version": "1.4.0",
+    "model_version": "m4",
+    "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+    "decision_policy_signature": "5a5e8235b9fba03abfbcb5d0410f4447db78e9d17d1aafebe53eaf1b99f3f7a4",
+    "evidence_pipeline_signature": "72e4e7b18bd2bed65e0a840df6dcbe604d31dc540507b97d4d326376d4801e04",
+    "prediction_code_sha256": "d21d48f849b0b87e61aaf5f684dd22a84b7a4b214eea5a3757b543c150095d0f",
+    "config_sha256": "769fd5e5784a86f68203917918073507c3ce728aa1e8d41797b582eadd2bd9cf",
+    "engine_bundle_sha256": "c59383ffd90f6db76a52f67fadc90caeb99b163a9c90e0a28a1855a046f94c8d"
+  },
+  "current_version_n": 48,
+  "paired_market_n": 48,
+  "minimum_n": 100,
+  "status": "HOLD",
+  "reasons": [
+    "current_sample_below_minimum",
+    "paired_market_sample_below_minimum",
+    "brier_not_better_than_market",
+    "brier_ci_not_strictly_below_zero",
+    "logloss_not_better_than_market",
+    "logloss_ci_not_strictly_below_zero"
+  ],
+  "paired_market": {
+    "n": 48,
+    "bootstrap_iterations": 2000,
+    "seed": 20260808,
+    "brier_delta_model_minus_market": 0.0031559,
+    "brier_delta_95ci": [
+      -0.00444987,
+      0.01031926
+    ],
+    "log_loss_delta_model_minus_market": 0.0034956,
+    "log_loss_delta_95ci": [
+      -0.0081007,
+      0.01428472
+    ],
+    "interpretation": "负值表示模型优于同场市场；95%CI不跨0才视为有统计证据。"
+  },
+  "league_review": {
+    "巴甲": {
+      "n": 2,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "德国杯": {
+      "n": 2,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "德超杯": {
+      "n": 1,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "意甲": {
+      "n": 9,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "日职": {
+      "n": 1,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "沙职": {
+      "n": 2,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "法乙": {
+      "n": 1,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "法甲": {
+      "n": 4,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "瑞超": {
+      "n": 3,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "美职": {
+      "n": 2,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "芬超": {
+      "n": 1,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "英冠": {
+      "n": 1,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "英超": {
+      "n": 4,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "荷甲": {
+      "n": 3,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "葡超": {
+      "n": 4,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "西甲": {
+      "n": 7,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    },
+    "韩职": {
+      "n": 1,
+      "minimum_n": 300,
+      "status": "INSUFFICIENT"
+    }
+  },
+  "automatic_weight_change": false,
+  "production_recommendations_enabled": false
+}

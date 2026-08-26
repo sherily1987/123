@@ -43,13 +43,13 @@ LLM 票比不是概率：无 `calibrated_probs` 时不得算 EV，`vote_share_ta
 
 ## 路径 C — 纸面仓位（未开放）
 
-前置：影子 hybrid 相对**同场市场**样本外同时更好（Brier **和** logloss），场次达到 SKILL 里的复审触发点，且 `market_derived=false`、edge 大于敏感性。  
-才允许研究字段 \(f_{\mathrm{paper}}=\frac14\max(f^*,0)\)，`action` 仍为 `skip`，推荐总闸保持关闭。  
-胜平负互斥，不得三个 \(f^*\) 相加。
+前置见 `hybrid_sample_governance.md`：同一 `hybrid_cohort_key` 下 `hybrid_admission` 必须为 `EVIDENCE_BETTER_THAN_MARKET`，且 `market_derived=false`、edge 大于敏感性。  
+`NO_EVIDENCE` / `EVIDENCE_OF_HARM` / `INSUFFICIENT_SAMPLE` 一律不得输出 \(f^*\)。  
+2026-08-26 `HISTORICAL_HYBRID_REPLAY_CURRENT` 已过 n=100 门槛，判定为 `NO_EVIDENCE`，路径 C 保持关闭。  
+即便将来开放，也只允许研究字段 \(f_{\mathrm{paper}}=\frac14\max(f^*,0)\)，`action` 仍为 `skip`。胜平负互斥，不得三个 \(f^*\) 相加。
 
 ## 分母
 
-- 影子 hybrid 有效样本 = 工单里 `research.hybrid` 有 `final_1x2_pct` 且无 `skip_reason` 的场次。
-- 不得把只有 `outputs.quant`、`research=null` 的工单算作 hybrid 样本。
-- `late_info` 伤停快照不是 hybrid 概率，单独计数。
+- 不得把 `jobs/` 文件数、`late_info` 行数、或只有 `outputs.quant` 的工单算作 hybrid 样本。
 - 生产 `research_candidate` 不得冒充已跑通的 hybrid。
+- 计数必须声明 `denominator_id` 与 `hybrid_cohort_key`；四个分母禁止混用。

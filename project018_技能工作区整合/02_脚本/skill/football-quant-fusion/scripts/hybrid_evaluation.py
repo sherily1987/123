@@ -6,8 +6,12 @@ import json
 import math
 import random
 import argparse
-from datetime import datetime
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from hybrid_contract import LIVE_HYBRID_REVIEW_UNIQUE
 
 
 def _parse_time(value) -> datetime | None:
@@ -17,6 +21,15 @@ def _parse_time(value) -> datetime | None:
         return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
     except ValueError:
         return None
+
+
+def _time_order(value) -> float:
+    parsed = _parse_time(value)
+    if parsed is None:
+        return float("-inf")
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.timestamp()
 
 
 def _actual_index(score) -> int | None:
@@ -115,6 +128,11 @@ def _eligible(job: dict, jobs_root: Path) -> tuple[dict | None, str | None]:
     identity = job.get("identity") or {}
     return {
         "match_id": identity.get("match_id"),
+        "kickoff": input_obj.get("kickoff") or input_obj.get("kickoff_iso"),
+        "research_run_at": hybrid.get("research_run_at"),
+        "model_version": hybrid.get("model_version"),
+        "probability_signature": hybrid.get("probability_signature"),
+        "hybrid_cohort_key": hybrid.get("hybrid_cohort_key"),
         "actual_idx": actual,
         "hybrid_probs": hybrid_probs,
         "market_probs": market_probs,
@@ -168,6 +186,7 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
                   bootstrap_seed: int = 20260821) -> dict:
     """评测所有 sales_day 工单；只统计可验证的独立赛前 hybrid 概率。"""
     root = Path(jobs_root)
+    candidates: list[dict] = []
     rows: list[dict] = []
     sweep_rows: dict[str, list[dict]] = {}
     excluded: dict[str, int] = {}
@@ -194,6 +213,20 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
             excluded[reason] = excluded.get(reason, 0) + 1
             continue
         assert row is not None
+        candidates.append(row)
+
+    # LIVE_HYBRID_REVIEW_UNIQUE is one row per fixture. A fixture may be sold
+    # on more than one day; retain only its latest qualified pre-match run.
+    latest_by_match: dict[str, dict] = {}
+    for candidate in candidates:
+        match_id = str(candidate.get("match_id") or "")
+        previous = latest_by_match.get(match_id)
+        if previous is None or _time_order(candidate.get("research_run_at")) > _time_order(
+                previous.get("research_run_at")):
+            latest_by_match[match_id] = candidate
+
+    for selected in latest_by_match.values():
+        row = dict(selected)
         actual = row.pop("actual_idx")
         hybrid_probs, market_probs = row.pop("hybrid_probs"), row.pop("market_probs")
         sweep = row.pop("weight_sweep", [])
@@ -239,6 +272,7 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
             sweep_rows.setdefault(_weight_key(weight), []).append(variant_row)
     report = {
         "schema_version": "hybrid-oos-evaluation-1.0",
+        "denominator_id": LIVE_HYBRID_REVIEW_UNIQUE,
         "research_only": True,
         "bootstrap": {"samples": bootstrap_samples, "seed": bootstrap_seed},
         "n": len(rows),
@@ -247,11 +281,18 @@ def evaluate_jobs(jobs_root: Path | str, *, bootstrap_samples: int = 2000,
             "hybrid_sidecars": hybrid_sidecars,
             "hybrid_ok_sidecars": hybrid_ok_sidecars,
             "router_audited_sidecars": router_audited_sidecars,
+            "eligible_sidecar_files_before_dedup": len(candidates),
+            "eligible_unique_matches": len(rows),
             "note": "覆盖率只描述工单证据完整度，不改变有效样本资格或生产门禁",
         },
         "excluded": excluded,
         "rows": rows,
     }
+    cohorts: dict[str, int] = {}
+    for row in rows:
+        key = row.get("hybrid_cohort_key") or "UNATTRIBUTED"
+        cohorts[key] = cohorts.get(key, 0) + 1
+    report["cohorts"] = cohorts
     if rows:
         report["metrics"] = {
             "brier": {

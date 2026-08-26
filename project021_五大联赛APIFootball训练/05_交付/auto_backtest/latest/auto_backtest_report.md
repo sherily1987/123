@@ -1,8 +1,8 @@
-# 自动回测报告（20260820_213505）
+# 自动回测报告（20260826_190549）
 
-- 运行时间：2026-08-20T21:35:05.270580+08:00
+- 运行时间：2026-08-26T19:05:49.539212+08:00
 - 工作区：F:\HM足球比赛预测
-- 共享库 settle：{"error": "atus\": \"settled\",\n      \"err\": null\n    },\n    {\n      \"match_id\": \"sporttery-2040937\",\n      \"match\": \"安养FC vs 济州SK\",\n      \"matched_by\": \"fixed_by_id\",\n      \"sco
+- 共享库 settle：{"error": "{\n  \"pending\": 11,\n  \"official_finished\": 49,\n  \"settled\": 0,\n  \"report\": [\n    {\n      \"match_id\": \"sporttery-2040912\",\n      \"status\": \"no_result_yet\",\n      \"mat
 - 共享库量化回测：成功
 
 ## 双轨（待回测记录）汇总
@@ -16,8 +16,8 @@
 
 | 日期 | 正式结算 | 交叉验证 | 量化1X2 | LLM双选 | 报告 |
 | --- | --- | --- | --- | --- | --- |
-| 2026-08-17 | 7 | 0 | 5/7（71.43%） | 1/1（100.0%） | F:\HM足球比赛预测\project021_五大联赛APIFootball训练\05_交付\auto_backtest\archive\20260820_213505\dual_track\backtest_dual_track_2026-08-17_030268958088.json |
-| 2026-08-18 | 4 | 0 | 1/4（25.0%） | 0/0（None%） | F:\HM足球比赛预测\project021_五大联赛APIFootball训练\05_交付\auto_backtest\archive\20260820_213505\dual_track\backtest_dual_track_2026-08-18_59d7bd5bb967.json |
+| 2026-08-17 | 7 | 0 | 5/7（71.43%） | 1/1（100.0%） | F:\HM足球比赛预测\project021_五大联赛APIFootball训练\05_交付\auto_backtest\archive\20260826_190549\dual_track\backtest_dual_track_2026-08-17_3a8947932836.json |
+| 2026-08-18 | 4 | 0 | 1/4（25.0%） | 0/0（None%） | F:\HM足球比赛预测\project021_五大联赛APIFootball训练\05_交付\auto_backtest\archive\20260826_190549\dual_track\backtest_dual_track_2026-08-18_556a54fce1f1.json |
 
 ## 结论边界
 

@@ -1,0 +1,27 @@
+{
+  "schema_version": "hybrid-cohort-lock-1.0",
+  "status": "ACTIVE",
+  "denominator_id": "LIVE_HYBRID_REVIEW_UNIQUE",
+  "model_version": "m4",
+  "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+  "hybrid_cohort_key": "m4::48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+  "opened_at": "2026-08-26T00:00:00+08:00",
+  "hybrid_sidecar_schema_version": "hybrid-sidecar-2.0",
+  "evaluation_contract_version": "hybrid-review-1.0",
+  "review": {
+    "minimum_settled_unique_matches": 100,
+    "time_split": "chronological_70_30_by_kickoff_date_group",
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 20260826
+  },
+  "probability_files_frozen": [
+    "scripts/fusion_predict_core.py",
+    "scripts/production_router.py",
+    "core/zu-yu-dashi-3/scripts/predict.py",
+    "core/zu-yu-dashi-3/scripts/market_fit.py",
+    "core/zu-yu-dashi-3/scripts/odds_methods.py",
+    "core/zu-yu-dashi-3/scripts/team_strength.py",
+    "config/market_weights.json"
+  ],
+  "rule": "窗口期内任何概率文件改动都会作废已积累样本；旧样本保留在旧 cohort，不删除。"
+}

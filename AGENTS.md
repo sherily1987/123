@@ -87,6 +87,36 @@
 工单文件在 `project018_技能工作区整合/04_素材/shared-data/football-quant-fusion/jobs/<sales_day>/`。
 读写：`python fusion_cli.py job --input match.json --quant out.json` 或 `--match-id sporttery-2040898`。
 影子 hybrid（不开 m4、不登记）：`python fusion_cli.py hybrid-shadow --input raw.json --sales-day YYYY-MM-DD`；赛后 `--score`。结果在工单 `research.hybrid`，`research_only=true`。国际盘凯利指数是同一次跑出来的侧车 `research.intl_kelly`（UNFITTED，不算仓位）；先 `odds-intl` 才有 \(G\)。同一盘口 EV 卫生在 LLM `ev_calculator.same_book_ev_audit`。细则：`02_脚本/skill/football-quant-fusion/references/kelly_research.md`。有效 hybrid 分母只数带 `research.hybrid` 概率的场次，不是 `jobs/` 文件数。
+
+**Hybrid 样本管道与版本窗口（2026-08-26，强制）**：成功侧车执行 Sidecar v2
+“构建→验证→原子写入”，必须同时保存路由审计、`history_latest`、有时区且早于开球的
+`research_run_at`、与输入一致的 `market_input_as_of`，以及完整
+`model_version + probability_signature`；缺任一身份字段必须非零退出。不得使用
+`model_version_window = current production unchanged` 之类叙述字符串代替可复验身份。分组键固定为
+`hybrid_cohort_key = model_version + "::" + probability_signature`。当前研究窗口见
+`config/hybrid_review_cohort.json`；**窗口期内任何概率文件改动都会作废已积累样本**（旧样本不删，留在旧
+cohort）。现有 market_only 重放别名不能外推到 hybrid；要合并旧签名必须做 hybrid 路由逐场完全等价重放。
+
+三个分母名是契约，禁止相减、拼接或共用指标：
+
+- `REGISTERED_HYBRID_BACKTEST_V1`：回测登记 hybrid 路由，历史 n=12、Brier 0.64358；
+- `FROZEN_HYBRID_SIDECAR_AUDIT_20260824`：冻结侧车121行，有效12行的 Brier 0.628422；
+- `LIVE_HYBRID_REVIEW_UNIQUE`：唯一 match_id 的最后一次合格赛前运行，且必须再按完整 cohort 分组。
+
+缺 v2 字段、时间越界或 cohort 漂移时，hybrid 子进程非零退出且不写残缺侧车；日流水线只追加
+`research_alerts`，不得阻断、回滚或改变正式 market_only 登记。没有独立先验是正常跳过，不生成
+`research.hybrid`。同一 cohort 只有达到100个已结算唯一比赛才有评审资格：按开球日期组70/30时间切分，
+测试集做固定种子10000次同场配对 bootstrap；Brier 与 LogLoss 的95% CI上界都严格小于0才算
+“有证据”，接触或跨0均为 `NO_EVIDENCE`，整体大于0为 `EVIDENCE_OF_HARM`。禁止只报点估计，且
+n=100只触发人工评审，不自动切生产或开启推荐。完整逐行审计见
+`project018_技能工作区整合/06_复盘/2026-08-26_hybrid样本管道治理/`。
+
+当前开发节奏下，近30天概率文件最长干净窗口仅5天，而自然积累100场需约20—50天，故自然
+积累预期会在达标前因签名变化重置。历史补跑必须在 Sidecar v2 后执行，使用独立分母
+`HISTORICAL_HYBRID_REPLAY_CURRENT`：真实墙钟写 `replay_generated_at`，赛前模拟截点写
+`simulation_as_of`，不得伪造 `research_run_at`；逐场只取开球前最后市场快照，历史先验严格
+截断在开球前，同一当前签名一次生成，禁止在评估集调权重。该分母不得与上面三个分母混用，
+仍执行同一 n=100 评审契约，且只能授予人工评审资格。
 两轨各写 `outputs[]` 一条；`strength` 必须标 `vote_share`，禁止和 `final_1x2_pct` 混列。
 PPT / txt / SQLite 是投影。实现：`scripts/job_ticket.py`。
 

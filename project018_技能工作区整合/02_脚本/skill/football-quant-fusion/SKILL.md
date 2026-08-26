@@ -51,6 +51,7 @@ python $cli --help
 8. 中文盘口「凯利指数」\(G=\)体彩赔率\(\times\)国际共识去水\(p\)，与 Kelly 仓位 \(f^*=\mathrm{EV}/(\mathrm{odds}-1)\) 禁止混称。\(G\) 只作研究特征；未获准前不得输出 \(f^*\)、注额或建议仓位。
 9. `market_only` / `market_derived` 对**同一体彩盘口**算 EV 量到的是庄家水位。三个方向必须全 \(\le 0\)，否则标 `KELLY_SANITY_FAIL`，`action` 仍为 `skip`。卫生检查走 LLM 工程 `ev_calculator.same_book_ev_audit`。
 10. 国际盘凯利指数只写工单 `research.intl_kelly`（`research_only=true`，`calibration=UNFITTED`），由 `hybrid-shadow` 在预测之后附加。不进生产概率、不进 `predict_one` 输入、不进推荐门控。缺国际盘快照时 `status=skipped`，不阻断 hybrid。
+11. Hybrid 样本分母不得跨口径相减或拼接。`hybrid_cohort_key = model_version + "::" + probability_signature`。Sidecar v2 缺 `model_version`、64 位 `probability_signature` 或 `hybrid_cohort_key` 必须非零退出，不得写残缺侧车。`NO_EVIDENCE` / `EVIDENCE_OF_HARM` 只授予或不授予人工评审资格，不自动进生产、不开放路径 C。详见 `references/hybrid_sample_governance.md`。
 
 ## 生产门控：默认拒绝推荐
 
@@ -154,9 +155,24 @@ BB-browser 适配器不得假定固定联赛网址：`--url-map` 的每场映射
 
 1. **路径 A（已落地）**：有校准确率时必须跑同一盘口卫生检查。`same_book_audit` 是研究字段；`market_derived` 出现正 EV 只加 `KELLY_SANITY_FAIL`，不得当成价值投注。
 2. **路径 B（已落地）**：先 `odds-intl` 写入 `odds/intl_production.jsonl`，再 `hybrid-shadow`。共识 \(p\) 优先 Pinnacle h2h（忽略 lay），否则各家去水等权平均。读 \(G\) 的三向相对差（`gap_max_minus_mid` / `softest_direction`），禁止用「\(G>1\) 才买」。
-3. **路径 C（未开放）**：纸面 1/4 Kelly 仅在影子 hybrid 样本外同时打败市场（Brier **和** logloss；场次达到复审触发点且结论成立）之后才允许讨论。当前 `research.hybrid` 有独立 1X2 的场次不得把仅含 quant 的工单算进分母。
+3. **路径 C（未开放）**：须同一 `hybrid_cohort_key` 下 `hybrid_admission` 判定为 `EVIDENCE_BETTER_THAN_MARKET`（Brier **和** LogLoss 的 95% CI 上界均严格小于 0）。`NO_EVIDENCE`、`EVIDENCE_OF_HARM`、`INSUFFICIENT_SAMPLE` 均不得讨论纸面 Kelly。2026-08-26 无泄漏补跑 `HISTORICAL_HYBRID_REPLAY_CURRENT` 为 `NO_EVIDENCE`，故路径 C 保持关闭。
 
-`hybrid-shadow --score` 只评 `research.hybrid` 相对同场市场，不并入 current，不开 m4。
+`hybrid-shadow --score` 只评 `research.hybrid` 相对同场市场，不并入 current，不开生产 hybrid。
+
+## Hybrid 样本分母与版本窗口（2026-08-26 固化）
+
+当前窗口锁在 `config/hybrid_review_cohort.json`。审计快照在 `06_复盘/2026-08-26_hybrid样本管道治理/`。契约：
+
+| denominator_id | 用途 |
+|---|---|
+| `REGISTERED_HYBRID_BACKTEST_V1` | 回测库登记的 hybrid 路由 |
+| `FROZEN_HYBRID_SIDECAR_AUDIT_20260824` | 冻结侧车覆盖审计 |
+| `LIVE_HYBRID_REVIEW_UNIQUE` | 唯一 match_id 的最后一次合格赛前运行，且须再按完整 cohort 分组 |
+| `HISTORICAL_HYBRID_REPLAY_CURRENT` | 当前签名无泄漏历史补跑；独立分母 |
+
+禁止把上述分母的 n、Brier、LogLoss 相减或拼成「总样本」。没有独立先验是正常跳过，不写 `research.hybrid`。赛后运行、缺核验 90 分钟赛果、缺路由审计均不得混入已结算评估。market_only 重放别名不得外推到 hybrid。
+
+同一完整 cohort 达到 100 个已结算唯一比赛后：按开球日期组 70/30 切分，测试集固定种子 10000 次同场配对 bootstrap。Brier 与 LogLoss 的 95% CI 上界均严格小于 0 才是 `EVIDENCE_BETTER_THAN_MARKET`；接触或跨 0 为 `NO_EVIDENCE`；CI 下界大于 0 为 `EVIDENCE_OF_HARM`。n=100 只触发人工评审。窗口期内改概率文件会作废已积累样本（旧 cohort 保留）。自然日积累不是主路径；历史补跑必须保留 `replay_generated_at` 与 `simulation_as_of`，禁止把事后执行时间写成赛前 `research_run_at`。
 
 ## 常用命令
 
@@ -224,6 +240,7 @@ current 计入样本。别名要求 `model_version` 与 `probability_signature` 
 - `references/data_contract.md`：输入、状态和证据账本；
 - `references/output_contract.md`：报告字段与门控；
 - `references/kelly_research.md`：凯利指数 / 同一盘口卫生 / 路径 A–C；
+- `references/hybrid_sample_governance.md`：hybrid 分母、cohort key、Sidecar v2、验收判定；
 - `references/motive_evidence_reference.md`：赛前事实映射；
 - `references/pitfalls.md`：工程与方法论踩坑；
 - `references/version_and_data_migration.md`：唯一事实源、版本与回滚。

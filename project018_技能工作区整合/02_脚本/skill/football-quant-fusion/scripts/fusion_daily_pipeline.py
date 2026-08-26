@@ -120,7 +120,11 @@ def run_hybrid_shadow(batch: Path, sales_day: str, day_dir: Path, snapshot: str)
     except ValueError:
         return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
     if result.returncode != 0:
-        return {"status": "error", "error": (result.stderr or result.stdout)[-300:], "output": str(output)}
+        errors = payload.get("errors") or [item for row in payload.get("results", [])
+                                           for item in row.get("errors", [])]
+        error = ", ".join(dict.fromkeys(str(item) for item in errors))
+        return {"status": "error", "error": error or (result.stderr or result.stdout)[-300:],
+                "output": str(output)}
     return {
         "status": "ok",
         "n": payload.get("n", 0),
@@ -128,6 +132,17 @@ def run_hybrid_shadow(batch: Path, sales_day: str, day_dir: Path, snapshot: str)
         "skipped": payload.get("skipped", 0),
         "output": str(output),
     }
+
+
+def record_research_alert(report: dict, stage: str, result: dict | None) -> None:
+    """Research failures are visible but never become production exit status."""
+    if not result or result.get("status") != "error":
+        return
+    report.setdefault("research_alerts", []).append({
+        "stage": stage,
+        "error": result.get("error") or "unknown research failure",
+        "blocking": False,
+    })
 
 
 def run_half_time_research(store: Path) -> dict:
@@ -271,7 +286,7 @@ def main():
               'settle': None, 'collect': None, 'record': [], 'movement': None,
               'intl_odds': None, 'hybrid_shadow': None, 'half_time_research': None,
               'derivative_research': None, 'draw_watch_research': None,
-              'llm_calibration': None}
+              'llm_calibration': None, 'research_alerts': []}
 
     # 1) Settle already-finished matches first (official matchId preferred).
     r = run([HERE / 'fusion_settle.py', '--store', a.store]
@@ -469,6 +484,7 @@ def main():
     # It writes only research.hybrid sidecars and never changes the production
     # probability or its registry entry.
     report['hybrid_shadow'] = run_hybrid_shadow(batch, sales_day, d, a.snapshot)
+    record_research_alert(report, 'hybrid_shadow', report['hybrid_shadow'])
 
     report['summary'] = {
         'settled': (report['settle'] or {}).get('settled', 0),

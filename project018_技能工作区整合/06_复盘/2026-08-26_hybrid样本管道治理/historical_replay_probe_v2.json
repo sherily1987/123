@@ -1,0 +1,138 @@
+{
+  "schema_version": "hybrid-historical-replay-2.0",
+  "denominator_id": "HISTORICAL_HYBRID_REPLAY_CURRENT",
+  "research_only": true,
+  "production_change_allowed": false,
+  "generated_at": "2026-08-26T13:44:53.109366+00:00",
+  "cohort_lock": {
+    "schema_version": "hybrid-cohort-lock-1.0",
+    "status": "ACTIVE",
+    "denominator_id": "LIVE_HYBRID_REVIEW_UNIQUE",
+    "model_version": "m4",
+    "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+    "hybrid_cohort_key": "m4::48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+    "opened_at": "2026-08-26T00:00:00+08:00",
+    "hybrid_sidecar_schema_version": "hybrid-sidecar-2.0",
+    "evaluation_contract_version": "hybrid-review-1.0",
+    "review": {
+      "minimum_settled_unique_matches": 100,
+      "time_split": "chronological_70_30_by_kickoff_date_group",
+      "bootstrap_samples": 10000,
+      "bootstrap_seed": 20260826
+    },
+    "probability_files_frozen": [
+      "scripts/fusion_predict_core.py",
+      "scripts/production_router.py",
+      "core/zu-yu-dashi-3/scripts/predict.py",
+      "core/zu-yu-dashi-3/scripts/market_fit.py",
+      "core/zu-yu-dashi-3/scripts/odds_methods.py",
+      "core/zu-yu-dashi-3/scripts/team_strength.py",
+      "config/market_weights.json"
+    ],
+    "rule": "窗口期内任何概率文件改动都会作废已积累样本；旧样本保留在旧 cohort，不删除。"
+  },
+  "source_policy": {
+    "market_snapshot": "last verified Sporttery snapshot strictly before kickoff",
+    "history_cutoff": "strictly before kickoff",
+    "weight_tuning_on_evaluation_set": false,
+    "execution_time_truth": "replay_generated_at is wall-clock; simulation_as_of is pre-match cutoff"
+  },
+  "attempted": 1,
+  "n": 1,
+  "excluded": {},
+  "error_rows": [],
+  "cohorts": {
+    "m4::48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b": 1
+  },
+  "rows": [
+    {
+      "status": "ok",
+      "denominator_id": "HISTORICAL_HYBRID_REPLAY_CURRENT",
+      "match_id": "sporttery-2036927",
+      "kickoff": "2026-01-14T01:30:00+08:00",
+      "hybrid": {
+        "research_only": true,
+        "status": "ok",
+        "mode": "hybrid",
+        "final_1x2_pct": [
+          5.6,
+          12.4,
+          82.0
+        ],
+        "model_1x2_pct": [
+          5.8,
+          10.9,
+          83.3
+        ],
+        "market_1x2_pct": [
+          4.5,
+          9.8,
+          85.7
+        ],
+        "market_dependency_pct": 60.0,
+        "lambda_prior": {
+          "lambda_home": 1.095745,
+          "lambda_away": 1.762411,
+          "weight": 0.02,
+          "source": "apifootball_events_goals_only",
+          "sample_legs": 274,
+          "team_sample_sizes": {
+            "home": 141,
+            "away": 141
+          },
+          "note": "开球前APIfootball Finished历史进球生成λ候选"
+        },
+        "skip_reason": null,
+        "market_derived": false,
+        "execution_type": "historical_replay",
+        "historical_replay": true,
+        "routing_audit": {
+          "route": "apifootball_goals_only",
+          "as_of": "2026-01-13T17:30:00+00:00",
+          "no_future_leakage": true,
+          "fallback_reason": null,
+          "source": "apifootball_events_goals_only",
+          "sample_legs": 274,
+          "history_latest": "2026-01-10T01:30:00+00:00"
+        },
+        "simulation_as_of": "2026-01-13T20:01:57+08:00",
+        "market_input_as_of": "2026-01-13T20:01:57+08:00",
+        "replay_generated_at": "2026-08-26T13:44:53.109366+00:00",
+        "hybrid_sidecar_schema_version": "hybrid-sidecar-2.0",
+        "evaluation_contract_version": "hybrid-review-1.0",
+        "model_version": "m4",
+        "probability_signature": "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b",
+        "hybrid_cohort_key": "m4::48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b"
+      },
+      "score_90": {
+        "home": 1,
+        "away": 1
+      },
+      "brier_hybrid": 1.4429119999999998,
+      "brier_market": 1.550078,
+      "brier_delta_hybrid_minus_market": -0.10716600000000032,
+      "logloss_hybrid": 2.0874737133771,
+      "logloss_market": 2.322787800311565,
+      "logloss_delta_hybrid_minus_market": -0.23531408693446476
+    }
+  ],
+  "review": {
+    "schema_version": "hybrid-review-decision-1.0",
+    "denominator_id": "LIVE_HYBRID_REVIEW_UNIQUE",
+    "n": 1,
+    "minimum_n": 100,
+    "automatic_production_change": false,
+    "production_recommendations_enabled": false,
+    "decision": "INSUFFICIENT_SAMPLE",
+    "split": null,
+    "test": null
+  },
+  "input": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\datasets\\sporttery_all_leagues_history_2026_with_big5.json",
+  "understat_store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\datasets\\understat_store.jsonl",
+  "events_store": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\04_素材\\标准化",
+  "source_excluded": {
+    "incomplete_corresponding_odds_pools": 88,
+    "missing_verified_full_time_score": 7,
+    "no_independent_lambda": 451
+  }
+}

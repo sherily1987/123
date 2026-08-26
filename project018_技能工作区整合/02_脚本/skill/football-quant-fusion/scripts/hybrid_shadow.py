@@ -22,6 +22,11 @@ from job_ticket import (
     load_job,
     upsert_job,
 )
+from hybrid_contract import (
+    load_active_cohort_lock,
+    stamp_success_sidecar,
+    validate_success_sidecar,
+)
 from production_router import BIG5, GOALS_ONLY, load_event_rows, route_match
 from runtime_paths import backtest_store, data_root, workspace_root
 from sales_day_collect import build_field_meta
@@ -29,6 +34,10 @@ from sales_day_collect import build_field_meta
 
 WEIGHT_SWEEP = (0.40, 0.50, 0.60, 0.70, 0.80)
 LOCAL_MATCH_TZ = timezone(timedelta(hours=8))
+
+
+def active_cohort_lock() -> dict:
+    return load_active_cohort_lock()
 
 
 def _utc_now(now_utc=None) -> datetime:
@@ -224,8 +233,6 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": gate_reason}
     skip = in_scope(match)
     if skip:
-        upsert_job(jobs_root(), ident, input_obj=match,
-                   research=_research_blob(match, hybrid_from_fusion_output({}, skip_reason=skip)))
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": skip}
 
     research_run_at = observed.isoformat()
@@ -233,11 +240,6 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
     prior = routed.get("lambda_prior")
     if not prior or routed.get("research_only") is not True:
         reason = ((routed.get("field_meta") or {}).get("production_router") or {}).get("fallback_reason") or "no_prior"
-        skipped_blob = _attach_routing_audit(
-            _research_blob(match, hybrid_from_fusion_output({}, skip_reason=reason)),
-            routed, match, research_run_at)
-        upsert_job(jobs_root(), ident, input_obj=match,
-                   research=skipped_blob)
         return {"match_id": ident.get("match_id"), "status": "skipped", "reason": reason}
 
     out = predict_one(core, version, routed)
@@ -245,6 +247,10 @@ def run_one(core, version, match: dict, understat, events, min_history: int, sal
         out["research_only"] = True
     blob = _research_blob(match, hybrid_from_fusion_output(out, prior=prior))
     blob = _attach_routing_audit(blob, routed, match, research_run_at)
+    blob = stamp_success_sidecar(blob, out.get("build_identity") or {})
+    errors = validate_success_sidecar(blob, match, active_cohort_lock())
+    if errors:
+        return {"match_id": ident.get("match_id"), "status": "error", "errors": errors}
     blob["weight_sweep"] = weight_sweep(core, version, routed, prior)
     path = upsert_job(jobs_root(), ident, input_obj=match, research=blob)
     return {
@@ -340,17 +346,17 @@ def main(argv=None) -> int:
         results.append(run_one(core, version, match, understat, events, args.min_history, sales_day))
     report = {
         "research_only": True,
-        "model_version_window": "current production unchanged",
         "n": len(results),
         "ok": sum(1 for r in results if r.get("status") == "ok"),
         "skipped": sum(1 for r in results if r.get("status") == "skipped"),
+        "errors": sum(1 for r in results if r.get("status") == "error"),
         "results": results,
     }
     text = json.dumps(report, ensure_ascii=False, indent=2)
     print(text)
     if args.output:
         Path(args.output).write_text(text + "\n", encoding="utf-8")
-    return 0
+    return 1 if report["errors"] else 0
 
 
 if __name__ == "__main__":

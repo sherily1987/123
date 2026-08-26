@@ -116,7 +116,11 @@ def test_run_one_persists_router_time_audit_with_research_sidecar(monkeypatch, t
     })
     monkeypatch.setattr(hs, "predict_one", lambda *_args: {
         "fusion_status": "ok", "mode": "hybrid",
+        "build_identity": {"model_version": "m4", "probability_signature": "a" * 64},
         "forecast": {"final_1x2_pct": [40, 30, 30], "market_prob_pct": [45, 25, 30]},
+    })
+    monkeypatch.setattr(hs, "active_cohort_lock", lambda: {
+        "model_version": "m4", "probability_signature": "a" * 64,
     })
     monkeypatch.setattr(hs, "weight_sweep", lambda *_args, **_kwargs: [])
     monkeypatch.setattr(hs, "_research_blob", lambda _match, blob: blob)
@@ -132,6 +136,64 @@ def test_run_one_persists_router_time_audit_with_research_sidecar(monkeypatch, t
     assert hybrid["routing_audit"] == router_audit
     assert hybrid["market_input_as_of"] == "2026-08-21T20:00:00+00:00"
     assert hybrid["research_run_at"].endswith("+00:00")
+    assert hybrid["hybrid_cohort_key"] == "m4::" + "a" * 64
+
+
+def test_run_one_contract_failure_does_not_write_sidecar(monkeypatch, tmp_path):
+    writes = []
+    prior = {"lambda_home": 1.1, "lambda_away": 0.9, "source": "test", "sample_legs": 10}
+    monkeypatch.setattr(hs, "route_match", lambda match, *_args, **_kwargs: {
+        **match, "mode": "hybrid", "research_only": True, "lambda_prior": prior,
+        "field_meta": {"production_router": {"route": "test", "no_future_leakage": True}},
+    })
+    monkeypatch.setattr(hs, "predict_one", lambda *_args: {
+        "fusion_status": "ok", "mode": "hybrid",
+        "build_identity": {"model_version": "m4", "probability_signature": "a" * 64},
+        "forecast": {"final_1x2_pct": [40, 30, 30], "market_prob_pct": [45, 25, 30]},
+    })
+    monkeypatch.setattr(hs, "active_cohort_lock", lambda: {
+        "model_version": "m4", "probability_signature": "a" * 64,
+    })
+    monkeypatch.setattr(hs, "weight_sweep", lambda *_args, **_kwargs: [])
+    monkeypatch.setattr(hs, "_research_blob", lambda _match, blob: blob)
+    monkeypatch.setattr(hs, "upsert_job", lambda *_args, **_kwargs: writes.append(kwargs))
+
+    result = hs.run_one(None, {}, {
+        "match_id": "sporttery-1", "home": "主队", "away": "客队", "competition": "英超",
+        "kickoff": "2026-08-25T00:00:00+00:00", "prediction_as_of": "2026-08-21T20:00:00+00:00",
+    }, [], [], 5, "2026-08-22", now_utc=datetime(2026, 8, 24, 12, 0, tzinfo=timezone.utc))
+
+    assert result["status"] == "error"
+    assert "HYBRID_HISTORY_LATEST_MISSING" in result["errors"]
+    assert writes == []
+
+
+def test_expected_non_independent_skip_does_not_create_hybrid_sidecar(monkeypatch):
+    writes = []
+    monkeypatch.setattr(hs, "upsert_job", lambda *_args, **kwargs: writes.append(kwargs))
+    result = hs.run_one(None, {}, {
+        "match_id": "sporttery-1", "home": "主队", "away": "客队", "competition": "俱乐部友谊",
+        "kickoff": "2026-08-25T00:00:00+00:00", "prediction_as_of": "2026-08-21T20:00:00+00:00",
+    }, [], [], 5, "2026-08-22", now_utc=datetime(2026, 8, 24, 12, 0, tzinfo=timezone.utc))
+    assert result["status"] == "skipped"
+    assert writes == []
+
+
+def test_cli_returns_nonzero_when_any_sidecar_contract_fails(monkeypatch, tmp_path, capsys):
+    payload = tmp_path / "batch.json"
+    payload.write_text(json.dumps({"matches": [{
+        "match_id": "sporttery-1", "home": "主队", "away": "客队",
+        "league": "英超", "kickoff": "2099-08-25T00:00:00+00:00", "model_odds": [2, 3, 4],
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(hs, "load_rows", lambda *_args: [])
+    monkeypatch.setattr(hs, "load_core", lambda: (None, {}))
+    monkeypatch.setattr(hs, "run_one", lambda *_args, **_kwargs: {
+        "match_id": "sporttery-1", "status": "error", "errors": ["HYBRID_COHORT_DRIFT"],
+    })
+
+    assert hs.main(["--input", str(payload), "--sales-day", "2099-08-24"]) == 1
+    report = json.loads(capsys.readouterr().out)
+    assert "model_version_window" not in report
 
 
 def test_kickoff_gate_rejects_local_time_after_kickoff():

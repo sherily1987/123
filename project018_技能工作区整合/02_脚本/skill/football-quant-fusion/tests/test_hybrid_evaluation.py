@@ -140,3 +140,28 @@ def test_weight_sweep_is_scored_as_separate_research_candidates(tmp_path):
     assert sweep["0.4"]["n"] == 1
     assert sweep["0.8"]["n"] == 1
     assert sweep["0.4"]["metrics"]["brier"]["candidate"] < sweep["0.8"]["metrics"]["brier"]["candidate"]
+
+
+def test_live_review_deduplicates_match_id_using_latest_prematch_run(tmp_path):
+    base = {
+        "research_only": True, "status": "ok", "mode": "hybrid",
+        "final_1x2_pct": [60, 25, 15], "market_1x2_pct": [50, 30, 20],
+        "lambda_prior": {"source": "independent_strength"},
+        "model_version": "m4", "probability_signature": "a" * 64,
+        "hybrid_cohort_key": "m4::" + "a" * 64,
+    }
+    early = _job("sporttery-same", base)
+    early["research"]["hybrid"]["research_run_at"] = "2026-08-21T10:01:00+00:00"
+    late = _job("sporttery-same", {**base, "final_1x2_pct": [55, 30, 15]})
+    late["research"]["hybrid"]["research_run_at"] = "2026-08-21T10:02:00+00:00"
+    _write_job(tmp_path, "early", early)
+    second = tmp_path / "2026-08-22"
+    second.mkdir()
+    (second / "sporttery-late.json").write_text(json.dumps(late), encoding="utf-8")
+
+    report = evaluation.evaluate_jobs(tmp_path, bootstrap_samples=0)
+
+    assert report["denominator_id"] == "LIVE_HYBRID_REVIEW_UNIQUE"
+    assert report["n"] == 1
+    assert report["coverage"]["eligible_sidecar_files_before_dedup"] == 2
+    assert report["rows"][0]["research_run_at"] == "2026-08-21T10:02:00+00:00"

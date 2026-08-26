@@ -53,7 +53,24 @@ def test_kelly_research_is_hardened_and_not_a_stake():
     assert "不得输出" in skill and "f^*" in skill
     assert "kelly_research.md" in skill
     assert "路径 C（未开放）" in skill
+    assert "NO_EVIDENCE" in skill
+    assert "hybrid_sample_governance.md" in skill
     assert "Pinnacle" in detail
-    assert "不得把只有 `outputs.quant`" in detail
+    assert "不得把 `jobs/` 文件数" in detail
     assert "research.intl_kelly" in output
     assert "KELLY_SANITY_FAIL" in output
+
+
+def test_hybrid_sample_governance_is_hardened():
+    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8-sig")
+    gov = (ROOT / "references" / "hybrid_sample_governance.md").read_text(encoding="utf-8-sig")
+    assert "REGISTERED_HYBRID_BACKTEST_V1" in skill
+    assert "LIVE_HYBRID_REVIEW_UNIQUE" in skill
+    assert "HISTORICAL_HYBRID_REPLAY_CURRENT" in skill
+    assert "禁止跨口径" in skill or "不得跨口径" in skill
+    assert "hybrid_cohort_key" in skill
+    assert "EVIDENCE_BETTER_THAN_MARKET" in skill
+    assert "NO_EVIDENCE" in gov
+    assert "不得相减" in gov or "禁止跨口径" in gov
+    lock = (ROOT / "config" / "hybrid_review_cohort.json").read_text(encoding="utf-8-sig")
+    assert "48d50abee08c6c1ed3854dda4d76e762c9106134d1bd0fa5202c15e460d0798b" in lock

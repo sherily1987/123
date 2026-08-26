@@ -1,12 +1,12 @@
 {
   "schema_version": "engine-full-test-1.0",
-  "generated_at": "2026-08-11T21:17:07+08:00",
-  "engine": "3.4.4",
+  "generated_at": "2026-08-24T23:39:36+08:00",
+  "engine": "3.4.5",
   "fusion": "fusion_predict_core",
   "summary": {
-    "total": 14,
-    "pass": 13,
-    "fail": 1
+    "total": 16,
+    "pass": 7,
+    "fail": 9
   },
   "tests": [
     {
@@ -35,44 +35,49 @@
     },
     {
       "name": "market_only新鲜盘口",
-      "status": "PASS",
-      "details": "1X2=校准市场、MARKET_BASELINE",
-      "error": null
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
+    },
+    {
+      "name": "market_only远期新鲜快照",
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
     },
     {
       "name": "model_first显式λ",
-      "status": "PASS",
-      "details": "λ=显式值、kind=model_goal_rate",
-      "error": null
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
     },
     {
-      "name": "陈旧盘口无锚回退",
-      "status": "FAIL",
-      "details": "stale_had: status=blocked tags=[]",
-      "error": null
+      "name": "market_only陈旧HAD明确阻断",
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
     },
     {
       "name": "两回合晋级",
-      "status": "PASS",
-      "details": "晋级概率和=100、点球主队0.38、ET=29.8%",
-      "error": null
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
     },
     {
       "name": "极端赔率",
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
+    },
+    {
+      "name": "market_only极端λ回退HAD",
       "status": "PASS",
-      "details": "极端赔率不崩溃、1X2和=100",
+      "details": "拒绝4.0/0.1，回退HAD λ=[1.025, 0.943]",
       "error": null
     },
     {
       "name": "4场生产批量不变量",
-      "status": "PASS",
-      "details": "4场不变量全部通过",
-      "error": null
+      "status": "ERROR",
+      "error": "JSONDecodeError: Invalid \\escape: line 14 column 34 (char 831)"
     },
     {
       "name": "模型常数",
-      "status": "PASS",
-      "details": "常数校验 通过",
+      "status": "FAIL",
+      "details": "常数校验 不符: SCORE_LAMBDA3",
       "error": null
     },
     {
@@ -89,8 +94,8 @@
     },
     {
       "name": "注册库健康",
-      "status": "PASS",
-      "details": "sample_audit 正常",
+      "status": "FAIL",
+      "details": "sample_audit 失败: F:\\HM足球比赛预测\\project017_football-quant-fusion技能导出\\01_技能本体\\football-quant-fusion\\scripts\\sample_audit.py:14: SyntaxWarning: \"\\H\" is an invalid escape sequence. Such sequences will not work in the future",
       "error": null
     }
   ]

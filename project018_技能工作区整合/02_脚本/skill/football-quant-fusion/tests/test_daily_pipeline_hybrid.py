@@ -55,6 +55,25 @@ def test_hybrid_shadow_uses_the_exact_collected_batch_and_sales_day(monkeypatch,
                       "output": str(tmp_path / "hybrid_T-7h.json")}
 
 
+def test_hybrid_failure_is_an_alert_and_does_not_raise_into_production_pipeline(monkeypatch, tmp_path):
+    batch = tmp_path / "inputs_prematch.json"
+    batch.write_text(json.dumps({"matches": []}), encoding="utf-8")
+    monkeypatch.setattr(pipeline, "run", lambda *_args, **_kwargs: type("Result", (), {
+        "returncode": 1,
+        "stdout": json.dumps({"status": "error", "errors": ["HYBRID_COHORT_DRIFT"]}),
+        "stderr": "",
+    })())
+
+    result = pipeline.run_hybrid_shadow(batch, "2026-08-26", tmp_path, "prematch")
+    report = {"research_alerts": []}
+    pipeline.record_research_alert(report, "hybrid_shadow", result)
+
+    assert result["status"] == "error"
+    assert report["research_alerts"] == [{
+        "stage": "hybrid_shadow", "error": result["error"], "blocking": False,
+    }]
+
+
 def test_half_time_research_captures_then_enriches_without_touching_settlement(monkeypatch, tmp_path):
     seen = []
     fixtures = tmp_path / "research" / "half-time-fixtures" / "apifootball" / "fixtures.json"

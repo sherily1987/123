@@ -1,25 +1,25 @@
 {
   "schema": "auto-backtest-1.1",
-  "ran_at": "2026-08-20T21:35:05.270580+08:00",
-  "run_id": "20260820_213505",
-  "archive_dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260820_213505",
+  "ran_at": "2026-08-26T19:05:49.539212+08:00",
+  "run_id": "20260826_190549",
+  "archive_dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260826_190549",
   "latest_entry": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\latest",
   "workspace": "F:\\HM足球比赛预测",
   "store": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
   "settle": {
-    "error": "atus\": \"settled\",\n      \"err\": null\n    },\n    {\n      \"match_id\": \"sporttery-2040937\",\n      \"match\": \"安养FC vs 济州SK\",\n      \"matched_by\": \"fixed_by_id\",\n      \"score_90\": \"2-1\",\n      \"status\": \"settled\",\n      \"err\": null\n    },\n    {\n      \"match_id\": \"sporttery-2040938\",\n      \"match\": \"马竞 vs 马拉加\",\n      \"matched_by\": \"fixed_by_id\",\n      \"score_90\": \"2-0\",\n      \"status\": \"settled\",\n      \"er",
+    "error": "{\n  \"pending\": 11,\n  \"official_finished\": 49,\n  \"settled\": 0,\n  \"report\": [\n    {\n      \"match_id\": \"sporttery-2040912\",\n      \"status\": \"no_result_yet\",\n      \"match\": \"布拉加 vs 吉维森特\"\n    },\n    {\n      \"match_id\": \"sporttery-2041062\",\n      \"status\": \"no_result_yet\",\n      \"match\": \"雅典AEK vs 索列夫\"\n    },\n    {\n      \"match_id\": \"sporttery-2041063\",\n      \"status\": \"no_result_yet\",\n      \"match\": \"采",
     "ok": true
   },
   "store_backtest": {
     "ok": true,
     "rc": 0,
-    "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260820_213505\\store_backtest.json",
-    "tail": "\"top1_accuracy_pct\": 11.83,\n        \"top3_accuracy_pct\": 31.18,\n        \"top5_accuracy_pct\": 48.92,\n        \"score_log_loss\": 6.4393\n      },\n      \"ou_2_5_brier\": 0.260912,\n      \"btts_brier\": 0.254829,\n      \"clv_mean_pp\": -0.029,\n      \"clv_n\": 369\n    },\n    \"fusion-1.4.0+core-3.4.4\": {\n      \"n\": 2,\n      \"accuracy_pct\": 0.0,\n      \"brier_mean\": 0.965633,\n      \"brier_sum\": 1.931266,\n      \"log_loss\": 1.4538607,\n      \"ece\": 0.469333,\n      \"ou_2_5_brier\": 0.227299,\n      \"btts_brier\": 0.306952\n    },\n    \"fusion-1.4.0-core-3.4.4\": {\n      \"n\": 111,\n      \"accuracy_pct\": 43.243,\n      \"brier_mean\": 0.65867655,\n      \"brier_sum\": 73.113097,\n      \"log_loss\": 1.10015283,\n      \"ece\": 0.080111,\n      \"score\": {\n        \"top1_accuracy_pct\": 14.41,\n        \"top3_accuracy_pct\": 32.43,\n        \"top5_accuracy_pct\": 51.35,\n        \"score_log_loss\": 5.62933\n      },\n      \"ou_2_5_brier\": 0.249154,\n      \"btts_brier\": 0.252153\n    },\n    \"fusion-1.5.0-core-3.4.4\": {\n      \"n\": 22,\n      \"accuracy_pct\": 50.0,\n      \"brier_mean\": 0.60007609,\n      \"brier_sum\": 13.201674,\n      \"log_loss\": 0.9963119,\n      \"ece\": 0.078182,\n      \"score\": {\n        \"top1_accuracy_pct\": 27.27,\n        \"top3_accuracy_pct\": 40.91,\n        \"top5_accuracy_pct\": 63.64,\n        \"score_log_loss\": 5.05794\n      },\n      \"ou_2_5_brier\": 0.249517,\n      \"btts_brier\": 0.242835\n    }\n  },\n  \"output\": \"F:\\\\HM足球比赛预测\\\\project021_五大联赛APIFootball训练\\\\05_交付\\\\auto_backtest\\\\archive\\\\20260820_213505\\\\store_backtest.json\"\n}\n"
+    "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260826_190549\\store_backtest.json",
+    "tail": " 77.48\n      },\n      \"btts_brier\": 0.252153\n    },\n    \"fusion-1.5.0-core-3.4.4\": {\n      \"n\": 54,\n      \"accuracy_pct\": 57.407,\n      \"brier_mean\": 0.5950337,\n      \"brier_sum\": 32.13182,\n      \"log_loss\": 1.00129333,\n      \"ece\": 0.07516,\n      \"score\": {\n        \"top1_accuracy_pct\": 12.96,\n        \"top3_accuracy_pct\": 35.19,\n        \"top5_accuracy_pct\": 48.15,\n        \"full_matrix_n\": 54,\n        \"score_log_loss\": 3.02371\n      },\n      \"ou_2_5_brier\": 0.258337,\n      \"ou_2_5\": {\n        \"n\": 54,\n        \"brier\": 0.258337,\n        \"accuracy_pct\": 48.15\n      },\n      \"ou_3_5\": {\n        \"n\": 54,\n        \"brier\": 0.16892,\n        \"accuracy_pct\": 77.78\n      },\n      \"btts_brier\": 0.264556\n    },\n    \"fusion-1.5.0-core-3.4.5\": {\n      \"n\": 57,\n      \"accuracy_pct\": 61.404,\n      \"brier_mean\": 0.48658728,\n      \"brier_sum\": 27.735475,\n      \"log_loss\": 0.84180667,\n      \"ece\": 0.092064,\n      \"score\": {\n        \"top1_accuracy_pct\": 22.81,\n        \"top3_accuracy_pct\": 42.11,\n        \"top5_accuracy_pct\": 57.89,\n        \"full_matrix_n\": 57,\n        \"score_log_loss\": 2.76792\n      },\n      \"ou_2_5_brier\": 0.236097,\n      \"ou_2_5\": {\n        \"n\": 57,\n        \"brier\": 0.236097,\n        \"accuracy_pct\": 59.65\n      },\n      \"ou_3_5\": {\n        \"n\": 57,\n        \"brier\": 0.168523,\n        \"accuracy_pct\": 77.19\n      },\n      \"btts_brier\": 0.273634\n    }\n  },\n  \"output\": \"F:\\\\HM足球比赛预测\\\\project021_五大联赛APIFootball训练\\\\05_交付\\\\auto_backtest\\\\archive\\\\20260826_190549\\\\store_backtest.json\"\n}\n"
   },
   "dual_track_dates": [
     {
       "date": "2026-08-17",
-      "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+      "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
       "match_ids": [
         "sporttery-2040907",
         "sporttery-2040908",
@@ -31,7 +31,7 @@
         "sporttery-2040914"
       ],
       "ok": true,
-      "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260820_213505\\dual_track\\backtest_dual_track_2026-08-17_030268958088.json",
+      "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260826_190549\\dual_track\\backtest_dual_track_2026-08-17_3a8947932836.json",
       "summary": {
         "settled": 7,
         "settlement_provenance": {
@@ -105,7 +105,7 @@
     },
     {
       "date": "2026-08-18",
-      "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18",
+      "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18",
       "match_ids": [
         "sporttery-2040915",
         "sporttery-2040916",
@@ -113,7 +113,7 @@
         "sporttery-2040922"
       ],
       "ok": true,
-      "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260820_213505\\dual_track\\backtest_dual_track_2026-08-18_59d7bd5bb967.json",
+      "output": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\auto_backtest\\archive\\20260826_190549\\dual_track\\backtest_dual_track_2026-08-18_556a54fce1f1.json",
       "summary": {
         "settled": 4,
         "settlement_provenance": {
@@ -185,7 +185,7 @@
     }
   ],
   "summary": {
-    "record_dirs_found": 5,
+    "record_dirs_found": 10,
     "official_settled_total": 11,
     "cross_validation_total": 0,
     "quant_1x2_total": {
@@ -206,76 +206,160 @@
         "match_id": "sporttery-2040907",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T01:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040908",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T01:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040909",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T01:15:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040910",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T03:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040911",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T03:30:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040912",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T03:30:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040913",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T06:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040914",
         "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
         "kickoff": "2026-08-17T23:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17"
       },
       {
         "match_id": "sporttery-2040915",
         "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
         "kickoff": "2026-08-18T01:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
       },
       {
         "match_id": "sporttery-2040916",
         "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
         "kickoff": "2026-08-18T03:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
       },
       {
         "match_id": "sporttery-2040918",
         "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
         "kickoff": "2026-08-18T07:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
       },
       {
         "match_id": "sporttery-2040922",
         "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
         "kickoff": "2026-08-18T03:00:00+08:00",
-        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18"
       }
     ],
     "dropped": [
+      {
+        "match_id": "sporttery-2040787",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-10T00:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040789",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-10T01:15:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040790",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-10T03:30:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040791",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-10T03:30:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040792",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-10T05:30:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040793",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-10T06:30:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040794",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-11T01:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260810\\待回测记录\\20260810",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040795",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-11T01:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260810\\待回测记录\\20260810",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040796",
+        "prediction_as_of": null,
+        "kickoff": "2026-08-11T03:15:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260810\\待回测记录\\20260810",
+        "reason": "missing_prediction_as_of"
+      },
+      {
+        "match_id": "sporttery-2040831",
+        "prediction_as_of": "2026-08-12T07:39:09.422367+00:00",
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
+        "reason": "missing_kickoff"
+      },
+      {
+        "match_id": "sporttery-2040819",
+        "prediction_as_of": "2026-08-12T07:39:09.422367+00:00",
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
+        "reason": "missing_kickoff"
+      },
+      {
+        "match_id": "sporttery-2040820",
+        "prediction_as_of": "2026-08-12T07:39:09.422367+00:00",
+        "kickoff": null,
+        "dir": "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
+        "reason": "missing_kickoff"
+      },
       {
         "match_id": "sporttery-2040787",
         "prediction_as_of": null,
@@ -359,11 +443,103 @@
         "kickoff": null,
         "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12",
         "reason": "missing_kickoff"
+      },
+      {
+        "match_id": "sporttery-2040907",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T01:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040908",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T01:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040909",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T01:15:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040910",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T03:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040911",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T03:30:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040912",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T03:30:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040913",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T06:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040914",
+        "prediction_as_of": "2026-08-16T04:07:29.502744+00:00",
+        "kickoff": "2026-08-17T23:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040915",
+        "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
+        "kickoff": "2026-08-18T01:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040916",
+        "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
+        "kickoff": "2026-08-18T03:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040918",
+        "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
+        "kickoff": "2026-08-18T07:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18",
+        "reason": "superseded_by_newer_prediction"
+      },
+      {
+        "match_id": "sporttery-2040922",
+        "prediction_as_of": "2026-08-16T07:54:38.991111+00:00",
+        "kickoff": "2026-08-18T03:00:00+08:00",
+        "dir": "F:\\HM足球比赛预测\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18",
+        "reason": "superseded_by_newer_prediction"
       }
     ]
   },
   "provenance": {
     "input_indexes": {
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809\\index.json": "d156d552a05ba482c5c4bbb0fa44cb8275e58c5d3da73aa7b7da5169b9576d63",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809\\index_llm.json": "2f921579faec35073b61e1326fce2f5b0e036aae7140c7eb6f3305b822c84d65",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260810\\待回测记录\\20260810\\index.json": "124ed60606e14c9da2bbcf8e6af31fe1f4d91da7d97a80ab8ca6b970af629248",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260810\\待回测记录\\20260810\\index_llm.json": "9615376d803a3ad5b67c47d6b1698269af83ea81ae611eef9a1bc58916b9dc49",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-12\\待回测记录\\2026-08-12\\index.json": "b2099c0e47b4973064557bac7412852fe48e5216960273e7c8a7929b566970c1",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17\\index.json": "9af2e30b841c577a5f84e93d2dfc4f1391bbe9b15ea469362f6c583d02059220",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-17\\待回测记录\\2026-08-17\\index_llm.json": "d5bb3df375f53bd559b658d92970196ab03c27ead4d6fffb46ecc567933d3df3",
+      "F:\\HM足球比赛预测\\.worktrees\\b3-web-workbench\\project021_五大联赛APIFootball训练\\05_交付\\每日开售预测\\2026-08-18\\待回测记录\\2026-08-18\\index.json": "ac1eeb38bb6c4310e2b9738181c168d2175d5e95eece018cae057752beee0074",
       "F:\\HM足球比赛预测\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809\\index.json": "def666286043d8626dc992f11e531eda9dbb848d945078b7c38b06c83208524b",
       "F:\\HM足球比赛预测\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260809\\待回测记录\\20260809\\index_llm.json": "1d1d8b7e4520f6f1fe89b75d5e1e510d29ea26f82404b568b714a21149c03e38",
       "F:\\HM足球比赛预测\\project001_足球预测\\05_交付\\今日推荐_双轨四玩法_20260810\\待回测记录\\20260810\\index.json": "38ee7a10a23e763d18b69a2d519a649f17eb7b3356f55fd3367510a3de0f90d8",
@@ -375,7 +551,7 @@
     },
     "scripts": {
       "auto_backtest.py": "ca22d30f17734e0aa7bc467e77376fd002898b8160fcc8e2e6f7786271c7271c",
-      "backtest_dual_track.py": "c05dfdb4925da6d93769a61f0ed5aafad3b28d7cbb540c4ba90c53923224e02f"
+      "backtest_dual_track.py": "9c024f01328070fbdb1a53c64d5b6a5a5cb7e4f88954c554c1832206566dec4a"
     },
     "result_hashes": {
       "sporttery-2040907": "044c97591002b9b016e44f3dc7b007db02385d5845a6f506620ad8e1c591418e",
