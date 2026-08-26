@@ -281,7 +281,7 @@ def test_collect_file_accepts_single_match_object(monkeypatch, tmp_path):
         "home": "A", "away": "B", "kickoff": "2026-08-26T03:00:00+00:00",
         "evidence_sources": {"scrapling_url": "https://league.example/single"},
     }), encoding="utf-8")
-    report = bec.collect_file(source, tmp_path / "out", None)
+    report = bec.collect_file(source, tmp_path / "out", None, now_utc=NOW)
     assert report["count"] == 1
     assert report["ok"] == 1
     assert (tmp_path / "out" / "evidence_001_A_B_browser.md").is_file()
