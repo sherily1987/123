@@ -46,6 +46,7 @@ def _write_lock(path: Path, *, signature: str = CURRENT_SIG) -> None:
 def _write_attestation(
     path: Path,
     *,
+    repository_root: Path | None = None,
     status: str = "PENDING_REVIEW",
     route: str = "market_only",
     fields: list[str] | None = None,
@@ -56,6 +57,7 @@ def _write_attestation(
     target_model_version: object = "m4",
     tolerance: object = 1e-10,
 ) -> None:
+    repository_root = (repository_root or path.parent).resolve()
     results = [
         {
             "match_id": f"match-{index}",
@@ -112,10 +114,30 @@ def _write_attestation(
         json.dumps(core, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
     payload["generated_at"] = "2026-08-26T01:00:00+00:00"
-    payload["attestation_path"] = str(path)
+    payload["attestation_path"] = path.resolve().relative_to(repository_root).as_posix()
     path.write_text(
         json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
         encoding="utf-8",
+    )
+
+
+def _approve_attestation(
+    report: Path, alias_file: Path, lock_file: Path, *, governance_root: Path | None = None,
+) -> dict:
+    root = (governance_root or report.parent).resolve()
+    return aliases.approve_attestation(
+        report, alias_file, lock_file,
+        governance_root=root, repository_root=root,
+    )
+
+
+def _load_aliases(
+    alias_file: Path, lock_file: Path, *, governance_root: Path | None = None,
+) -> list[dict]:
+    root = (governance_root or alias_file.parent).resolve()
+    return aliases.load_approved_aliases(
+        alias_file, lock_file,
+        governance_root=root, repository_root=root,
     )
 
 
@@ -125,7 +147,7 @@ def _approve(tmp_path: Path) -> tuple[dict, Path, Path, Path]:
     lock_file = tmp_path / "release_lock.json"
     _write_attestation(report)
     _write_lock(lock_file)
-    approved = aliases.approve_attestation(report, alias_file, lock_file)
+    approved = _approve_attestation(report, alias_file, lock_file)
     return approved, report, alias_file, lock_file
 
 
@@ -142,7 +164,7 @@ def test_approval_function_rejects_unreviewable_proof_without_touching_alias_fil
     before = alias_file.read_bytes()
 
     with pytest.raises(aliases.ProbabilityAliasError, match="PENDING_REVIEW"):
-        aliases.approve_attestation(report, alias_file, lock_file)
+        _approve_attestation(report, alias_file, lock_file)
     assert alias_file.read_bytes() == before
 
 
@@ -170,6 +192,8 @@ def test_production_approval_cli_uses_only_managed_config_paths(monkeypatch, tmp
         return {"status": "EQUIVALENT_ALIAS"}
 
     monkeypatch.setattr(aliases, "approve_attestation", fake_approve)
+    monkeypatch.setattr(aliases, "MANAGED_GOVERNANCE_ROOT", tmp_path)
+    monkeypatch.setattr(aliases, "REPOSITORY_ROOT", tmp_path)
 
     assert aliases.main(["--attestation", str(report)]) == 0
     assert captured == {
@@ -191,10 +215,10 @@ def test_approval_writes_exact_route_scoped_alias_from_proof(tmp_path):
         "route": "market_only",
         "alias_to_model_version": "m4",
         "alias_to_probability_signature": CURRENT_SIG,
-        "attestation_path": str(report.resolve()),
+        "attestation_path": "proof.json",
         "attestation_sha256": hashlib.sha256(report.read_bytes()).hexdigest(),
     }
-    assert aliases.load_approved_aliases(alias_file, lock_file) == [approved]
+    assert _load_aliases(alias_file, lock_file) == [approved]
 
 
 def test_alias_rejected_after_attestation_is_modified(tmp_path):
@@ -202,7 +226,7 @@ def test_alias_rejected_after_attestation_is_modified(tmp_path):
 
     report.write_text(report.read_text(encoding="utf-8") + " ", encoding="utf-8")
 
-    assert aliases.load_approved_aliases(alias_file, lock_file) == []
+    assert _load_aliases(alias_file, lock_file) == []
 
 
 def test_alias_rejected_after_current_release_lock_changes(tmp_path):
@@ -210,7 +234,7 @@ def test_alias_rejected_after_current_release_lock_changes(tmp_path):
 
     _write_lock(lock_file, signature="c" * 64)
 
-    assert aliases.load_approved_aliases(alias_file, lock_file) == []
+    assert _load_aliases(alias_file, lock_file) == []
 
 
 def test_load_revalidates_tolerance_even_if_proof_and_outer_hash_are_recomputed(tmp_path):
@@ -238,7 +262,7 @@ def test_load_revalidates_tolerance_even_if_proof_and_outer_hash_are_recomputed(
         encoding="utf-8",
     )
 
-    assert aliases.load_approved_aliases(alias_file, lock_file) == []
+    assert _load_aliases(alias_file, lock_file) == []
 
 
 def test_market_only_alias_does_not_admit_hybrid_row(tmp_path):
@@ -294,7 +318,7 @@ def test_approval_rejects_incomplete_or_non_equivalent_group(
     _write_lock(lock_file)
 
     with pytest.raises(aliases.ProbabilityAliasError, match=error_text):
-        aliases.approve_attestation(report, alias_file, lock_file)
+        _approve_attestation(report, alias_file, lock_file)
 
     assert not alias_file.exists()
 
@@ -307,11 +331,67 @@ def test_approval_rejects_target_not_equal_to_release_lock(tmp_path):
     _write_lock(lock_file, signature="c" * 64)
 
     with pytest.raises(aliases.ProbabilityAliasError, match="发布锁"):
-        aliases.approve_attestation(report, alias_file, lock_file)
+        _approve_attestation(report, alias_file, lock_file)
 
 
 def test_approval_is_idempotent_for_the_same_attestation(tmp_path):
     approved, report, alias_file, lock_file = _approve(tmp_path)
 
-    assert aliases.approve_attestation(report, alias_file, lock_file) == approved
+    assert _approve_attestation(report, alias_file, lock_file) == approved
     assert json.loads(alias_file.read_text(encoding="utf-8"))["aliases"] == [approved]
+
+
+def test_approval_rejects_absolute_attestation_reference(tmp_path):
+    report = tmp_path / "proof.json"
+    alias_file = tmp_path / "aliases.json"
+    lock_file = tmp_path / "release_lock.json"
+    _write_attestation(report)
+    payload = json.loads(report.read_text(encoding="utf-8"))
+    payload["attestation_path"] = str(report.resolve())
+    report.write_text(json.dumps(payload), encoding="utf-8")
+    _write_lock(lock_file)
+
+    with pytest.raises(aliases.ProbabilityAliasError, match="相对路径"):
+        _approve_attestation(report, alias_file, lock_file)
+
+
+def test_approval_rejects_report_outside_governance_root(tmp_path):
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
+    report = tmp_path / "outside.json"
+    alias_file = tmp_path / "aliases.json"
+    lock_file = tmp_path / "release_lock.json"
+    _write_attestation(report, repository_root=tmp_path)
+    _write_lock(lock_file)
+
+    with pytest.raises(aliases.ProbabilityAliasError, match="治理根目录"):
+        aliases.approve_attestation(
+            report, alias_file, lock_file,
+            governance_root=governance_root, repository_root=tmp_path,
+        )
+
+
+def test_loader_rejects_alias_reference_outside_governance_root(tmp_path):
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
+    report = governance_root / "proof.json"
+    alias_file = tmp_path / "aliases.json"
+    lock_file = tmp_path / "release_lock.json"
+    _write_attestation(report, repository_root=tmp_path)
+    _write_lock(lock_file)
+    approved = aliases.approve_attestation(
+        report, alias_file, lock_file,
+        governance_root=governance_root, repository_root=tmp_path,
+    )
+    assert approved["attestation_path"] == "governance/proof.json"
+
+    outside = tmp_path / "outside.json"
+    outside.write_bytes(report.read_bytes())
+    document = json.loads(alias_file.read_text(encoding="utf-8"))
+    document["aliases"][0]["attestation_path"] = "outside.json"
+    alias_file.write_text(json.dumps(document), encoding="utf-8")
+
+    assert aliases.load_approved_aliases(
+        alias_file, lock_file,
+        governance_root=governance_root, repository_root=tmp_path,
+    ) == []

@@ -12,6 +12,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 if str(SCRIPTS) not in sys.path:
@@ -32,6 +34,29 @@ hybrid = _load("hybrid_shadow")
 prematch = _load("prematch_evidence_collect")
 
 NOW = datetime.fromisoformat("2026-08-24T12:00:00+00:00")
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        lambda tmp: bec.collect_one({"match_id": "bb"}, None, now_utc=datetime(2026, 8, 24)),
+        lambda tmp: late.collect_one(
+            {}, "prematch", False, False, tmp / "events.jsonl",
+            now_utc=datetime(2026, 8, 24),
+        ),
+        lambda tmp: hybrid.run_one(
+            None, {}, {"match_id": "hybrid"}, [], [], 5, None,
+            now_utc=datetime(2026, 8, 24),
+        ),
+        lambda tmp: prematch.collect_one(
+            {"match_id": "prematch"}, now_utc=datetime(2026, 8, 24),
+        ),
+    ],
+    ids=["browser", "late-info", "hybrid", "prematch"],
+)
+def test_public_entrypoints_reject_naive_injected_utc_clock(entry, tmp_path):
+    with pytest.raises(ValueError, match="timezone-aware"):
+        entry(tmp_path)
 
 
 def test_bb_collect_file_keeps_fixed_fixture_in_prematch_window(tmp_path):

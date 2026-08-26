@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 import json
 import hashlib
@@ -9,9 +10,32 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-SKILL_ROOT = Path(r"C:\Users\Administrator\.codex\skills\football-quant-fusion")
+SKILL_ROOT = Path(os.environ.get(
+    "FUSION_SKILL_ROOT", Path(__file__).resolve().parents[1],
+)).resolve()
 SCRIPTS = SKILL_ROOT / "scripts"
-CORE = Path(r"C:\Users\Administrator\.codex\skills\football-quant-fusion-suite\skills\zu-yu-dashi-3\scripts")
+_CURRENT_PROJECT_ROOT = SKILL_ROOT.parents[2]
+_CURRENT_CORE = (
+    SKILL_ROOT.parents[1] / "core" / "zu-yu-dashi-3" / "scripts"
+).resolve()
+_ENV_CORE = Path(os.environ.get("FUSION_CORE_DIR", _CURRENT_CORE)).resolve()
+CORE = _ENV_CORE if _ENV_CORE.is_relative_to(_CURRENT_PROJECT_ROOT) else _CURRENT_CORE
+# Subprocess checks must inherit the same worktree-local core selected above.
+os.environ["FUSION_CORE_DIR"] = str(CORE)
+
+# pytest can collect another checkout first and leave same-named top-level
+# modules cached.  Even a module file inside this worktree may have frozen an
+# earlier checkout's CORE_DIR at import time, so reload every project-local
+# top-level name after the worktree-local environment is fixed.
+_ALLOWED_IMPORT_ROOTS = (SCRIPTS.resolve(), CORE.resolve())
+_LOCAL_MODULE_NAMES = {
+    path.stem for root in _ALLOWED_IMPORT_ROOTS if root.is_dir()
+    for path in root.glob("*.py")
+}
+for _name, _module in list(sys.modules.items()):
+    if _name.split(".", 1)[0] not in _LOCAL_MODULE_NAMES:
+        continue
+    sys.modules.pop(_name, None)
 sys.path.insert(0, str(SCRIPTS))
 sys.path.insert(0, str(CORE))
 
@@ -20,6 +44,20 @@ import fusion_backtest as backtest
 import market_fit
 import sales_day_collect
 import fusion_cli
+
+
+class RuntimePathIsolationTests(unittest.TestCase):
+    def test_p0_imports_resolve_inside_the_current_worktree(self):
+        self.assertEqual(SKILL_ROOT.resolve(), Path(__file__).resolve().parents[1])
+        self.assertEqual(CORE.resolve(), _CURRENT_CORE)
+        self.assertEqual(Path(fusion.CORE_DIR).resolve(), CORE.resolve())
+        allowed = (SKILL_ROOT.resolve(), CORE.resolve())
+        for module in (fusion, backtest, market_fit, sales_day_collect, fusion_cli):
+            resolved = Path(module.__file__).resolve()
+            self.assertTrue(
+                any(resolved.is_relative_to(root) for root in allowed),
+                f"{module.__name__} escaped current worktree: {resolved}",
+            )
 
 
 class BuildIdentityTests(unittest.TestCase):

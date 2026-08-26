@@ -222,6 +222,12 @@ def test_prematch_record_contains_validated_direction_policy(tmp_path):
     assert recorded["direction_policy_status"] == "REGISTERED"
     assert recorded["direction_policy"] == out["direction_policy"]
     assert recorded["direction_policy"]["rule_version"] == "direction-policy-v1"
+    assert recorded["direction_policy"]["direction_policy_signature_scope"] == (
+        "direction_policy_config_and_implementation"
+    )
+    assert recorded["direction_policy"]["direction_policy_signature"] != (
+        recorded["model"]["decision_policy_signature"]
+    )
 
 
 def test_policy_config_has_aware_task4_activation_timestamp():
@@ -249,6 +255,57 @@ def test_legacy_output_before_policy_activation_is_not_backfilled(tmp_path):
     recorded = _records(tmp_path)[0]
     assert recorded["direction_policy_status"] == "NOT_REGISTERED"
     assert "direction_policy" not in recorded
+
+
+def test_complete_policy_before_activation_is_sanitized_not_registered(tmp_path):
+    activation = "2026-08-26T11:16:27+08:00"
+    prediction_as_of = "2026-08-26T11:16:26+08:00"
+    kickoff = "2026-08-27T20:00:00+08:00"
+    inp = _input(kickoff, prediction_as_of, match_id="pre-activation-policy")
+    out = _valid_output(activation)
+    out["direction_policy"]["prediction_as_of"] = prediction_as_of
+
+    result = _run_record(tmp_path, inp, out, allow_past=True)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    recorded = _records(tmp_path)[0]
+    assert recorded["direction_policy_status"] == "UNAVAILABLE"
+    assert recorded["direction_policy"]["status"] == "UNAVAILABLE"
+    assert recorded["direction_policy"]["classification"] == "UNAVAILABLE"
+    assert recorded["direction_policy"]["primary_direction"] is None
+    assert recorded["direction_policy"]["alternative_direction"] is None
+    assert recorded["direction_policy"]["validation_error"] == "policy_not_active"
+    assert all(
+        policy["status"] == "UNAVAILABLE"
+        and policy["primary_direction"] is None
+        and policy["alternative_direction"] is None
+        for policy in _direction_policies(recorded)
+    )
+
+
+@pytest.mark.parametrize("module_body", [None, "def broken(:\n"])
+def test_record_direction_module_damage_fails_safe(module_body, monkeypatch, tmp_path):
+    fusion_record = importlib.import_module("fusion_record")
+    module_path = tmp_path / "direction_policy.py"
+    if module_body is not None:
+        module_path.write_text(module_body, encoding="utf-8")
+    monkeypatch.setattr(fusion_record, "_DIRECTION_POLICY_FILE", module_path)
+    kickoff, prediction_as_of = _times()
+    out = _valid_output(prediction_as_of)
+
+    status, sanitized = fusion_record.validate_direction_registration(
+        out,
+        build=out["build_identity"],
+        prediction_as_of=prediction_as_of,
+        kickoff=datetime.fromisoformat(kickoff),
+    )
+
+    assert status == "UNAVAILABLE"
+    assert sanitized["status"] == "UNAVAILABLE"
+    assert sanitized["classification"] == "UNAVAILABLE"
+    assert sanitized["primary_direction"] is None
+    assert sanitized["alternative_direction"] is None
+    assert sanitized["validation_error"].startswith("direction_policy_import_failed:")
 
 
 @pytest.mark.parametrize("prediction_as_of", [
@@ -295,10 +352,10 @@ def test_current_output_missing_policy_is_unavailable_not_legacy(tmp_path, predi
         (lambda policy, out, inp: policy.update(unregistered_extension=True), "schema_fields_mismatch"),
         (lambda policy, out, inp: policy.update(non_finite_extension=float("nan")), "schema_fields_mismatch"),
         (lambda policy, out, inp: policy.update(rule_version="direction-policy-v0"), "rule_version_mismatch"),
-        (lambda policy, out, inp: policy.update(decision_policy_signature="0" * 64), "decision_policy_signature_mismatch"),
-        (lambda policy, out, inp: policy["decision_policy_signature_components"].update(
+        (lambda policy, out, inp: policy.update(direction_policy_signature="0" * 64), "direction_policy_signature_mismatch"),
+        (lambda policy, out, inp: policy["direction_policy_signature_components"].update(
             implementation_sha256="0" * 64
-        ), "decision_policy_signature_components_mismatch"),
+        ), "direction_policy_signature_components_mismatch"),
         (lambda policy, out, inp: policy.update(classification="PRIMARY_WITH_COVER"), "classification_mismatch"),
         (lambda policy, out, inp: policy.update(primary_direction="A"), "primary_direction_mismatch"),
     ],

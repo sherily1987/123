@@ -20,10 +20,16 @@ from fusion_predict_core import build_identity
 from probability_replay_check import (COMPARE_FIELDS, FLOAT_TOLERANCE,
                                       canonical_json, is_complete_signature,
                                       registered_route, replay_one)
+from runtime_paths import data_root
 
 
 _ROUTE_UNSET = object()
 _PROTECTED_OUTPUT_TOKENS = {"store", "history", "registry", "results", "lock", "policy"}
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+REPOSITORY_ROOT = PROJECT_ROOT.parent
+MANAGED_GOVERNANCE_ROOT = (
+    PROJECT_ROOT / "06_复盘" / "2026-08-26_签名漂移治理"
+)
 
 
 class ReplaySelectionError(RuntimeError):
@@ -178,10 +184,9 @@ def _attestation_dir(root: Path) -> Path:
     return root / "signature-drift-attestations" / datetime.now(timezone.utc).date().isoformat()
 
 
-def _attestation_filename(group_key: tuple[str, tuple[str, str], str]) -> str:
-    """Map every raw group identity to one fixed Windows-safe filename."""
-    digest = hashlib.sha256(canonical_json(group_key).encode("utf-8")).hexdigest()
-    return f"signature-drift-{digest}.json"
+def _attestation_filename(report_sha256: str) -> str:
+    """Name an immutable proof by the hash of its canonical report content."""
+    return f"signature-drift-{report_sha256}.json"
 
 
 def build_drift_attestations(
@@ -195,6 +200,7 @@ def build_drift_attestations(
     route_filter: object = _ROUTE_UNSET,
     expected_record_count: int | None = None,
     require_exactly_one_group: bool = False,
+    reference_root: Path | None = None,
 ) -> list[dict]:
     """Read registered snapshots and write only caller-selected evidence files."""
     reports = []
@@ -229,11 +235,23 @@ def build_drift_attestations(
             canonical_json(report_hash_input).encode("utf-8")
         ).hexdigest()
         report["generated_at"] = datetime.now(timezone.utc).isoformat()
-        path = evidence_dir / _attestation_filename(key)
+        path = evidence_dir / _attestation_filename(report["report_sha256"])
         path.parent.mkdir(parents=True, exist_ok=True)
-        report["attestation_path"] = str(path)
-        path.write_text(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-                        encoding="utf-8")
+        resolved_path = path.resolve()
+        if reference_root is None:
+            report["attestation_path"] = str(resolved_path)
+        else:
+            resolved_root = Path(reference_root).resolve()
+            try:
+                report["attestation_path"] = resolved_path.relative_to(resolved_root).as_posix()
+            except ValueError as exc:
+                raise ReplaySelectionError(
+                    "attestation output is outside the configured reference root"
+                ) from exc
+        # Exclusive creation is the final guard against silently replacing an
+        # earlier review artifact, including a same-content rerun.
+        with path.open("x", encoding="utf-8") as handle:
+            handle.write(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n")
         reports.append(report)
     return reports
 
@@ -273,6 +291,15 @@ def main(argv: list[str] | None = None) -> int:
     output_dir = Path(args.output_dir).resolve()
     if output_dir == store or _is_within(output_dir, store):
         raise SystemExit("output-dir must be outside the read-only store")
+    canonical_root = data_root().resolve()
+    if output_dir == canonical_root or _is_within(output_dir, canonical_root):
+        raise SystemExit("output-dir must be outside canonical FUSION_DATA_ROOT")
+    managed_runs = (MANAGED_GOVERNANCE_ROOT / "runs").resolve()
+    if (not _is_within(output_dir, managed_runs)
+            or len(output_dir.relative_to(managed_runs).parts) < 2):
+        raise SystemExit(
+            "output-dir must be an exclusive run subdirectory under managed governance runs"
+        )
     if _contains_protected_output_directory(output_dir):
         raise SystemExit("output-dir must not use a protected governance directory")
     try:
@@ -285,6 +312,7 @@ def main(argv: list[str] | None = None) -> int:
             route_filter=None if args.route_null else args.route,
             expected_record_count=args.expected_record_count,
             require_exactly_one_group=True,
+            reference_root=REPOSITORY_ROOT,
         )
     except ReplaySelectionError as exc:
         print(json.dumps({"status": "REJECTED", "reason": str(exc)},

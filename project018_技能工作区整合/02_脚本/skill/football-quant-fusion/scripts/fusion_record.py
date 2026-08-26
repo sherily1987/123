@@ -8,16 +8,16 @@ match_id 优先用 sporttery_meta.match_id（如 sporttery-2040688），
 import argparse
 import copy
 import hashlib
+import importlib.util
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from release_governance import ReleaseGovernanceError, assert_output_matches_release_lock
-from direction_policy import build_direction_policy, load_policy
-
 HERE = Path(__file__).resolve().parent
 LOCK_FILE = HERE.parent / 'config' / 'release_lock.json'
+_DIRECTION_POLICY_FILE = HERE / 'direction_policy.py'
 
 from runtime_paths import core_scripts_dir, data_root
 from job_ticket import (
@@ -88,6 +88,18 @@ def _aware_datetime(value):
     return parsed.astimezone(timezone.utc)
 
 
+def _load_direction_policy_module():
+    """Load optional direction governance only inside the fail-safe boundary."""
+    spec = importlib.util.spec_from_file_location(
+        '_fusion_record_direction_policy_runtime', _DIRECTION_POLICY_FILE,
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f'direction policy module missing: {_DIRECTION_POLICY_FILE}')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def _direction_policy_claims(value, path='$'):
     """Collect every persisted direction-policy copy with its JSON path."""
     claims = []
@@ -156,16 +168,16 @@ def _direction_validation_error(candidate, expected, *, probabilities,
         return 'policy_version_mismatch'
     if candidate.get('activation_timestamp') != expected.get('activation_timestamp'):
         return 'activation_timestamp_mismatch'
-    signature = candidate.get('decision_policy_signature')
+    signature = candidate.get('direction_policy_signature')
     if (not is_complete_sha256(signature)
-            or signature != expected.get('decision_policy_signature')):
-        return 'decision_policy_signature_mismatch'
-    components = candidate.get('decision_policy_signature_components')
+            or signature != expected.get('direction_policy_signature')):
+        return 'direction_policy_signature_mismatch'
+    components = candidate.get('direction_policy_signature_components')
     if (not isinstance(components, dict)
             or set(components) != {'policy_canonical_sha256', 'implementation_sha256'}
             or not all(is_complete_sha256(value) for value in components.values())
-            or components != expected.get('decision_policy_signature_components')):
-        return 'decision_policy_signature_components_mismatch'
+            or components != expected.get('direction_policy_signature_components')):
+        return 'direction_policy_signature_components_mismatch'
     for field in ('classification', 'primary_direction', 'alternative_direction',
                   'status', 'probability_unit', 'probability_source', 'trigger',
                   'gap_pp', 'reason'):
@@ -197,7 +209,14 @@ def validate_direction_registration(out, *, build, prediction_as_of, kickoff):
     claims = _direction_policy_claims(out)
     rejected_sha256 = _direction_claims_sha256(claims)
     try:
-        policy_config = load_policy()
+        direction_module = _load_direction_policy_module()
+    except Exception as exc:
+        return 'UNAVAILABLE', _unavailable_direction_policy(
+            {}, error=f'direction_policy_import_failed:{type(exc).__name__}',
+            rejected_sha256=rejected_sha256,
+        )
+    try:
+        policy_config = direction_module.load_policy()
     except Exception as exc:
         return 'UNAVAILABLE', _unavailable_direction_policy(
             {}, error=f'policy_validation_failed:{type(exc).__name__}',
@@ -215,7 +234,7 @@ def validate_direction_registration(out, *, build, prediction_as_of, kickoff):
     if not top_level_present and not claims and prediction_time < activation:
         return 'NOT_REGISTERED', None
 
-    expected = build_direction_policy(
+    expected = direction_module.build_direction_policy(
         probabilities,
         prediction_as_of=prediction_as_of,
         model_identity=build,
@@ -229,7 +248,7 @@ def validate_direction_registration(out, *, build, prediction_as_of, kickoff):
         )
     if expected.get('status') != 'AVAILABLE':
         return 'UNAVAILABLE', _unavailable_direction_policy(
-            expected, error='expected_policy_unavailable',
+            expected, error=expected.get('reason') or 'expected_policy_unavailable',
             rejected_sha256=rejected_sha256,
         )
     for claim in claims:

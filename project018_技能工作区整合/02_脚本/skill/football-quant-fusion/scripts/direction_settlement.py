@@ -101,9 +101,10 @@ def settle_direction_policy(
         return _empty_settlement("UNAVAILABLE", official)
 
     prediction_as_of = _aware_time(policy.get("prediction_as_of"))
+    activation_at = _aware_time(policy.get("activation_timestamp"))
     kickoff_at = _aware_time(kickoff)
-    if (prediction_as_of is None or kickoff_at is None
-            or prediction_as_of >= kickoff_at):
+    if (prediction_as_of is None or activation_at is None or kickoff_at is None
+            or prediction_as_of < activation_at or prediction_as_of >= kickoff_at):
         return _empty_settlement("UNAVAILABLE", official)
 
     classification = policy.get("classification")

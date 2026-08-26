@@ -27,6 +27,7 @@ def _policy(classification, primary, alternative=None):
         "classification": classification,
         "primary_direction": primary,
         "alternative_direction": alternative,
+        "activation_timestamp": "2026-08-26T03:16:27+00:00",
         "prediction_as_of": "2026-09-01T10:00:00+00:00",
     }
 

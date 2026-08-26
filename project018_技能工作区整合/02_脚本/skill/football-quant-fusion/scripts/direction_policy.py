@@ -120,6 +120,21 @@ def _aware_time(value: Any) -> str | None:
     return rendered
 
 
+def _aware_datetime(value: Any) -> datetime | None:
+    if isinstance(value, datetime):
+        parsed = value
+    elif isinstance(value, str) and value.strip():
+        try:
+            parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    else:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed
+
+
 def _valid_identity(value: Any) -> tuple[str, str] | None:
     if not isinstance(value, dict):
         return None
@@ -192,8 +207,9 @@ def _unavailable(*, policy: Any, probabilities: Any, prediction_as_of: Any,
         "prediction_as_of": _aware_time(prediction_as_of),
         "model_version": identity[0] if identity else None,
         "probability_signature": identity[1] if identity else None,
-        "decision_policy_signature": signature,
-        "decision_policy_signature_components": signature_components,
+        "direction_policy_signature": signature,
+        "direction_policy_signature_components": signature_components,
+        "direction_policy_signature_scope": "direction_policy_config_and_implementation",
         "reason": reason,
     }
 
@@ -221,8 +237,12 @@ def build_direction_policy(probabilities: Any, *, prediction_as_of: Any,
     if time_value is None:
         return _unavailable(policy=policy, probabilities=probabilities,
                             prediction_as_of=prediction_as_of,
-                            model_identity=model_identity,
-                            reason="prediction_as_of_must_be_timezone_aware")
+                             model_identity=model_identity,
+                             reason="prediction_as_of_must_be_timezone_aware")
+    if _aware_datetime(prediction_as_of) < _aware_datetime(policy["activation_timestamp"]):
+        return _unavailable(policy=policy, probabilities=probabilities,
+                            prediction_as_of=prediction_as_of,
+                            model_identity=model_identity, reason="policy_not_active")
     identity = _valid_identity(model_identity)
     if identity is None:
         return _unavailable(policy=policy, probabilities=probabilities,
@@ -296,7 +316,8 @@ def build_direction_policy(probabilities: Any, *, prediction_as_of: Any,
         "prediction_as_of": time_value,
         "model_version": identity[0],
         "probability_signature": identity[1],
-        "decision_policy_signature": canonical_policy_signature(policy),
-        "decision_policy_signature_components": signature_components,
+        "direction_policy_signature": canonical_policy_signature(policy),
+        "direction_policy_signature_components": signature_components,
+        "direction_policy_signature_scope": "direction_policy_config_and_implementation",
         "reason": None,
     }

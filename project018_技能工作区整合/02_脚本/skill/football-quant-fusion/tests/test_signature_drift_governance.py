@@ -300,7 +300,7 @@ def test_replay_requires_registered_prediction_time_to_equal_stored_input(monkey
     assert result["time_audit"]["reason"] == "prediction_as_of_mismatch"
 
 
-def test_legacy_build_report_still_validates_as_a_complete_equivalent_attestation(monkeypatch, tmp_path):
+def test_schema2_build_report_validates_as_a_complete_equivalent_attestation(monkeypatch, tmp_path):
     row = record("m-1")
     prediction_path = tmp_path / "prediction.json"
     prediction_path.write_text(json.dumps(row), encoding="utf-8")
@@ -310,15 +310,14 @@ def test_legacy_build_report_still_validates_as_a_complete_equivalent_attestatio
     monkeypatch.setattr(replay_check, "replay_one", lambda item: identical_result(item))
 
     report = replay_check.build_report(tmp_path, "m4")
+    assert report["verdict"] == "equivalent"
+    assert report["replayed_probability_signatures"] == [OLD_SIG]
+    assert report["replayed_modes"] == ["market_only"]
     validated = release_governance.validate_replay_attestation(
         report,
         previous_lock={"model_version": "m4", "probability_signature": OLD_SIG},
         current_identity=CURRENT,
     )
-
-    assert report["verdict"] == "equivalent"
-    assert report["replayed_probability_signatures"] == [OLD_SIG]
-    assert report["replayed_modes"] == ["market_only"]
     assert validated["replay_verdict"] == "equivalent"
 
 
@@ -406,7 +405,7 @@ def test_limited_report_with_same_signature_and_route_is_explicitly_partial_and_
         )
 
 
-def test_complete_multi_record_report_remains_valid_for_release_governance(monkeypatch, tmp_path):
+def test_complete_schema2_multi_record_report_remains_valid(monkeypatch, tmp_path):
     first, second = record("m-1"), record("m-2")
     entries = []
     for index, row in enumerate((first, second)):
@@ -419,14 +418,13 @@ def test_complete_multi_record_report_remains_valid_for_release_governance(monke
     monkeypatch.setattr(replay_check, "replay_one", lambda item: identical_result(item))
 
     report = replay_check.build_report(tmp_path, "m4")
+    assert report["is_complete_replay"] is True
+    assert report["verdict"] == "equivalent"
     validated = release_governance.validate_replay_attestation(
         report,
         previous_lock={"model_version": "m4", "probability_signature": OLD_SIG},
         current_identity=CURRENT,
     )
-
-    assert report["is_complete_replay"] is True
-    assert report["verdict"] == "equivalent"
     assert validated["replay_verdict"] == "equivalent"
 
 
@@ -447,7 +445,27 @@ def test_attestation_write_is_read_only_and_hashes_its_canonical_content(monkeyp
     assert report["status"] == "PENDING_REVIEW"
     assert report["report_sha256"] == expected
     assert persisted["report_sha256"] == expected
+    assert attestation.name == f"signature-drift-{expected}.json"
     assert not (tmp_path / "registry.jsonl").exists()
+
+
+def test_content_addressed_attestation_cannot_be_overwritten(monkeypatch, tmp_path):
+    row = record("m-1")
+    evidence = tmp_path / "proofs"
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: [row])
+    monkeypatch.setattr(governance, "replay_one", lambda item: identical_result(item))
+    report = governance.build_drift_attestations(
+        tmp_path / "store", CURRENT, output_dir=evidence,
+    )[0]
+    path = Path(report["attestation_path"])
+    before = path.read_bytes()
+
+    with pytest.raises(FileExistsError):
+        governance.build_drift_attestations(
+            tmp_path / "store", CURRENT, output_dir=evidence,
+        )
+
+    assert path.read_bytes() == before
 
 
 def test_mixed_raw_signature_types_write_distinct_safe_attestations_without_invalid_replay(
@@ -558,7 +576,7 @@ def test_runtime_cli_rejects_evidence_output_inside_read_only_store(tmp_path):
     store = tmp_path / "canonical-store"
     store.mkdir()
 
-    with pytest.raises(SystemExit, match="output-dir must be outside"):
+    with pytest.raises(SystemExit, match="read-only store"):
         governance.main([
             "--store", str(store),
             "--output-dir", str(store / "forbidden-write"),
@@ -575,8 +593,12 @@ def test_runtime_cli_rejects_evidence_output_inside_read_only_store(tmp_path):
 def test_runtime_cli_rejects_protected_governance_output_directories(
         monkeypatch, tmp_path, protected_name):
     store = tmp_path / "canonical" / "backtest"
-    output = tmp_path / "evidence" / protected_name / "run"
+    managed_root = tmp_path / "governance"
+    output = managed_root / "runs" / "run-1" / protected_name
     monkeypatch.setattr(governance, "build_identity", lambda: CURRENT)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical")
 
     with pytest.raises(SystemExit, match="protected governance directory"):
         governance.main([
@@ -588,7 +610,8 @@ def test_runtime_cli_rejects_protected_governance_output_directories(
 
 def test_runtime_cli_route_null_selects_exactly_one_expected_group(monkeypatch, tmp_path):
     store = tmp_path / "canonical" / "backtest"
-    evidence = tmp_path / "review-evidence"
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
     null_route_rows = [record(f"null-{index}") for index in range(14)]
     for row in null_route_rows:
         row.pop("mode")
@@ -599,6 +622,9 @@ def test_runtime_cli_route_null_selects_exactly_one_expected_group(monkeypatch, 
     ))
     monkeypatch.setattr(governance, "build_identity", lambda: CURRENT)
     monkeypatch.setattr(governance, "replay_one", lambda row: identical_result(row))
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
 
     assert governance.main([
         "--store", str(store), "--output-dir", str(evidence),
@@ -609,6 +635,7 @@ def test_runtime_cli_route_null_selects_exactly_one_expected_group(monkeypatch, 
     reports = list(evidence.glob("signature-drift-*.json"))
     assert len(reports) == 1
     payload = json.loads(reports[0].read_text(encoding="utf-8"))
+    assert payload["attestation_path"] == reports[0].relative_to(tmp_path).as_posix()
     assert payload["route"] is None
     assert payload["record_count"] == 14
 
@@ -617,9 +644,13 @@ def test_runtime_cli_route_null_selects_exactly_one_expected_group(monkeypatch, 
 def test_runtime_cli_zero_match_or_count_mismatch_fails_without_success_report(
         monkeypatch, tmp_path, rows, expected_count):
     store = tmp_path / "canonical" / "backtest"
-    evidence = tmp_path / "review-evidence"
+    managed_root = tmp_path / "governance"
+    evidence = managed_root / "runs" / "run-1" / "proofs"
     monkeypatch.setattr(governance, "load_registered_records", lambda _root: rows)
     monkeypatch.setattr(governance, "build_identity", lambda: CURRENT)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", managed_root)
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(governance, "data_root", lambda: tmp_path / "canonical-data")
 
     assert governance.main([
         "--store", str(store), "--output-dir", str(evidence),
@@ -655,3 +686,34 @@ def test_runtime_cli_rejects_incomplete_signature_and_requires_route_and_count(t
 
     with pytest.raises(SystemExit, match="complete 64-hex"):
         governance.main(common + ["--route-null", "--expected-record-count", "14"])
+
+
+def test_runtime_cli_rejects_any_output_under_canonical_data_root(monkeypatch, tmp_path):
+    canonical_root = tmp_path / "canonical-data"
+    store = canonical_root / "backtest"
+    output = canonical_root / "innocent-run-name"
+    monkeypatch.setattr(governance, "data_root", lambda: canonical_root)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", tmp_path / "governance")
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+
+    with pytest.raises(SystemExit, match="canonical FUSION_DATA_ROOT"):
+        governance.main([
+            "--store", str(store), "--output-dir", str(output),
+            "--model-version", "m4", "--probability-signature", OLD_SIG,
+            "--route-null", "--expected-record-count", "1",
+        ])
+
+
+def test_runtime_cli_rejects_output_outside_managed_governance_runs(monkeypatch, tmp_path):
+    canonical_root = tmp_path / "canonical-data"
+    monkeypatch.setattr(governance, "data_root", lambda: canonical_root)
+    monkeypatch.setattr(governance, "MANAGED_GOVERNANCE_ROOT", tmp_path / "governance")
+    monkeypatch.setattr(governance, "REPOSITORY_ROOT", tmp_path)
+
+    with pytest.raises(SystemExit, match="managed governance runs"):
+        governance.main([
+            "--store", str(canonical_root / "backtest"),
+            "--output-dir", str(tmp_path / "somewhere-else"),
+            "--model-version", "m4", "--probability-signature", OLD_SIG,
+            "--route-null", "--expected-record-count", "1",
+        ])

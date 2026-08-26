@@ -7,7 +7,10 @@
 自 1.5.0 / model m2 起，发布身份拆为三条相互独立的签名：
 
 - `probability_signature`：只覆盖会改变概率数值的核心算法、生产路由和概率配置；
-- `decision_policy_signature`：覆盖推荐门控代码与政策配置；
+- `decision_policy_signature`：模型 build identity 的推荐/决策治理 bundle 发布审计签名；
+- `direction_policy_signature`：单场 `direction_policy` 专用，只覆盖方向分类配置与实现，
+  固定声明 `direction_policy_signature_scope=direction_policy_config_and_implementation`；
+  两者不得互换或用同一字段承载；
 - `evidence_pipeline_signature`：覆盖赛前采集、特征适配与LLM证据入口。
 
 概率代码改变必须升级 `model_version` 并重建发布锁。只改推荐政策或证据管线不得伪装成新概率模型，但正式登记仍须冻结三条签名以便复现。

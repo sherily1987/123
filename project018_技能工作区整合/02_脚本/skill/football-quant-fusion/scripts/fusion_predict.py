@@ -56,8 +56,9 @@ def _unavailable_policy(result, data, probabilities, error):
         "prediction_as_of": data.get("prediction_as_of"),
         "model_version": identity.get("model_version"),
         "probability_signature": identity.get("probability_signature"),
-        "decision_policy_signature": None,
-        "decision_policy_signature_components": None,
+        "direction_policy_signature": None,
+        "direction_policy_signature_components": None,
+        "direction_policy_signature_scope": "direction_policy_config_and_implementation",
         "reason": "validation_error",
         "validation_error": error,
     }

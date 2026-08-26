@@ -89,7 +89,11 @@ def test_valid_policy_carries_auditable_identity_source_and_signature():
     assert result["probability_signature"] == "a" * 64
     assert result["prediction_as_of"] == AS_OF
     assert result["probability_source"] == "final_1x2_pct"
-    assert len(result["decision_policy_signature"]) == 64
+    assert len(result["direction_policy_signature"]) == 64
+    assert result["direction_policy_signature_scope"] == (
+        "direction_policy_config_and_implementation"
+    )
+    assert "decision_policy_signature" not in result
 
 
 def test_policy_signature_changes_when_canonical_config_changes():
@@ -97,7 +101,7 @@ def test_policy_signature_changes_when_canonical_config_changes():
     changed = dict(POLICY, alternative_min_probability=0.29)
     second = build([0.44, 0.28, 0.28], policy=changed)
 
-    assert first["decision_policy_signature"] != second["decision_policy_signature"]
+    assert first["direction_policy_signature"] != second["direction_policy_signature"]
 
 
 def test_direction_implementation_is_governed_as_decision_policy_not_probability_code():
@@ -137,7 +141,7 @@ def test_policy_signature_changes_when_governed_implementation_bytes_change(
     governed_code.write_bytes(b"changed direction behavior")
     second = build([0.44, 0.28, 0.28])
 
-    assert first["decision_policy_signature"] != second["decision_policy_signature"]
+    assert first["direction_policy_signature"] != second["direction_policy_signature"]
 
 
 def test_invalid_input_returns_unavailable_without_fabricating_direction():
@@ -156,3 +160,26 @@ def test_naive_prediction_time_returns_unavailable():
     assert result["status"] == "UNAVAILABLE"
     assert result["primary_direction"] is None
     assert result["reason"] == "prediction_as_of_must_be_timezone_aware"
+
+
+def test_prediction_before_policy_activation_is_unavailable():
+    result = build(
+        [0.55, 0.25, 0.20],
+        prediction_as_of="2026-08-26T11:16:26+08:00",
+    )
+
+    assert result["status"] == "UNAVAILABLE"
+    assert result["classification"] == "UNAVAILABLE"
+    assert result["primary_direction"] is None
+    assert result["alternative_direction"] is None
+    assert result["reason"] == "policy_not_active"
+
+
+def test_policy_is_active_at_exact_activation_timestamp():
+    result = build(
+        [0.55, 0.25, 0.20],
+        prediction_as_of=POLICY["activation_timestamp"],
+    )
+
+    assert result["status"] == "AVAILABLE"
+    assert result["classification"] == "PRIMARY_ONLY"

@@ -20,6 +20,11 @@ from release_governance import (ReleaseGovernanceError,
 
 SCHEMA_VERSION = "probability-aliases-1.0"
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+REPOSITORY_ROOT = PROJECT_ROOT.parent
+MANAGED_GOVERNANCE_ROOT = (
+    PROJECT_ROOT / "06_复盘" / "2026-08-26_签名漂移治理"
+)
 MANAGED_ALIAS_PATH = SKILL_ROOT / "config" / "probability_aliases.json"
 MANAGED_RELEASE_LOCK_PATH = SKILL_ROOT / "config" / "release_lock.json"
 
@@ -58,23 +63,72 @@ def _proof_sha256(path: Path) -> str:
         raise ProbabilityAliasError(f"无法计算证明文件 SHA256：{path}") from exc
 
 
-def _validated_proof(report_path: Path, lock_path: Path) -> tuple[dict[str, str], str]:
+def _inside(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return False
+    return True
+
+
+def _stable_report_reference(
+    report_path: Path, *, governance_root: Path, repository_root: Path,
+) -> tuple[Path, str]:
     report_path = Path(report_path).resolve()
+    governance_root = Path(governance_root).resolve()
+    repository_root = Path(repository_root).resolve()
+    if not _inside(report_path, governance_root):
+        raise ProbabilityAliasError("证明文件不在仓库签名漂移治理根目录内")
+    if not _inside(governance_root, repository_root):
+        raise ProbabilityAliasError("签名漂移治理根目录不在仓库内")
+    return report_path, report_path.relative_to(repository_root).as_posix()
+
+
+def _resolve_report_reference(
+    path_value: Any, *, governance_root: Path, repository_root: Path,
+) -> tuple[Path, str]:
+    if not isinstance(path_value, str) or not path_value.strip():
+        raise ProbabilityAliasError("证明缺少 attestation_path")
+    relative = Path(path_value)
+    if relative.is_absolute():
+        raise ProbabilityAliasError("证明 attestation_path 必须是仓库稳定相对路径")
+    repository_root = Path(repository_root).resolve()
+    governance_root = Path(governance_root).resolve()
+    resolved = (repository_root / relative).resolve()
+    if not _inside(resolved, governance_root):
+        raise ProbabilityAliasError("证明 attestation_path 逃逸签名漂移治理根目录")
+    stable = resolved.relative_to(repository_root).as_posix()
+    if Path(stable) != relative:
+        raise ProbabilityAliasError("证明 attestation_path 不是规范化仓库相对路径")
+    return resolved, stable
+
+
+def _validated_proof(
+    report_path: Path,
+    lock_path: Path,
+    *,
+    governance_root: Path,
+    repository_root: Path,
+) -> tuple[dict[str, str], str, str]:
+    report_path, stable_reference = _stable_report_reference(
+        report_path,
+        governance_root=governance_root,
+        repository_root=repository_root,
+    )
     report = _read_object(report_path, purpose="重放证明")
     lock = _lock_identity(_read_object(Path(lock_path), purpose="发布锁"))
-    declared_path = report.get("attestation_path")
-    if not isinstance(declared_path, str):
-        raise ProbabilityAliasError("证明缺少 attestation_path")
-    try:
-        if Path(declared_path).resolve() != report_path:
-            raise ProbabilityAliasError("证明 attestation_path 与审批文件不一致")
-    except OSError as exc:
-        raise ProbabilityAliasError("证明 attestation_path 无法解析") from exc
+    declared_path, declared_reference = _resolve_report_reference(
+        report.get("attestation_path"),
+        governance_root=governance_root,
+        repository_root=repository_root,
+    )
+    if declared_path != report_path or declared_reference != stable_reference:
+        raise ProbabilityAliasError("证明 attestation_path 与审批文件不一致")
     try:
         identity = validate_grouped_alias_attestation(report, current_identity=lock)
     except ReleaseGovernanceError as exc:
         raise ProbabilityAliasError(str(exc)) from exc
-    return identity, _proof_sha256(report_path)
+    return identity, _proof_sha256(report_path), stable_reference
 
 
 def _read_alias_document(path: Path) -> dict[str, Any]:
@@ -86,14 +140,26 @@ def _read_alias_document(path: Path) -> dict[str, Any]:
     return payload
 
 
-def approve_attestation(report_path: Path, alias_path: Path, lock_path: Path) -> dict:
+def approve_attestation(
+    report_path: Path,
+    alias_path: Path,
+    lock_path: Path,
+    *,
+    governance_root: Path | None = None,
+    repository_root: Path | None = None,
+) -> dict:
     """Approve one complete PENDING_REVIEW proof without accepting raw keys."""
-    report_path = Path(report_path).resolve()
-    identity, proof_hash = _validated_proof(report_path, Path(lock_path))
+    governance_root = Path(governance_root or MANAGED_GOVERNANCE_ROOT)
+    repository_root = Path(repository_root or REPOSITORY_ROOT)
+    identity, proof_hash, stable_reference = _validated_proof(
+        Path(report_path), Path(lock_path),
+        governance_root=governance_root,
+        repository_root=repository_root,
+    )
     approved = {
         "status": "EQUIVALENT_ALIAS",
         **identity,
-        "attestation_path": str(report_path),
+        "attestation_path": stable_reference,
         "attestation_sha256": proof_hash,
     }
     alias_path = Path(alias_path)
@@ -134,8 +200,16 @@ def _entry_matches_proof(entry: dict[str, Any], proof_identity: dict[str, str], 
             and entry.get("attestation_sha256") == proof_hash)
 
 
-def load_approved_aliases(alias_path: Path, lock_path: Path) -> list[dict]:
+def load_approved_aliases(
+    alias_path: Path,
+    lock_path: Path,
+    *,
+    governance_root: Path | None = None,
+    repository_root: Path | None = None,
+) -> list[dict]:
     """Load only aliases whose proof and release target are valid right now."""
+    governance_root = Path(governance_root or MANAGED_GOVERNANCE_ROOT)
+    repository_root = Path(repository_root or REPOSITORY_ROOT)
     try:
         document = _read_alias_document(Path(alias_path))
         # Validate the lock even for an empty list, so malformed governance
@@ -152,7 +226,18 @@ def load_approved_aliases(alias_path: Path, lock_path: Path) -> list[dict]:
         if not isinstance(path_value, str) or not _is_sha256(entry.get("attestation_sha256")):
             continue
         try:
-            proof_identity, proof_hash = _validated_proof(Path(path_value), Path(lock_path))
+            report_path, stable_reference = _resolve_report_reference(
+                path_value,
+                governance_root=governance_root,
+                repository_root=repository_root,
+            )
+            if stable_reference != path_value:
+                continue
+            proof_identity, proof_hash, _ = _validated_proof(
+                report_path, Path(lock_path),
+                governance_root=governance_root,
+                repository_root=repository_root,
+            )
         except ProbabilityAliasError:
             continue
         if not _entry_matches_proof(entry, proof_identity, proof_hash):

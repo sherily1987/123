@@ -183,7 +183,9 @@ def test_same_version_signature_transition_requires_complete_equivalent_attestat
     lock_path = tmp_path / "release_lock.json"
     lock_path.write_text(json.dumps(_identity(OLD_SIG)), encoding="utf-8")
     report_path = tmp_path / "replay.json"
-    report_path.write_text(json.dumps(_attestation(fields=["final_1x2_pct"])), encoding="utf-8")
+    report_path.write_text(json.dumps(_schema_2_attestation(
+        compare_fields=["final_1x2_pct"]
+    )), encoding="utf-8")
 
     with pytest.raises(governance.ReleaseGovernanceError, match="比较字段"):
         governance.transition_release_lock(lock_path, _identity(), report_path)
@@ -193,7 +195,7 @@ def test_same_version_signature_transition_writes_audited_lock(tmp_path):
     lock_path = tmp_path / "release_lock.json"
     lock_path.write_text(json.dumps(_identity(OLD_SIG)), encoding="utf-8")
     report_path = tmp_path / "replay.json"
-    report_path.write_text(json.dumps(_attestation()), encoding="utf-8")
+    report_path.write_text(json.dumps(_schema_2_attestation()), encoding="utf-8")
 
     locked = governance.transition_release_lock(lock_path, _identity(), report_path)
 
@@ -208,11 +210,39 @@ def test_schema_2_complete_full_replay_remains_valid():
     assert _validate(_schema_2_attestation())["replay_verdict"] == "equivalent"
 
 
-def test_historical_schema_1_complete_replay_remains_valid_without_new_fields():
+def test_historical_schema_1_is_read_only_and_cannot_validate_state_change():
     report = _attestation()
     report["schema_version"] = "fusion-probability-replay-1.0"
 
-    assert _validate(report)["replay_verdict"] == "equivalent"
+    with pytest.raises(governance.ReleaseGovernanceError, match="只读|schema 2"):
+        _validate(report)
+
+
+def test_historical_schema_1_cannot_rewrite_release_lock(tmp_path):
+    previous = _identity(OLD_SIG)
+    lock_path = tmp_path / "release_lock.json"
+    lock_path.write_text(json.dumps(previous), encoding="utf-8")
+    report = _attestation()
+    report["schema_version"] = "fusion-probability-replay-1.0"
+    report_path = tmp_path / "legacy-replay.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+
+    with pytest.raises(governance.ReleaseGovernanceError, match="只读|schema 2"):
+        governance.transition_release_lock(lock_path, _identity(), report_path)
+
+    assert json.loads(lock_path.read_text(encoding="utf-8")) == previous
+
+
+def test_release_status_still_displays_existing_legacy_attestation(tmp_path):
+    legacy = {"schema_version": "fusion-probability-replay-1.0", "verdict": "equivalent"}
+    lock = {**_identity(), "replay_attestation": legacy}
+    lock_path = tmp_path / "release_lock.json"
+    lock_path.write_text(json.dumps(lock), encoding="utf-8")
+
+    status = governance.release_status(_identity(), lock_path)
+
+    assert status["status"] == "LOCKED"
+    assert status["replay_attestation"] == legacy
 
 
 @pytest.mark.parametrize("missing_field", [
@@ -260,7 +290,7 @@ def test_same_version_signature_transition_rejects_any_probability_difference(tm
     lock_path = tmp_path / "release_lock.json"
     lock_path.write_text(json.dumps(_identity(OLD_SIG)), encoding="utf-8")
     report_path = tmp_path / "replay.json"
-    report_path.write_text(json.dumps(_attestation(verdict="changed")), encoding="utf-8")
+    report_path.write_text(json.dumps(_schema_2_attestation(verdict="changed")), encoding="utf-8")
 
     with pytest.raises(governance.ReleaseGovernanceError, match="数值不等价"):
         governance.transition_release_lock(lock_path, _identity(), report_path)

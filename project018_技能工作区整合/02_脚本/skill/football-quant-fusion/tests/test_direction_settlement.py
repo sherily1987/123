@@ -24,6 +24,7 @@ def policy(classification="PRIMARY_WITH_COVER", primary="H", alternative="D"):
         "classification": classification,
         "primary_direction": primary,
         "alternative_direction": alternative,
+        "activation_timestamp": "2026-08-26T03:16:27+00:00",
         "prediction_as_of": "2026-09-01T10:00:00+00:00",
     }
 
@@ -131,6 +132,21 @@ def test_registered_policy_must_still_have_a_valid_prematch_time_contract():
     for kickoff in (None, "", "not-a-time", "2026-09-01T12:00:00"):
         assert settle(policy("PRIMARY_ONLY", "H", None), official("H"),
                       kickoff=kickoff)["settlement_status"] == "UNAVAILABLE"
+
+
+def test_registered_policy_before_activation_cannot_be_settled():
+    historical = policy("PRIMARY_ONLY", "H", None)
+    historical["prediction_as_of"] = "2026-08-26T03:16:26+00:00"
+
+    settled = settle(
+        historical,
+        official("H"),
+        kickoff="2026-08-27T12:00:00+00:00",
+    )
+
+    assert settled["settlement_status"] == "UNAVAILABLE"
+    assert settled["primary_hit"] is None
+    assert settled["direction_policy_hit"] is None
 
 
 def test_three_hit_metrics_keep_independent_denominators():
