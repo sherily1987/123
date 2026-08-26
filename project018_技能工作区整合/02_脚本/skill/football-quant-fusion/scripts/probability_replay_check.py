@@ -33,6 +33,12 @@ COMPARE_FIELDS = (
 FLOAT_TOLERANCE = 1e-10
 
 
+def is_complete_signature(value: Any) -> bool:
+    """A probability signature is usable only as a complete SHA-256 hex value."""
+    text = str(value or "")
+    return len(text) == 64 and all(char in "0123456789abcdef" for char in text.lower())
+
+
 def canonical_json(value: Any) -> str:
     """Stable JSON used for immutable replay-input hashes."""
     return json.dumps(value, ensure_ascii=False, sort_keys=True,
@@ -210,6 +216,13 @@ def replay_one(record: dict[str, Any]) -> dict:
     payload = record.get("input")
     route = registered_route(record)
     prediction_as_of = record.get("prediction_as_of")
+    signature = (record.get("model") or {}).get("probability_signature")
+    if not is_complete_signature(signature):
+        input_sha256 = (hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+                        if isinstance(payload, dict) else None)
+        return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
+                "prediction_as_of": prediction_as_of, "input_sha256": input_sha256, "diffs": {},
+                "time_audit": {"usable": False, "reason": "probability_signature_invalid"}}
     if not isinstance(payload, dict):
         return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
                 "prediction_as_of": prediction_as_of, "input_sha256": None, "diffs": {},
@@ -255,15 +268,21 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
             continue
         if str((rec.get("model") or {}).get("model_version") or "") == model_version:
             records.append(rec)
-    results = [replay_one(rec) for rec in (records[:limit] if limit else records)]
+    replayed_records = records[:limit] if limit else records
+    results = [replay_one(rec) for rec in replayed_records]
     counts: dict[str, int] = {}
     for item in results:
         counts[item["status"]] = counts.get(item["status"], 0) + 1
     current_identity = build_identity()
+    # Coverage declarations are the intersection of the selected subset and
+    # successful numerical replays.  A record merely read after --limit, or an
+    # unreplayable member in the selected subset, cannot prove equivalence.
+    successful_pairs = [(record, result) for record, result in zip(replayed_records, results)
+                        if result.get("status") == "identical"]
     replayed_signatures = sorted({str((record.get("model") or {}).get("probability_signature") or "")
-                                  for record in records
-                                  if (record.get("model") or {}).get("probability_signature")})
-    replayed_modes = sorted({str(item.get("route")) for item in results if item.get("route")})
+                                  for record, _ in successful_pairs})
+    replayed_modes = sorted({str(result.get("route")) for _, result in successful_pairs
+                            if result.get("route")})
     verdict = ("equivalent" if results and all(item.get("status") == "identical" for item in results)
                else "changed" if any(item.get("status") == "differs" for item in results)
                else "inconclusive")

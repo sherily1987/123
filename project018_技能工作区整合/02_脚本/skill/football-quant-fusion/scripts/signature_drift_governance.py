@@ -14,12 +14,8 @@ from typing import Any
 
 from fusion_backtest import load_jsonl, resolve_path
 from probability_replay_check import (COMPARE_FIELDS, FLOAT_TOLERANCE,
-                                      canonical_json, registered_route, replay_one)
-
-
-def _is_complete_signature(value: Any) -> bool:
-    text = str(value or "")
-    return len(text) == 64 and all(char in "0123456789abcdef" for char in text.lower())
+                                      canonical_json, is_complete_signature,
+                                      registered_route, replay_one)
 
 
 def _identity(record: dict[str, Any]) -> tuple[str, str]:
@@ -59,11 +55,11 @@ def evaluate_group(records: list[dict], *, current_identity: dict) -> dict:
     expected_key = (model_version, signature, route)
     current_signature = str(current_identity.get("probability_signature") or "")
     current_identity_valid = bool(str(current_identity.get("model_version") or "")) and \
-        _is_complete_signature(current_signature)
+        is_complete_signature(current_signature)
     results = []
     for record in records:
         actual_key = (*_identity(record), registered_route(record) or "")
-        record_signature_valid = _is_complete_signature(actual_key[1])
+        record_signature_valid = is_complete_signature(actual_key[1])
         if not record_signature_valid:
             result = {
                 "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
