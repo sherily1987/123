@@ -129,7 +129,7 @@ def _approve(tmp_path: Path) -> tuple[dict, Path, Path, Path]:
     return approved, report, alias_file, lock_file
 
 
-def test_approval_cli_rejects_unreviewable_proof_without_touching_alias_file(tmp_path):
+def test_approval_function_rejects_unreviewable_proof_without_touching_alias_file(tmp_path):
     report = tmp_path / "unreplayable.json"
     alias_file = tmp_path / "probability_aliases.json"
     lock_file = tmp_path / "release_lock.json"
@@ -141,12 +141,44 @@ def test_approval_cli_rejects_unreviewable_proof_without_touching_alias_file(tmp
     )
     before = alias_file.read_bytes()
 
-    assert aliases.main([
-        "--attestation", str(report),
-        "--aliases", str(alias_file),
-        "--release-lock", str(lock_file),
-    ]) == 1
+    with pytest.raises(aliases.ProbabilityAliasError, match="PENDING_REVIEW"):
+        aliases.approve_attestation(report, alias_file, lock_file)
     assert alias_file.read_bytes() == before
+
+
+@pytest.mark.parametrize("forbidden_option", ["--aliases", "--release-lock"])
+def test_production_approval_cli_does_not_expose_governance_output_paths(
+        tmp_path, forbidden_option):
+    report = tmp_path / "proof.json"
+    _write_attestation(report)
+
+    with pytest.raises(SystemExit) as exc_info:
+        aliases.main([
+            "--attestation", str(report), forbidden_option, str(tmp_path / "override.json"),
+        ])
+
+    assert exc_info.value.code == 2
+
+
+def test_production_approval_cli_uses_only_managed_config_paths(monkeypatch, tmp_path):
+    report = tmp_path / "proof.json"
+    _write_attestation(report)
+    captured = {}
+
+    def fake_approve(report_path, alias_path, lock_path):
+        captured.update(report=report_path, aliases=alias_path, release_lock=lock_path)
+        return {"status": "EQUIVALENT_ALIAS"}
+
+    monkeypatch.setattr(aliases, "approve_attestation", fake_approve)
+
+    assert aliases.main(["--attestation", str(report)]) == 0
+    assert captured == {
+        "report": report,
+        "aliases": aliases.MANAGED_ALIAS_PATH,
+        "release_lock": aliases.MANAGED_RELEASE_LOCK_PATH,
+    }
+    assert aliases.MANAGED_ALIAS_PATH == SKILL_ROOT / "config" / "probability_aliases.json"
+    assert aliases.MANAGED_RELEASE_LOCK_PATH == SKILL_ROOT / "config" / "release_lock.json"
 
 
 def test_approval_writes_exact_route_scoped_alias_from_proof(tmp_path):

@@ -1,0 +1,100 @@
+{
+  "schema_version": "task7-runtime-acceptance-summary-2.0",
+  "run_id": "20260826T045241Z-fix1",
+  "generated_at": "2026-08-26T04:55:10.000000+00:00",
+  "task_status": "COMPLETE_WITH_ALIAS_REJECTED",
+  "release_admission": "HOLD",
+  "strict_selection": {
+    "model_version": "m4",
+    "probability_signature": "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+    "registered_route": null,
+    "expected_record_count": 14,
+    "selected_group_count": 1,
+    "selected_record_count": 14
+  },
+  "target_group": {
+    "status": "UNREPLAYABLE",
+    "result_status_counts": {"UNREPLAYABLE": 14},
+    "blocking_reasons": {"registered_route_missing_or_inconsistent": 14},
+    "registered_vs_input_match_id_mismatch_count": 14,
+    "input_sha256_present_count": 14,
+    "registered_identity_present_count": 14,
+    "input_identity_present_count": 14,
+    "prediction_before_kickoff_count": 14,
+    "evidence_after_prediction_as_of_count": 0,
+    "numerical_comparison_reached": false,
+    "compare_fields_contract": [
+      "final_1x2_pct",
+      "model_1x2_pct",
+      "score_matrix",
+      "top_scores",
+      "ou_2_5",
+      "ou_3_5",
+      "btts",
+      "hafu_model",
+      "ttg_score_consistency"
+    ],
+    "attestation_report_sha256": "334d1d24a6f8773fe6f8dade544be04c1097775ac6aa2bc9f9ab751f6874e19e",
+    "attestation_file_sha256": "373ed911ab2f7e7bec65347cd18b103f151cff9167c0f2356168f75596959d41"
+  },
+  "approval": {
+    "attempted": true,
+    "exit_code": 1,
+    "exit_code_expected": true,
+    "result": "REJECTED",
+    "reason": "证明状态必须为 PENDING_REVIEW",
+    "probability_aliases_changed": false,
+    "probability_aliases_before_sha256": "26642be7d8a4463fb372ae13d849f4619a3989f567958014feae49e748a33271",
+    "probability_aliases_after_sha256": "26642be7d8a4463fb372ae13d849f4619a3989f567958014feae49e748a33271"
+  },
+  "sample_identity": {
+    "raw_current_n": 11,
+    "approved_alias_n": 0,
+    "current_settled_n": 11,
+    "net_current_change": 0
+  },
+  "current_paired_market": {
+    "n": 11,
+    "brier_delta_model_minus_market": 0.01393036,
+    "brier_delta_95ci": [0.00405373, 0.02393031],
+    "log_loss_delta_model_minus_market": 0.02003962,
+    "log_loss_delta_95ci": [0.00746678, 0.03348974]
+  },
+  "gates": {
+    "min_recalibration": 100,
+    "threshold_review": 200,
+    "ready_for_recalibration": false,
+    "ready_for_threshold_review": false,
+    "production_recommendations_enabled": false
+  },
+  "immutability": {
+    "baseline_generated_before_commands": true,
+    "baseline_file_count": 28,
+    "post_file_count": 28,
+    "all_unchanged": true,
+    "canonical_store_written": false,
+    "release_lock_updated": false,
+    "baseline_sha256": "dce7f72c412bfb2112cd7210b2cdf41fa4bfe3b109965ab4aacc44bc1d80cbfe",
+    "post_hashes_sha256": "c55e0c7eda8d53c52be871998f66e3586ba060e1182d638592377adff634e875"
+  },
+  "commands": {
+    "count": 9,
+    "all_exit_codes_expected": true,
+    "command_manifest_sha256": "3680968274db2396d37ae4b7cc431e79de9a090fd346a72f785689931eb7b755",
+    "approval_rejection_raw_stdout": "raw/03_alias-approval-rejection.stdout.txt",
+    "approval_rejection_raw_stderr": "raw/03_alias-approval-rejection.stderr.txt"
+  },
+  "verification": {
+    "full_suite_raw": "503 passed, 6 subtests passed in 27.43s",
+    "full_suite_junit": {"tests": 509, "failures": 0, "errors": 0},
+    "independent_p0_raw": "26 passed, 6 subtests passed in 3.20s",
+    "independent_p0_junit": {"tests": 32, "failures": 0, "errors": 0},
+    "release_lock_precheck": "MATCH",
+    "release_lock_postcheck": "MATCH"
+  },
+  "concerns": [
+    "The selected 14-row group has no uniquely registered route, so the nine numerical fields were not replayed and no equivalence may be claimed.",
+    "A separate 37-row m4 drift group remains UNREPLAYED and isolated.",
+    "The current paired-market sample is only 11 and production recommendation admission remains HOLD."
+  ]
+}

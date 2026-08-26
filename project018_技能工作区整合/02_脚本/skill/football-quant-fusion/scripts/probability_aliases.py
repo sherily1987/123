@@ -19,6 +19,9 @@ from release_governance import (ReleaseGovernanceError,
 
 
 SCHEMA_VERSION = "probability-aliases-1.0"
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+MANAGED_ALIAS_PATH = SKILL_ROOT / "config" / "probability_aliases.json"
+MANAGED_RELEASE_LOCK_PATH = SKILL_ROOT / "config" / "release_lock.json"
 
 
 class ProbabilityAliasError(RuntimeError):
@@ -193,14 +196,10 @@ def matches(row: dict[str, Any], approved_alias: dict[str, Any]) -> bool:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="从完整重放证明审批精确概率别名")
     parser.add_argument("--attestation", required=True)
-    parser.add_argument("--aliases", default=str(Path(__file__).resolve().parents[1] /
-                                                  "config" / "probability_aliases.json"))
-    parser.add_argument("--release-lock", default=str(Path(__file__).resolve().parents[1] /
-                                                       "config" / "release_lock.json"))
     args = parser.parse_args(argv)
     try:
         approved = approve_attestation(
-            Path(args.attestation), Path(args.aliases), Path(args.release_lock),
+            Path(args.attestation), MANAGED_ALIAS_PATH, MANAGED_RELEASE_LOCK_PATH,
         )
     except ProbabilityAliasError as exc:
         print(json.dumps({"status": "REJECTED", "reason": str(exc)},

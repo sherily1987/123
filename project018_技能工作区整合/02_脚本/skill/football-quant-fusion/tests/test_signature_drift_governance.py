@@ -53,7 +53,7 @@ def identical_result(row: dict) -> dict:
     return {
         "match_id": row["match_id"],
         "status": "identical",
-        "route": row["mode"],
+        "route": row.get("mode"),
         "prediction_as_of": row["prediction_as_of"],
         "input_sha256": "1" * 64,
         "diffs": {},
@@ -564,4 +564,94 @@ def test_runtime_cli_rejects_evidence_output_inside_read_only_store(tmp_path):
             "--output-dir", str(store / "forbidden-write"),
             "--model-version", "m4",
             "--probability-signature", OLD_SIG,
+            "--route-null",
+            "--expected-record-count", "1",
         ])
+
+
+@pytest.mark.parametrize("protected_name", [
+    "store", "history", "registry", "results", "lock", "policy",
+])
+def test_runtime_cli_rejects_protected_governance_output_directories(
+        monkeypatch, tmp_path, protected_name):
+    store = tmp_path / "canonical" / "backtest"
+    output = tmp_path / "evidence" / protected_name / "run"
+    monkeypatch.setattr(governance, "build_identity", lambda: CURRENT)
+
+    with pytest.raises(SystemExit, match="protected governance directory"):
+        governance.main([
+            "--store", str(store), "--output-dir", str(output),
+            "--model-version", "m4", "--probability-signature", OLD_SIG,
+            "--route-null", "--expected-record-count", "1",
+        ])
+
+
+def test_runtime_cli_route_null_selects_exactly_one_expected_group(monkeypatch, tmp_path):
+    store = tmp_path / "canonical" / "backtest"
+    evidence = tmp_path / "review-evidence"
+    null_route_rows = [record(f"null-{index}") for index in range(14)]
+    for row in null_route_rows:
+        row.pop("mode")
+        row["input"].pop("mode")
+    unrelated = record("other", route="market_only")
+    monkeypatch.setattr(governance, "load_registered_records", lambda root: (
+        null_route_rows + [unrelated] if root == store.resolve() else pytest.fail("wrong store")
+    ))
+    monkeypatch.setattr(governance, "build_identity", lambda: CURRENT)
+    monkeypatch.setattr(governance, "replay_one", lambda row: identical_result(row))
+
+    assert governance.main([
+        "--store", str(store), "--output-dir", str(evidence),
+        "--model-version", "m4", "--probability-signature", OLD_SIG,
+        "--route-null", "--expected-record-count", "14",
+    ]) == 0
+
+    reports = list(evidence.glob("signature-drift-*.json"))
+    assert len(reports) == 1
+    payload = json.loads(reports[0].read_text(encoding="utf-8"))
+    assert payload["route"] is None
+    assert payload["record_count"] == 14
+
+
+@pytest.mark.parametrize("rows,expected_count", [([], 14), ([record("one")], 14)])
+def test_runtime_cli_zero_match_or_count_mismatch_fails_without_success_report(
+        monkeypatch, tmp_path, rows, expected_count):
+    store = tmp_path / "canonical" / "backtest"
+    evidence = tmp_path / "review-evidence"
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: rows)
+    monkeypatch.setattr(governance, "build_identity", lambda: CURRENT)
+
+    assert governance.main([
+        "--store", str(store), "--output-dir", str(evidence),
+        "--model-version", "m4", "--probability-signature", OLD_SIG,
+        "--route", "market_only", "--expected-record-count", str(expected_count),
+    ]) == 1
+    assert not evidence.exists()
+
+
+def test_strict_replay_rejects_multiple_groups_before_writing(monkeypatch, tmp_path):
+    evidence = tmp_path / "review-evidence"
+    rows = [record("market", route="market_only"), record("hybrid", route="hybrid")]
+    monkeypatch.setattr(governance, "load_registered_records", lambda _root: rows)
+
+    with pytest.raises(governance.ReplaySelectionError, match="exactly one group"):
+        governance.build_drift_attestations(
+            tmp_path / "store", CURRENT, output_dir=evidence,
+            model_version="m4", probability_signature=OLD_SIG,
+            expected_record_count=2, require_exactly_one_group=True,
+        )
+
+    assert not evidence.exists()
+
+
+def test_runtime_cli_rejects_incomplete_signature_and_requires_route_and_count(tmp_path):
+    common = [
+        "--store", str(tmp_path / "store"), "--output-dir", str(tmp_path / "evidence"),
+        "--model-version", "m4", "--probability-signature", "short",
+    ]
+    with pytest.raises(SystemExit) as missing_selector:
+        governance.main(common)
+    assert missing_selector.value.code == 2
+
+    with pytest.raises(SystemExit, match="complete 64-hex"):
+        governance.main(common + ["--route-null", "--expected-record-count", "14"])

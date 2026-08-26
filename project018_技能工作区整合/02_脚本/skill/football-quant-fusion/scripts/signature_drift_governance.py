@@ -12,12 +12,22 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+import re
+import sys
 
 from fusion_backtest import load_jsonl, resolve_path
 from fusion_predict_core import build_identity
 from probability_replay_check import (COMPARE_FIELDS, FLOAT_TOLERANCE,
                                       canonical_json, is_complete_signature,
                                       registered_route, replay_one)
+
+
+_ROUTE_UNSET = object()
+_PROTECTED_OUTPUT_TOKENS = {"store", "history", "registry", "results", "lock", "policy"}
+
+
+class ReplaySelectionError(RuntimeError):
+    """The strict replay selector did not resolve one complete expected group."""
 
 
 def _identity(record: dict[str, Any]) -> tuple[str, Any]:
@@ -182,6 +192,9 @@ def build_drift_attestations(
     model_version: str | None = None,
     probability_signature: str | None = None,
     route: str | None = None,
+    route_filter: object = _ROUTE_UNSET,
+    expected_record_count: int | None = None,
+    require_exactly_one_group: bool = False,
 ) -> list[dict]:
     """Read registered snapshots and write only caller-selected evidence files."""
     reports = []
@@ -192,10 +205,22 @@ def build_drift_attestations(
     if probability_signature is not None:
         records = [record for record in records
                    if _identity(record)[1] == probability_signature]
-    if route is not None:
+    # ``route`` is retained for function-level compatibility.  Strict callers
+    # use ``route_filter`` so that an explicit JSON null route is distinguishable
+    # from no route filter at all.
+    if route_filter is not _ROUTE_UNSET:
+        records = [record for record in records if registered_route(record) == route_filter]
+    elif route is not None:
         records = [record for record in records if registered_route(record) == route]
-    for key, records in sorted(group_records(records).items()):
-        report = evaluate_group(records, current_identity=current_identity)
+    groups = group_records(records)
+    if expected_record_count is not None and len(records) != expected_record_count:
+        raise ReplaySelectionError(
+            f"selected record count {len(records)} != expected {expected_record_count}"
+        )
+    if require_exactly_one_group and len(groups) != 1:
+        raise ReplaySelectionError(f"strict replay requires exactly one group; selected {len(groups)}")
+    for key, group_rows in sorted(groups.items()):
+        report = evaluate_group(group_rows, current_identity=current_identity)
         report_hash_input = {key: value for key, value in report.items() if key not in {
             "generated_at", "report_sha256", "report_hash_input", "attestation_path",
         }}
@@ -221,26 +246,50 @@ def _is_within(path: Path, parent: Path) -> bool:
     return True
 
 
+def _contains_protected_output_directory(path: Path) -> bool:
+    for part in path.parts:
+        tokens = {token for token in re.split(r"[^a-z0-9]+", part.casefold()) if token}
+        if tokens & _PROTECTED_OUTPUT_TOKENS:
+            return True
+    return False
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="按注册身份生成只读签名漂移重放证明")
     parser.add_argument("--store", required=True, help="只读正式 backtest 目录")
     parser.add_argument("--output-dir", required=True, help="正式库之外的治理证据目录")
-    parser.add_argument("--model-version")
-    parser.add_argument("--probability-signature")
-    parser.add_argument("--route")
+    parser.add_argument("--model-version", required=True)
+    parser.add_argument("--probability-signature", required=True)
+    route_group = parser.add_mutually_exclusive_group(required=True)
+    route_group.add_argument("--route")
+    route_group.add_argument("--route-null", action="store_true")
+    parser.add_argument("--expected-record-count", required=True, type=int)
     args = parser.parse_args(argv)
+    if not is_complete_signature(args.probability_signature):
+        raise SystemExit("probability-signature must be a complete 64-hex SHA256")
+    if args.expected_record_count < 1:
+        raise SystemExit("expected-record-count must be positive")
     store = Path(args.store).resolve()
     output_dir = Path(args.output_dir).resolve()
     if output_dir == store or _is_within(output_dir, store):
         raise SystemExit("output-dir must be outside the read-only store")
-    reports = build_drift_attestations(
-        store,
-        build_identity(),
-        output_dir=output_dir,
-        model_version=args.model_version,
-        probability_signature=args.probability_signature,
-        route=args.route,
-    )
+    if _contains_protected_output_directory(output_dir):
+        raise SystemExit("output-dir must not use a protected governance directory")
+    try:
+        reports = build_drift_attestations(
+            store,
+            build_identity(),
+            output_dir=output_dir,
+            model_version=args.model_version,
+            probability_signature=args.probability_signature,
+            route_filter=None if args.route_null else args.route,
+            expected_record_count=args.expected_record_count,
+            require_exactly_one_group=True,
+        )
+    except ReplaySelectionError as exc:
+        print(json.dumps({"status": "REJECTED", "reason": str(exc)},
+                         ensure_ascii=False, indent=2), file=sys.stderr)
+        return 1
     print(json.dumps({
         "store": str(store),
         "output_dir": str(output_dir),

@@ -1,0 +1,278 @@
+{
+  "all_exit_codes_expected": true,
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\release_lock.py",
+        "--check"
+      ],
+      "command_sha256": "f359ca6a5e941f171b1798d11f384e94711f8a37edacad8c2a6d455fdc22956c",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:54:29.776853+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "release-lock-precheck",
+      "started_at": "2026-08-26T04:54:29.672650+00:00",
+      "stderr_path": "raw\\01_release-lock-precheck.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\01_release-lock-precheck.stdout.txt",
+      "stdout_sha256": "a760f070e0b4ea319ec2e9ffc1ecb38807a84d3043ac02cb206391d9e17ce4ca"
+    },
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\fusion_cli.py",
+        "signature-replay",
+        "--store",
+        "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+        "--output-dir",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\proofs",
+        "--model-version",
+        "m4",
+        "--probability-signature",
+        "42d3ccacb1d9b2b0d19879222f739f9f0e429f3229e903e1ec759cd91637186e",
+        "--route-null",
+        "--expected-record-count",
+        "14"
+      ],
+      "command_sha256": "f8c50108c630a581a8538d47f8df26b88e901b6ebeea55bac11b03d6aff05c07",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:54:31.250087+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "strict-signature-replay",
+      "started_at": "2026-08-26T04:54:29.778062+00:00",
+      "stderr_path": "raw\\02_strict-signature-replay.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\02_strict-signature-replay.stdout.txt",
+      "stdout_sha256": "cdcdfab0923c34c25b33dc166ff24ef678c447d71d10f30721da46932c393c57"
+    },
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\fusion_cli.py",
+        "signature-alias-approve",
+        "--attestation",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\proofs\\signature-drift-9286a130f059e9aabf4e8e75c2ffd8e7dc728b78ea0084a1349988f224525136.json"
+      ],
+      "command_sha256": "aad8e166d799bc417b62b944ae2c1918058615cc7717284e248458e2798d9ac0",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:54:31.398144+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 1,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        1
+      ],
+      "name": "alias-approval-rejection",
+      "started_at": "2026-08-26T04:54:31.251881+00:00",
+      "stderr_path": "raw\\03_alias-approval-rejection.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\03_alias-approval-rejection.stdout.txt",
+      "stdout_sha256": "c1a609bd4f0c77267bede996db73650ec208128c95f2d8c16fe62bbc40786bbf"
+    },
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\fusion_cli.py",
+        "version-progress",
+        "--store",
+        "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+        "--attestation-root",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\proofs",
+        "--json",
+        "--output",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\version_progress_after.json"
+      ],
+      "command_sha256": "5552f601f0f3d70d70201b9396c79e786c0bb29ffe77117f9a715f3ee586958c",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:54:32.728601+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "version-progress",
+      "started_at": "2026-08-26T04:54:31.399153+00:00",
+      "stderr_path": "raw\\04_version-progress.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\04_version-progress.stdout.txt",
+      "stdout_sha256": "fe87c8d4da7a7b752955b8ce4ef3f97482cc07b0993ef1ff478b3817b68e8015"
+    },
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\fusion_cli.py",
+        "backtest",
+        "--store",
+        "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+        "--snapshot-policy",
+        "latest_before_kickoff",
+        "--output",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\backtest_after.json"
+      ],
+      "command_sha256": "9d97d82d2ee1905d8bccb8a3f881d01c69718da7606fd18b11e113fce3925585",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:54:35.982004+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "backtest",
+      "started_at": "2026-08-26T04:54:32.729691+00:00",
+      "stderr_path": "raw\\05_backtest.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\05_backtest.stdout.txt",
+      "stdout_sha256": "85f851683d9293447e09cc3b26878d7383d57b42a5994e0b00e5eb479bced556"
+    },
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\fusion_cli.py",
+        "direction-governance-report",
+        "--store",
+        "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion\\backtest",
+        "--attestation-root",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\proofs"
+      ],
+      "command_sha256": "2f428adeddd4ecc768d4c3b23caf6bd6059f4659f61fbf9f236ca0966a8b44b2",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:54:38.452074+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "direction-governance-report",
+      "started_at": "2026-08-26T04:54:35.983077+00:00",
+      "stderr_path": "raw\\06_direction-governance-report.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\06_direction-governance-report.stdout.txt",
+      "stdout_sha256": "bb68f4a44595294b5379a2a29af55ad3d4f4a988cccfe0c4b3f2da6e83b947ee"
+    },
+    {
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\tests",
+        "-q",
+        "--junitxml=F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\full-suite.junit.xml"
+      ],
+      "command_sha256": "293533e6542ac1c08f4c66338fafd7dcaf544d7c8145cd6ca6e0783b9a054786",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:55:06.317727+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "full-suite",
+      "started_at": "2026-08-26T04:54:38.453061+00:00",
+      "stderr_path": "raw\\07_full-suite.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\07_full-suite.stdout.txt",
+      "stdout_sha256": "936e58a698aeb59c64174137aab2bf54682d7dfdf1df9665f58f5f04c3aa6810"
+    },
+    {
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\tests\\test_p0_evaluation.py",
+        "-q",
+        "--junitxml=F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\06_复盘\\2026-08-26_签名漂移治理\\runs\\20260826T045241Z-fix1\\p0-independent.junit.xml"
+      ],
+      "command_sha256": "e186989af0d3241cc12c5842b0273068719795615aa78a68f6deefb46fedd9b4",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:55:09.912077+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "p0-independent-process",
+      "started_at": "2026-08-26T04:55:06.318780+00:00",
+      "stderr_path": "raw\\08_p0-independent-process.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\08_p0-independent-process.stdout.txt",
+      "stdout_sha256": "b2a6bf431532eeda513676e4da6678659c947c6a40a58ccfdf84997074855544"
+    },
+    {
+      "argv": [
+        "python",
+        "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\skill\\football-quant-fusion\\scripts\\release_lock.py",
+        "--check"
+      ],
+      "command_sha256": "013c41f0d7e80c49d2b782adf7f80fb3b2a12d78d3396192a19fe50406031da5",
+      "cwd": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance",
+      "ended_at": "2026-08-26T04:55:10.012625+00:00",
+      "env": {
+        "FUSION_CORE_DIR": "F:\\HM足球比赛预测\\.worktrees\\signature-direction-governance\\project018_技能工作区整合\\02_脚本\\core\\zu-yu-dashi-3\\scripts",
+        "FUSION_DATA_ROOT": "F:\\HM足球比赛预测\\project018_技能工作区整合\\04_素材\\shared-data\\football-quant-fusion",
+        "PYTHONUTF8": "1"
+      },
+      "exit_code": 0,
+      "exit_code_expected": true,
+      "expected_exit_codes": [
+        0
+      ],
+      "name": "release-lock-postcheck",
+      "started_at": "2026-08-26T04:55:09.914046+00:00",
+      "stderr_path": "raw\\09_release-lock-postcheck.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "raw\\09_release-lock-postcheck.stdout.txt",
+      "stdout_sha256": "a760f070e0b4ea319ec2e9ffc1ecb38807a84d3043ac02cb206391d9e17ce4ca"
+    }
+  ],
+  "generated_at": "2026-08-26T04:55:10.013243+00:00",
+  "run_id": "20260826T045241Z-fix1",
+  "schema_version": "task7-command-manifest-1.0"
+}
