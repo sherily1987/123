@@ -283,6 +283,15 @@ def test_current_output_missing_policy_is_unavailable_not_legacy(tmp_path, predi
             datetime.fromisoformat(inp["prediction_as_of"]) + timedelta(seconds=1)
         ).isoformat()), "prediction_as_of_mismatch"),
         (lambda policy, out, inp: policy.update(schema_version="direction-policy-0.0"), "schema_version_mismatch"),
+        (lambda policy, out, inp: policy.update(
+            activation_timestamp="2026-08-26T11:16:28+08:00"
+        ), "activation_timestamp_mismatch"),
+        (lambda policy, out, inp: policy.update(
+            activation_timestamp="2026-08-26T11:16:27"
+        ), "activation_timestamp_mismatch"),
+        (lambda policy, out, inp: policy.update(
+            activation_timestamp=20260826111627
+        ), "activation_timestamp_mismatch"),
         (lambda policy, out, inp: policy.update(unregistered_extension=True), "schema_fields_mismatch"),
         (lambda policy, out, inp: policy.update(non_finite_extension=float("nan")), "schema_fields_mismatch"),
         (lambda policy, out, inp: policy.update(rule_version="direction-policy-v0"), "rule_version_mismatch"),
@@ -314,6 +323,11 @@ def test_invalid_policy_records_probability_snapshot_as_unavailable(
     assert unavailable["alternative_direction"] is None
     assert unavailable["reason"] == "validation_error"
     assert unavailable["validation_error"] == expected_error
+    for persisted_policy in _direction_policies(recorded):
+        assert persisted_policy["status"] == "UNAVAILABLE"
+        assert persisted_policy["primary_direction"] is None
+        assert persisted_policy["alternative_direction"] is None
+        assert persisted_policy["validation_error"] == expected_error
 
 
 def test_invalid_policy_is_sanitized_from_every_persisted_nested_copy(tmp_path):

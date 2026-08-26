@@ -154,6 +154,8 @@ def _direction_validation_error(candidate, expected, *, probabilities,
         return 'rule_version_mismatch'
     if candidate.get('policy_version') != expected.get('policy_version'):
         return 'policy_version_mismatch'
+    if candidate.get('activation_timestamp') != expected.get('activation_timestamp'):
+        return 'activation_timestamp_mismatch'
     signature = candidate.get('decision_policy_signature')
     if (not is_complete_sha256(signature)
             or signature != expected.get('decision_policy_signature')):
