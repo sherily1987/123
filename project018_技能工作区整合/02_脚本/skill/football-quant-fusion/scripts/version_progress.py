@@ -42,6 +42,19 @@ def settled_status(root: Path) -> dict:
     return status
 
 
+def registered_route(record: dict) -> str | None:
+    """Read the immutable registered route; never derive it from current code."""
+    values = []
+    for container in (record, record.get("model") or {}, record.get("input") or {}):
+        if isinstance(container, dict):
+            value = container.get("route") or container.get("mode")
+            if value not in (None, ""):
+                values.append(str(value).strip())
+    if not values or not values[0] or any(value != values[0] for value in values):
+        return None
+    return values[0]
+
+
 def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
     """读取全部登记预测（含未结算），返回 (rows, 读取失败数)。"""
     rows = []
@@ -66,6 +79,7 @@ def load_prediction_rows(root: Path) -> tuple[list[dict], int]:
             "kickoff": rec.get("kickoff") or "",
             "model_version": str(model.get("model_version") or "unattributable"),
             "probability_signature": str(model.get("probability_signature") or ""),
+            "route": registered_route(rec),
         })
     return rows, unreadable
 
@@ -100,6 +114,7 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
 
     by_version: dict[str, dict] = {}
     signature_drift = []
+    signature_drift_groups: dict[tuple[str, str, str], int] = {}
     current_settled = 0
     current_pending = 0
     for row in primary:
@@ -129,6 +144,8 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
                 "match_id": row["match_id"],
                 "signature": row["probability_signature"][:12] or "(none)",
             })
+            key = (row["model_version"], row["probability_signature"], row["route"] or "")
+            signature_drift_groups[key] = signature_drift_groups.get(key, 0) + 1
 
     settled = current_settled
     pending = current_pending
@@ -161,6 +178,11 @@ def build_report(root: Path, snapshot_policy: str = "latest_before_kickoff") -> 
         },
         "by_model_version": {k: v for k, v in sorted(by_version.items())},
         "signature_drift": signature_drift,
+        "signature_drift_groups": [
+            {"model_version": model_version, "probability_signature": signature,
+             "route": route or None, "record_count": record_count, "status": "UNREPLAYED"}
+            for (model_version, signature, route), record_count in sorted(signature_drift_groups.items())
+        ],
         "superseded_snapshot_count": max(0, len(rows) - len(primary)),
         "reissued_current_snapshot_count": reissued_current_snapshot_count,
         "unreadable_records": unreadable,

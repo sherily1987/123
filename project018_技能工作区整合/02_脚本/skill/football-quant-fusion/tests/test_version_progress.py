@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-SKILL_ROOT = Path(r"C:\Users\Administrator\.codex\skills\football-quant-fusion")
+SKILL_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = SKILL_ROOT / "scripts"
 CORE = Path(r"C:\Users\Administrator\.codex\skills\football-quant-fusion-suite\skills\zu-yu-dashi-3\scripts")
 sys.path.insert(0, str(SCRIPTS))
@@ -40,13 +40,14 @@ def build_store(root: Path, predictions, results):
 
 
 def prediction(match_id, created_at, model_version, signature, snapshot="prematch",
-               prediction_as_of=None):
+               prediction_as_of=None, route="market_only"):
     row = {
         "prediction_id": f"{match_id}__{created_at}__{snapshot}",
         "match_id": match_id,
         "snapshot_type": snapshot,
         "created_at": created_at,
         "model": {"model_version": model_version, "probability_signature": signature},
+        "input": {"mode": route},
     }
     if prediction_as_of is not None:
         row["prediction_as_of"] = prediction_as_of
@@ -105,6 +106,25 @@ class VersionProgressTests(unittest.TestCase):
             [{"match_id": "m-1"}, {"match_id": "m-2"}])
         self.assertEqual(len(report["signature_drift"]), 1)
         self.assertEqual(report["signature_drift"][0]["match_id"], "m-2")
+
+    def test_unapproved_drift_is_grouped_by_complete_signature_and_registered_route(self):
+        """An attestation candidate remains isolated until a later approval task loads an alias."""
+        report = self._report(
+            [prediction("m-current", "2026-08-10T00:00:00Z", "m2", CURRENT_SIG),
+             prediction("m-market", "2026-08-10T00:00:00Z", "m2", OTHER_SIG,
+                        route="market_only"),
+             prediction("m-hybrid", "2026-08-10T00:00:00Z", "m2", OTHER_SIG,
+                        route="hybrid")],
+            [{"match_id": "m-current"}, {"match_id": "m-market"}, {"match_id": "m-hybrid"}],
+        )
+
+        self.assertEqual(report["current"]["settled"], 1)
+        self.assertEqual(report["signature_drift_groups"], [
+            {"model_version": "m2", "probability_signature": OTHER_SIG,
+             "route": "hybrid", "record_count": 1, "status": "UNREPLAYED"},
+            {"model_version": "m2", "probability_signature": OTHER_SIG,
+             "route": "market_only", "record_count": 1, "status": "UNREPLAYED"},
+        ])
 
     def test_only_one_snapshot_per_match_is_counted(self):
         report = self._report(

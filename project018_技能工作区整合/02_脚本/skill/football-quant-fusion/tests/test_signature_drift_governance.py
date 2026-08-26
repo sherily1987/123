@@ -14,6 +14,7 @@ if str(SCRIPTS) not in sys.path:
 
 import probability_replay_check as replay_check
 import signature_drift_governance as governance
+import release_governance
 
 
 OLD_SIG = "b" * 64
@@ -27,6 +28,7 @@ def record(match_id: str, *, route: str = "market_only", input_ok: bool = True) 
         "match_id": match_id,
         "home": "Home",
         "away": "Away",
+        "competition": "League",
         "kickoff": "2026-09-01T12:00:00Z",
         "prediction_as_of": "2026-09-01T10:00:00Z",
         "mode": route,
@@ -38,6 +40,8 @@ def record(match_id: str, *, route: str = "market_only", input_ok: bool = True) 
         "mode": route,
         "input": payload,
         "output": {},
+        "match": {"home": "Home", "away": "Away", "competition": "League",
+                  "kickoff": "2026-09-01T12:00:00Z"},
         "model": {"model_version": "m4", "probability_signature": OLD_SIG},
     }
 
@@ -74,6 +78,20 @@ def test_route_is_part_of_group_identity():
         ("m4", OLD_SIG, "market_only"),
         ("m4", OLD_SIG, "hybrid"),
     }
+
+
+@pytest.mark.parametrize("signature", ["", "b" * 12, "z" * 64])
+def test_invalid_or_truncated_signature_makes_the_whole_group_unreplayable(monkeypatch, signature):
+    rows = [record("m-1"), record("m-2")]
+    for row in rows:
+        row["model"]["probability_signature"] = signature
+    monkeypatch.setattr(governance, "replay_one", lambda row: identical_result(row))
+
+    report = governance.evaluate_group(rows, current_identity=CURRENT)
+
+    assert report["status"] == "UNREPLAYABLE"
+    assert {item["status"] for item in report["results"]} == {"UNREPLAYABLE"}
+    assert report["alias_eligible"] is False
 
 
 def test_equivalent_group_stays_pending_review_and_never_alias_eligible(monkeypatch):
@@ -165,6 +183,65 @@ def test_replay_rejects_registered_team_identity_that_disagrees_with_input(monke
 
     assert result["status"] == "UNREPLAYABLE"
     assert result["time_audit"]["reason"] == "home_team_mismatch"
+
+
+@pytest.mark.parametrize(
+    ("field", "input_value"),
+    [
+        ("match_id", None),
+        ("home", None),
+        ("away", None),
+        ("competition", None),
+        ("kickoff", None),
+        ("prediction_as_of", "2026-09-01T10:00:00"),
+    ],
+)
+def test_replay_requires_complete_timezone_aware_registered_and_input_identity(
+        monkeypatch, field, input_value):
+    row = record("m-1")
+    if field == "prediction_as_of":
+        row["input"][field] = input_value
+    else:
+        row["input"].pop(field, None) if input_value is None else row["input"].__setitem__(field, input_value)
+    monkeypatch.setattr(replay_check, "_run_replay", lambda _payload: pytest.fail("must not replay"))
+
+    result = replay_check.replay_one(row)
+
+    assert result["status"] == "UNREPLAYABLE"
+    assert result["time_audit"]["usable"] is False
+
+
+def test_replay_requires_registered_prediction_time_to_equal_stored_input(monkeypatch):
+    row = record("m-1")
+    row["input"]["prediction_as_of"] = "2026-09-01T09:59:00Z"
+    monkeypatch.setattr(replay_check, "_run_replay", lambda _payload: pytest.fail("must not replay"))
+
+    result = replay_check.replay_one(row)
+
+    assert result["status"] == "UNREPLAYABLE"
+    assert result["time_audit"]["reason"] == "prediction_as_of_mismatch"
+
+
+def test_legacy_build_report_still_validates_as_a_complete_equivalent_attestation(monkeypatch, tmp_path):
+    row = record("m-1")
+    prediction_path = tmp_path / "prediction.json"
+    prediction_path.write_text(json.dumps(row), encoding="utf-8")
+    (tmp_path / "registry.jsonl").write_text(json.dumps({"path": str(prediction_path)}) + "\n",
+                                                encoding="utf-8")
+    monkeypatch.setattr(replay_check, "build_identity", lambda: CURRENT)
+    monkeypatch.setattr(replay_check, "replay_one", lambda item: identical_result(item))
+
+    report = replay_check.build_report(tmp_path, "m4")
+    validated = release_governance.validate_replay_attestation(
+        report,
+        previous_lock={"model_version": "m4", "probability_signature": OLD_SIG},
+        current_identity=CURRENT,
+    )
+
+    assert report["verdict"] == "equivalent"
+    assert report["replayed_probability_signatures"] == [OLD_SIG]
+    assert report["replayed_modes"] == ["market_only"]
+    assert validated["replay_verdict"] == "equivalent"
 
 
 def test_attestation_write_is_read_only_and_hashes_its_canonical_content(monkeypatch, tmp_path):

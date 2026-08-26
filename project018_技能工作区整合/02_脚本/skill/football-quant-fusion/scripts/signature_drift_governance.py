@@ -17,6 +17,11 @@ from probability_replay_check import (COMPARE_FIELDS, FLOAT_TOLERANCE,
                                       canonical_json, registered_route, replay_one)
 
 
+def _is_complete_signature(value: Any) -> bool:
+    text = str(value or "")
+    return len(text) == 64 and all(char in "0123456789abcdef" for char in text.lower())
+
+
 def _identity(record: dict[str, Any]) -> tuple[str, str]:
     model = record.get("model") or {}
     return (str(model.get("model_version") or ""),
@@ -52,10 +57,30 @@ def evaluate_group(records: list[dict], *, current_identity: dict) -> dict:
     model_version, signature = _identity(records[0])
     route = registered_route(records[0]) or ""
     expected_key = (model_version, signature, route)
+    current_signature = str(current_identity.get("probability_signature") or "")
+    current_identity_valid = bool(str(current_identity.get("model_version") or "")) and \
+        _is_complete_signature(current_signature)
     results = []
     for record in records:
         actual_key = (*_identity(record), registered_route(record) or "")
-        if actual_key != expected_key:
+        record_signature_valid = _is_complete_signature(actual_key[1])
+        if not record_signature_valid:
+            result = {
+                "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
+                "route": actual_key[2] or None,
+                "prediction_as_of": record.get("prediction_as_of"), "input_sha256": None,
+                "diffs": {},
+                "time_audit": {"usable": False, "reason": "probability_signature_invalid"},
+            }
+        elif not current_identity_valid:
+            result = {
+                "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
+                "route": actual_key[2] or None,
+                "prediction_as_of": record.get("prediction_as_of"), "input_sha256": None,
+                "diffs": {},
+                "time_audit": {"usable": False, "reason": "current_identity_invalid"},
+            }
+        elif actual_key != expected_key:
             result = {
                 "match_id": record.get("match_id"), "status": "UNREPLAYABLE",
                 "route": actual_key[2] or None,

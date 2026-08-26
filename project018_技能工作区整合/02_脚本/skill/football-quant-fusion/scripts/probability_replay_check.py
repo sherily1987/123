@@ -64,13 +64,6 @@ def registered_route(record: dict[str, Any]) -> str | None:
     return candidates[0] if all(value == candidates[0] for value in candidates) else None
 
 
-def _recorded_kickoff(record: dict[str, Any], payload: dict[str, Any]) -> Any:
-    match = record.get("match") if isinstance(record.get("match"), dict) else {}
-    payload_match = payload.get("match") if isinstance(payload.get("match"), dict) else {}
-    return (record.get("kickoff") or match.get("kickoff") or payload.get("kickoff")
-            or payload.get("kickoff_at") or payload_match.get("kickoff"))
-
-
 def _identity_value(container: dict[str, Any], field: str) -> Any:
     match = container.get("match") if isinstance(container.get("match"), dict) else {}
     aliases = {
@@ -84,6 +77,30 @@ def _identity_value(container: dict[str, Any], field: str) -> Any:
         if match.get(key) not in (None, ""):
             return match[key]
     return None
+
+
+def _record_identity(record: dict[str, Any]) -> dict[str, Any]:
+    match = record.get("match") if isinstance(record.get("match"), dict) else {}
+    return {
+        "match_id": record.get("match_id"),
+        "home": _identity_value(record, "home"),
+        "away": _identity_value(record, "away"),
+        "competition": _identity_value(record, "competition"),
+        "kickoff": record.get("kickoff") or match.get("kickoff"),
+        "prediction_as_of": record.get("prediction_as_of"),
+    }
+
+
+def _input_identity(payload: dict[str, Any]) -> dict[str, Any]:
+    match = payload.get("match") if isinstance(payload.get("match"), dict) else {}
+    return {
+        "match_id": payload.get("match_id"),
+        "home": _identity_value(payload, "home"),
+        "away": _identity_value(payload, "away"),
+        "competition": _identity_value(payload, "competition"),
+        "kickoff": payload.get("kickoff") or payload.get("kickoff_at") or match.get("kickoff"),
+        "prediction_as_of": payload.get("prediction_as_of"),
+    }
 
 
 _EVIDENCE_TIME_KEYS = frozenset({
@@ -110,34 +127,31 @@ def _late_evidence_time(value: Any, prediction_as_of: datetime | None) -> bool:
 
 
 def _time_audit(record: dict[str, Any], payload: dict[str, Any], route: str | None) -> dict:
-    prediction_as_of = record.get("prediction_as_of") or payload.get("prediction_as_of")
-    as_of = _parse_time(prediction_as_of)
-    kickoff = _parse_time(_recorded_kickoff(record, payload))
     if not route:
         return {"usable": False, "reason": "registered_route_missing_or_inconsistent"}
-    if as_of is None:
-        return {"usable": False, "reason": "prediction_as_of_missing_or_not_timezone_aware"}
-    if kickoff is None:
-        return {"usable": False, "reason": "kickoff_missing_or_not_timezone_aware"}
-    if as_of >= kickoff:
-        return {"usable": False, "reason": "prediction_as_of_not_before_kickoff"}
-    registered_id = record.get("match_id")
-    payload_id = payload.get("match_id")
-    if registered_id and payload_id and str(registered_id) != str(payload_id):
-        return {"usable": False, "reason": "match_id_mismatch"}
-    if not registered_id or not payload_id:
-        return {"usable": False, "reason": "match_id_missing"}
-    for field, reason in (("home", "home_team_mismatch"), ("away", "away_team_mismatch"),
-                          ("competition", "competition_mismatch")):
-        registered_value = _identity_value(record, field)
-        input_value = _identity_value(payload, field)
-        if (registered_value not in (None, "") and input_value not in (None, "")
-                and str(registered_value) != str(input_value)):
+    registered, stored = _record_identity(record), _input_identity(payload)
+    for field in ("match_id", "home", "away", "competition"):
+        if registered[field] in (None, "") or stored[field] in (None, ""):
+            return {"usable": False, "reason": f"{field}_missing"}
+        if str(registered[field]) != str(stored[field]):
+            reason = {"home": "home_team_mismatch", "away": "away_team_mismatch"}.get(
+                field, f"{field}_mismatch")
             return {"usable": False, "reason": reason}
-    input_kickoff = _parse_time(_recorded_kickoff({}, payload))
-    if input_kickoff is not None and input_kickoff != kickoff:
+    registered_kickoff, stored_kickoff = (_parse_time(registered["kickoff"]),
+                                          _parse_time(stored["kickoff"]))
+    if registered_kickoff is None or stored_kickoff is None:
+        return {"usable": False, "reason": "kickoff_missing_or_not_timezone_aware"}
+    if registered_kickoff != stored_kickoff:
         return {"usable": False, "reason": "kickoff_mismatch"}
-    if _late_evidence_time(payload, as_of):
+    registered_as_of, stored_as_of = (_parse_time(registered["prediction_as_of"]),
+                                      _parse_time(stored["prediction_as_of"]))
+    if registered_as_of is None or stored_as_of is None:
+        return {"usable": False, "reason": "prediction_as_of_missing_or_not_timezone_aware"}
+    if registered_as_of != stored_as_of:
+        return {"usable": False, "reason": "prediction_as_of_mismatch"}
+    if registered_as_of >= registered_kickoff:
+        return {"usable": False, "reason": "prediction_as_of_not_before_kickoff"}
+    if _late_evidence_time(payload, registered_as_of):
         return {"usable": False, "reason": "evidence_after_prediction_as_of"}
     return {"usable": True, "reason": None}
 
@@ -195,8 +209,7 @@ def replay_one(record: dict[str, Any]) -> dict:
     match_id = record.get("match_id")
     payload = record.get("input")
     route = registered_route(record)
-    prediction_as_of = record.get("prediction_as_of") or (
-        payload.get("prediction_as_of") if isinstance(payload, dict) else None)
+    prediction_as_of = record.get("prediction_as_of")
     if not isinstance(payload, dict):
         return {"match_id": match_id, "status": "UNREPLAYABLE", "route": route,
                 "prediction_as_of": prediction_as_of, "input_sha256": None, "diffs": {},
@@ -247,11 +260,20 @@ def build_report(root: Path, model_version: str, limit: int = 0) -> dict:
     for item in results:
         counts[item["status"]] = counts.get(item["status"], 0) + 1
     current_identity = build_identity()
+    replayed_signatures = sorted({str((record.get("model") or {}).get("probability_signature") or "")
+                                  for record in records
+                                  if (record.get("model") or {}).get("probability_signature")})
+    replayed_modes = sorted({str(item.get("route")) for item in results if item.get("route")})
+    verdict = ("equivalent" if results and all(item.get("status") == "identical" for item in results)
+               else "changed" if any(item.get("status") == "differs" for item in results)
+               else "inconclusive")
     return {"schema_version": "fusion-probability-replay-2.0",
             "replayed_model_version": model_version,
             "current_identity": {key: str(current_identity.get(key) or "")
                                  for key in ("model_version", "probability_signature")},
             "compare_fields": list(COMPARE_FIELDS), "float_tolerance": FLOAT_TOLERANCE,
+            "replayed_probability_signatures": replayed_signatures,
+            "replayed_modes": replayed_modes, "verdict": verdict,
             "replayed_n": len(results), "counts": counts, "results": results,
             "note": "Evidence only; this script never creates or loads aliases."}
 
